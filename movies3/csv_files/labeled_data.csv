@@ -1,0 +1,405 @@
+#key=_id
+#ltable=POINTER
+#rtable=POINTER
+#foreign_key_ltable=ltable.ID
+#foreign_key_rtable=rtable.ID
+_id,ltable.ID,rtable.ID,ltable.Director,ltable.Title,ltable.Year,rtable.Director,rtable.Title,rtable.Year,gold
+0,3,1105,Phil Lord,21 Jump Street,3/16/2012,Jon Gunn,Mercy Streets,10/31/2000,0
+1,22,24,Nicholas Jarecki,Arbitrage,9/14/2012,Nicholas Jarecki,Arbitrage,9/14/2012,1
+2,66,67,Justin Chambers,Broken Roads,11/8/2012,Justin Chambers,Broken Roads,12/14/2012,1
+3,73,73,Katherine Fairfax Wright,Call Me Kuchu,6/14/2013,Katherine Fairfax Wright,Call Me Kuchu,6/14/2013,1
+4,78,78,Ken Burns,The Central Park Five,11/23/2012,Ken Burns,The Central Park Five,11/23/2012,1
+5,99,1728,Steve Rash,Crooked Arrows,5/18/2012,Steve Carr,Rebound,7/1/2005,0
+6,117,2424,Larry Charles,The Dictator,5/16/2012,Barry Battles,The Baytown Outlaws,1/11/2013,0
+7,121,119,Attila Luca,Dracula Reborn,5/18/2015,Attila Luca,Dracula Reborn,,1
+8,122,120,John Hyams,Dragon Eyes,10/9/2014,John Hyams (II),Dragon Eyes,5/11/2012,1
+9,140,2635,Edward Burns,The Fitzgerald Family Christmas,12/7/2012,,Plus One - The Home Video,,0
+10,167,165,Gary Ross,The Hunger Games,3/23/2012,Gary Ross,The Hunger Games,3/23/2012,1
+11,186,184,Julia Loktev,The Loneliest Planet,1/3/2013,Julia Loktev,The Loneliest Planet,10/26/2012,1
+12,195,36,RZA,The Man with the Iron Fists,11/2/2012,,Barbie In A Mermaid Tale 2,2/4/2012,0
+13,208,203,Lee Daniels,The Paperboy,10/17/2012,Lee Daniels,The Paperboy,10/5/2012,1
+14,212,228,Jonathan Demme,Philadelphia,1/14/1994,Jonathan Dayton,Ruby Sparks,7/25/2012,0
+15,219,213,Nima Nourizadeh,Project X,3/2/2012,Jonathan Kaplan,Project X,3/2/2012,1
+16,232,2635,Boaz Yakin,Safe,4/27/2012,,Plus One - The Home Video,,0
+17,237,145,Lorene Scafaria,Seeking a Friend for the End of the World,6/22/2012,Jennifer Westfeldt,Friends With Kids,3/9/2012,0
+18,242,238,David O. Russell,Silver Linings Playbook,12/25/2012,David O. Russell,Silver Linings Playbook,11/21/2012,1
+19,281,275,Tim Burton,Alice in Wonderland,3/5/2010,Tim Burton,Alice in Wonderland,3/5/2010,1
+20,283,277,Anthony Bell,Alpha and Omega,9/17/2010,Anthony Bell,Alpha and Omega,9/17/2010,1
+21,301,2511,Michael Apted,The Chronicles of Narnia: The Voyage of the Dawn Treader,12/10/2010,Roman Coppola,A Glimpse Inside the Mind of Charles Swan III,2/8/2013,0
+22,307,297,Kevin Smith,Cop Out,2/26/2010,Kevin Smith,Cop Out,2/26/2010,1
+23,313,2508,Shawn Levy,Date Night,4/9/2010,Yaron Levy,Getaway,8/30/2013,0
+24,314,1623,Michael Spierig,Daybreakers,1/8/2010,Michael Bigelow,Deuce Bigalow: European Gigolo,8/12/2005,0
+25,315,36,Lasse HallstrÃ¶m,Dear John,2/5/2010,,Barbie In A Mermaid Tale 2,2/4/2012,0
+26,326,315,Martin Campbell,Edge of Darkness,1/29/2010,Martin Campbell,Edge of Darkness,1/29/2010,1
+27,333,322,Rob Reiner,Flipped,9/10/2010,Rob Reiner,Flipped,8/6/2010,1
+28,334,323,Tyler Perry,For Colored Girls,11/5/2010,Tyler Perry,For Colored Girls,11/5/2010,1
+29,335,324,Heidi Ewing,Freakonomics,9/3/2010,Seth Gordon,Freakonomics,10/1/2010,1
+30,340,329,Nicholas Stoller,Get Him to the Greek,6/4/2010,Nicholas Stoller,Get Him to the Greek,6/4/2010,1
+31,344,299,Shana Feste,The Greatest,11/5/2009,Shana Feste,Country Strong,1/7/2011,0
+32,347,336,Dennis Dugan,Grown Ups,6/25/2010,Dennis Dugan,Grown Ups,6/25/2010,1
+33,354,340,Steve Pink,Hot Tub Time Machine,3/26/2010,Steve Pink,Hot Tub Time Machine,3/26/2010,1
+34,360,346,Glenn Ficarra,I Love You Phillip Morris,1/7/2011,John Requa,I Love You Phillip Morris,12/3/2010,1
+35,373,356,Lisa Cholodenko,The Kids Are All Right,7/30/2010,Lisa Cholodenko,The Kids Are All Right,7/9/2010,1
+36,378,1567,M. Night Shyamalan,The Last Airbender,7/1/2010,M. Night Shyamalan,The Village,7/30/2004,0
+37,381,363,Anand Tucker,Leap Year,1/8/2010,Anand Tucker,Leap Year,1/8/2010,1
+38,382,994,Zack Snyder,Legend of the Guardians: The Owls of Ga'Hoole,9/24/2010,Zack Snyder,Watchmen,3/6/2009,0
+39,390,372,Paul Weitz,Little Fockers,12/22/2010,Paul Weitz,Little Fockers,12/22/2010,1
+40,392,1131,Taylor Hackford,Love Ranch,1/6/2011,Taylor Hackford,Proof of Life,12/8/2000,0
+41,430,410,Floria Sigismondi,The Runaways,3/19/2010,Floria Sigismondi,The Runaways,4/9/2010,1
+42,455,433,Florian Henckel von Donnersmarck,The Tourist,12/10/2010,Florian Henckel von Donnersmarck,The Tourist,12/10/2010,1
+43,458,2553,Ethan Coen,True Grit,12/22/2010,Ethan Coen,Inside Llewyn Davis,12/6/2013,0
+44,460,431,Tony Scott,Unstoppable,11/12/2010,Jake Scott,Tooth Fairy,11/30/2004,0
+45,464,2139,Jake Scott,Welcome to the Rileys,11/18/2011,Kenn Scott,Adventures of Johnny Tao Rock Around the Dragon,2/3/2007,0
+46,475,36,Miguel Arteta,Youth in Revolt,1/8/2010,,Barbie In A Mermaid Tale 2,2/4/2012,0
+47,477,628,Ruben Fleischer,30 Minutes or Less,8/12/2011,Jon Avnet,88 Minutes,4/18/2008,0
+48,486,462,Gonzalo LÃ³pez-Gallego,Apollo 18,9/2/2011,Gonzalo Lopez Gallego,Apollo 18,9/2/2011,1
+49,494,36,Jodie Foster,The Beaver,5/19/2011,,Barbie In A Mermaid Tale 2,2/4/2012,0
+50,498,1906,John Whitesell,Big Mommas: Like Father Like Son,2/18/2011,Clint Eastwood,Flags of Our Fathers,10/20/2006,0
+51,500,420,David Lickley,Born to Be Wild,4/8/2011,David Fincher,The Social Network,10/1/2010,0
+52,502,476,Paul Feig,Bridesmaids,5/13/2011,Paul Feig,Bridesmaids,5/13/2011,1
+53,511,2635,Marcus Nispel,Conan the Barbarian,8/19/2011,,Plus One - The Home Video,,0
+54,514,36,Alex Kendrick,Courageous,9/30/2011,,Barbie In A Mermaid Tale 2,2/4/2012,0
+55,514,486,Alex Kendrick,Courageous,9/30/2011,Alex Kendrick,Courageous,9/30/2011,1
+56,521,703,David Bowers,Diary of a Wimpy Kid: Rodrick Rules,3/25/2011,Steven Spielberg,Indiana Jones and the Kingdom of the Crystal Skull,5/22/2008,0
+57,532,1077,Stephen Daldry,Extremely Loud & Incredibly Close,1/20/2012,Stephen Frears,High Fidelity,3/31/2000,0
+58,534,502,Trent Cooper,Father of Invention,11/3/2011,Trent Cooper,Father of Invention,10/14/2011,1
+59,535,2581,Kevin Williams,Fear of a Black Republican,4/1/2011,Tom Williams,Last Weekend,8/29/2014,0
+60,556,2068,Tate Taylor,The Help,8/10/2011,Steve Taylor,The Second Chance,2/17/2006,0
+61,575,244,Salim Akil,Jumping the Broom,5/6/2011,Salim Akil,Sparkle,8/17/2012,0
+62,578,543,Jonathan Hensleigh,Kill the Irishman,5/11/2012,Jonathan Hensleigh,Kill the Irishman,3/11/2011,1
+63,624,588,Alister Grierson,Sanctum,2/4/2011,Alister Grierson,Sanctum,2/4/2011,1
+64,628,2635,Matt Russell,Seven Days in Utopia,9/2/2011,,Plus One - The Home Video,,0
+65,636,291,Dito Montiel,The Son of No One,7/9/2011,Alex Gibney,Casino Jack And The United States Of Money,5/7/2010,0
+66,641,2639,Zack Snyder,Sucker Punch,3/25/2011,Zack Parker,Proxy,4/18/2014,0
+67,645,3059,Jeff Nichols,Take Shelter,11/10/2011,Mike Nichols,Primary Colors,3/20/1998,0
+68,668,3114,Frank Coraci,Zookeeper,7/8/2011,Frank Coraci,The Wedding Singer,2/13/1998,0
+69,671,627,Anne Fletcher,27 Dresses,1/18/2008,Anne Fletcher,27 Dresses,1/9/2008,1
+70,674,820,David Zucker,An American Carol,10/3/2008,Tim Disney,American Violet,4/17/2009,0
+71,719,672,Dennis Lee,Fireflies in the Garden,7/17/2008,Dennis Lee,Fireflies in the Garden,10/14/2011,1
+72,726,2120,Nicholas Stoller,Forgetting Sarah Marshall,4/18/2008,Joseph McGinty Nichol,We Are Marshall,12/22/2006,0
+73,734,686,David Koepp,Ghost Town,9/19/2008,David Koepp,Ghost Town,9/5/2008,1
+74,738,1887,Bruce Hendricks,Hannah Montana & Miley Cyrus: Best of Both Worlds Concert,2/1/2008,Greg Coolidge,Employee of the Month,10/6/2006,0
+75,745,36,Brian Smrz,Hero Wanted,7/10/2008,,Barbie In A Mermaid Tale 2,2/4/2012,0
+76,751,702,Louis Leterrier,The Incredible Hulk,6/13/2008,Louis Leterrier,The Incredible Hulk,6/12/2008,1
+77,752,1055,Steven Spielberg,Indiana Jones and the Kingdom of the Crystal Skull,5/22/2008,Steven Soderbergh,Erin Brockovich,3/17/2000,0
+78,752,1771,Steven Spielberg,Indiana Jones and the Kingdom of the Crystal Skull,5/22/2008,Steven Spielberg,War of the Worlds,6/29/2005,0
+79,757,2412,Patricia Rozema,Kit Kittredge: An American Girl,7/2/2008,David O. Russell,American Hustle,12/20/2013,0
+80,779,3063,Rob Cohen,The Mummy: Tomb of the Dragon Emperor,8/1/2008,Rob Cohen,The Rat Pack,8/22/1998,0
+81,793,1707,Steven Sebring,Patti Smith: Dream of Life,8/6/2008,Doug Liman,Mr. & Mrs. Smith,6/7/2005,0
+82,810,36,Sam Mendes,Revolutionary Road,1/23/2009,,Barbie In A Mermaid Tale 2,2/4/2012,0
+83,814,756,Carter Smith,The Ruins,4/4/2008,Carter Smith,The Ruins,4/4/2008,1
+84,816,2055,Gina Prince-Bythewood,The Secret Life of Bees,10/17/2008,Mark McNabb,Billy Owens and the Secret of the Runes,,0
+85,825,1161,Kirk De Micco,Space Chimps,7/18/2008,Clint Eastwood,Space Cowboys,8/4/2000,0
+86,842,786,Carl Deal,Trouble the Water,12/5/2008,Carl Deal,Trouble the Water,8/22/2008,1
+87,845,789,Gregory Hoblit,Untraceable,1/25/2008,Gregory Hoblit,Untraceable,1/25/2008,1
+88,848,792,Woody Allen,Vicky Cristina Barcelona,8/15/2008,Woody Allen,Vicky Cristina Barcelona,5/17/2008,1
+89,853,797,Timur Bekmambetov,Wanted,6/27/2008,Timur Bekmambetov,Wanted,6/12/2008,1
+90,861,806,Peyton Reed,Yes Man,12/19/2008,Peyton Reed,Yes Man,12/19/2008,1
+91,874,816,R.W. Goodwin,Alien Trespass,1/1/2009,R.W. Goodwin,Alien Trespass,4/3/2009,1
+92,910,846,Sophie Barthes,Cold Souls,5/5/2010,Sophie Barthes,Cold Souls,8/7/2009,1
+93,921,858,Neill Blomkamp,District 9,8/14/2009,Neill Blomkamp,District 9,8/14/2009,1
+94,931,868,Justin Lin,Fast & Furious 6,5/24/2013,John Singleton,2 Fast 2 Furious,6/6/2003,0
+95,940,852,Mark Neveldine,Gamer,9/4/2009,Mark Neveldine,Crank 2: High Voltage,4/17/2009,0
+96,943,2635,Matt Aselton,Gigantic,6/19/2009,,Plus One - The Home Video,,0
+97,961,36,Bob Gosse,I Hope They Serve Beer in Hell,9/25/2009,,Barbie In A Mermaid Tale 2,2/4/2012,0
+98,968,901,Gregor Jordan,The Informers,4/24/2009,Gregor Jordan,The Informers,4/24/2009,1
+99,974,2635,Davis Guggenheim,It Might Get Loud,8/27/2009,,Plus One - The Home Video,,0
+100,988,919,Brandon Camp,Love Happens,9/18/2009,Brandon Camp,Love Happens,9/18/2009,1
+101,989,920,Robert Iscove,Love N' Dancing,1/6/2011,Robert Iscove,Love N' Dancing,5/14/2008,1
+102,999,464,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Jason Winer,Arthur,4/8/2011,0
+103,999,470,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Jodie Foster,The Beaver,5/6/2011,0
+104,999,778,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Bryan Bertino,The Strangers,5/29/2008,0
+105,999,807,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Kevin Smith,Zack and Miri Make a Porno,10/31/2008,0
+106,999,1027,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,John Whitesell,Big Mommas: Like Father Like Son,2/18/2011,0
+107,999,1046,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Michael Dinner,The Crew,8/25/2000,0
+108,999,1369,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,David L. Cunningham,To End All Wars,12/6/2002,0
+109,999,1450,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Nick Hamm,Godsend,12/1/2003,0
+110,999,1506,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Ernest R. Dickerson,Never Die Alone,3/26/2004,0
+111,999,1523,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Sean Patrick Mcnamara,Raise Your Voice,10/8/2004,0
+112,999,1983,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Danielle Agnello,Lime Salted Love,,0
+113,999,2321,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Ed Glaser,Press Start,,0
+114,999,2338,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Tamara Jenkins,The Savages,11/28/2007,0
+115,999,2753,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Les Mayfield,Blue Streak,9/17/1999,0
+116,999,2824,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Barry Levinson,Liberty Heights,11/17/1999,0
+117,999,2866,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Ron Shelton,Play It to the Bone,12/24/1999,0
+118,999,2968,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Betty Thomas,Dr. Dolittle,6/26/1998,0
+119,999,2980,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Bob Hoge,The Godson,10/6/1998,0
+120,999,3121,,Michael Jackson's 'This Is It': The Gloved One,1/26/2010,Pat Proft,Wrongfully Accused,8/21/1998,0
+121,1012,2218,Rob Marshall,Nine,12/25/2009,Garry Marshall,Georgia Rule,5/11/2007,0
+122,1014,943,Bill Duke,Not Easily Broken,1/9/2009,Bill Duke,Not Easily Broken,1/9/2009,1
+123,1014,2635,Bill Duke,Not Easily Broken,1/9/2009,,Plus One - The Home Video,,0
+124,1032,961,Rebecca Miller,The Private Lives of Pippa Lee,7/10/2009,Rebecca Miller,The Private Lives of Pippa Lee,11/27/2009,1
+125,1037,965,Andy Fickman,Race to Witch Mountain,3/13/2009,Andy Fickman,Race to Witch Mountain,3/13/2009,1
+126,1049,976,J.J. Abrams,Star Trek,5/8/2009,J.J. Abrams,Star Trek,5/7/2009,1
+127,1057,2974,Michael Bay,Pearl Harbor,5/25/2001,Michael Bay,Transformers: Revenge of the Fallen,6/24/2009,0
+128,1063,986,Craig Johnson,True Adolescents,7/29/2011,Craig Johnson,True Adolescents,7/29/2011,1
+129,1076,1364,Dominic Sena,Whiteout,9/11/2009,Dominic Sena,Swordfish,6/8/2001,0
+130,1086,2134,Mikael HÃ¥fstrÃ¶m,1408,6/22/2007,Mikael Hfstrm,1408,6/22/2007,1
+131,1088,2135,David Slade,30 Days of Night,10/19/2007,David Slade,30 Days of Night,10/19/2007,1
+132,1090,2137,Julie Taymor,Across the Universe,10/12/2007,Julie Taymor,Across the Universe,9/14/2007,1
+133,1093,2140,Allan Harmon,Afghan Knights,7/31/2007,Allan Harmon,Afghan Knights,7/31/2007,1
+134,1107,1244,Steve Carr,Are We Done Yet?,4/4/2007,Steve Carr,Dr. Dolittle 2,6/22/2001,0
+135,1108,2155,Andrew Dominik,The Assassination of Jesse James by the Coward Robert Ford,10/19/2007,Andrew Dominik,The Assassination of Jesse James by the Coward Robert Ford,10/5/2007,1
+136,1113,2635,Michael Lehmann,Because I Said So,2/2/2007,,Plus One - The Home Video,,0
+137,1115,2491,Sidney Lumet,Before the Devil Knows You're Dead,12/7/2007,Fede Alvarez,Evil Dead,4/5/2013,0
+138,1117,1185,Robert Zemeckis,Beowulf,11/16/2007,Robert Zemeckis,What Lies Beneath,7/21/2000,0
+139,1118,2164,Josh Gordon,Blades of Glory,3/30/2007,Will Speck & Josh Gordon,Blades of Glory,3/30/2007,1
+140,1129,1402,Michael Roesch,Brotherhood of Blood,10/14/2008,Zana Briski,Born Into Brothels,12/8/2004,0
+141,1141,2502,Scott Wiper,The Condemned,4/27/2007,Scott Walker,The Frozen Ground,8/23/2013,0
+142,1145,2187,Fred Savage,Daddy Day Camp,8/8/2007,Fred Savage,Daddy Day Camp,8/8/2007,1
+143,1165,2635,Adam Jay Epstein,Extreme Movie,7/29/2009,,Plus One - The Home Video,,0
+144,1182,1761,Mary Harron,American Psycho,4/14/2000,Duncan Tucker,Transamerica,1/20/2006,0
+145,1187,1118,Spike Lee,Bamboozled,10/20/2000,Spike Lee,The Original Kings of Comedy,8/18/2000,0
+146,1191,1023,Stephen Metcalfe,Beautiful Joe,6/9/2000,Stephen Metcalfe,Beautiful Joe,6/9/2000,1
+147,1198,1030,Ben Younger,Boiler Room,2/18/2000,Ben Younger,Boiler Room,2/18/2000,1
+148,1199,2751,Joe Berlinger,Book of Shadows: Blair Witch 2,10/27/2000,Bob Griffin,The Blair Witch Project,7/30/1999,0
+149,1206,1431,John Waters,Cecil B. DeMented,9/1/2000,John Waters,A Dirty Shame,9/24/2004,0
+150,1216,683,Michael Dinner,The Crew,8/25/2000,Michael Haneke,Funny Games,3/14/2008,0
+151,1229,1056,Barry Levinson,An Everlasting Piece,3/23/2001,Barry Levinson,An Everlasting Piece,2/1/2001,1
+152,1230,1057,Fenton Bailey,The Eyes of Tammy Faye,1/25/2000,Fenton Bailey,The Eyes of Tammy Faye,6/1/2000,1
+153,1249,1310,Stephen Frears,High Fidelity,3/31/2000,Stephen Sommers,The Mummy Returns,5/4/2001,0
+154,1258,778,Mark Jonathan Harris,Into the Arms of Strangers: Stories of the Kindertransport,11/24/2000,Bryan Bertino,The Strangers,5/29/2008,0
+155,1260,3094,Stanley Tucci,Joe Gould's Secret,5/26/2000,Michael Bay,13 Hours: The Secret Soldiers Of Benghazi,1/15/2016,0
+156,1270,2135,Deborah Hoffmann,Long Night's Journey Into Day,12/20/2001,David Slade,30 Days of Night,10/19/2007,0
+157,1274,1098,Nora Ephron,Lucky Numbers,10/27/2000,Nora Ephron,Lucky Numbers,10/27/2000,1
+158,1281,1105,Jon Gunn,Mercy Streets,10/31/2000,Jon Gunn,Mercy Streets,10/31/2000,1
+159,1294,1117,Myles Connell,The Opportunists,8/11/2000,Myles Connell,The Opportunists,8/11/2000,1
+160,1304,1127,Ed Harris,Pollock,3/23/2001,Ed Harris,Pollock,12/15/2000,1
+161,1305,1128,Michael Addis,Poor White Trash,6/16/2000,Michael Addis,Poor White Trash,11/10/2000,1
+162,1311,1134,Brian Robbins,Ready to Rumble,4/7/2000,Brian Robbins,Ready to Rumble,4/7/2000,1
+163,1325,1147,Wes Craven,Scream 3,2/4/2000,Wes Craven,Scream 3,2/4/2000,1
+164,1326,1148,Reg Traviss,Screwed,6/3/2011,Scott Alexander,Screwed,5/12/2000,1
+165,1342,3073,Robert Greenwald,Steal This Movie,6/28/2002,Norton Virgien,The Rugrats Movie,11/20/1998,0
+166,1365,1184,Christopher McQuarrie,The Way of the Gun,9/8/2000,Christopher McQuarrie,The Way of the Gun,9/8/2000,1
+167,1370,1116,Matt Williams,Where the Heart Is,4/28/2000,Ethan Coen,O Brother Where Art Thou?,12/22/2000,0
+168,1372,1192,Jonathan Lynn,The Whole Nine Yards,2/18/2000,Jonathan Lynn,The Whole Nine Yards,2/18/2000,1
+169,1388,2412,Les Mayfield,American Outlaws,8/17/2001,David O. Russell,American Hustle,12/20/2013,0
+170,1391,36,Julie Davis,Amy's Orgasm,10/21/2004,,Barbie In A Mermaid Tale 2,2/4/2012,0
+171,1396,1270,Gary Trousdale,Atlantis: The Lost Empire,6/15/2001,Scott Hicks,Hearts in Atlantis,9/28/2001,0
+172,1402,2635,John Moore,Behind Enemy Lines,11/30/2001,,Plus One - The Home Video,,0
+173,1459,1268,Mark Waters,Head Over Heels,2/2/2001,Mark Waters,Head over Heels,2/2/2001,1
+174,1483,1054,Chris Nahon,Kiss of the Dragon,7/6/2001,Courtney Solomon,Dungeons & Dragons,12/8/2000,0
+175,1495,920,Nicole Holofcener,Lovely & Amazing,8/2/2002,Robert Iscove,Love N' Dancing,5/14/2008,0
+176,1506,1309,David Lynch,Mulholland Drive,10/19/2001,David Lynch,Mulholland Drive,10/8/2001,1
+177,1522,1323,Alejandro AmenÃ¡bar,The Others,8/10/2001,Alejandro Amenbar,The Others,8/10/2001,1
+178,1541,541,Dennis Dugan,Saving Silverman,2/9/2001,Dennis Dugan,Just Go with It,2/11/2011,0
+179,1541,1545,Dennis Dugan,Saving Silverman,2/9/2001,Marc Webb,The Amazing Spider-Man 2,5/2/2014,0
+180,1543,1341,Keenen Ivory Wayans,Scary Movie 2,7/4/2001,Keenen Ivory Wayans,Scary Movie 2,7/4/2001,1
+181,1551,36,Andrew Adamson,Shrek,5/18/2001,,Barbie In A Mermaid Tale 2,2/4/2012,0
+182,1563,1631,Jay Chandrasekhar,Super Troopers,2/15/2002,Jay Chandrasekhar,The Dukes of Hazzard,8/5/2005,0
+183,1565,590,Dominic Sena,Swordfish,6/8/2001,Dominic Sena,Season of the Witch,1/7/2011,0
+184,1565,2635,Dominic Sena,Swordfish,6/8/2001,,Plus One - The Home Video,,0
+185,1568,1367,Jill Sprecher,Thirteen Conversations About One Thing,7/5/2002,Jill Sprecher,Thirteen Conversations About One Thing,9/1/2001,1
+186,1572,2635,Maria Ripoll,Tortilla Soup,8/31/2001,,Plus One - The Home Video,,0
+187,1587,2635,Peter Segal,50 First Dates,2/13/2004,,Plus One - The Home Video,,0
+188,1592,2129,Oliver Stone,Alexander,11/24/2004,Oliver Stone,World Trade Center,8/9/2006,0
+189,1593,1384,Charles Shyer,Alfie,11/5/2004,Charles Shyer,Alfie,11/5/2004,1
+190,1595,1942,Louie Schwartzberg,America's Heart & Soul,7/2/2004,Ward Serrill,The Heart of the Game,6/11/2005,0
+191,1595,2150,Louie Schwartzberg,America's Heart & Soul,7/2/2004,Lorraine Senna,Americanizing Shelley,5/4/2007,0
+192,1601,1390,Martin Scorsese,The Aviator,12/25/2004,Martin Scorsese,The Aviator,12/17/2004,1
+193,1615,2635,Paul Greengrass,The Bourne Supremacy,7/23/2004,,Plus One - The Home Video,,0
+194,1616,1011,Daniel Taplitz,Breakin' All the Rules,5/14/2004,Billy Bob Thornton,All the Pretty Horses,12/25/2000,0
+195,1619,1319,Eric Bress,The Butterfly Effect,1/23/2004,Eric Bross,On the Line,10/26/2001,0
+196,1625,248,Joe Roth,Christmas with the Kranks,11/24/2004,Richard Rich,The Swan Princess Christmas,,0
+197,1626,36,David Twohy,The Chronicles of Riddick,6/11/2004,,Barbie In A Mermaid Tale 2,2/4/2012,0
+198,1637,1419,Lance Rivera,The Cookout,9/3/2004,Lance Rivera,The Cookout,9/3/2004,1
+199,1642,1425,Sergio Arau,A Day Without a Mexican,5/21/2004,Sergio Arau,A Day Without a Mexican,5/14/2004,1
+200,1650,2154,Steve Carver,Drum,8/27/1976,Steve Carr,Are We Done Yet?,4/4/2007,0
+201,1659,1441,Marc Forster,Finding Neverland,12/17/2004,Marc Forster,Finding Neverland,11/12/2004,1
+202,1667,1450,Nick Hamm,Godsend,4/30/2004,Nick Hamm,Godsend,12/1/2003,1
+203,1676,2635,Robert Harmon,Highwaymen,2/19/2004,,Plus One - The Home Video,,0
+204,1692,36,Greg Lombardo,Knots,2004,,Barbie In A Mermaid Tale 2,2/4/2012,0
+205,1703,36,Jonathan Demme,The Manchurian Candidate,7/30/2004,,Barbie In A Mermaid Tale 2,2/4/2012,0
+206,1713,1497,Renny Harlin,Mindhunters,5/13/2005,Renny Harlin,Mindhunters,5/13/2005,1
+207,1721,1503,Gregg Araki,Mysterious Skin,6/24/2005,Gregg Araki,Mysterious Skin,5/6/2005,1
+208,1723,1903,Jon Turteltaub,National Treasure,11/19/2004,Morgan,Final Destination 3,2/10/2006,0
+209,1725,1507,Dennie Gordon,New York Minute,5/7/2004,Dennie Gordon,New York Minute,5/7/2004,1
+210,1731,3119,Robert Townsend,B*A*P*S,3/28/1997,Robert Towne,Without Limits,9/11/1998,0
+211,1735,1517,Brian Robbins,The Perfect Score,1/30/2004,Brian Robbins,The Perfect Score,1/30/2004,1
+212,1736,2635,Joel Schumacher,The Phantom of the Opera,12/22/2004,,Plus One - The Home Video,,0
+213,1743,1523,Sean McNamara,Raise Your Voice,10/8/2004,Sean Patrick Mcnamara,Raise Your Voice,10/8/2004,1
+214,1749,2635,James Wan,Saw,10/29/2004,,Plus One - The Home Video,,0
+215,1750,595,Raja Gosnell,Scooby-Doo 2: Monsters Unleashed,3/26/2004,Raja Gosnell,The Smurfs,7/29/2011,0
+216,1750,931,Raja Gosnell,Scooby-Doo 2: Monsters Unleashed,3/26/2004,Robert Letterman,Monsters vs. Aliens,3/27/2009,0
+217,1755,1535,Spike Lee,She Hate Me,7/30/2004,Spike Lee,She Hate Me,7/28/2004,1
+218,1759,2453,John Sayles,Silver City,9/24/2004,John Carney,Begin Again,6/27/2014,0
+219,1765,1543,David Mamet,Spartan,3/12/2004,David Mamet,Spartan,3/12/2004,1
+220,1822,1597,F. Gary Gray,Be Cool,3/4/2005,F. Gary Gray,Be Cool,3/4/2005,1
+221,1827,1602,Stephen Kay,Boogeyman,2/4/2005,Stephen T. Kay,Boogeyman,2/4/2005,1
+222,1838,803,Andrew Adamson,The Chronicles of Narnia: The Lion the Witch and the Wardrobe,12/9/2005,Charles Robert Carner,Witless Protection,2/22/2008,0
+223,1849,36,Mikael HÃ¥fstrÃ¶m,Derailed,11/11/2005,,Barbie In A Mermaid Tale 2,2/4/2012,0
+224,1867,1638,Thomas Bezucha,The Family Stone,12/16/2005,Tom Bezucha,The Family Stone,12/16/2005,1
+225,1874,838,John Singleton,Four Brothers,8/12/2005,Rian Johnson,The Brothers Bloom,5/15/2009,0
+226,1879,1649,Kamal,Goal,5/11/2007,Kamal,Goal,5/11/2007,1
+227,1883,1652,Bill Paxton,The Greatest Game Ever Played,9/30/2005,Bill Paxton,The Greatest Game Ever Played,9/30/2005,1
+228,1884,2420,Lexi Alexander,Green Street Hooligans,9/9/2005,Uwe Boll,Assault On Wall Street,5/10/2013,0
+229,1896,1667,David Duchovny,House of D,4/29/2005,David Duchovny,House of D,5/7/2004,1
+230,1897,1668,Jaume Collet-Serra,House of Wax,5/6/2005,Jaume Collet-Serra,House of Wax,5/6/2005,1
+231,1898,1669,Craig Brewer,Hustle & Flow,7/22/2005,Craig Brewer,Hustle & Flow,7/22/2005,1
+232,1915,1686,Peter Jackson,King Kong,12/14/2005,Peter Jackson,King Kong,12/14/2005,1
+233,1930,1699,Eric Darnell,Madagascar,5/27/2005,Conrad Vernon,Madagascar,5/27/2005,1
+234,1933,920,Randall Miller,Marilyn Hotchkiss' Ballroom Dancing & Charm School,1/12/2006,Robert Iscove,Love N' Dancing,5/14/2008,0
+235,1959,1724,Ben Younger,Prime,10/28/2005,Ben Younger,Prime,10/28/2005,1
+236,1964,396,Chris Columbus,Rent,11/23/2005,Chris Columbus,Percy Jackson & the Olympians: The Lightning Thief,2/12/2010,0
+237,1964,2635,Chris Columbus,Rent,11/23/2005,,Plus One - The Home Video,,0
+238,1994,1759,Mike Mills,Thumbsucker,10/7/2005,Mike Mills (II),Thumbsucker,9/16/2005,1
+239,1996,1208,Duncan Tucker,Transamerica,3/3/2006,Les Mayfield,American Outlaws,8/17/2001,0
+240,2002,1767,Mike Binder,The Upside of Anger,4/1/2005,Mike Binder,The Upside of Anger,3/11/2005,1
+241,2026,2154,Steve Pink,Accepted,8/18/2006,Steve Carr,Are We Done Yet?,4/4/2007,0
+242,2042,1802,Mel Gibson,Apocalypto,12/8/2006,Mel Gibson,Apocalypto,12/8/2006,1
+243,2056,1814,Brian Pimental,Bambi II,1/26/2006,Jim Ballantine,Bambi II,1/1/2006,1
+244,2074,2174,Edward Zwick,Blood Diamond,12/8/2006,Sid Haig,Brotherhood of Blood,10/11/2007,0
+245,2078,2093,Larry Charles,Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan,11/3/2006,Geoffrey Sax,Alex Rider: Operation Stormbreaker,10/13/2006,0
+246,2087,1843,Martin Campbell,Casino Royale,11/17/2006,Martin Campbell,Casino Royale,11/17/2006,1
+247,2098,1849,Kevin Smith,Clerks II,7/21/2006,Kevin Smith,Clerks II,7/21/2006,1
+248,2098,2635,Kevin Smith,Clerks II,7/21/2006,,Plus One - The Home Video,,0
+249,2104,1855,Bruce Beresford,The Contract,4/5/2007,Bruce Beresford,The Contract,10/9/2006,1
+250,2117,1868,Craig Singer,Dark Ride,10/20/2006,Craig Singer,Dark Ride,11/17/2006,1
+251,2126,1875,John Whitesell,Deck the Halls,11/22/2006,John Whitesell,Deck the Halls,11/22/2006,1
+252,2131,1880,Katherine Dieckmann,Diggers,4/14/2007,Katherine Dieckmann,Diggers,4/14/2007,1
+253,2136,1883,Bill Condon,Dreamgirls,12/25/2006,Bill Condon,Dreamgirls,12/25/2006,1
+254,2158,1966,James Wong,Final Destination 3,2/10/2006,Mary Jordan,Jack Smith and the Destruction of Atlantis,4/26/2006,0
+255,2168,1280,BJ Davis,Forget About It,10/14/2006,John Davis,Jimmy Neutron - Boy Genius,12/21/2001,0
+256,2178,2635,Carl Colpaert,G.I. Jesus,9/30/2006,,Plus One - The Home Video,,0
+257,2187,62,,The Great Warming,3/3/2006,Tony Gilroy,The Bourne Legacy,8/10/2012,0
+258,2187,74,,The Great Warming,3/3/2006,Jay Roach,The Campaign,8/10/2012,0
+259,2187,104,,The Great Warming,3/3/2006,Damian Lee,The Truth (A Dark Truth),1/4/2013,0
+260,2187,279,,The Great Warming,3/3/2006,Chris D'Arienzo,Barry Munday,10/1/2010,0
+261,2187,432,,The Great Warming,3/3/2006,Ben Affleck,The Town,9/17/2010,0
+262,2187,474,,The Great Warming,3/3/2006,David Frankel,The Big Year,10/14/2011,0
+263,2187,477,,The Great Warming,3/3/2006,Jaime Zevallos,Me You and Five Bucks,9/25/2015,0
+264,2187,483,,The Great Warming,3/3/2006,Marcus Nispel,Conan the Barbarian,8/19/2011,0
+265,2187,582,,The Great Warming,3/3/2006,Michael Pavone,The Reunion,10/21/2011,0
+266,2187,669,,The Great Warming,3/3/2006,Xavier Palud,The Eye,2/1/2008,0
+267,2187,775,,The Great Warming,3/3/2006,Jon M. Chu,Step Up 2 the Streets,2/14/2008,0
+268,2187,794,,The Great Warming,3/3/2006,Jonathan Levine,The Wackness,7/3/2008,0
+269,2187,993,,The Great Warming,3/3/2006,Ben Chace,Wah Do Dem,6/18/2010,0
+270,2187,1007,,The Great Warming,3/3/2006,D.J. Pooh,3 Strikes,3/1/2000,0
+271,2187,1086,,The Great Warming,3/3/2006,Alan Jacobs,Just One Night,,0
+272,2187,1161,,The Great Warming,3/3/2006,Clint Eastwood,Space Cowboys,8/4/2000,0
+273,2187,1398,,The Great Warming,3/3/2006,Ricky Schroder,Black Cloud,3/11/2005,0
+274,2187,1487,,The Great Warming,3/3/2006,Jonathan Demme,The Manchurian Candidate,7/30/2004,0
+275,2187,1775,,The Great Warming,3/3/2006,Clare Kilner,The Wedding Date,2/4/2005,0
+276,2187,1810,,The Great Warming,3/3/2006,Chris Robinson (IV),ATL,3/31/2006,0
+277,2187,1902,,The Great Warming,3/3/2006,Theo Avgerinos,Fifty Pills,4/26/2006,0
+278,2187,2259,,The Great Warming,3/3/2006,Jeff Glickman,Killing Zelda Sparks,8/28/2007,0
+279,2187,2269,,The Great Warming,3/3/2006,Ken Kwapis,License to Wed,7/3/2007,0
+280,2187,2312,,The Great Warming,3/3/2006,Christopher Zalla,Padre Nuestro,5/16/2008,0
+281,2187,2340,,The Great Warming,3/3/2006,Evan Somers,The Seeker,5/7/2005,0
+282,2187,2359,,The Great Warming,3/3/2006,Jon Artigo,Still Green,5/15/2009,0
+283,2187,2403,,The Great Warming,3/3/2006,Tomer Almagor,9 Full Moons,11/7/2014,0
+284,2187,2661,,The Great Warming,3/3/2006,Ben Stiller,The Secret Life Of Walter Mitty,12/25/2013,0
+285,2187,2718,,The Great Warming,3/3/2006,Daniel Cockburn,You Are Here,5/11/2012,0
+286,2187,2730,,The Great Warming,3/3/2006,Harold Ramis,Analyze This,3/5/1999,0
+287,2187,2816,,The Great Warming,3/3/2006,Frank Whaley,Joe the King,10/15/1999,0
+288,2187,2983,,The Great Warming,3/3/2006,Alfonso Cuarn,Great Expectations,1/30/1998,0
+289,2188,1928,Phil Joanou,Gridiron Gang,9/15/2006,Phil Joanou,Gridiron Gang,9/15/2006,1
+290,2211,1950,Bob Dolman,How to Eat Fried Worms,8/25/2006,Bob Dolman,How to Eat Fried Worms,8/25/2006,1
+291,2228,1595,Mary Jordan,Jack Smith and the Destruction of Atlantis,4/26/2006,Rebecca Miller,The Ballad of Jack and Rose,3/25/2005,0
+292,2231,1968,Randall Rubin,Jimmy and Judy,2/5/2006,Randall Rubin,Jimmy and Judy,9/15/2006,1
+293,2240,1976,M. Night Shyamalan,Lady in the Water,7/21/2006,M. Night Shyamalan,Lady in the Water,7/21/2006,1
+294,2241,2635,Alejandro Agresti,The Lake House,6/16/2006,,Plus One - The Home Video,,0
+295,2255,381,George Gallo,Local Color,8/15/2009,George Gallo,Middle Men,8/6/2010,0
+296,2259,1994,Chris Fuller,Loren Cass,8/25/2006,Chris Fuller,Loren Cass,8/25/2006,1
+297,2263,923,Tyler Perry,Madea's Family Reunion,2/24/2006,Tyler Perry,Madea Goes to Jail,2/20/2009,0
+298,2281,1987,John Woo,Mission: Impossible II,5/24/2000,Jonathan Dayton,Little Miss Sunshine,7/26/2006,0
+299,2282,992,Ivan Reitman,My Super Ex-Girlfriend,7/21/2006,Jason Reitman,Up in the Air,12/4/2009,0
+300,2285,787,Catherine Hardwicke,The Nativity Story,12/1/2006,Catherine Hardwicke,Twilight,11/21/2008,0
+301,2293,2635,Ã‰lie Chouraqui,O Jerusalem,10/18/2006,,Plus One - The Home Video,,0
+302,2297,2635,Richard Donner,The Omen,6/25/1976,,Plus One - The Home Video,,0
+303,2303,1456,Guillermo del Toro,Pan's Labyrinth,1/19/2007,Guillermo del Toro,Hellboy II: The Golden Army (Hellboy 2),6/28/2008,0
+304,2323,36,Will VÃ¡zquez,Quick Pick,4/19/2006,,Barbie In A Mermaid Tale 2,2/4/2012,0
+305,2345,2393,David Zucker,Scary Movie 4,4/14/2006,David Fincher,Zodiac,3/2/2007,0
+306,2350,2069,Zach C. Gray,Secret of the Cave,10/19/2006,Zach C. Gray,Secret of the Cave,9/1/2007,1
+307,2350,2430,Zach C. Gray,Secret of the Cave,10/19/2006,Samantha Buck,Best Kept Secret,9/6/2013,0
+308,2352,1617,Clark Johnson,The Sentinel,4/21/2006,Mike Johnson,Tim Burton's Corpse Bride,9/16/2005,0
+309,2362,2080,James Gunn,Slither,3/31/2006,James Gunn,Slither,3/31/2006,1
+310,2378,1546,Karen Hyden,Strawberry Shortcake: The Sweet Dreams Movie,9/4/2006,Sherm Cohen,The Spongebob Squarepants Movie,11/19/2004,0
+311,2385,1447,Adam McKay,Talladega Nights: The Ballad of Ricky Bobby,8/4/2006,Peter Berg,Friday Night Lights,10/8/2004,0
+312,2387,1903,Liam Lynch,Tenacious D in The Pick of Destiny,11/22/2006,Morgan,Final Destination 3,2/10/2006,0
+313,2400,2111,Chris Chan Lee,Undoing,12/5/2007,Chris Chan Lee,Undoing,6/24/2006,1
+314,2424,2131,Peter Hewitt,Zoom,8/11/2006,Peter Hewitt,Zoom,8/11/2006,1
+315,2428,2215,Christian Charles,Full of It,6/13/2008,Christian Charles,Full of It,3/2/2007,1
+316,2430,2217,Pearry Reginald Teo,The Gene Generation,9/27/2007,Pearry Reginald Teo,The Gene Generation,9/27/2007,1
+317,2445,638,Adam Shankman,Hairspray,7/20/2007,Adam Shankman,Bedtime Stories,12/25/2008,0
+318,2449,3050,David Yates,Harry Potter and the Order of the Phoenix,7/11/2007,David Yates,Harry Potter and the Order of the Phoenix,7/11/2007,1
+319,2460,693,Richard Shepard,The Hunting Party,9/21/2007,Mickey Liddell,The Haunting of Molly Hartley,10/31/2008,0
+320,2463,2247,Amy Heckerling,I Could Never Be Your Woman,5/11/2007,Amy Heckerling,I Could Never Be Your Woman,5/11/2007,1
+321,2474,2257,George Ratliff,Joshua,7/13/2007,George Ratliff,Joshua,6/16/2007,1
+322,2487,2267,Robert Shaye,The Last Mimzy,3/23/2007,Robert Shaye,The Last Mimzy,3/18/2007,1
+323,2502,2281,Stephen J. Anderson,Meet the Robinsons,3/30/2007,Steve Anderson (V),Meet the Robinsons,3/30/2007,1
+324,2506,2286,Harmony Korine,Mister Lonely,3/14/2008,Harmony Korine,Mister Lonely,5/22/2007,1
+325,2513,2290,Craig Gillespie,Mr. Woodcock,9/14/2007,Craig Gillespie,Mr. Woodcock,9/14/2007,1
+326,2515,2635,Marc Lawrence,Music and Lyrics,2/14/2007,,Plus One - The Home Video,,0
+327,2518,2295,Andrew Fleming,Nancy Drew,6/15/2007,Andrew Fleming,Nancy Drew,6/15/2007,1
+328,2522,2298,Dean Matthew Ronalds,Netherbeast Incorporated,3/30/2007,Dean Matthew Ronalds,Netherbeast Incorporated,3/30/2007,1
+329,2524,2553,Ethan Coen,No Country for Old Men,11/21/2007,Ethan Coen,Inside Llewyn Davis,12/6/2013,0
+330,2536,896,Richard LaGravenese,P.S. I Love You,12/21/2007,Chris Columbus,I Love You Beth Cooper,7/10/2009,0
+331,2544,2318,Vincent Paronnaud,Persepolis,2/22/2008,Marjane Satrapi,Persepolis,12/25/2007,0
+332,2552,1251,Rob Cohen,The Fast and the Furious,6/22/2001,Rob Cohen,The Fast and the Furious,6/22/2001,1
+333,2554,2328,Jess Manafort,Remember the Daze,6/1/2007,Jess Manafort,Remember the Daze,4/11/2008,1
+334,2560,2334,Jeffrey Blitz,Rocket Science,9/28/2007,Jeff Blitz,Rocket Science,8/10/2007,1
+335,2572,2635,Chris Miller,Shrek the Third,5/18/2007,,Plus One - The Home Video,,0
+336,2582,2355,Sam Raimi,Spider-Man 3,5/4/2007,Sam Raimi,Spider-Man 3,5/4/2007,1
+337,2590,2363,Marc Klein,Suburban Girl,10/1/2007,Marc Klein,Suburban Girl,4/27/2007,1
+338,2592,1824,Danny Boyle,Sunshine,7/27/2007,Dave Boyle,Big Dreams Little Tokyo,11/2/2006,0
+339,2598,2370,David Wain,The Ten,8/21/2008,David Wain,The Ten,1/18/2007,1
+340,2609,2380,M. dot Strange,We Are the Strange,1/1/2007,M dot Strange,We Are the Strange,1/19/2007,1
+341,2614,2382,Stewart Hendler,Whisper,5/16/2007,Stewart Hendler,Whisper,11/27/2007,1
+342,2630,2399,Michelle Schumacher,3 Geezers!,5/22/2013,Michelle Schumacher,3 Geezers!,5/22/2013,1
+343,2634,2403,Tomer Almagor,9 Full Moons,11/14/2014,Tomer Almagor,9 Full Moons,11/7/2014,1
+344,2636,2406,Paul Weitz,Admission,3/22/2013,Paul Weitz,Admission,3/22/2013,1
+345,2641,2411,Ray Bengston,Alone Yet Not Alone,9/27/2013,Ray Bengston,Alone Yet Not Alone,4/5/2013,1
+346,2654,2428,Ben Ketai,Beneath,7/25/2014,Dagen Merrill,Beneath,8/7/2007,0
+347,2656,2424,Barry Battles,The Baytown Outlaws,6/15/2013,Barry Battles,The Baytown Outlaws,1/11/2013,1
+348,2660,2055,Samantha Buck,Best Kept Secret,5/4/2013,Mark McNabb,Billy Owens and the Secret of the Runes,,0
+349,2671,2442,Jeremy Saulnier,Blue Ruin,7/9/2014,Jeremy Saulnier,Blue Ruin,4/25/2014,1
+350,2675,2446,Ramaa Mosley,The Brass Teapot,4/15/2013,Ramaa Mosley,The Brass Teapot,4/5/2013,1
+351,2694,2461,Dean Jones,Coffin Baby,8/4/2015,Dean Jones,Coffin Baby,,1
+352,2699,1320,James Wan,The Conjuring,7/19/2013,James Wong,The One,11/2/2001,0
+353,2708,2475,Scott Stewart,Dark Skies,2/22/2013,Scott Stewart,Dark Skies,2/22/2013,1
+354,2727,1613,Arie Posin,The Face of Love,10/25/2013,Arie Posin,The Chumscrubber,8/5/2005,0
+355,2735,2500,Andrew Weiner,The Frankenstein Theory,3/1/2013,Andrew Weiner,The Frankenstein Theory,3/1/2013,1
+356,2748,1039,Roman Coppola,A Glimpse Inside the Mind of Charles Swan III,3/14/2013,Francine McDougall,Behind the Camera: The Unauthorized Story of 'Charlie's Angels',,0
+357,2759,2522,Todd Phillips,The Hangover Part III,5/23/2013,Todd Phillips,The Hangover Part III,5/23/2013,1
+358,2765,2527,Liza Johnson,Hateship Loveship,6/12/2014,Liza Johnson,Hateship Loveship,4/11/2014,1
+359,2768,2054,Michael Urie,He's Way More Famous Than You,5/10/2013,Michael Hurst,Room 6,9/25/2006,0
+360,2779,2539,A.D. Calvo,House of Dust,11/1/2013,A.D. Calvo,House of Dust,,1
+361,2780,2635,Therese Shechter,How to Lose Your Virginity,11/15/2013,,Plus One - The Home Video,,0
+362,2785,2543,Lawrence Shapiro,I Know That Voice,11/6/2013,Lawrence Shapiro,I Know That Voice,,1
+363,2794,783,George Tillman Jr.,The Inevitable Defeat of Mister & Pete,1/25/2013,Rob Stevenhagen,The Tale of Despereaux,12/19/2008,0
+364,2798,2556,Shane Black,Iron Man 3,5/3/2013,Shane Black,Iron Man 3,5/3/2013,1
+365,2807,2564,Don Coscarelli,John Dies at the End,1/25/2013,Don Coscarelli,John Dies at the End,1/25/2013,1
+366,2827,2583,Jason Osder,Let the Fire Burn,10/2/2013,Jason Osder,Let The Fire Burn,10/2/2013,1
+367,2830,2586,Liz W. Garcia,The Lifeguard,7/30/2013,Liz W. Garcia,The Lifeguard,8/30/2013,1
+368,2837,1901,Peter Berg,Lone Survivor,1/10/2014,Peter Weir,Fearless,1/1/1993,0
+369,2838,2593,Megan Griffiths,Lucky Them,4/21/2014,Megan Griffiths,Lucky Them,5/30/2014,1
+370,2859,169,RyÃ»hei Kitamura,No One Lives,5/10/2013,Mark Duplass,Jeff Who Lives at Home,3/16/2012,0
+371,2867,2619,Michael Bay,Pain & Gain,4/26/2013,Michael Bay,Pain & Gain,4/26/2013,1
+372,2871,151,,Half Life,,Bobcat Goldthwait,God Bless America,5/11/2012,0
+373,2871,215,,Half Life,,Ridley Scott,Prometheus,6/8/2012,0
+374,2871,327,,Half Life,,Roger Kumble,Furry Vengeance,4/30/2010,0
+375,2871,353,,Half Life,,Gregg Araki,Kaboom,1/28/2011,0
+376,2871,394,,Half Life,,Tod Williams,Paranormal Activity 2,10/22/2010,0
+377,2871,496,,Half Life,,Jim Sheridan,Dream House,9/30/2011,0
+378,2871,538,,Half Life,,David M. Rosenthal,Janie Jones,10/28/2011,0
+379,2871,670,,Half Life,,Tyler Perry,The Family That Preys,9/12/2008,0
+380,2871,1143,,Half Life,,Andrzej Bartkowiak,Romeo Must Die,3/22/2000,0
+381,2871,1169,,Half Life,,Joel Schumacher,Tigerland,10/6/2000,
+382,2871,1214,,Half Life,,Peter Howitt,Antitrust,1/12/2001,0
+383,2871,1767,,Half Life,,Mike Binder,The Upside of Anger,3/11/2005,0
+384,2871,1773,,Half Life,,Phedon Papamichael,The Weather Man,10/28/2005,0
+385,2871,1803,,Half Life,,Elizabeth Allen (II),Aquamarine,3/3/2006,0
+386,2871,1918,,Half Life,,David Munro,Full Grown Men,6/25/2008,0
+387,2871,1983,,Half Life,,Danielle Agnello,Lime Salted Love,,0
+388,2871,2333,,Half Life,,Rod Lurie,Resurrecting the Champ,8/24/2007,0
+389,2871,2860,,Half Life,,Garry Marshall,The Other Sister,2/26/1999,0
+390,2871,2972,,Half Life,,Andrew Tennant,Ever After: A Cinderella Story,7/31/1998,0
+391,2871,3033,,Half Life,,Richard Schenkman,10/22/2015,12/31/1998,0
+392,2900,2648,Eric England,Roadside,4/14/2015,Eric England,Roadside,,1
+393,2912,1471,Kevin Goetz,Scenic Route,8/23/2013,Kevin Smith,Jersey Girl,3/26/2004,0
+394,2935,2682,Chan-wook Park,Stoker,3/1/2013,Park Chan-wook,Stoker,3/1/2013,1
+395,2949,2695,Brian Spitz,UnHung Hero,12/6/2013,Brian Spitz,UnHung Hero,12/6/2013,1
+396,2951,1552,Morgan Spurlock,Super Size Me,6/11/2004,Morgan Spurlock,Super Size Me,5/7/2004,1
+397,2961,2707,Jim Mickle,We Are What We Are,10/25/2013,Jim Mickle,We Are What We Are,9/27/2013,1
+398,2966,2710,Zach Clark,White Reindeer,12/6/2013,Zach Clark,White Reindeer,12/6/2013,1
