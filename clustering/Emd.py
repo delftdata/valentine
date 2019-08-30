@@ -8,7 +8,7 @@ import numpy as np
 from pyemd.emd import emd
 from scipy.spatial.distance import pdist, squareform
 from scipy.stats import stats
-
+from pybloom import ScalableBloomFilter
 
 TABLE = str.maketrans({key: ' ' for key in string.punctuation})
 
@@ -20,8 +20,8 @@ def quantile_emd(column1, column2, quantile=256):
         column2 = np.array(column2)
 
     # if data is string, process it (apply lowercase, remove punctuation and tokenize the strings)
-    column1 = __tokenize(column1)
-    column2 = __tokenize(column2)
+    column1 = tokenize(column1)
+    column2 = tokenize(column2)
 
     # get the unique values
     set1 = set(column1)
@@ -71,14 +71,11 @@ def quantile_emd(column1, column2, quantile=256):
 
 
 def intersection_emd(column1, column2):
-    if type(column1) is not np.ndarray:
-        column1 = np.array(column1)
-    if type(column2) is not np.ndarray:
-        column2 = np.array(column2)
+    column1, column2 = make_numpy(column1, column2)
 
     # if data is string, process it (apply lowercase, remove punctuation and tokenize the strings)
-    column1 = __tokenize(column1)
-    column2 = __tokenize(column2)
+    column1 = tokenize(column1)
+    column2 = tokenize(column2)
 
     # get the unique values
     set1 = set(column1)
@@ -87,20 +84,42 @@ def intersection_emd(column1, column2):
     # compute the union of the 2 columns
     set_intersection = list(set1.intersection(set2))
 
-    if len(set_intersection) == 0:
-        return math.inf
+    return set_intersection
+    # if len(set_intersection) == 0:
+    #     return math.inf
 
-    e1 = quantile_emd(column1, set_intersection)
-    e2 = quantile_emd(column2, set_intersection)
+    # e1 = quantile_emd(column1, set_intersection)
+    # e2 = quantile_emd(column2, set_intersection)
 
-    return (e1 + e2) / 2
+    # return (e1 + e2) / 2
 
 
-def __tokenize(column):
-    if (type(column[0]) is str) or (type(column[0]) is np.str_):
+def tokenize(column):
+    c_type = column.dtype.type
+    if (c_type is str) or (c_type is np.str_) or (c_type is np.object_):
         column = column.astype(str)
         column = np.chararray.translate(column, TABLE)
         column = np.char.lower(column)
         column = [nltk.word_tokenize(token) for token in column]
         column = np.concatenate(column).ravel()
     return column
+
+
+def make_numpy(column1, column2):
+    if type(column1) is not np.ndarray:
+        column1 = np.array(column1)
+    if type(column2) is not np.ndarray:
+        column2 = np.array(column2)
+
+    return column1, column2
+
+
+def bloom_filter_intersection(column1, column2):
+    column1, column2 = make_numpy(column1, column2)
+    column1 = list(set(tokenize(column1)))
+    column2 = list(set(tokenize(column2)))
+    bloom_filter = ScalableBloomFilter(mode=ScalableBloomFilter.LARGE_SET_GROWTH)
+    [bloom_filter.add(x) for x in column1]
+    intersection = np.extract(list(map(lambda x: x in bloom_filter, column2)), column2)
+
+    return intersection
