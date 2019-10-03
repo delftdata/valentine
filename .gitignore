@@ -1,5 +1,7 @@
 .ipynb_checkpoints
-/tpch
 .DS_Store
 .idea/
 __pycache__/
+data
+models
+package-lock.json
