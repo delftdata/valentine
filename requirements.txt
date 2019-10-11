@@ -1,3 +1,5 @@
+tqdm
+pybloom
 flexmatcher==1.0.4
 jupyter==1.0.0
 jupyter-client==5.2.4

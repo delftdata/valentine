@@ -1,18 +1,18 @@
-import tqdm as tqdm
+from tqdm import tqdm
 import numpy as np
-from clustering import Emd
+from clustering import emd_utils
 
 
 def compute_cutoff_threshold(C, threshold):
-    t = {}
-    t['e'] = threshold + 0.001
+    t = dict()
+    t['e'] = threshold
     t['c'] = 0
     C.append(t)
     C = sorted(C, key=lambda i: i['e'])
     cutoff = 0
     gap = 0.0
     i = 0
-    while C[i + 1]['e'] <= threshold:
+    while i < len(C)-1 and C[i + 1]['e'] <= threshold:
         if gap < (C[i + 1]['e'] - C[i]['e']):
             gap = C[i + 1]['e'] - C[i]['e']
             cutoff = C[i]['e']
@@ -25,85 +25,99 @@ def get_neighbors(C, cutoff):
     return [i['c'] for i in C if i['e'] <= cutoff]
 
 
-def compute_distribution_clusters(data, columns, threshold):
-    graph = {}
-    A = {}
+def compute_distribution_clusters(columns, threshold, quantile):
+    graph = dict()
+    A = dict()
 
-    for i in range(0, len(columns)):
+    for i in tqdm(range(0, len(columns))):
         print(i)
-        for j in range(i + 1, len(columns)):
+        name_i = columns[i].get_long_name()
+        for j in tqdm(range(i + 1, len(columns))):
             print('\t'+str(j))
-            e = Emd.quantile_emd(data[columns[i]], data[columns[j]])
-            item_j = {}
+            name_j = columns[j].get_long_name()
+            e = emd_utils.quantile_emd(columns[i], columns[j], quantile)
+
+            item_j = dict()
             item_j['e'] = e
-            item_j['c'] = columns[j]
+            item_j['c'] = name_j
             if columns[i] not in A:
                 A[columns[i]] = []
             A[columns[i]].append(item_j)
 
-            item_i = {}
+            item_i = dict()
             item_i['e'] = e
-            item_i['c'] = columns[i]
+            item_i['c'] = name_i
             if columns[j] not in A:
                 A[columns[j]] = []
             A[columns[j]].append(item_i)
-        graph[columns[i]] = set()
 
+        graph[name_i] = set()
+
+    print("Compute cutoff threshold and neighbors")
     for i in range(len(columns)):
+        name_i = columns[i].get_long_name()
+        print(name_i)
         theta = compute_cutoff_threshold(A[columns[i]], threshold)
+        print(A[columns[i]])
+        print(theta)
+        print('\n')
         Nc = get_neighbors(A[columns[i]], theta)
-        graph[columns[i]].update(Nc)
+        # print(Nc)
+        graph[columns[i].get_long_name()].update(Nc)
 
+    print(graph)
     return graph
 
 
 def bfs(graph, start):
-        visited, queue = set(), [start]
-        while queue:
-            vertex = queue.pop(0)
-            if vertex not in visited:
-                visited.add(vertex)
-                queue.extend(graph[vertex] - visited)
-        return visited
+    visited, queue = set(), [start]
+    while queue:
+        vertex = queue.pop(0)
+        if vertex not in visited:
+            visited.add(vertex)
+            queue.extend(graph[vertex] - visited)
+    return visited
 
 
-def compute_attributes(data, DC, theta):
-        GA = {}
-        I = {}
-        E = np.zeros((len(DC), len(DC)))
-        M = []
+def compute_attributes(columns, DC, theta, quantile):
+    GA = dict()
+    I = dict()
+    E = np.zeros((len(DC), len(DC)))
 
-        for i in tqdm(range(len(DC))):
-            for j in tqdm(range(i + 1, len(DC))):
-                e = Emd.intersection_emd(data[DC[i]], data[DC[j]])
-                item_j = {}
-                item_j['e'] = e
-                item_j['c'] = DC[j]
+    for i in tqdm(range(len(DC))):
+        c_i = next(filter(lambda x: x.get_long_name() == DC[i], columns))
+        for j in tqdm(range(i + 1, len(DC))):
+            c_j = next(filter(lambda x: x.get_long_name() == DC[j], columns))
+            e = emd_utils.intersection_emd(c_i, c_j, quantile)
 
-                if DC[i] not in I:
-                    I[DC[i]] = []
-                I[DC[i]].append(item_j)
+            item_j = dict()
+            item_j['e'] = e
+            item_j['c'] = c_j.get_long_name()
+            if c_i not in I:
+                I[c_i] = []
+            I[c_i].append(item_j)
 
-                item_i = {}
-                item_i['e'] = e
-                item_i['c'] = DC[i]
+            item_i = dict()
+            item_i['e'] = e
+            item_i['c'] = c_i.get_long_name()
+            if c_j not in I:
+                I[c_j] = []
+            I[c_j].append(item_i)
 
-                if DC[j] not in I:
-                    I[DC[j]] = []
-                I[DC[j]].append(item_i)
-            print(I[DC[i]])
-            cutoff_i = compute_cutoff_threshold(I[DC[i]], theta)
-            print(cutoff_i)
-            Nc = get_neighbors(I[DC[i]], cutoff_i)
-            print(Nc)
-            for Cj in Nc:
-                E[i][DC.index(Cj)] = 1
-            GA[DC[i]] = set()
-        M = E + np.dot(E, E)
-        for i in range(len(DC)):
-            for j in range(len(DC)):
-                if M[i][j] == 0:
-                    GA[DC[i]].update(['-' + DC[j]])
-                else:
-                    GA[DC[i]].update([DC[j]])
-        return GA
+        print(I[c_i])
+        cutoff_i = compute_cutoff_threshold(I[c_i], theta)
+        print(cutoff_i)
+        Nc = get_neighbors(I[c_i], cutoff_i)
+        print(Nc)
+        for Cj in Nc:
+            E[i][DC.index(Cj)] = 1
+        GA[DC[i]] = set()
+
+    M = E + np.dot(E, E)
+    for i in range(len(DC)):
+        for j in range(len(DC)):
+            if M[i][j] == 0:
+                GA[DC[i]].update(['-' + DC[j]])
+            else:
+                GA[DC[i]].update([DC[j]])
+    return GA
