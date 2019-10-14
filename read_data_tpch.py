@@ -1,10 +1,10 @@
 import pandas as pd
 
 rows = None
-customer = pd.read_csv('../data/tpch/customer.csv', sep='|', nrows=rows)
+customer = pd.read_csv('data/tpch/customer.csv', sep='|', nrows=rows)
 # lineitem = pd.read_csv('tpch/lineitem.csv', sep='|', nrows=rows)
-nation = pd.read_csv('../data/tpch/nation.csv', sep='|', nrows=rows)
-orders = pd.read_csv('../data/tpch/orders.csv', sep='|', nrows=rows)
+nation = pd.read_csv('data/tpch/nation.csv', sep='|', nrows=rows)
+orders = pd.read_csv('data/tpch/orders.csv', sep='|', nrows=rows)
 # part = pd.read_csv('tpch/part.csv', sep='|', nrows=rows)
 # region = pd.read_csv('tpch/region.csv', sep='|', nrows=rows)
 # supplier = pd.read_csv('tpch/supplier.csv', sep='|', nrows=rows)

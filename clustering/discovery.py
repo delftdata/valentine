@@ -111,13 +111,87 @@ def compute_attributes(columns, DC, theta, quantile):
         print(Nc)
         for Cj in Nc:
             E[i][DC.index(Cj)] = 1
-        GA[DC[i]] = set()
+        GA[DC[i]] = dict()
 
     M = E + np.dot(E, E)
     for i in range(len(DC)):
         for j in range(len(DC)):
             if M[i][j] == 0:
-                GA[DC[i]].update(['-' + DC[j]])
+                GA[DC[i]][DC[j]] = -1
             else:
-                GA[DC[i]].update([DC[j]])
+                GA[DC[i]][DC[j]] = 1
     return GA
+
+
+def correlation_clustering_gurobi(vertexes, edges):
+    import gurobipy as grb
+
+    opt_model = grb.Model(name="MIP Model")
+
+    set_u = vertexes
+    set_v = vertexes
+    set_w = vertexes
+
+    x_vars = {(i, j): opt_model.addVar(vtype=grb.GRB.INTEGER, lb=0, ub=1, name="{0}-{1}".format(i, j))
+              for i in set_u for j in set_v}
+    constraints = {(i, j, k): opt_model.addConstr(lhs=x_vars[i, k],
+                                                  sense=grb.GRB.LESS_EQUAL,
+                                                  rhs=x_vars[i, j] + x_vars[j, k],
+                                                  name="constraint_{0}_{1}_{2}".format(i, j, k))
+                   for i in set_u for j in set_v for k in set_w}
+
+    sum1 = grb.quicksum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
+    sum2 = grb.quicksum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
+
+    opt_model.ModelSense = grb.GRB.MINIMIZE
+    opt_model.setObjective(sum1 + sum2)
+
+    opt_model.optimize()
+
+    result = dict()
+
+    for v in opt_model.getVars():
+        result[v.varName] = v.x
+
+    return result
+
+
+def correlation_clustering_pulp(vertexes, edges):
+    import pulp as plp
+
+    opt_model = plp.LpProblem(name="MIP Model")
+
+    set_u = vertexes
+    set_v = vertexes
+    set_w = vertexes
+
+    x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="{0}--{1}".format(i, j))
+              for i in set_u for j in set_v}
+
+    constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
+                                               sense=plp.LpConstraintLE,
+                                               rhs=x_vars[i, j] + x_vars[j, k],
+                                               name="constraint_{0}_{1}_{2}".format(i, j, k))
+                   for i in set_u for j in set_v for k in set_w}
+
+    sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
+    sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
+
+    opt_model.sense = plp.LpMinimize
+    opt_model.setObjective(sum1 + sum2)
+
+    opt_model.solve()
+
+    result = dict()
+
+    for v in opt_model.variables():
+        result[v.name] = v.varValue
+
+    return result
+
+
+def process_correlation_clustering_result(result):
+    clusters = [k for (k, v) in result.items() if v == 0]
+    return np.extract(list(map(lambda x: False if x.split('__')[0] == x.split('__')[1] else True, clusters)), clusters)
+
+

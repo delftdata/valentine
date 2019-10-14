@@ -1,6 +1,6 @@
 import clustering as cl
 from clustering.column_model import Column
-from read_data_tpch import data
+# from read_data_tpch import data
 from read_data_movies import data_imdb, data_rt
 
 # Should vary depending on the quantile and data
@@ -50,4 +50,9 @@ connected_components = cl.discovery.bfs(distribution_clusters, list(distribution
 print(connected_components)
 
 print("Compute attributes ... \n")
-graph_attributes = cl.discovery.compute_attributes(all_columns, list(connected_components), threshold, quantile)
+edges = cl.discovery.compute_attributes(all_columns, list(connected_components), threshold, quantile)
+
+result = cl.discovery.correlation_clustering_pulp(list(connected_components), edges)
+
+print(cl.discovery.process_correlation_clustering_result(result))
+
