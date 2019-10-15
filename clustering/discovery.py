@@ -30,10 +30,8 @@ def compute_distribution_clusters(columns, threshold, quantile):
     A = dict()
 
     for i in tqdm(range(0, len(columns))):
-        print(i)
         name_i = columns[i].get_long_name()
         for j in tqdm(range(i + 1, len(columns))):
-            print('\t'+str(j))
             name_j = columns[j].get_long_name()
             e = emd_utils.quantile_emd(columns[i], columns[j], quantile)
 
@@ -62,10 +60,8 @@ def compute_distribution_clusters(columns, threshold, quantile):
         print(theta)
         print('\n')
         Nc = get_neighbors(A[columns[i]], theta)
-        # print(Nc)
         graph[columns[i].get_long_name()].update(Nc)
 
-    print(graph)
     return graph
 
 
@@ -82,13 +78,15 @@ def bfs(graph, start):
 def get_connected_components(distribution_clusters):
     connected_components = list()
     for i in list(distribution_clusters.keys()):
-        components = bfs(distribution_clusters, i)
+        components = list(bfs(distribution_clusters, i))
 
         if len(components) > 1:
             if len(connected_components) == 0:
                 connected_components.append(components)
-            elif ~is_in_list(components, connected_components):
+            elif not is_in_list(components, connected_components):
                 connected_components.append(components)
+
+    return connected_components
 
 
 def is_in_list(small_list, big_list):
