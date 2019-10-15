@@ -1,45 +1,79 @@
-import gurobipy as grb
+from clustering.column_model import Column
+import clustering.discovery as discovery
 
-import random
 
-opt_model = grb.Model(name="MIP Model")
+class CorrelationClustering:
+    def __init__(self, quantiles, threshold):
+        self.data = list(dict())
+        self.quantiles = quantiles
+        self.threshold = threshold
+        self.columns = list()
 
-n = 10
-m = 5
-set_I = range(1, n+1)
-set_J = range(1, m+1)
-c = {(i,j): random.normalvariate(0,1) for i in set_I for j in set_J}
-a = {(i,j): random.normalvariate(0,5) for i in set_I for j in set_J}
-l = {(i,j): random.randint(0,10) for i in set_I for j in set_J}
-u = {(i,j): random.randint(10,20) for i in set_I for j in set_J}
-b = {j: random.randint(0,30) for j in set_J}
+    def add_data(self, data, source_name, selected_columns=[]):
+        new_data = dict()
+        new_data['data'] = data
+        new_data['source_name'] = source_name
+        new_data['selected_columns'] = selected_columns
+        self.data.append(new_data)
 
-# if x is Continuous
-x_vars = {(i, j): opt_model.addVar(vtype=grb.GRB.CONTINUOUS, lb=l[i,j], ub= u[i,j], name="x_{0}_{1}".format(i,j))
-          for i in set_I for j in set_J}
-# if x is Binary
-# x_vars  = {(i,j):opt_model.addVar(vtype=grb.GRB.BINARY, name="x_{0}_{1}".format(i,j)) for i in set_I for j in set_J}
-# if x is Integer
-# x_vars  ={(i,j):opt_model.addVar(vtype=grb.GRB.INTEGER, lb=l[i,j], ub= u[i,j], name="x_{0}_{1}".format(i,j))
-#           for i in set_I for j in set_J}
+    def __process_data(self, data_object):
+        """
+        Tokenize each data column
 
-# <= constraints
-constraints = {j: opt_model.addConstr(lhs=grb.quicksum(a[i,j] * x_vars[i,j] for i in set_I), sense=grb.GRB.LESS_EQUAL,
-                                      rhs=b[j], name="constraint_{0}".format(j)) for j in set_J}
+        :return: clustering.column_model.Column entity
+        """
+        columns = []
 
-# sense=grb.GRB.GREATER_EQUAL,
+        if len(data_object.selected_columns) > 0:
+            column_list = data_object.selected_columns
+        else:
+            column_list = list(data_object.data.columns)
 
-# sense=grb.GRB.EQUAL,
+        for column in column_list:
+            print("Process column %s" % column)
+            c = Column(column, data_object.data[column], data_object.source_name)
+            print("\tTokenize data...")
+            c.process_data()
+            columns.append(c)
 
-objective = grb.quicksum(x_vars[i,j] * c[i,j] for i in set_I for j in set_J)
+        return columns
 
-# for maximization
-# opt_model.ModelSense = grb.GRB.MAXIMIZE
-# for minimization
-opt_model.ModelSense = grb.GRB.MINIMIZE
-opt_model.setObjective(objective)
+    def find_matchings(self):
+        print("Process data ... \n")
+        for item in self.data:
+            self.columns.extend(self.__process_data(item))
 
-opt_model.optimize()
+        print("Compute distribution clusters ...\n")
+        distribution_clusters = discovery.compute_distribution_clusters(self.columns, self.threshold, self.quantiles)
 
-for v in opt_model.getVars():
-    print('%s %g' % (v.varName, v.x))
+        print("Find connected components ... \n")
+        connected_components = discovery.get_connected_components(distribution_clusters)
+
+        print("Compute attributes ... \n")
+        all_attributes = list()
+        for components in connected_components:
+            edges = discovery.compute_attributes(self.columns, components, self.threshold, self.quantiles)
+            all_attributes.append((components, edges))
+
+        print("Solve linear program ... \n")
+        results = list()
+        for components, edges in all_attributes:
+            results.append(discovery.correlation_clustering_pulp(components, edges))
+
+        print("Extract clusters ... \n")
+        clusters = list()
+        for result in results:
+            clusters.append(discovery.process_correlation_clustering_result(result))
+
+        return clusters
+
+
+if __name__ == "__main__":
+    cc = CorrelationClustering(256, 0.05)
+
+    from read_data_movies import data_imdb, data_rt
+    cc.add_data(data_imdb, 'imdb', ['Name', 'YearRange', 'Genre'])
+    cc.add_data(data_rt, 'rt', ['Name', 'Year', 'Genre'])
+
+    matchings = cc.find_matchings()
+

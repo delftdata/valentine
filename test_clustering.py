@@ -49,10 +49,10 @@ print("Find connected components ... \n")
 connected_components = cl.discovery.get_connected_components(distribution_clusters)
 print(connected_components)
 
-# print("Compute attributes ... \n")
-# edges = cl.discovery.compute_attributes(all_columns, list(connected_components), threshold, quantile)
-#
-# result = cl.discovery.correlation_clustering_pulp(list(connected_components), edges)
-#
-# print(cl.discovery.process_correlation_clustering_result(result))
+print("Compute attributes ... \n")
+edges = cl.discovery.compute_attributes(all_columns, list(connected_components), threshold, quantile)
+
+result = cl.discovery.correlation_clustering_pulp(list(connected_components), edges)
+
+print(cl.discovery.process_correlation_clustering_result(result))
 
