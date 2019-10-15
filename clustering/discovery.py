@@ -79,6 +79,26 @@ def bfs(graph, start):
     return visited
 
 
+def get_connected_components(distribution_clusters):
+    connected_components = list()
+    for i in list(distribution_clusters.keys()):
+        components = bfs(distribution_clusters, i)
+
+        if len(components) > 1:
+            if len(connected_components) == 0:
+                connected_components.append(components)
+            elif ~is_in_list(components, connected_components):
+                connected_components.append(components)
+
+
+def is_in_list(small_list, big_list):
+    for lst in big_list:
+        result = all(elm in lst for elm in small_list)
+        if result:
+            return result
+    return False
+
+
 def compute_attributes(columns, DC, theta, quantile):
     GA = dict()
     I = dict()

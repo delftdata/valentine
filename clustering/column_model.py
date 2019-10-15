@@ -5,6 +5,8 @@ import nltk
 import numpy as np
 import string
 
+nltk.download('punkt')
+
 
 TABLE = str.maketrans({key: ' ' for key in string.punctuation})
 
