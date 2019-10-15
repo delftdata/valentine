@@ -24,14 +24,14 @@ class CorrelationClustering:
         """
         columns = []
 
-        if len(data_object.selected_columns) > 0:
-            column_list = data_object.selected_columns
+        if len(data_object["selected_columns"]) > 0:
+            column_list = data_object["selected_columns"]
         else:
-            column_list = list(data_object.data.columns)
+            column_list = list(data_object["data"].columns)
 
         for column in column_list:
             print("Process column %s" % column)
-            c = Column(column, data_object.data[column], data_object.source_name)
+            c = Column(column, data_object["data"][column], data_object["source_name"])
             print("\tTokenize data...")
             c.process_data()
             columns.append(c)
@@ -60,6 +60,8 @@ class CorrelationClustering:
         for components, edges in all_attributes:
             results.append(discovery.correlation_clustering_pulp(components, edges))
 
+        print(results)
+
         print("Extract clusters ... \n")
         clusters = list()
         for result in results:
@@ -68,7 +70,7 @@ class CorrelationClustering:
         return clusters
 
 
-if __name__ == "__main__":
+def test():
     cc = CorrelationClustering(256, 0.05)
 
     from read_data_movies import data_imdb, data_rt
@@ -76,4 +78,6 @@ if __name__ == "__main__":
     cc.add_data(data_rt, 'rt', ['Name', 'Year', 'Genre'])
 
     matchings = cc.find_matchings()
+
+    return matchings
 
