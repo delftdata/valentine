@@ -16,6 +16,12 @@ class CorrelationClustering:
         new_data['selected_columns'] = selected_columns
         self.data.append(new_data)
 
+    def set_quantiles(self, quantiles):
+        self.quantiles = quantiles
+
+    def set_threshold(self, threshold):
+        self.threshold = threshold
+
     def __process_data(self, data_object):
         """
         Tokenize each data column
