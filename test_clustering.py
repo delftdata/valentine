@@ -39,8 +39,8 @@ else:
     selected_imdb = ['Name', 'YearRange', 'Genre']
     selected_rt = ['Name', 'Year', 'Genre']
 
-    all_columns.extend(process_data(data_imdb, selected_imdb, 'imdb'))
-    all_columns.extend(process_data(data_rt, selected_rt, 'rt'))
+    all_columns.extend(process_data(data_imdb, list(data_imdb.columns), 'imdb'))
+    all_columns.extend(process_data(data_rt, list(data_rt.columns), 'rt'))
 
 print("Compute distribution clusters ...\n")
 distribution_clusters = cl.discovery.compute_distribution_clusters(all_columns, threshold, quantile)
