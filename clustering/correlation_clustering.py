@@ -8,6 +8,7 @@ class CorrelationClustering:
         self.quantiles = quantiles
         self.threshold = threshold
         self.columns = list()
+        self.__processed = False
 
     def add_data(self, data, source_name, selected_columns=[]):
         """
@@ -24,6 +25,7 @@ class CorrelationClustering:
         new_data['source_name'] = source_name
         new_data['selected_columns'] = selected_columns
         self.data.append(new_data)
+        self.__processed = False
 
     def set_quantiles(self, quantiles):
         self.quantiles = quantiles
@@ -53,10 +55,16 @@ class CorrelationClustering:
 
         return columns
 
-    def find_matchings(self):
+    def process_data(self):
         print("Process data ... \n")
+        self.columns = list()
         for item in self.data:
             self.columns.extend(self.__process_data(item))
+
+    def find_matchings(self):
+        if not self.__processed:
+            print("Please process data before finding matchings (call process_data())")
+            return
 
         print("Compute distribution clusters ...\n")
         distribution_clusters = discovery.compute_distribution_clusters(self.columns, self.threshold, self.quantiles)
