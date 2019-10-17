@@ -10,6 +10,15 @@ class CorrelationClustering:
         self.columns = list()
 
     def add_data(self, data, source_name, selected_columns=[]):
+        """
+        Create data objects
+
+        :param data: Dataframe
+        :type data: pandas Dataframe
+        :param source_name: Name of the database
+        :param selected_columns: If only a part of the dataset should be used, specify the columns
+        :return: The function adds the new data object to the data param
+        """
         new_data = dict()
         new_data['data'] = data
         new_data['source_name'] = source_name
