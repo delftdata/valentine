@@ -60,6 +60,7 @@ class CorrelationClustering:
         self.columns = list()
         for item in self.data:
             self.columns.extend(self.__process_data(item))
+        self.__processed = True
 
     def find_matchings(self):
         if not self.__processed:
