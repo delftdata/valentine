@@ -11,4 +11,7 @@ else
   output_pkl=$2
 fi
 
+path="$(dirname "$0")"
+cd $path/aurum-datadiscovery
+
 python3 create_pkl_ontology.py $input_owl $output_pkl

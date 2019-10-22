@@ -28,6 +28,8 @@ sources:
    type: csv
    config:
      # path indicates where the CSV files live
+     # Note: the path will be relative to "aurum-datadiscovery/ddprofiler", hence the "../../". The extra "../" is
+     # to navigate to my data folder which is outside of seeping-semantics folder.
      path: "../../../data/google/movies1/csv_files/aurum-files"
      # separator used in the CSV files
      separator: ','

@@ -22,6 +22,6 @@ echo $'\n'Build ddprofiler$'\n'
 
 #echo $'\n'Create model in pickle format $'\n'
 #python networkbuildercoordinator.py --opath test/testmodel/
-pid=$(ps -ef | grep elastic | cut -d " " -f 4 | head -1)
+pid=$(ps -ef | grep elastic | tr -s " " | cut -d " " -f 2 | head -1)
 
 echo $'\n'Elastics Seach pid: "$pid"$'\n'
