@@ -11,4 +11,4 @@ else
   output_pkl=$2
 fi
 
-python3 aurum-datadiscovery/create_pkl_ontology.py $input_owl $output_pkl
+python3 create_pkl_ontology.py $input_owl $output_pkl

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+path="$(dirname "$0")"
 source_name=
 
 if [ $# -gt 0 ]; then
@@ -9,8 +10,9 @@ else
     echo "Please provide the path to the yml config file"
 fi
 
-cd aurum-datadiscovery/ddprofiler
+cd $path/aurum-datadiscovery/ddprofiler
 
 echo $'\n'Load db into elasticsearch$'\n'
-./run.sh --sources ../../access-db-movies.yml
+#./run.sh --sources ../../access-db-movies.yml
+./run.sh --sources $source_name
 

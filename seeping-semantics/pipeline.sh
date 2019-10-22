@@ -1,13 +1,14 @@
 #!/bin/bash
 
 echo 'Run Elastic Search Script'
-./run-es.sh
+rm -rf /tmp/elasticsearch-dir
+path="$(dirname "$0")"
+$path/run-es.sh
 
-pid=$(ps -ef | grep elastic | cut -d " " -f 5 | head -1)
 
-cd aurum-datadiscovery/ddprofiler
+cd $path/aurum-datadiscovery/ddprofiler
 echo $'\n'Build ddprofiler$'\n'
-./build.sh
+./build.sh && \
 
 #echo $'\n'Load db into elasticsearch$'\n'
 #./run.sh --sources ../../../access-db-movies.yml
@@ -21,4 +22,6 @@ echo $'\n'Build ddprofiler$'\n'
 
 #echo $'\n'Create model in pickle format $'\n'
 #python networkbuildercoordinator.py --opath test/testmodel/
+pid=$(ps -ef | grep elastic | cut -d " " -f 4 | head -1)
+
 echo $'\n'Elastics Seach pid: "$pid"$'\n'
