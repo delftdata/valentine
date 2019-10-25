@@ -9,7 +9,17 @@ The repository contains the following:
 3. Example scripts to read data for clustering and run it
 
 ## Clustering 
-### column_model
+
+### Before running
+Before running CorrelationClustering, create a
+virtual environment and install the requirements from 
+*requirements-clustering.txt*
+
+Prerequisites: Python3.6 or Python3.7
+
+### File descriptions
+
+#### column_model
 The file contains the data model used in the application. 
 The "Column" is a representation of a column from a database. 
 To map a dataset into _Columns_, read each column of the dataset
@@ -22,14 +32,14 @@ before performing any other operations.
 All of the above operations are automatically done by the main class
 of the module _CorrelationClustering_
 
-### emd_utils
+#### emd_utils
 The file contains the functions that computes different kinds of
 Earth Mover's Distance (EMD) algorithms. 
 
-### discovery
+#### discovery
 The file contains the main algorithms described in the paper.
 
-### correlation_clustering
+#### correlation_clustering
 The file contains the main class of the application. 
 To instantiate and work with it, the following steps must be followed:
 1. Create a new _CorrelationClustering_ object and specify 
@@ -43,6 +53,11 @@ required transformation in order to convert the data in _Column_ format.
 4. Find matchings (_find_matchings()_). This might take a while,
 since it is the main scope of the application. The result is a list of 
 matchings. 
+
+### Test
+_read_data_movies_ and _read_data_tpch_ are example files of reading data.
+
+*test_clustering* contains the steps to test the module. 
 
 
 ## seeping-semantics

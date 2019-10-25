@@ -36,3 +36,12 @@ Convert the ontology into pkl format by running create_pkl_ontology.sh <input_fi
 If the path contains folders, make sure they exist already in aurum-datadiscovery.
 To convert the ontology from .owl to .pkl format takes a while. 
 Moreover, the framework doens't give any update on the progress, so just be patient (e.g. efo.owl ontology took 25 mins to parse).
+
+## Run
+The _aurum_ repository contains a python script *semprop_pipeline* that
+has configured the entire pipeline of SemProp as described in the 
+[paper](http://raulcastrofernandez.com/papers/icde18-seeping.pdf). 
+
+Check the function _init_test()_ and update with the corresponding paths.
+Function _test()_ performs the test, that can also be found in 
+_test_semprop_pipeline.py_. 
