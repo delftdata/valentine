@@ -94,15 +94,3 @@ class CorrelationClustering:
         return clusters
 
 
-def test():
-    cc = CorrelationClustering(256, 0.05)
-
-    from read_data_movies import data_imdb, data_rt
-    cc.add_data(data_imdb, 'imdb', ['Name', 'YearRange', 'Genre'])
-    cc.add_data(data_rt, 'rt', ['Name', 'Year', 'Genre'])
-    cc.process_data()
-
-    matchings = cc.find_matchings()
-
-    return matchings
-

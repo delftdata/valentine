@@ -48,7 +48,6 @@ class Column:
         self.__name = name
         self.__data = data
         self.tokens = []
-        self.quantile_histogram = defaultdict(defaultdict)
 
     def get_original_name(self):
         return self.__name
