@@ -7,10 +7,6 @@ threshold = 0.05
 # Should vary depending on the size of the data
 quantile = 100
 # name of the db
-data_type = 'movies'
-# data_type = 'tpch'
-
-all_columns = []
 
 cc = CorrelationClustering(quantile, threshold)
 cc.add_data(data_imdb, 'imdb', ['Name', 'YearRange', 'Genre'])
