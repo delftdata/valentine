@@ -32,4 +32,18 @@ The file contains the main algorithms described in the paper.
 ### correlation_clustering
 The file contains the main class of the application. 
 To instantiate and work with it, the following steps must be followed:
-1. Create a new _CorrelationClustering_ object 
+1. Create a new _CorrelationClustering_ object and specify 
+the number of quantiles used to compute histograms and
+the threshold used to compare EMD values (start small e.g. 0.05)
+2. Add data using _add_data()_. The method requires a *Pandas DataFrame*
+object, the source name (table name) and what columns should be used instead
+of the entire dataset (optional).
+3. Process the data (_process_data()_). The method will make the
+required transformation in order to convert the data in _Column_ format.
+4. Find matchings (_find_matchings()_). This might take a while,
+since it is the main scope of the application. The result is a list of 
+matchings. 
+
+
+## seeping-semantics
+The folder contains its own README that will help with running the application.

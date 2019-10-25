@@ -7,6 +7,7 @@ Aurum can easily read data in csv, postgres, mysql, oracle10g, oracle11g formats
 Clone/Fork https://github.com/AndraIonescu/aurum-datadiscovery in this directory. 
 
 This version is a fork from the original repository, that contains small updates to make it compatible with python3.6 
+It also contains special files that contains the running pipeline.
 ### Step 1 
 Run pipeline.sh 
 This will download ElasticSearch and will build the profiler (the module responsible with loading the data). 
@@ -29,7 +30,6 @@ Create a model from the previously loaded db, by running create_pkl_model.sh.
 This script creates the model in .pkl format and other metadata files used in the framework. 
 
 ### Step 5
-Move "create_pkl_ontology.py" to the aurum-datadiscovery repo. 
 Convert the ontology into pkl format by running create_pkl_ontology.sh <input_file.owl> <output_path.pkl>
 
 **Note**: the output file will be generated into aurum-datadiscovery folder. 
