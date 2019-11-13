@@ -38,16 +38,16 @@ def compute_distribution_clusters(columns, threshold, quantile):
             item_j = dict()
             item_j['e'] = e
             item_j['c'] = name_j
-            if columns[i] not in A:
-                A[columns[i]] = []
-            A[columns[i]].append(item_j)
+            if name_i not in A:
+                A[name_i] = []
+            A[name_i].append(item_j)
 
             item_i = dict()
             item_i['e'] = e
             item_i['c'] = name_i
-            if columns[j] not in A:
-                A[columns[j]] = []
-            A[columns[j]].append(item_i)
+            if name_j not in A:
+                A[name_j] = []
+            A[name_j].append(item_i)
 
         graph[name_i] = set()
 
@@ -55,11 +55,11 @@ def compute_distribution_clusters(columns, threshold, quantile):
     for i in range(len(columns)):
         name_i = columns[i].get_long_name()
         print(name_i)
-        theta = compute_cutoff_threshold(A[columns[i]], threshold)
-        print(A[columns[i]])
+        theta = compute_cutoff_threshold(A[name_i], threshold)
+        print(A[name_i])
         print(theta)
         print('\n')
-        Nc = get_neighbors(A[columns[i]], theta)
+        Nc = get_neighbors(A[name_i], theta)
         graph[columns[i].get_long_name()].update(Nc)
 
     return graph
