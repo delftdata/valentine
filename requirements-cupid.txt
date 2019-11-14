@@ -1,0 +1,5 @@
+anytree==2.7.2
+nltk==3.4.3
+six==1.13.0
+snakecase==1.0.1
+strsim==0.0.3
