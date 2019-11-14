@@ -14,10 +14,12 @@ from cupid.elements import SchemaElement, Token, TokenTypes
 def normalize(element, schema_element=None):
     if schema_element is None:
         schema_element = SchemaElement(element)
+
     tokens = nltk.word_tokenize(element)
 
     for token in tokens:
         token_obj = Token()
+
         if token in string.punctuation:
             token_obj.ignore = True
             token_obj.data = token
@@ -31,6 +33,7 @@ def normalize(element, schema_element=None):
                 schema_element.add_token(token_obj)
             except ValueError:
                 token_snake = snakecase.convert(token)
+
                 if '_' in token_snake:
                     token_snake = token_snake.replace('_', ' ')
                     schema_element = normalize(token_snake, schema_element)
@@ -47,6 +50,7 @@ def normalize(element, schema_element=None):
     return schema_element
 
 
+# max = 1
 def name_similarity_tokens(token_set1, token_set2):
     sum1 = get_partial_similarity(token_set1, token_set2)
     sum2 = get_partial_similarity(token_set2, token_set1)
@@ -54,14 +58,14 @@ def name_similarity_tokens(token_set1, token_set2):
     return (sum1 + sum2) / (len(token_set1) + len(token_set2))
 
 
-def get_partial_similarity(token_set1, token_set2):
+def get_partial_similarity(token_set1, token_set2, n=2):
     total_sum = 0
     for t1 in token_set1:
         max_sim = -math.inf
         for t2 in token_set2:
             sim = compute_similarity_wordnet(t1.data, t2.data)
             if math.isnan(sim):
-                sim = 1 - compute_similarity_ngram(t1.data, t2.data, 2)
+                sim = 1 - compute_similarity_ngram(t1.data, t2.data, n)
 
             if sim > max_sim:
                 max_sim = sim
@@ -115,14 +119,17 @@ def name_similarity_elements(element1, element2):
 
 
 def compute_lsim(element1, element2):
-    ns = name_similarity_elements(element1, element2)
-    max_c = -math.inf
+    name_similarity = name_similarity_elements(element1, element2)
+    max_category = -math.inf
+
     for c1 in element1.categories:
         c1 = normalize(c1)
+
         for c2 in element2.categories:
             c2 = normalize(c2)
-            nsc = name_similarity_elements(c1, c2)
-            if nsc > max_c:
-                max_c = nsc
+            name_similarity_categories = name_similarity_elements(c1, c2)
 
-    return ns * max_c
+            if name_similarity_categories > max_category:
+                max_category = name_similarity_categories
+
+    return name_similarity * max_category

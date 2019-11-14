@@ -12,8 +12,9 @@ def compute_weighted_similarity(ssim, lsim, w_struct=0.5):
     return w_struct * ssim + (1 - w_struct) * lsim
 
 
-def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_accept=0.14, th_high=0.15,
-               th_low=0.13, c_inc=1.2, c_dec=0.9):
+def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_accept=0.14, th_high=0.15, th_low=0.13,
+               c_inc=1.2, c_dec=0.9):
+
     s_leaves = list(map(lambda n: n.name, source_tree.leaves))
     t_leaves = list(map(lambda n: n.name, target_tree.leaves))
     all_leaves = product(s_leaves, t_leaves)
@@ -29,10 +30,14 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
     t_post_order = [node for node in PostOrderIter(target_tree)]
 
     for s in s_post_order:
+        s_name = s.name.initial_name
+
         if type(s.name) is not SchemaElement:
             continue
 
         for t in t_post_order:
+            t_name = t.name.initial_name
+
             if type(t.name) is not SchemaElement:
                 continue
 
@@ -40,13 +45,13 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
                 ssim = compute_ssim(s, t, sims, th_accept)
                 lsim = compute_lsim(s.name, t.name)
                 wsim = compute_weighted_similarity(ssim, lsim, w_struct)
-                sims[(s.name.initial_name, t.name.initial_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
+                sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
 
-            if sims[(s.name.initial_name, t.name.initial_name)]['wsim'] > th_high:
+            if sims[(s_name, t_name)]['wsim'] > th_high:
                 change_structural_similarity(list(map(lambda n: n.name.initial_name, s.leaves)),
                                              list(map(lambda n: n.name.initial_name, t.leaves)), sims, c_inc)
 
-            if sims[(s.name.initial_name, t.name.initial_name)]['wsim'] < th_low:
+            if sims[(s_name, t_name)]['wsim'] < th_low:
                 change_structural_similarity(list(map(lambda n: n.name.initial_name, s.leaves)),
                                              list(map(lambda n: n.name.initial_name, t.leaves)), sims, c_dec)
     return sims

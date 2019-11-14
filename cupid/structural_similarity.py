@@ -14,5 +14,6 @@ def compute_ssim(node_s, node_t, sims, th_accept=0.5):
 
 def change_structural_similarity(leaves_s, leaves_t, sims, factor):
     all_leaves = product(leaves_s, leaves_t)
+
     for pair in all_leaves:
         sims[pair]['ssim'] = sims[pair]['ssim'] * factor
