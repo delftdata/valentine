@@ -41,17 +41,17 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
             if type(t.name) is not SchemaElement:
                 continue
 
-            if s.name not in s_leaves or t.name not in t_leaves:
+            if s.height == t.height:
                 ssim = compute_ssim(s, t, sims, th_accept)
                 lsim = compute_lsim(s.name, t.name)
                 wsim = compute_weighted_similarity(ssim, lsim, w_struct)
                 sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
 
-            if sims[(s_name, t_name)]['wsim'] > th_high:
+            if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] > th_high:
                 change_structural_similarity(list(map(lambda n: n.name.initial_name, s.leaves)),
                                              list(map(lambda n: n.name.initial_name, t.leaves)), sims, c_inc)
 
-            if sims[(s_name, t_name)]['wsim'] < th_low:
+            if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] < th_low:
                 change_structural_similarity(list(map(lambda n: n.name.initial_name, s.leaves)),
                                              list(map(lambda n: n.name.initial_name, t.leaves)), sims, c_dec)
     return sims
