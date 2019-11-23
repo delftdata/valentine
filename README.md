@@ -59,6 +59,17 @@ _read_data_movies_ and _read_data_tpch_ are example files of reading data.
 
 *test_clustering* contains the steps to test the module. 
 
+### Clustering scale 
+This module contains the same functionality and structure as the clustering scale but, with the following additions to 
+performance.
 
+* Identified that 99% of the computation time is spent on the EMD calculations
+  * Parallelized, in both algorithm 2 and 3 with multiple processes 
+  * In algorithm 2 added a sorted list in favor of the normal one removing the need to sort in algorithm 1
+  * For the EMD input pre-send the column tokens to the processes for calculation, avoiding extra data transfers. 
+* For the connected components uses the networkx library which is a bit faster
+
+ An example on how to run with the movies dataset is in the file `test_clustering_scale.py`. The 
+ `if __name__ == '__main__':` is required for MS Windows machines, since the new processes need to know their parent. 
 ## seeping-semantics
 The folder contains its own README that will help with running the application.
