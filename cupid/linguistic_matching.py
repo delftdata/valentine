@@ -83,10 +83,10 @@ def compute_similarity_wordnet(word1, word2):
     if len(allsyns1) == 0 or len(allsyns2) == 0:
         return math.nan
 
-    best = max((wn.wup_similarity(s1, s2) or 0, s1, s2) for s1, s2 in product(allsyns1, allsyns2))
-    #     print(best)
+    # best = max((wn.wup_similarity(s1, s2) or 0, s1, s2) for s1, s2 in product(allsyns1, allsyns2))
+    best = max(wn.wup_similarity(s1, s2) or math.nan for s1, s2 in product(allsyns1, allsyns2))
 
-    return best[0]
+    return best
 
 
 # the lower, the better
@@ -120,16 +120,23 @@ def name_similarity_elements(element1, element2):
 
 def compute_lsim(element1, element2):
     name_similarity = name_similarity_elements(element1, element2)
+    max_category = get_max_ns_category(element1.categories, element2.categories)
+
+    return name_similarity * max_category
+
+
+def get_max_ns_category(categories_e1, categories_e2):
     max_category = -math.inf
 
-    for c1 in element1.categories:
+    for c1 in categories_e1:
         c1 = normalize(c1)
 
-        for c2 in element2.categories:
+        for c2 in categories_e2:
             c2 = normalize(c2)
-            name_similarity_categories = name_similarity_elements(c1, c2)
+            name_similarity_categories = name_similarity_tokens(c1.get_tokens_by_token_type(TokenTypes.CONTENT),
+                                                                c2.get_tokens_by_token_type(TokenTypes.CONTENT))
 
             if name_similarity_categories > max_category:
                 max_category = name_similarity_categories
 
-    return name_similarity * max_category
+    return max_category

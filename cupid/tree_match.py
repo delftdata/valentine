@@ -1,3 +1,4 @@
+import math
 from itertools import product
 from operator import getitem
 
@@ -24,41 +25,77 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
         ssim = name_similarity_elements(normalize(s.data_type), normalize(t.data_type))
         lsim = compute_lsim(s, t)
         wsim = compute_weighted_similarity(ssim, lsim, leaf_w_struct)
-        sims[(s.initial_name, t.initial_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
+        sims[(s.long_name, t.long_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
 
     s_post_order = [node for node in PostOrderIter(source_tree)]
     t_post_order = [node for node in PostOrderIter(target_tree)]
 
     for s in s_post_order:
-        s_name = s.name.initial_name
+        s_name = s.name.long_name
 
         if type(s.name) is not SchemaElement:
             continue
 
         for t in t_post_order:
-            t_name = t.name.initial_name
+            t_name = t.name.long_name
 
             if type(t.name) is not SchemaElement:
                 continue
 
+            # if the nodes are on the same level
             if s.height == t.height:
                 ssim = compute_ssim(s, t, sims, th_accept)
+
+                # the nodes should have a similar number of leaves (within a factor of 2)
+                if math.isnan(ssim):
+                    continue
+
                 lsim = compute_lsim(s.name, t.name)
                 wsim = compute_weighted_similarity(ssim, lsim, w_struct)
                 sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
 
             if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] > th_high:
-                change_structural_similarity(list(map(lambda n: n.name.initial_name, s.leaves)),
-                                             list(map(lambda n: n.name.initial_name, t.leaves)), sims, c_inc)
+                change_structural_similarity(list(map(lambda n: n.name.long_name, s.leaves)),
+                                             list(map(lambda n: n.name.long_name, t.leaves)), sims, c_inc)
 
             if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] < th_low:
-                change_structural_similarity(list(map(lambda n: n.name.initial_name, s.leaves)),
-                                             list(map(lambda n: n.name.initial_name, t.leaves)), sims, c_dec)
+                change_structural_similarity(list(map(lambda n: n.name.long_name, s.leaves)),
+                                             list(map(lambda n: n.name.long_name, t.leaves)), sims, c_dec)
+    return sims
+
+
+def recompute_wsim(source_tree, target_tree, sims, w_struct=0.6, th_accept=0.14):
+    s_post_order = [node for node in PostOrderIter(source_tree)]
+    t_post_order = [node for node in PostOrderIter(target_tree)]
+
+    for s in s_post_order:
+        s_name = s.name.long_name
+
+        if type(s.name) is not SchemaElement:
+            continue
+
+        for t in t_post_order:
+            t_name = t.name.long_name
+
+            if type(t.name) is not SchemaElement:
+                continue
+
+            # if the nodes are on the same level
+            if s.height == t.height and (s.height > 0 and t.height > 0):
+                ssim = compute_ssim(s, t, sims, th_accept)
+
+                # the nodes should have a similar number of leaves (within a factor of 2)
+                if math.isnan(ssim):
+                    continue
+
+                lsim = compute_lsim(s.name, t.name)
+                wsim = compute_weighted_similarity(ssim, lsim, w_struct)
+                sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
     return sims
 
 
 def get_matchings(sims, th_accept=0.14):
     sorted_sims = sorted(sims.items(), key=lambda x: getitem(x[1], 'wsim'), reverse=True)
-    return list(map(lambda x: x[0], filter(lambda s: s[1]['wsim'] > th_accept, sorted_sims)))
+    return list(filter(lambda s: s[1]['wsim'] > th_accept, sorted_sims))
 
 

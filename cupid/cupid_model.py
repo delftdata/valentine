@@ -1,30 +1,42 @@
 import itertools
 
-from anytree import Node, RenderTree, PostOrderIter
+from anytree import Node, RenderTree
 
 from cupid.linguistic_matching import normalize
 from cupid.tree_match import tree_match, get_matchings
+
+
+def create_cupid_element(data_type, element_name, source_name):
+    element = normalize(element_name)
+    element.data_type = data_type
+    element.add_category(data_type)
+    element.add_long_name(source_name, element_name)
+    return element
 
 
 class Cupid:
     def __init__(self):
         self.data = list()
 
+    def add_data(self, schema_name, table_name, column_data_pairs, schema_type="string", table_type="string"):
+        self.add_schema(schema_name, schema_type)
+        self.add_table(schema_name, table_name, table_type)
+        self.add_columns_to_table(schema_name, table_name, column_data_pairs)
+
     def add_schema(self, name, data_type):
-        element = normalize(name)
-        element.data_type = data_type
-        element.add_category(data_type)
+        element = create_cupid_element(data_type, name, name)
         schema = Node(element)
         self.data.append(schema)
 
-    def get_schema(self, name):
+    def get_schema_by_name(self, name):
         return next(filter(lambda d: d.name.initial_name == name, self.data))
+
+    def get_schema_by_index(self, index):
+        return self.data[index]
 
     def add_table(self, schema_name, table_name, data_type):
         schema = next(filter(lambda d: d.name.initial_name == schema_name, self.data))
-        element = normalize(table_name)
-        element.data_type = data_type
-        element.add_category(data_type)
+        element = create_cupid_element(data_type, table_name, table_name)
         table = Node(element, parent=schema)
 
     def get_table(self, schema_name, table_name):
@@ -33,13 +45,15 @@ class Cupid:
             if child.name.initial_name == table_name:
                 return child
 
+    def get_all_tables(self, schema_name):
+        schema = next(filter(lambda d: d.name.initial_name == schema_name, self.data))
+        return schema.children
+
     def add_columns_to_table(self, schema_name, table_name, column_data_pairs):
         table = self.get_table(schema_name, table_name)
         for column, data_type in column_data_pairs:
-            schema_element = normalize(column)
-            schema_element.add_category(data_type)
-            schema_element.data_type = data_type
-            node = Node(schema_element, parent=table)
+            element = create_cupid_element(data_type, column, table_name)
+            node = Node(element, parent=table)
 
     def print_data(self):
         def render_tree(schema):

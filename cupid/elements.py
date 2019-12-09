@@ -9,6 +9,10 @@ class SchemaElement:
         self.data_type = None
         self.tokens = list()
         self.initial_name = name
+        self.long_name = None
+
+    def add_long_name(self, table_name, name):
+        self.long_name = table_name + '_' + name
 
     def add_category(self, category):
         self.categories.append(category)
