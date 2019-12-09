@@ -1,4 +1,3 @@
-from tqdm import tqdm
 import numpy as np
 from clustering import emd_utils
 
@@ -29,9 +28,9 @@ def compute_distribution_clusters(columns, threshold, quantile):
     graph = dict()
     A = dict()
 
-    for i in tqdm(range(0, len(columns))):
+    for i in range(len(columns)):
         name_i = columns[i].get_long_name()
-        for j in tqdm(range(i + 1, len(columns))):
+        for j in range(i + 1, len(columns)):
             name_j = columns[j].get_long_name()
             e = emd_utils.quantile_emd(columns[i], columns[j], quantile)
 
@@ -60,7 +59,7 @@ def compute_distribution_clusters(columns, threshold, quantile):
         print(theta)
         print('\n')
         Nc = get_neighbors(A[name_i], theta)
-        graph[columns[i].get_long_name()].update(Nc)
+        graph[name_i].update(Nc)
 
     return graph
 
@@ -102,9 +101,9 @@ def compute_attributes(columns, DC, theta, quantile):
     I = dict()
     E = np.zeros((len(DC), len(DC)))
 
-    for i in tqdm(range(len(DC))):
+    for i in range(len(DC)):
         c_i = next(filter(lambda x: x.get_long_name() == DC[i], columns))
-        for j in tqdm(range(i + 1, len(DC))):
+        for j in range(i + 1, len(DC)):
             c_j = next(filter(lambda x: x.get_long_name() == DC[j], columns))
             e = emd_utils.intersection_emd(c_i, c_j, quantile)
 
@@ -209,7 +208,10 @@ def correlation_clustering_pulp(vertexes, edges):
 
 
 def process_correlation_clustering_result(result):
+    # remove uncorrelated pairs
     clusters = [k for (k, v) in result.items() if v == 0]
+
+    # remove correlation with themselves and extract the rest
     return np.extract(list(map(lambda x: False if x.split('__')[0] == x.split('__')[1] else True, clusters)), clusters)
 
 

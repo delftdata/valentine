@@ -3,26 +3,26 @@ import clustering.discovery as discovery
 
 
 class CorrelationClustering:
-    def __init__(self, quantiles, threshold):
+    def __init__(self):
         self.data = list(dict())
-        self.quantiles = quantiles
-        self.threshold = threshold
+        self.quantiles = None
+        self.threshold = None
         self.columns = list()
         self.__processed = False
 
-    def add_data(self, data, source_name, selected_columns=[]):
+    def add_data(self, table_name, data, selected_columns=[]):
         """
         Create data objects
 
         :param data: Dataframe
         :type data: pandas Dataframe
-        :param source_name: Name of the database
+        :param table_name: Name of the table
         :param selected_columns: If only a part of the dataset should be used, specify the columns
         :return: The function adds the new data object to the data param
         """
         new_data = dict()
         new_data['data'] = data
-        new_data['source_name'] = source_name
+        new_data['source_name'] = table_name
         new_data['selected_columns'] = selected_columns
         self.data.append(new_data)
         self.__processed = False
@@ -63,6 +63,14 @@ class CorrelationClustering:
         self.__processed = True
 
     def find_matchings(self):
+        if self.quantiles is None:
+            print("Please set the quantiles before finding matchings (call set_quantiles())")
+            return
+
+        if self.threshold is None:
+            print("Please set a threshold before finding matchings (call set_threshold())")
+            return
+
         if not self.__processed:
             print("Please process data before finding matchings (call process_data())")
             return
