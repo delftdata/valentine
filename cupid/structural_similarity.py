@@ -29,4 +29,5 @@ def change_structural_similarity(leaves_s, leaves_t, sims, factor):
     all_leaves = product(leaves_s, leaves_t)
 
     for pair in all_leaves:
-        sims[pair]['ssim'] = sims[pair]['ssim'] * factor
+        if pair in sims:
+            sims[pair]['ssim'] = sims[pair]['ssim'] * factor

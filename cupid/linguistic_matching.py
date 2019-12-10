@@ -115,6 +115,9 @@ def name_similarity_elements(element1, element2):
         sum1 = sum1 + tt.weight * sim
         sum2 = sum2 + tt.weight * (len(t1) + len(t2))
 
+    if sum1 == 0 or sum2 == 0:
+        return 0
+
     return sum1 / sum2
 
 
@@ -129,12 +132,11 @@ def get_max_ns_category(categories_e1, categories_e2):
     max_category = -math.inf
 
     for c1 in categories_e1:
-        c1 = normalize(c1)
+        c1_tokens = nltk.word_tokenize(c1)
 
         for c2 in categories_e2:
-            c2 = normalize(c2)
-            name_similarity_categories = name_similarity_tokens(c1.get_tokens_by_token_type(TokenTypes.CONTENT),
-                                                                c2.get_tokens_by_token_type(TokenTypes.CONTENT))
+            c2_tokens = nltk.word_tokenize(c2)
+            name_similarity_categories = name_similarity_tokens(c1_tokens, c2_tokens)
 
             if name_similarity_categories > max_category:
                 max_category = name_similarity_categories
