@@ -66,20 +66,31 @@ def quantile_emd(column1, column2, quantile=256, intersection=False):
 
     if len(ranks2.shape) > 0:
         ranks2 = sorted(ranks2)
+        l2 = len(ranks2)
+
+    # find which list is bigger to compute the quantiles
+    if l2 > l1:
+        ranks = ranks2
+        length = l2
+    else:
+        ranks = ranks1
+        length = l1
+
+    #todo: make a script for computing the graphs
 
     # get the bin edges by using N-quantile
-    bin_edges1 = stats.mstats.mquantiles(ranks1, np.array(range(0, l1 + 1, quantile)) / l1)
+    bin_edges = stats.mstats.mquantiles(ranks, np.array(range(0, length + 1, quantile)) / length)
 
     # compute the quantile histogram
-    hist1, bins1 = np.histogram(ranks1, bins=bin_edges1)
+    hist1, bins1 = np.histogram(ranks1, bins=bin_edges)
 
     # use the edges from the quantile histogram to find the number of values in each bin (hist2)
-    hist2, bins2 = np.histogram(ranks2, bins=bin_edges1)
+    hist2, bins2 = np.histogram(ranks2, bins=bin_edges)
 
     # use quantiles to create new ranks
-    wmap = {key: int(i / quantile) for (i, key) in enumerate(sorted_set)}
-    ranks = np.array(list(set(wmap.values())))
-    ranks_l = len(ranks)
+    # wmap = {key: int(i / quantile) for (i, key) in enumerate(sorted_set)}
+    # ranks = np.array(list(set(wmap.values())))
+    # ranks_l = len(ranks)
 
     # find the distance matrix between each word
     # D = pdist(ranks.reshape(-1, 1), 'minkowski', p=1.)
@@ -89,7 +100,8 @@ def quantile_emd(column1, column2, quantile=256, intersection=False):
     if len(hist1) == 0 or len(hist2) == 0:
         return math.inf
     # return emd(hist1 / ranks_l, hist2 / ranks_l, squareform(D)) / ranks_l
-    return emd_samples(hist1 / ranks_l, hist2 / ranks_l)
+    e = emd_samples(hist1, hist2, bins=bins1)
+    return e
 
 
 def intersection_emd(c1, c2, quantile, bloom_filter=False):

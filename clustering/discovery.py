@@ -34,19 +34,13 @@ def compute_distribution_clusters(columns, threshold, quantile):
             name_j = columns[j].get_long_name()
             e = emd_utils.quantile_emd(columns[i], columns[j], quantile)
 
-            item_j = dict()
-            item_j['e'] = e
-            item_j['c'] = name_j
             if name_i not in A:
                 A[name_i] = []
-            A[name_i].append(item_j)
+            A[name_i].append({'e': e, 'c': name_j})
 
-            item_i = dict()
-            item_i['e'] = e
-            item_i['c'] = name_i
             if name_j not in A:
                 A[name_j] = []
-            A[name_j].append(item_i)
+            A[name_j].append({'e': e, 'c': name_i})
 
         graph[name_i] = set()
 
@@ -82,6 +76,7 @@ def get_connected_components(distribution_clusters):
         if len(components) > 1:
             if len(connected_components) == 0:
                 connected_components.append(components)
+            # sometimes the same components are returned for multiple nodes
             elif not is_in_list(components, connected_components):
                 connected_components.append(components)
 
