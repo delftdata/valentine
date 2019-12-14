@@ -98,34 +98,21 @@ def recompute_wsim(source_tree, target_tree, sims, w_struct=0.6, th_accept=0.14)
     return sims
 
 
-def mapping_generation_leaves(source_tree, target_tree, sims, th_accept):
+def mapping_generation_leaves(source_tree, target_tree, sims, th_accept=0.14):
     s_leaves = list(map(lambda n: n.name.long_name, source_tree.leaves))
     t_leaves = list(map(lambda n: n.name.long_name, target_tree.leaves))
-    all_leaves = product(s_leaves, t_leaves)
-    final_mappings = list()
 
-    for pair in all_leaves:
-        if sims[pair]['wsim'] > th_accept:
-            final_mappings.append(sims[pair])
-
-    return final_mappings
+    return list(filter(lambda s: sims[s]['wsim'] > th_accept, product(s_leaves, t_leaves)))
 
 
-def mapping_generation_non_leaves(source_tree, target_tree, sims, th_accept):
+def mapping_generation_non_leaves(source_tree, target_tree, sims, th_accept=0.14):
     max_level_s = source_tree.height - 1
     max_level_t = target_tree.height - 1
 
     non_leaves_s = list(map(lambda n: n.name.long_name, LevelOrderIter(source_tree.root, maxlevel=max_level_s)))
     non_leaves_t = list(map(lambda n: n.name.long_name, LevelOrderIter(target_tree.root, maxlevel=max_level_t)))
 
-    all_leaves = product(non_leaves_s, non_leaves_t)
-    final_mappings = list()
-
-    for pair in all_leaves:
-        if sims[pair]['wsim'] > th_accept:
-            final_mappings.append(sims[pair])
-
-    return final_mappings
+    return list(filter(lambda s: sims[s]['wsim'] > th_accept, product(non_leaves_s, non_leaves_t)))
 
 
 def get_matchings(sims, th_accept=0.14):

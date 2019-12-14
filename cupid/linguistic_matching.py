@@ -132,10 +132,10 @@ def get_max_ns_category(categories_e1, categories_e2):
     max_category = -math.inf
 
     for c1 in categories_e1:
-        c1_tokens = nltk.word_tokenize(c1)
+        c1_tokens = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(c1)))
 
         for c2 in categories_e2:
-            c2_tokens = nltk.word_tokenize(c2)
+            c2_tokens = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(c2)))
             name_similarity_categories = name_similarity_tokens(c1_tokens, c2_tokens)
 
             if name_similarity_categories > max_category:

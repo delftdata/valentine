@@ -12,7 +12,7 @@ class SchemaElement:
         self.long_name = None
 
     def add_long_name(self, table_name, name):
-        self.long_name = table_name + '_' + name
+        self.long_name = table_name + '__' + name
 
     def add_category(self, category):
         self.categories.append(category)
@@ -48,6 +48,10 @@ class Token:
         self.ignore = False
         self.data = None
         self.token_type = None
+
+    def add_data(self, data):
+        self.data = data
+        return self
 
 
 TokenType = namedtuple('TokenType', ['token_name', 'weight'])
