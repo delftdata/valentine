@@ -1,0 +1,35 @@
+table,column
+products,ProductID
+products,ProductName
+products,BrandID
+products,BrandDescription
+geography,PostalCode
+geography,TerritoryID
+geography,TerritoryDescription
+geography,RegionID
+geography,RegionDescription
+sales,OrderID
+sales,OrderDetailID
+sales,CustomerID (FK)
+sales,PostalCode (FK)
+sales,ProductID (FK)
+sales,OrderDate (FK)
+sales,Quantity
+sales,UnitPrice
+sales,Discount
+customers,CustomerID
+customers,CustomerName
+customers,CustomerTypeID
+customers,CustomerTypeDescription
+customers,PostalCode
+customers,State
+time,Date
+time,DayOfWeek
+time,Month
+time,Year
+time,Quarter
+time,DayOfYear
+time,Holiday
+time,Weekend
+time,YearMonth
+time,WeekOfYear

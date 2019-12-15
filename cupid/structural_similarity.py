@@ -30,4 +30,5 @@ def change_structural_similarity(leaves_s, leaves_t, sims, factor):
 
     for pair in all_leaves:
         if pair in sims:
-            sims[pair]['ssim'] = sims[pair]['ssim'] * factor
+            partial = sims[pair]['ssim'] * factor
+            sims[pair]['ssim'] = partial if partial < 1 else 1

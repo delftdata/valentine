@@ -1,0 +1,35 @@
+territories__TerritoryID, geography__TerritoryID
+territories__TerritoryDescription, geography__TerritoryDescription
+region__RegionID, geography__RegionID
+region__RegionDescription, geography__RegionDescription
+customers__CustomerID, customers__CustomerID
+customers__ContactFirstName, customers__CustomerName
+customers__ContactLastName, customers__CustomerName
+customers__StateOrProvince, customers__State
+customers__PostalCode, customers__PostalCode
+products__ProductID, products__ProductID
+products__BrandID(FK), products__BrandID
+products__ProductName, products__ProductName
+products__BrandDescription, products__BrandDescription
+orders__OrderID, sales__OrderID
+orders__CustomerID(FK), sales__CustomerID (FK)
+orders__OrderDate, sales__OrderDate (FK)
+orders__Quantity, sales__Quantity
+orders__UnitPrice, sales__UnitPrice
+orders__Discount, sales__Discount
+orderDetails__OrderDetailID, sales__OrderDetailID
+orderDetails__OrderID(FK), sales__OrderID
+orderDetails__ProductID(FK), sales__ProductID (FK)
+orderDetails__Quantity, sales__Quantity
+orderDetails__UnitPrice, sales__UnitPrice
+orderDetails__Discount, sales__Discount
+customers__PostalCode, geography__PostalCode
+customers__PostalCode, sales__PostalCode (FK)
+('brands__BrandID', 'products__BrandID')
+('brands__BrandDescription', 'products__BrandDescription')
+('territoryRegion__TerritoryID(FK), 'geography__TerritoryID')
+('territoryRegion__RegionID(FK)', 'geography__RegionID')
+('employeeTerritory__TerritoryID(FK)', 'geography__TerritoryID')
+('payment__OrderID(FK)', 'sales__OrderID')
+('orders__CustomerID(FK)', 'customers__CustomerID')
+('products__ProductID', 'sales__ProductID (FK)')

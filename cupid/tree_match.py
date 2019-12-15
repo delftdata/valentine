@@ -1,4 +1,5 @@
 import math
+import time
 from itertools import product
 from operator import getitem
 
@@ -21,12 +22,15 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
     all_leaves = product(s_leaves, t_leaves)
     sims = dict()
 
+    start = time.time()
     for s, t in all_leaves:
         # data type compatibility - max = 0.5
         ssim = name_similarity_elements(normalize(s.data_type), normalize(t.data_type))
         lsim = compute_lsim(s, t)
         wsim = compute_weighted_similarity(ssim, lsim, leaf_w_struct)
         sims[(s.long_name, t.long_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
+    end = time.time()
+    print('Leaves computation took: {}'.format(end-start))
 
     s_post_order = [node for node in PostOrderIter(source_tree)]
     t_post_order = [node for node in PostOrderIter(target_tree)]
@@ -62,6 +66,8 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
             if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] < th_low:
                 change_structural_similarity(list(map(lambda n: n.name.long_name, s.leaves)),
                                              list(map(lambda n: n.name.long_name, t.leaves)), sims, c_dec)
+    end2 = time.time()
+    print('Post-order matchings computation took: {}'.format(end2 - end))
     return sims
 
 
