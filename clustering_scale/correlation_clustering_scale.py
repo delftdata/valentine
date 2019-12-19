@@ -1,79 +1,81 @@
 import timeit
+from pandas import DataFrame
+from multiprocessing import Pool
 
-from clustering.column_model import Column
 import clustering_scale.discovery_scale as discovery
+from clustering_scale.scale_utils import process_columns, ingestion_column_generator
 
 
 class CorrelationClustering:
-    def __init__(self, quantiles, threshold):
-        self.data = list(dict())
+    """
+    A class that contains the data and methods required for the algorithms proposed in
+    "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]
+
+    Attributes
+    ----------
+    quantiles: int
+        the number of quantiles of the histograms
+    threshold : float
+        the global threshold described in [1]
+    columns : list(str)
+        a list with all the compound column names (table_name + '_' + column_name)
+
+    Methods
+    -------
+    add_data(data, source_name, pool)
+        Returns the quantile histogram of the column
+
+    find_matches(pool)
+        Returns the column name
+
+    """
+    def __init__(self, quantiles: int, threshold: float):
+        """
+        Parameters
+        ----------
+        quantiles : int
+            The number of quantiles of the column's quantile histogram
+        threshold : float
+            The global threshold described in [1]
+        """
         self.quantiles = quantiles
         self.threshold = threshold
         self.columns = list()
-        self.__processed = False
 
-    def add_data(self, data, source_name, selected_columns=None):
+    def add_data(self, data: DataFrame, source_name: str, pool: Pool):
         """
-        Create data objects
+        Processes a table into column_model_scale.Column objects and stores them as pickle files
 
-        :param data: Dataframe
-        :type data: pandas Dataframe
-        :param source_name: Name of the database
-        :param selected_columns: If only a part of the dataset should be used, specify the columns
-        :return: The function adds the new data object to the data param
+        Parameters
+        ---------
+        data : pandas.Dataframe
+            a table of the database
+        source_name : str
+            the name of the table
+        pool: multiprocessing.Pool
+            the process pool that will be used in the pre-processing of the table's columns
         """
-        new_data = dict()
-        new_data['data'] = data
-        new_data['source_name'] = source_name
-        new_data['selected_columns'] = selected_columns
-        self.data.append(new_data)
-        self.__processed = False
+        pool.map(process_columns, ingestion_column_generator(data, source_name, self.quantiles))
 
-    def set_quantiles(self, quantiles):
-        self.quantiles = quantiles
+        self.columns = self.columns + list(map(lambda name: source_name + '_' + name, data.columns))
 
-    def set_threshold(self, threshold):
-        self.threshold = threshold
-
-    def __process_data(self, data_object):
+    def find_matches(self, pool: Pool, chunk_size: int = None):
         """
-        Tokenize each data column
+        "Main" function of [1] that will calculate first the distribution clusters and then the attribute clusters
 
-        :return: clustering.column_model.Column entity
+        Parameters
+        ---------
+        pool: multiprocessing.Pool
+            the process pool that will be used in the algorithms 1, 2 and 3 of [1]
+        chunk_size: int, optional
+            the number of chunks of each job process (default let the framework decide)
         """
-        columns = []
-
-        if (data_object["selected_columns"] is not None) and len(data_object["selected_columns"]) > 0:
-            column_list = data_object["selected_columns"]
-        else:
-            column_list = list(data_object["data"].columns)
-
-        for column in column_list:
-            print("Process column %s" % column)
-            c = Column(column, data_object["data"][column], data_object["source_name"])
-            print("\tTokenize data...")
-            c.process_data()
-            columns.append(c)
-
-        return columns
-
-    def process_data(self):
-        print("Process data ... \n")
-        self.columns = list()
-        for item in self.data:
-            self.columns.extend(self.__process_data(item))
-        self.__processed = True
-
-    def find_matchings(self):
-        if not self.__processed:
-            print("Please process data before finding matchings (call process_data())")
-            return
-
         start = timeit.default_timer()
 
         print("Compute distribution clusters ...\n")
 
-        connected_components = discovery.compute_distribution_clusters(self.columns, self.threshold, self.quantiles)
+        connected_components = discovery.compute_distribution_clusters(self.columns, self.threshold, pool,
+                                                                       chunk_size, self.quantiles)
 
         stop = timeit.default_timer()
 
@@ -84,7 +86,7 @@ class CorrelationClustering:
         print("Compute attributes ... \n")
         all_attributes = list()
         for components in connected_components:
-            edges = discovery.compute_attributes(self.columns, list(components), self.threshold, self.quantiles)
+            edges = discovery.compute_attributes(list(components), self.threshold, pool, chunk_size, self.quantiles)
             all_attributes.append((list(components), edges))
 
         stop = timeit.default_timer()
@@ -113,6 +115,6 @@ class CorrelationClustering:
 
         print('Time: ', stop - start)
 
+        print(clusters)
+
         return clusters
-
-

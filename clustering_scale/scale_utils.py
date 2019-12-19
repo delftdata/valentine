@@ -1,60 +1,142 @@
-from sortedcontainers import SortedList
+from pandas import DataFrame
 
+from clustering_scale.column_model_scale import Column
 from clustering_scale.emd_utils import quantile_emd, intersection_emd
+from clustering_scale.quantile_histogram.histogram import QuantileHistogram
+import pickle
 
 
-def column_combinations(columns, quantile):
+def compute_cutoff_threshold(C: list, threshold: float):
     """
-    To balance the load of each process, instead of giving as input one iteration of the emd's calculation outer-loop
-    which is unbalanced. This function gives as input (in a lazy way) one column combination.
-    :param columns: The columns of the database
-    :param quantile: The number of quantiles for the quantile-EMD calculation
-    :return: A tuple with ((column_name1, column_name1), (column1, column2), #quantiles)
+    Algorithm 1 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]
+    This algorithm computes the threshold of a column that determines if any other column is to be considered
+    its neighbour.
+
+    Parameters
+    ---------
+    C : list
+        a list containing dicts of EMD/ColumnName pairs
+    threshold : float
+        the conservative global EMD cutoff threshold described in [1]
+
+    Returns
+    -------
+    float
+        the cutoff threshold of the input column
+    """
+    C.append({'e': threshold, 'c': 0})
+    C = sorted(C, key=lambda k: k['e'])
+    cutoff = 0.0
+    gap = 0.0
+    i = 0
+    while i < len(C) - 1 and C[i + 1]['e'] <= threshold:
+        if gap < (C[i + 1]['e'] - C[i]['e']):
+            gap = C[i + 1]['e'] - C[i]['e']
+            cutoff = C[i]['e']
+        i += 1
+    del C
+    return cutoff
+
+
+def column_combinations(columns: list, quantiles: int, intersection: bool = False):
+    """
+    All the unique combinations between all the columns
+
+    Parameters
+    ---------
+    columns : list
+        a list that contains all the column names
+    quantiles : int
+        The number of quantiles that the histograms are split on
+    intersection : bool, optional
+        if true do the intersection EMD else the normal EMD
+
+    Returns
+    -------
+    tuple
+        a tuple with ((column_name1, column_name1), quantiles, intersection)
     """
     c = len(columns)
     c_i = 0
     while c_i < c:
-        name_i = columns[c_i].get_long_name()
+        name_i = columns[c_i]
         c_j = c_i + 1
         while c_j < c:
-            name_j = columns[c_j].get_long_name()
-            yield (name_i, name_j), (columns[c_i].get_tokens(), columns[c_j].get_tokens()), quantile
+            name_j = columns[c_j]
+            yield (name_i, name_j), quantiles, intersection
             c_j = c_j + 1
         c_i = c_i + 1
 
 
-def process_emd(tup):
+def process_emd(tup: tuple):
     """
     Function defining a single quantile_emd process between two columns.
-    :param tup: Tuple containing (column1, column2, unique joint key of the column combination, #quantiles)
-    :return: a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
+
+    Parameters
+    ---------
+    tup : tuple
+        a tuple with k
+
+    Returns
+    -------
+    tuple
+        a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
     """
-    c1, c2, k, quantile = unwrap_process_input_tuple(tup)
-    return k, quantile_emd(c1, c2, quantile)
+    name_i, name_j, k, quantile, intersection = unwrap_process_input_tuple(tup)
+    with open('cache/'+name_i+'.pkl', 'rb') as pkl_file:
+        c1 = pickle.load(pkl_file)
+    with open('cache/'+name_j+'.pkl', 'rb') as pkl_file:
+        c2 = pickle.load(pkl_file)
+    if intersection:
+        return k, intersection_emd(c1, c2, quantile)
+    else:
+        return k, quantile_emd(c1, c2, quantile)
 
 
-def process_intersection_emd(tup):
+def unwrap_process_input_tuple(tup: tuple):
     """
-    Function defining a single intersection_quantile_emd process between two columns.
-    :param tup: Tuple containing (column1, column2, unique joint key of the column combination, #quantiles)
-    :return: a dictionary entry {k: joint key of the column combination, v: intersection_quantile_emd calculation}
+    Helper function that unwraps a tuple to its components and creates a unique key for the column combination
+
+    Parameters
+    ---------
+    tup : tuple
+        the tuple to unwrap
     """
-    c1, c2, k, quantile = unwrap_process_input_tuple(tup)
-    return k, intersection_emd(c1, c2, quantile)
-
-
-def unwrap_process_input_tuple(tup):
-    """Helper function that unwraps a tuple to its components and creates a unique key for the column combination"""
-    indexes, cols, quantile = tup
-    c1, c2 = cols
-    name_i, name_j = indexes
+    names, quantile, intersection = tup
+    name_i, name_j = names
     k = str(name_i) + "|" + str(name_j)
-    return c1, c2, k, quantile
+    return name_i, name_j, k, quantile, intersection
+
+
+def insert_to_dict(dc: dict, k: str, v: dict):
+    """
+    Helper function that instantiates a list to a dictionary key if it is not present and then appends an
+    EMD/ColumnName pair to it
+
+    Parameters
+    ---------
+    dc : dict
+        the dictionary
+    k : str
+        the key
+    v : dict
+         EMD/ColumnName pair
+    """
+    if k not in dc:
+        dc[k] = list()
+    dc[k].append(v)
 
 
 def transform_dict(dc: dict):
-    """Helper function that transforms a dict with composite column combination keys to a dict with column keys and
-    values EMD/ColumnName pairs in a sorted list (ascending based on the EMD value)"""
+    """
+    Helper function that transforms a dict with composite column combination keys to a dict with column keys and
+    values EMD/ColumnName pairs in a sorted list (ascending based on the EMD value)
+
+    Parameters
+    ---------
+    dc : dict
+        the dictionary
+    """
     tmp_dict = dict()
     for k, v in dc.items():
         k1, k2 = k.split("|")
@@ -65,9 +147,65 @@ def transform_dict(dc: dict):
     return tmp_dict
 
 
-def insert_to_dict(dc: dict, k, v):
-    """Helper function that instantiates a sorted list to a dictionary key if it is not present and then appends an
-    EMD/ColumnName pair to it"""
-    if k not in dc:
-        dc[k] = SortedList(key=lambda e: e['e'])
-    dc[k].add(v)
+def process_columns(tup: tuple):
+    """
+    Process a pandas dataframe column to a column_model_scale.Column
+
+    Parameters
+    ---------
+    tup : tuple
+        tuple containing the information of the column to be processed
+    """
+    column_name, data, source_name, data_type, quantiles = tup
+    column = Column(column_name, data, source_name, data_type, quantiles)
+    print("Processing column: ", column.get_long_name())
+    column.quantile_histogram = QuantileHistogram(column.get_original_data(), column.quantiles)
+    with open('cache/' + column.get_long_name() + '.pkl', 'wb') as output:
+        pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
+
+
+def parallel_cutoff_threshold(tup: tuple):
+    """
+    Process the cutoff threshold in parallel for each column
+
+    Parameters
+    ---------
+    tup : tuple
+        tuple containing the information of the column to be processed
+    """
+    A, column, threshold = tup
+    name_i = column.get_long_name()
+    theta = compute_cutoff_threshold(A[name_i], threshold)
+    Nc = [(name_i, i['c']) for i in A[name_i] if i['e'] <= theta]
+    return Nc
+
+
+def ingestion_column_generator(data: DataFrame, source_name: str, quantiles: int):
+    """
+    Generator of incoming pandas dataframe columns
+    """
+    column_names = data.columns
+    for column_name in column_names:
+        yield column_name, data[column_name], source_name, data.dtypes[column_name], quantiles
+
+
+def cuttoff_column_generator(A: dict, columns: list, threshold: float):
+    """
+    Generator of columns for the cutoff threshold computation
+    """
+    for column_name in columns:
+        with open('cache/' + column_name + '.pkl', 'rb') as pkl_file:
+            column = pickle.load(pkl_file)
+        yield A, column, threshold
+
+
+def calc_chunksize(n_workers: int, len_iterable: int, factor: int=4):
+    """
+    Calculate chunksize argument for Pool-methods.
+
+    Resembles source-code within `multiprocessing.pool.Pool._map_async`.
+    """
+    chunksize, extra = divmod(len_iterable, n_workers * factor)
+    if extra:
+        chunksize += 1
+    return chunksize

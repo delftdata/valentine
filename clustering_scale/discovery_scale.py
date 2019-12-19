@@ -1,90 +1,97 @@
 import numpy as np
-from multiprocessing.pool import Pool
-from sortedcontainers import SortedList
-import psutil
 import networkx as nx
+import pulp as plp
+from tqdm import tqdm
+from multiprocessing import Pool
 
-from clustering.column_model import Column
-from clustering_scale.scale_utils import transform_dict, process_intersection_emd, process_emd, column_combinations
-
-
-num_of_cpus = psutil.cpu_count(logical=True)  # The amount of cpus available in the VM (including logical)
-
-
-def compute_cutoff_threshold(C: SortedList, threshold):
-    """
-    Algorithm 1 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]
-    This algorithm computes the threshold of a column that determines if any other column is to be considered 
-    its neighbour.
-    :param C: A sorted list containing dicts of EMD/ColumnName pairs (sorted in increasing order based on the EMD value)
-    :param threshold: The conservative global EMD cutoff threshold described in [1]
-    :return: Returns the cutoff threshold of the input column
-    """
-    C.add({'e': threshold, 'c': 0})
-    cutoff = 0
-    gap = 0.0
-    i = 0
-    while i < len(C)-1 and C[i + 1]['e'] <= threshold:
-        if gap < (C[i + 1]['e'] - C[i]['e']):
-            gap = C[i + 1]['e'] - C[i]['e']
-            cutoff = C[i]['e']
-        i += 1
-    C.remove({'e': threshold, 'c': 0})
-    return cutoff
+from clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
+    parallel_cutoff_threshold, cuttoff_column_generator, compute_cutoff_threshold, calc_chunksize
 
 
-def compute_distribution_clusters(columns, threshold, quantile):
+def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, chunk_size: int = None,
+                                  quantiles: int = 256):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
     algorithm captures which columns contain data with similar distributions based on the EMD distance metric.
-    The present version is tuned for vertical scaling using as many parallel processes as the available number
-    of cpu cores.
-    :param columns: The columns of the database
-    :param threshold: The conservative global EMD cutoff threshold described in [1]
-    :param quantile: The number of quantiles required in the quantile-EMD's metric calculation
-    :return: Returns the distribution clusters of the database
-    """
-    p = Pool(num_of_cpus)  # Create a pool of processes
 
-    A = transform_dict(dict(p.map(process_emd, column_combinations(columns, quantile))))  # Compute EMD in parallel
+    Parameters
+    ---------
+    columns : list(str)
+        the columns of the database
+    threshold : float
+        the conservative global EMD cutoff threshold described in [1]
+    pool: multiprocessing.Pool
+        the process pool that will be used in the pre-processing of the table's columns
+    chunk_size : int, optional
+        the number of chunks of each job process (default let the framework decide)
+    quantiles : int, optional
+        ehe number of quantiles that the histograms are split on (default is 256)
+
+    Returns
+    -------
+    list(list(str))
+        a list that contains the distribution clusters that contain the column names in the cluster
+    """
+    total = ((len(columns) * (len(columns) - 1)) // 2)
+
+    if chunk_size is None:
+        chunk_size = int(calc_chunksize(pool._processes, total))
+
+    print("Total: ", total, " chuck size: ", chunk_size, " processes: ", pool._processes)
+
+    A: dict = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, column_combinations(columns, quantiles,
+                                                                                            intersection=False),
+                                                           chunksize=chunk_size), total=total)))
 
     graph = nx.Graph()
-
-    for i in range(len(columns)):
-        name_i = columns[i].get_long_name()
-        theta = compute_cutoff_threshold(A[name_i], threshold)
-        Nc = [(name_i, i['c']) for i in A[name_i] if i['e'] <= theta]
-        graph.add_edges_from(Nc)
-
+    edges_per_column = list(pool.map(parallel_cutoff_threshold, list(cuttoff_column_generator(A, columns, threshold))))
+    for edges in edges_per_column:
+        graph.add_edges_from(edges)
     connected_components = list(nx.connected_components(graph))
 
     return connected_components
 
 
-def compute_attributes(columns, DC, theta, quantile):
+def compute_attributes(DC: list, threshold: float, pool: Pool, chunk_size: int = None, quantiles: int = 256):
     """
-    Part of Algorithm 4 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
+    Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
     This algorithm creates the attribute graph of the distribution clusters computed in algorithm 2.
-    The present version is tuned for vertical scaling using as many parallel processes as the available number
-    of cpu cores.
-    :param columns: The columns of the database
-    :param DC: The distribution clusters computed in algorithm 2
-    :param theta: The conservative global EMD cutoff threshold described in [1]
-    :param quantile: The number of quantiles required in the quantile-intersection EMD's metric calculation
-    :return: The attribute graph of the distribution clusters
-    """
-    p = Pool(num_of_cpus)
 
-    I = transform_dict(dict(p.map(process_intersection_emd, column_combinations(columns, quantile))))
+    Parameters
+    ---------
+    DC : list(str)
+        the distribution clusters computed in algorithm 2
+    threshold : float
+        the conservative global EMD cutoff threshold described in [1]
+    pool: multiprocessing.Pool
+        the process pool that will be used in the pre-processing of the table's columns
+    chunk_size : int, optional
+        the number of chunks of each job process (default let the framework decide)
+    quantiles : int, optional
+        ehe number of quantiles that the histograms are split on (default is 256)
+
+    Returns
+    -------
+    dict
+        a dictionary that contains the attribute graph of the distribution clusters
+    """
+    total = ((len(DC) * (len(DC) - 1)) // 2)
+
+    if chunk_size is None:
+        chunk_size = int(calc_chunksize(pool._processes, total))
+
+    print("Total: ", total, " chuck size: ", chunk_size, " processes: ", pool._processes)
+
+    I = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, column_combinations(DC, quantiles, intersection=True),
+                                                     chunksize=chunk_size), total=total)))
 
     GA = dict()
     E = np.zeros((len(DC), len(DC)))
 
     for i in range(len(DC)):
-        c_i: Column = next(filter(lambda x: x.get_long_name() == DC[i], columns))
-        name_i = c_i.get_long_name()
+        name_i = DC[i]
 
-        cutoff_i = compute_cutoff_threshold(I[name_i], theta)
+        cutoff_i = compute_cutoff_threshold(I[name_i], threshold)
 
         Nc = [i['c'] for i in I[name_i] if i['e'] <= cutoff_i]
 
@@ -103,60 +110,22 @@ def compute_attributes(columns, DC, theta, quantile):
     return GA
 
 
-########################################################################################################################
-"""The functions bellow are exact copies of those in clustering.discovery (date: 15/11/2019)"""
-
-
-def correlation_clustering_gurobi(vertexes, edges):
-    import gurobipy as grb
-
-    opt_model = grb.Model(name="MIP Model")
-
-    set_u = vertexes
-    set_v = vertexes
-    set_w = vertexes
-
-    x_vars = {(i, j): opt_model.addVar(vtype=grb.GRB.INTEGER, lb=0, ub=1, name="{0}-{1}".format(i, j))
-              for i in set_u for j in set_v}
-    constraints = {(i, j, k): opt_model.addConstr(lhs=x_vars[i, k],
-                                                  sense=grb.GRB.LESS_EQUAL,
-                                                  rhs=x_vars[i, j] + x_vars[j, k],
-                                                  name="constraint_{0}_{1}_{2}".format(i, j, k))
-                   for i in set_u for j in set_v for k in set_w}
-
-    sum1 = grb.quicksum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
-    sum2 = grb.quicksum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
-
-    opt_model.ModelSense = grb.GRB.MINIMIZE
-    opt_model.setObjective(sum1 + sum2)
-
-    opt_model.optimize()
-
-    result = dict()
-
-    for v in opt_model.getVars():
-        result[v.varName] = v.x
-
-    return result
-
-
 def correlation_clustering_pulp(vertexes, edges):
-    import pulp as plp
 
-    opt_model = plp.LpProblem(name="MIP Model")
+    opt_model = plp.LpProblem(name="MIP_Model")
 
     set_u = vertexes
     set_v = vertexes
-    set_w = vertexes
+    # set_w = vertexes
 
     x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="{0}--{1}".format(i, j))
               for i in set_u for j in set_v}
 
-    constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
-                                               sense=plp.LpConstraintLE,
-                                               rhs=x_vars[i, j] + x_vars[j, k],
-                                               name="constraint_{0}_{1}_{2}".format(i, j, k))
-                   for i in set_u for j in set_v for k in set_w}
+    # constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
+    #                                            sense=plp.LpConstraintLE,
+    #                                            rhs=x_vars[i, j] + x_vars[j, k],
+    #                                            name="constraint_{0}_{1}_{2}".format(i, j, k))
+    #                for i in set_u for j in set_v for k in set_w}
 
     sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
     sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
