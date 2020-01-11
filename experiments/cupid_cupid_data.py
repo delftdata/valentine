@@ -1,4 +1,5 @@
 import itertools
+import os
 import re
 
 import pandas as pd
@@ -50,18 +51,22 @@ def run_experiments():
     source_tree = cupid_model.get_schema_by_index(0)
     target_tree = cupid_model.get_schema_by_index(1)
 
-    # i = 1.5
+    # i = 0.37
     factor = 0.01
-    for i in tqdm(np.arange(0.05, 0.5, 0.01)):
-        sims = tree_match(source_tree, target_tree, th_accept=i, th_low=i - factor, th_high=i + factor)
-        # new_sims = recompute_wsim(source_tree, target_tree, sims, th_accept=i)
-        map1 = mapping_generation_leaves(source_tree, target_tree, sims, th_accept=i)
-        # map2 = mapping_generation_non_leaves(source_tree, target_tree, new_sims, th_accept=i)
-        print("Leaf matchings:\n {}".format(map1))
-        # print("Non-leaf matchings:\n {}".format(map2))
+    for j in tqdm(np.arange(0.1, 1.0, 0.1)):
+        dirname = 'cupid-output/j-' + str(j)
+        os.mkdir(dirname)
+        for i in tqdm(np.arange(0.05, 0.5, 0.05)):
+            sims = tree_match(source_tree, target_tree, th_accept=i, th_low=i - factor, th_high=i + factor,
+                              leaf_w_struct=j, w_struct=j + 0.1)
+            # new_sims = recompute_wsim(source_tree, target_tree, sims, th_accept=i)
+            map1 = mapping_generation_leaves(source_tree, target_tree, sims, th_accept=i)
+            # map2 = mapping_generation_non_leaves(source_tree, target_tree, new_sims, th_accept=i)
+            print("Leaf matchings:\n {}".format(map1))
+            # print("Non-leaf matchings:\n {}".format(map2))
 
-        write_mappings(map1, 'cupid-output/leaf_{}.txt'.format(i))
-        # write_mappings(map2, 'cupid-output/non-leaf_{}.txt'.format(i))
+            write_mappings(map1, '{}/test_{}.txt'.format(dirname, i))
+            # write_mappings(map2, 'cupid-output/non-leaf_{}.txt'.format(i))
 
 
 def read_tuple_file(filepath):
@@ -97,19 +102,19 @@ def compute_f1_score(precision, recall):
     return f1
 
 
-def make_plot(x, precision_list, recall_list, f1_list):
+def make_plot(x, precision_list, recall_list, f1_list, name):
     plt.plot(x, precision_list, color='skyblue', linewidth=2, label='Precision')
     plt.plot(x, recall_list, color='green', linewidth=2, label='Recall')
     plt.plot(x, f1_list, color='red', linewidth=2, label="F1-score")
     plt.plot(x[argmax(f1_list)], max(f1_list), color='red', linewidth=2, marker="o")
     plt.legend()
-    plt.xticks([i for j in (np.arange(0.05, x[argmax(f1_list)] - 0.05, 0.05),
-                            np.arange(x[argmax(f1_list)], 0.5, 0.05)) for i in j])
+    # plt.xticks([i for j in (np.arange(0.05, x[argmax(f1_list)] - 0.05, 0.05),
+    #                         np.arange(x[argmax(f1_list)], 0.5, 0.05)) for i in j])
     plt.xlabel('Threshold')
     plt.ylabel('Value')
     plt.title('Precision/Recall/F1-score given threshold')
-    plt.show()
-    # plt.savefig('cupid_stats.pdf', dpi=300)
+    # plt.show()
+    plt.savefig('cupid_{}.pdf'.format(name), dpi=300)
 
 
 def make_output_size(x, sizes):
@@ -124,37 +129,44 @@ def make_output_size(x, sizes):
 def compute_statistics():
     golden_standard_file = 'cupid-output/golden_standard.txt'
     golden_standard = read_tuple_file(golden_standard_file)
-    path = 'cupid-output/leaf/'
-    files = [join(path, f) for f in listdir(path) if isfile(join(path, f))]
-    files.sort()
+    path = 'cupid-output/'
+    x = np.arange(0.1, 1.0, 0.1)
+
+    dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]
+    dirs.sort()
+
+    for dir in dirs:
+        files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
+        files.sort()
+
     # f = open('cupid-output/stats.txt', 'w+')
-    x = np.arange(0.05, 0.5, 0.01)
-    precision_list = list()
-    recall_list = list()
-    f1_list = list()
-    data_set_size = list()
+    # x = np.arange(0.05, 0.5, 0.01)
+        precision_list = list()
+        recall_list = list()
+        f1_list = list()
+        data_set_size = list()
 
-    for file in files:
-        tuples = read_tuple_file(file)
+        for file in files:
+            tuples = read_tuple_file(file)
 
-        precision = compute_precision(golden_standard, tuples)
-        recall = compute_recall(golden_standard, tuples)
-        f1 = compute_f1_score(precision, recall)
+            precision = compute_precision(golden_standard, tuples)
+            recall = compute_recall(golden_standard, tuples)
+            f1 = compute_f1_score(precision, recall)
 
-        data_set_size.append(len(tuples))
-        precision_list.append(precision)
-        recall_list.append(recall)
-        f1_list.append(f1)
+            data_set_size.append(len(tuples))
+            precision_list.append(precision)
+            recall_list.append(recall)
+            f1_list.append(f1)
 
-        # f.write('Filename: {}\n\tPrecision: {}\n\tRecall: {}\n\tF1-score: {}\n'.format(file, precision, recall, f1))
-    # f.close()
+            # f.write('Filename: {}\n\tPrecision: {}\n\tRecall: {}\n\tF1-score: {}\n'.format(file, precision, recall, f1))
+        # f.close()
 
-    # make_plot(x, precision_list, recall_list, f1_list)
+        make_plot(x, precision_list, recall_list, f1_list, dir)
     # make_output_size(x[np.where(np.array(data_set_size) < 500)[0][5]:],
     #                  data_set_size[np.where(np.array(data_set_size) < 500)[0][5]:])
     # make_output_size(x, data_set_size)
 
 
 if __name__ == '__main__':
-    # run_experiments()
+    run_experiments()
     compute_statistics()
