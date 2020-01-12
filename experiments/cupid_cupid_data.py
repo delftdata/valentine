@@ -39,6 +39,7 @@ def write_mappings(mappings, filename):
     f = open(filename, 'w+')
     for m in mappings:
         f.write(str(m))
+        f.write("\n")
     f.close()
 
 
@@ -54,7 +55,7 @@ def run_experiments():
     # i = 0.37
     # j = 0.5
     factor = 0.01
-    for j in tqdm(np.arange(0.1, 1.0, 0.1)):
+    for j in tqdm(np.arange(0.3, 1.0, 0.1)):
         dirname = 'cupid-output/out/j-' + str(j)
         os.mkdir(dirname)
         for i in tqdm(np.arange(0.05, 0.5, 0.02)):
@@ -104,6 +105,7 @@ def compute_f1_score(precision, recall):
 
 
 def make_plot(x, precision_list, recall_list, f1_list, name):
+    plt.figure()
     plt.plot(x, precision_list, color='skyblue', linewidth=2, label='Precision')
     plt.plot(x, recall_list, color='green', linewidth=2, label='Recall')
     plt.plot(x, f1_list, color='red', linewidth=2, label="F1-score")
@@ -131,11 +133,12 @@ def compute_statistics():
     golden_standard_file = 'cupid-output/golden_standard.txt'
     golden_standard = read_tuple_file(golden_standard_file)
     path = 'cupid-output/out/'
-    x = np.arange(0.1, 1.0, 0.1)
+    x = np.arange(0.05, 0.5, 0.02)
 
     dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]
     dirs.sort()
 
+    count = 0
     for dir in dirs:
         files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
         files.sort()
@@ -162,7 +165,8 @@ def compute_statistics():
             # f.write('Filename: {}\n\tPrecision: {}\n\tRecall: {}\n\tF1-score: {}\n'.format(file, precision, recall, f1))
         # f.close()
 
-        make_plot(x, precision_list, recall_list, f1_list, dir)
+        make_plot(x, precision_list, recall_list, f1_list, count)
+        count = count + 1
     # make_output_size(x[np.where(np.array(data_set_size) < 500)[0][5]:],
     #                  data_set_size[np.where(np.array(data_set_size) < 500)[0][5]:])
     # make_output_size(x, data_set_size)
@@ -170,4 +174,4 @@ def compute_statistics():
 
 if __name__ == '__main__':
     run_experiments()
-    compute_statistics()
+    # compute_statistics()
