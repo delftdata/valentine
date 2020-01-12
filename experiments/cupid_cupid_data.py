@@ -15,8 +15,8 @@ from cupid.cupid_model import Cupid
 from cupid.tree_match import tree_match, recompute_wsim, mapping_generation_leaves, mapping_generation_non_leaves
 
 CURRENT_DIR = os.path.dirname(__file__)
-RDB_SCHEMA = CURRENT_DIR + '/data/cupid/rdb_schema.csv'
-STAR_SCHEMA = CURRENT_DIR + '/data/cupid/star_schema.csv'
+RDB_SCHEMA = CURRENT_DIR + '/../data/cupid/rdb_schema.csv'
+STAR_SCHEMA = CURRENT_DIR + '/../data/cupid/star_schema.csv'
 
 
 def make_model(file_path1, file_path2):
@@ -58,7 +58,7 @@ def run_experiments():
     # j = 0.5
     factor = 0.01
     for j in tqdm(np.arange(0.1, 1.0, 0.1)):
-        dirname = CURRENT_DIR + '/experiments/cupid-output/out/j-' + str(j)
+        dirname = CURRENT_DIR + '/cupid-output/out/j-' + str(j)
         os.mkdir(dirname)
         for i in tqdm(np.arange(0.05, 0.5, 0.02)):
             sims = tree_match(source_tree, target_tree, cupid_model.get_categories(), th_accept=i, th_low=i - factor, th_high=i + factor,
@@ -132,9 +132,9 @@ def make_output_size(x, sizes):
 
 
 def compute_statistics():
-    golden_standard_file = CURRENT_DIR + '/experiments/cupid-output/golden_standard.txt'
+    golden_standard_file = CURRENT_DIR + '/cupid-output/golden_standard.txt'
     golden_standard = read_tuple_file(golden_standard_file)
-    path = CURRENT_DIR + '/experiments/cupid-output/out/'
+    path = CURRENT_DIR + '/cupid-output/out/'
     x = np.arange(0.05, 0.5, 0.02)
 
     dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]
