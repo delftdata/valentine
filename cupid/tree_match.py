@@ -6,7 +6,7 @@ from operator import getitem
 from anytree import PostOrderIter, LevelOrderIter
 
 from cupid.elements import SchemaElement
-from cupid.linguistic_matching import name_similarity_elements, normalize, compute_lsim
+from cupid.linguistic_matching import name_similarity_elements, normalization, compute_lsim, compute_compatibility, comparison
 from cupid.structural_similarity import compute_ssim, change_structural_similarity
 
 
@@ -14,8 +14,13 @@ def compute_weighted_similarity(ssim, lsim, w_struct=0.5):
     return w_struct * ssim + (1 - w_struct) * lsim
 
 
-def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_accept=0.14, th_high=0.15, th_low=0.13,
-               c_inc=1.2, c_dec=0.9):
+def tree_match(source_tree, target_tree, categories, leaf_w_struct=0.5, w_struct=0.6, th_accept=0.14, th_high=0.15,
+               th_low=0.13, c_inc=1.2, c_dec=0.9, th_ns=0.4):
+
+    compatibility_table = compute_compatibility(categories[source_tree.name.initial_name].keys(),
+                                                categories[target_tree.name.initial_name].keys())
+    lsims = comparison(source_tree, target_tree, categories[source_tree.name.initial_name],
+                       categories[target_tree.name.initial_name], compatibility_table, th_ns)
 
     s_leaves = list(map(lambda n: n.name, source_tree.leaves))
     t_leaves = list(map(lambda n: n.name, target_tree.leaves))
@@ -24,11 +29,13 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
 
     start = time.time()
     for s, t in all_leaves:
-        # data type compatibility - max = 0.5
-        ssim = name_similarity_elements(normalize(s.data_type), normalize(t.data_type))
-        lsim = compute_lsim(s, t)
-        wsim = compute_weighted_similarity(ssim, lsim, leaf_w_struct)
-        sims[(s.long_name, t.long_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
+        # data type compatibility: max = 0.5
+        ssim = name_similarity_elements(normalization(s.data_type), normalization(t.data_type))
+        # lsim = compute_lsim(s, t)
+        if (s, t) not in lsims:
+            lsims[(s, t)] = 0
+        wsim = compute_weighted_similarity(ssim, lsims[(s, t)], leaf_w_struct)
+        sims[(s.long_name, t.long_name)] = {'ssim': ssim, 'lsim': lsims[(s, t)], 'wsim': wsim}
     end = time.time()
     print('Leaves computation took: {}'.format(end-start))
 
@@ -55,9 +62,12 @@ def tree_match(source_tree, target_tree, leaf_w_struct=0.5, w_struct=0.6, th_acc
                 if math.isnan(ssim):
                     continue
 
-                lsim = compute_lsim(s.name, t.name)
-                wsim = compute_weighted_similarity(ssim, lsim, w_struct)
-                sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': lsim, 'wsim': wsim}
+                # lsim = compute_lsim(s.name, t.name)
+                if (s.name, t.name) not in lsims:
+                    lsims[(s.name, t.name)] = 0
+
+                wsim = compute_weighted_similarity(ssim, lsims[(s.name, t.name)], w_struct)
+                sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': lsims[(s.name, t.name)], 'wsim': wsim}
 
             if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] > th_high:
                 change_structural_similarity(list(map(lambda n: n.name.long_name, s.leaves)),

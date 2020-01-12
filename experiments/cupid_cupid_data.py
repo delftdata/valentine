@@ -52,13 +52,14 @@ def run_experiments():
     target_tree = cupid_model.get_schema_by_index(1)
 
     # i = 0.37
+    # j = 0.5
     factor = 0.01
     for j in tqdm(np.arange(0.1, 1.0, 0.1)):
-        dirname = 'cupid-output/j-' + str(j)
+        dirname = 'cupid-output/out/j-' + str(j)
         os.mkdir(dirname)
-        for i in tqdm(np.arange(0.05, 0.5, 0.05)):
-            sims = tree_match(source_tree, target_tree, th_accept=i, th_low=i - factor, th_high=i + factor,
-                              leaf_w_struct=j, w_struct=j + 0.1)
+        for i in tqdm(np.arange(0.05, 0.5, 0.02)):
+            sims = tree_match(source_tree, target_tree, cupid_model.get_categories(), th_accept=i, th_low=i - factor, th_high=i + factor,
+                              leaf_w_struct=j, w_struct=j + 0.1, th_ns=0.45)
             # new_sims = recompute_wsim(source_tree, target_tree, sims, th_accept=i)
             map1 = mapping_generation_leaves(source_tree, target_tree, sims, th_accept=i)
             # map2 = mapping_generation_non_leaves(source_tree, target_tree, new_sims, th_accept=i)
@@ -66,7 +67,7 @@ def run_experiments():
             # print("Non-leaf matchings:\n {}".format(map2))
 
             write_mappings(map1, '{}/test_{}.txt'.format(dirname, i))
-            # write_mappings(map2, 'cupid-output/non-leaf_{}.txt'.format(i))
+    # write_mappings(map2, 'cupid-output/non-leaf_{}.txt'.format(i))
 
 
 def read_tuple_file(filepath):
@@ -129,7 +130,7 @@ def make_output_size(x, sizes):
 def compute_statistics():
     golden_standard_file = 'cupid-output/golden_standard.txt'
     golden_standard = read_tuple_file(golden_standard_file)
-    path = 'cupid-output/'
+    path = 'cupid-output/out/'
     x = np.arange(0.1, 1.0, 0.1)
 
     dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]

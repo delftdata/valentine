@@ -2,33 +2,37 @@ import itertools
 
 from anytree import Node, RenderTree
 
-from cupid.linguistic_matching import normalize
+from cupid.linguistic_matching import normalization
 from cupid.tree_match import tree_match, recompute_wsim, mapping_generation_leaves, mapping_generation_non_leaves
 
 
-def create_cupid_element(data_type, element_name, source_name):
-    element = normalize(element_name)
+# TODO: make the code compatible for multiple categories
+def create_cupid_element(data_type, element_name, source_name, category):
+    element = normalization(element_name)
     element.data_type = data_type
-    element.add_category(data_type)
+    element.add_category(category)
     element.add_long_name(source_name, element_name)
+
     return element
 
 
 class Cupid:
     def __init__(self):
         self.data = list()
+        self.categories = dict()
 
-    def add_data(self, schema_name, table_name, column_data_pairs, schema_type="string", table_type="string"):
+    def add_data(self, schema_name, table_name, column_data_pairs, schema_type="none", table_type="none"):
         schema_node = self.get_schema_by_name(schema_name)
         if not schema_node:
             self.add_schema(schema_name, schema_type)
         self.add_table(schema_name, table_name, table_type)
         self.add_columns_to_table(schema_name, table_name, column_data_pairs)
 
-    def add_schema(self, name, data_type="string"):
-        element = create_cupid_element(data_type, name, name)
+    def add_schema(self, name, data_type="none"):
+        element = create_cupid_element(data_type, name, name, data_type)
         schema = Node(element)
         self.data.append(schema)
+        self.categories[name] = dict()
 
     def get_schema_by_name(self, name):
         nodes = list(filter(lambda d: d.name.initial_name == name, self.data))
@@ -45,7 +49,7 @@ class Cupid:
         if not schema:
             print("Please add a schema first")
             return
-        element = create_cupid_element(data_type, table_name, table_name)
+        element = create_cupid_element(data_type, table_name, table_name, data_type)
         table = Node(element, parent=schema)
 
     def get_table(self, schema_name, table_name):
@@ -68,8 +72,15 @@ class Cupid:
             print("Please add a table first")
             return
         for column, data_type in column_data_pairs:
-            element = create_cupid_element(data_type, column, table_name)
+            element = create_cupid_element(data_type, column, table_name, data_type)
             node = Node(element, parent=table)
+
+            if data_type not in self.categories[schema_name]:
+                self.categories[schema_name][data_type] = list()
+            self.categories[schema_name][data_type].append(element)
+
+    def get_categories(self):
+        return self.categories
 
     def print_data(self):
         def render_tree(schema):
@@ -87,15 +98,15 @@ def example():
     et = ['EmployeeIdFk', 'TeritoryId']
 
     cupid = Cupid()
-    cupid.add_data('rdb_schema', 'employee', zip(employees, itertools.repeat("string")))
-    cupid.add_data('rdb_schema', 'employee-territory', zip(et, itertools.repeat('str')))
+    cupid.add_data('rdb_schema1', 'employee', zip(employees, itertools.repeat("string")))
+    cupid.add_data('rdb_schema2', 'employee-territory', zip(et, itertools.repeat('str')))
     cupid.print_data()
 
     print('Computing matchings ... ')
-    source_tree = cupid.get_table('rdb_schema', 'employee')
-    target_tree = cupid.get_table('rdb_schema', 'employee-territory')
-    sims = tree_match(source_tree, target_tree)
+    source_tree = cupid.get_schema_by_name('rdb_schema1')
+    target_tree = cupid.get_schema_by_name('rdb_schema2')
+    sims = tree_match(source_tree, target_tree, cupid.get_categories())
     new_sims = recompute_wsim(source_tree, target_tree, sims)
 
     print("Leaf matchings:\n {}".format(mapping_generation_leaves(source_tree, target_tree, sims)))
-    print("Non-leaf matchings:\n {}".format(mapping_generation_non_leaves(source_tree, target_tree, new_sims)))
+    # print("Non-leaf matchings:\n {}".format(mapping_generation_non_leaves(source_tree, target_tree, new_sims)))

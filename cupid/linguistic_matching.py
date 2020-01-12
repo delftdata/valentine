@@ -1,9 +1,11 @@
 import math
+import operator
 import string
 from itertools import product
 
 import nltk
 import snakecase as snakecase
+from anytree import LevelOrderIter
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
 from similarity.ngram import NGram
@@ -11,7 +13,7 @@ from similarity.ngram import NGram
 from cupid.elements import SchemaElement, Token, TokenTypes
 
 
-def normalize(element, schema_element=None):
+def normalization(element, schema_element=None):
     if schema_element is None:
         schema_element = SchemaElement(element)
 
@@ -36,7 +38,7 @@ def normalize(element, schema_element=None):
 
                 if '_' in token_snake:
                     token_snake = token_snake.replace('_', ' ')
-                    schema_element = normalize(token_snake, schema_element)
+                    schema_element = normalization(token_snake, schema_element)
                 elif token.lower() in stopwords.words('english'):
                     token_obj.data = token.lower()
                     token_obj.ignore = True
@@ -48,6 +50,53 @@ def normalize(element, schema_element=None):
                     schema_element.add_token(token_obj)
 
     return schema_element
+
+
+def compute_compatibility(categories1, categories2):
+    compatibility_table = dict()
+
+    for cat1 in categories1:
+        compatibility_table[cat1] = dict()
+        tokens1 = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(cat1)))
+
+        for cat2 in categories2:
+            tokens2 = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(cat2)))
+
+            if cat2 not in compatibility_table:
+                compatibility_table[cat2] = dict()
+
+            compatibility = name_similarity_tokens(tokens1, tokens2)
+            compatibility_table[cat1][cat2] = compatibility
+            compatibility_table[cat2][cat1] = compatibility
+
+    return compatibility_table
+
+
+def comparison(source_tree, target_tree, categories_source, categories_target, compatibility_table, th_ns):
+    all_nodes_s = [node.name for node in LevelOrderIter(source_tree)]
+    all_nodes_t = [node.name for node in LevelOrderIter(target_tree)]
+    all_nodes = product(all_nodes_s, all_nodes_t)
+
+    keys_source = categories_source.keys()
+    keys_target = categories_target.keys()
+
+    name_sim = dict()
+    lsim = dict()
+
+    for cat_s in keys_source:
+        for cat_t in keys_target:
+            if compatibility_table[cat_s][cat_t] > th_ns:
+                all_compatible_nodes = product(categories_source[cat_s], categories_target[cat_t])
+                name_sim = {pair: name_similarity_elements(pair[0], pair[1]) for pair in all_compatible_nodes if pair in all_nodes}
+
+    for s, t in name_sim.keys():
+        s_cat = s.categories
+        t_cat = t.categories
+        maxs = [max(dict(filter(lambda x: x[0] in t_cat, compatibility_table[c].items())).items(),
+                    key=operator.itemgetter(1))[1] for c in s_cat]
+        lsim[(s, t)] = name_sim[(s, t)] * max(maxs)
+
+    return lsim
 
 
 # max = 1
