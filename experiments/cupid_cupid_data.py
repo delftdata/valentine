@@ -44,8 +44,8 @@ def write_mappings(mappings, filename):
 
 
 def run_experiments():
-    file1 = '../data/cupid/rdb_schema.csv'
-    file2 = '../data/cupid/star_schema.csv'
+    file1 = 'data/cupid/rdb_schema.csv'
+    file2 = 'data/cupid/star_schema.csv'
     cupid_model = make_model(file1, file2)
 
     print('Computing matchings ... ')
@@ -56,7 +56,7 @@ def run_experiments():
     # j = 0.5
     factor = 0.01
     for j in tqdm(np.arange(0.3, 1.0, 0.1)):
-        dirname = 'cupid-output/out/j-' + str(j)
+        dirname = 'experiments/cupid-output/out/j-' + str(j)
         os.mkdir(dirname)
         for i in tqdm(np.arange(0.05, 0.5, 0.02)):
             sims = tree_match(source_tree, target_tree, cupid_model.get_categories(), th_accept=i, th_low=i - factor, th_high=i + factor,
@@ -130,9 +130,9 @@ def make_output_size(x, sizes):
 
 
 def compute_statistics():
-    golden_standard_file = 'cupid-output/golden_standard.txt'
+    golden_standard_file = 'experiments/cupid-output/golden_standard.txt'
     golden_standard = read_tuple_file(golden_standard_file)
-    path = 'cupid-output/out/'
+    path = 'experiments/cupid-output/out/'
     x = np.arange(0.05, 0.5, 0.02)
 
     dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]
@@ -172,6 +172,6 @@ def compute_statistics():
     # make_output_size(x, data_set_size)
 
 
-if __name__ == '__main__':
-    run_experiments()
-    # compute_statistics()
+# if __name__ == '__main__':
+#     run_experiments()
+#     compute_statistics()
