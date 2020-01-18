@@ -14,6 +14,10 @@ from os.path import isfile, join
 from cupid.cupid_model import Cupid
 from cupid.tree_match import tree_match, recompute_wsim, mapping_generation_leaves, mapping_generation_non_leaves
 
+CURRENT_DIR = os.path.dirname(__file__)
+RDB_SCHEMA = CURRENT_DIR + '/../data/cupid/rdb_schema.csv'
+STAR_SCHEMA = CURRENT_DIR + '/../data/cupid/star_schema.csv'
+
 
 def make_model(file_path1, file_path2):
     cupid_model = Cupid()
@@ -44,10 +48,7 @@ def write_mappings(mappings, filename):
 
 
 def run_experiments():
-    file1 = 'data/cupid/rdb_schema.csv'
-    file2 = 'data/cupid/star_schema.csv'
-    cupid_model = make_model(file1, file2)
-
+    cupid_model = make_model(RDB_SCHEMA, STAR_SCHEMA)
     print('Computing matchings ... ')
     source_tree = cupid_model.get_schema_by_index(0)
     target_tree = cupid_model.get_schema_by_index(1)
@@ -55,8 +56,8 @@ def run_experiments():
     # i = 0.37
     # j = 0.5
     factor = 0.01
-    for j in tqdm(np.arange(0.3, 1.0, 0.1)):
-        dirname = 'experiments/cupid-output/out/j-' + str(j)
+    for j in tqdm(np.arange(0.1, 1.0, 0.1)):
+        dirname = CURRENT_DIR + '/cupid-output/out/j-' + str(j)
         os.mkdir(dirname)
         for i in tqdm(np.arange(0.05, 0.5, 0.02)):
             sims = tree_match(source_tree, target_tree, cupid_model.get_categories(), th_accept=i, th_low=i - factor, th_high=i + factor,
@@ -130,9 +131,9 @@ def make_output_size(x, sizes):
 
 
 def compute_statistics():
-    golden_standard_file = 'experiments/cupid-output/golden_standard.txt'
+    golden_standard_file = CURRENT_DIR + '/cupid-output/golden_standard.txt'
     golden_standard = read_tuple_file(golden_standard_file)
-    path = 'experiments/cupid-output/out/'
+    path = CURRENT_DIR + '/cupid-output/out/'
     x = np.arange(0.05, 0.5, 0.02)
 
     dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]
@@ -174,4 +175,4 @@ def compute_statistics():
 
 # if __name__ == '__main__':
 #     run_experiments()
-#     compute_statistics()
+#     # compute_statistics()
