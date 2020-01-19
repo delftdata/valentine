@@ -2,15 +2,18 @@ from clustering.correlation_clustering import CorrelationClustering
 from read_data_movies import data_imdb, data_rt
 
 
+# if __name__ == '__main__':
 # Should vary depending on the quantile and data
-threshold = 0.05
+threshold = 0.03
 # Should vary depending on the size of the data
-quantile = 100
+quantile = 256
 # name of the db
 
-cc = CorrelationClustering(quantile, threshold)
-cc.add_data(data_imdb, 'imdb', ['Name', 'YearRange', 'Genre'])
-cc.add_data(data_rt, 'rt', ['Name', 'Year', 'Genre'])
+cc = CorrelationClustering()
+cc.set_threshold(threshold)
+cc.set_quantiles(quantile)
+cc.add_data('imdb', data_imdb)
+cc.add_data('rt', data_rt)
 cc.process_data()
 
 matchings = cc.find_matchings()

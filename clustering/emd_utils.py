@@ -67,6 +67,8 @@ def quantile_emd(column1, column2, quantile=256, intersection=False):
     if len(ranks2.shape) > 0:
         ranks2 = sorted(ranks2)
         l2 = len(ranks2)
+    else:
+        l2 = 1
 
     # find which list is bigger to compute the quantiles
     if l2 > l1:
@@ -100,7 +102,7 @@ def quantile_emd(column1, column2, quantile=256, intersection=False):
     if len(hist1) == 0 or len(hist2) == 0:
         return math.inf
     # return emd(hist1 / ranks_l, hist2 / ranks_l, squareform(D)) / ranks_l
-    e = emd_samples(hist1, hist2, bins=bins1)
+    e = emd_samples(hist1, hist2, bins=bins1) / (l1 + l2)
     return e
 
 

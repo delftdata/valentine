@@ -2,6 +2,7 @@ from collections import defaultdict
 from time import time
 
 import nltk
+from nltk.tokenize import WhitespaceTokenizer
 import numpy as np
 import string
 
@@ -18,7 +19,7 @@ def tokenize(column):
         c = column.astype(str)
         c = np.chararray.translate(c, TABLE)
         c = np.char.lower(c)
-        c = [nltk.word_tokenize(token) for token in c]
+        c = [WhitespaceTokenizer().tokenize(token) for token in c]
         return np.concatenate(c).ravel()
 
     return column
