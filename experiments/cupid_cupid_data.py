@@ -49,7 +49,6 @@ def write_mappings(mappings, filename):
 
 def run_experiments():
     cupid_model = make_model(RDB_SCHEMA, STAR_SCHEMA)
-
     print('Computing matchings ... ')
     source_tree = cupid_model.get_schema_by_index(0)
     target_tree = cupid_model.get_schema_by_index(1)
@@ -57,7 +56,7 @@ def run_experiments():
     # i = 0.37
     # j = 0.5
     factor = 0.01
-    for j in tqdm(np.arange(0.1, 1.0, 0.1)):
+    for j in tqdm(np.arange(0.1, 0.3, 0.1)):
         dirname = CURRENT_DIR + '/cupid-output/out/j-' + str(j)
         os.mkdir(dirname)
         for i in tqdm(np.arange(0.05, 0.5, 0.02)):
@@ -108,18 +107,50 @@ def compute_f1_score(precision, recall):
 
 def make_plot(x, precision_list, recall_list, f1_list, name):
     plt.figure()
-    plt.plot(x, precision_list, color='skyblue', linewidth=2, label='Precision')
+    plt.plot(x, precision_list, color='blue', linewidth=2, label='Precision')
     plt.plot(x, recall_list, color='green', linewidth=2, label='Recall')
     plt.plot(x, f1_list, color='red', linewidth=2, label="F1-score")
-    plt.plot(x[argmax(f1_list)], max(f1_list), color='red', linewidth=2, marker="o")
+    x_tick = x[argmax(f1_list)]
+    plt.plot(x_tick, max(f1_list), color='red', linewidth=2, marker="o")
     plt.legend()
-    # plt.xticks([i for j in (np.arange(0.05, x[argmax(f1_list)] - 0.05, 0.05),
-    #                         np.arange(x[argmax(f1_list)], 0.5, 0.05)) for i in j])
-    plt.xlabel('Threshold')
+
+    limsx = plt.xlim()
+    limsy = plt.ylim()
+
+    xinterval = np.sort(np.append(plt.xticks()[0], x_tick))
+    yinterval = np.sort(np.append(plt.yticks()[0], max(f1_list)))
+   
+    posx = np.where(xinterval == x_tick)[0][0]
+    posy = np.where(yinterval == max(f1_list))[0][0]
+    
+    to_remove_x = closer_to(xinterval, posx)
+    to_remove_y = closer_to(yinterval, posy)
+    to_append = yinterval[posy+to_remove_y]+(to_remove_y/10)
+
+    xinterval = np.delete(xinterval, posx+to_remove_x)
+    yinterval = np.delete(yinterval, posy+to_remove_y)
+    yinterval = np.append(yinterval, to_append)
+
+    plt.xticks(xinterval)
+    plt.yticks(yinterval)
+    plt.xlim(limsx)
+    plt.ylim(limsy)
+
+    plt.xlabel('th_accept threshold')
     plt.ylabel('Value')
-    plt.title('Precision/Recall/F1-score given threshold')
+    plt.title('Precision/Recall/F1-score for w_struct_leaf = {}'.format(name))
     # plt.show()
     plt.savefig('cupid_{}.pdf'.format(name), dpi=300)
+
+
+def closer_to(interval, pos):
+    diff_min = abs(interval[pos]-interval[pos-1])
+    diff_max = abs(interval[pos]-interval[pos+1])
+
+    if diff_min < diff_max:
+        return -1
+    else:
+        return 1
 
 
 def make_output_size(x, sizes):
@@ -140,7 +171,8 @@ def compute_statistics():
     dirs = [join(path, f) for f in listdir(path) if not isfile(join(path, f))]
     dirs.sort()
 
-    count = 0
+    x1 = 0.1
+    step = 0.1
     for dir in dirs:
         files = [join(dir, f) for f in listdir(dir) if isfile(join(dir, f))]
         files.sort()
@@ -167,13 +199,13 @@ def compute_statistics():
             # f.write('Filename: {}\n\tPrecision: {}\n\tRecall: {}\n\tF1-score: {}\n'.format(file, precision, recall, f1))
         # f.close()
 
-        make_plot(x, precision_list, recall_list, f1_list, count)
-        count = count + 1
+        make_plot(x, precision_list, recall_list, f1_list, x1)
+        x1 = round(x1 + step, 2)
     # make_output_size(x[np.where(np.array(data_set_size) < 500)[0][5]:],
     #                  data_set_size[np.where(np.array(data_set_size) < 500)[0][5]:])
     # make_output_size(x, data_set_size)
 
-#
+
 # if __name__ == '__main__':
 #     run_experiments()
 #     # compute_statistics()
