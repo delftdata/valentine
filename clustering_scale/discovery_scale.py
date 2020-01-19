@@ -1,7 +1,9 @@
 import numpy as np
 import networkx as nx
 import pulp as plp
+import matplotlib.pyplot as plt
 from tqdm import tqdm
+import re
 from multiprocessing import Pool
 
 from clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
@@ -32,21 +34,26 @@ def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, c
     list(list(str))
         a list that contains the distribution clusters that contain the column names in the cluster
     """
-    total = ((len(columns) * (len(columns) - 1)) // 2)
+    combinations = list(column_combinations(columns, quantiles, intersection=False))
+
+    total = len(combinations)
 
     if chunk_size is None:
         chunk_size = int(calc_chunksize(pool._processes, total))
 
-    print("Total: ", total, " chuck size: ", chunk_size, " processes: ", pool._processes)
+    print("Total: ", total, " chunk size: ", chunk_size, " processes: ", pool._processes)
 
-    A: dict = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, column_combinations(columns, quantiles,
-                                                                                            intersection=False),
-                                                           chunksize=chunk_size), total=total)))
+    A: dict = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, combinations, chunksize=chunk_size),
+                                       total=total)))
+    print(A)
 
-    graph = nx.Graph()
     edges_per_column = list(pool.map(parallel_cutoff_threshold, list(cuttoff_column_generator(A, columns, threshold))))
-    for edges in edges_per_column:
-        graph.add_edges_from(edges)
+    print(edges_per_column)
+    graph = create_graph(columns, edges_per_column)
+
+    nx.draw(graph)
+    plt.show()
+
     connected_components = list(nx.connected_components(graph))
 
     return connected_components
@@ -75,15 +82,17 @@ def compute_attributes(DC: list, threshold: float, pool: Pool, chunk_size: int =
     dict
         a dictionary that contains the attribute graph of the distribution clusters
     """
-    total = ((len(DC) * (len(DC) - 1)) // 2)
+
+    combinations = list(column_combinations(DC, quantiles, intersection=True))
+
+    total = len(combinations)
 
     if chunk_size is None:
         chunk_size = int(calc_chunksize(pool._processes, total))
 
-    print("Total: ", total, " chuck size: ", chunk_size, " processes: ", pool._processes)
+    print("Total: ", total, " chunk size: ", chunk_size, " processes: ", pool._processes)
 
-    I = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, column_combinations(DC, quantiles, intersection=True),
-                                                     chunksize=chunk_size), total=total)))
+    I = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, combinations, chunksize=chunk_size), total=total)))
 
     GA = dict()
     E = np.zeros((len(DC), len(DC)))
@@ -112,25 +121,24 @@ def compute_attributes(DC: list, threshold: float, pool: Pool, chunk_size: int =
 
 def correlation_clustering_pulp(vertexes, edges):
 
-    opt_model = plp.LpProblem(name="MIP_Model")
+    opt_model = plp.LpProblem(name="MIP_Model", sense=plp.LpMinimize)
 
     set_u = vertexes
     set_v = vertexes
-    # set_w = vertexes
+    set_w = vertexes
 
     x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="{0}--{1}".format(i, j))
               for i in set_u for j in set_v}
 
-    # constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
-    #                                            sense=plp.LpConstraintLE,
-    #                                            rhs=x_vars[i, j] + x_vars[j, k],
-    #                                            name="constraint_{0}_{1}_{2}".format(i, j, k))
-    #                for i in set_u for j in set_v for k in set_w}
+    constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
+                                               sense=plp.LpConstraintLE,
+                                               rhs=x_vars[i, j] + x_vars[j, k],
+                                               name="constraint_{0}_{1}_{2}".format(i, j, k))
+                   for i in set_u for j in set_v for k in set_w}
 
     sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
     sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
 
-    opt_model.sense = plp.LpMinimize
     opt_model.setObjective(sum1 + sum2)
 
     opt_model.solve()
@@ -143,6 +151,32 @@ def correlation_clustering_pulp(vertexes, edges):
     return result
 
 
-def process_correlation_clustering_result(result):
+def process_correlation_clustering_result(result, columns):
     clusters = [k for (k, v) in result.items() if v == 0]
-    return np.extract(list(map(lambda x: False if x.split('__')[0] == x.split('__')[1] else True, clusters)), clusters)
+    edges_per_column = []
+    for match in clusters:
+        table1, column1, table2, column2 = get_columns_tables_from_match(match)
+        edges_per_column.append([(table1+"__"+column1, table2+"__"+column2)])
+
+    graph = create_graph(columns, edges_per_column)
+
+    nx.draw(graph)
+    plt.show()
+
+    connected_components = list(nx.connected_components(graph))
+
+    return connected_components
+
+
+def create_graph(nodes, edges_per_column):
+    graph = nx.Graph()
+    for node in nodes:
+        graph.add_node(node)
+    for edges in edges_per_column:
+        graph.add_edges_from(edges)
+    return graph
+
+
+def get_columns_tables_from_match(match: str):
+    match_obj = re.match(r'(.*)__(.*)__(.*)__(.*)', match)
+    return match_obj.group(1), match_obj.group(2), match_obj.group(3), match_obj.group(4)

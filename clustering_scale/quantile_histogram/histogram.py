@@ -1,7 +1,8 @@
 import scipy.stats as ss
 from numpy import ndarray
-
+import numpy as np
 from clustering_scale.quantile_histogram.bucket import Bucket
+import pickle
 
 
 class QuantileHistogram(object):
@@ -54,7 +55,7 @@ class QuantileHistogram(object):
      flatten_histogram()
         Flattens the histogram by creating two lists with all the bucket values with their weights
     """
-    def __init__(self, column: list, quantiles: int, reference_hist=None):
+    def __init__(self, name: str, column: list, quantiles: int, reference_hist=None):
         """
         Parameters
         ----------
@@ -65,6 +66,7 @@ class QuantileHistogram(object):
         reference_hist : QuantileHistogram, optional
             the reference histogram that provides the bucket boundaries
         """
+        self.name = name
         self.buckets = dict()
         if reference_hist is None:
             self.create_histogram(column, quantiles)
@@ -86,8 +88,10 @@ class QuantileHistogram(object):
         bucket_count = 0
         column_size = len(column)
         for chunk in self.chunks(self.get_sorted_ranks(column), quantiles):
+        # for chunk in self.chunks(self.get_global_ranks(column), quantiles):
             self.buckets[bucket_count] = Bucket(chunk, column_size)
             bucket_count = bucket_count + 1
+        self.normalize_buckets(self.size)
 
     def create_histogram_from_reference(self, column: list):
         """
@@ -100,8 +104,9 @@ class QuantileHistogram(object):
         """
         self.copy_buckets_without_values()
         for rank in self.get_sorted_ranks(column):
+        # for rank in self.get_global_ranks(column):
             self.add_value_to_bucket(rank)
-        self.normalize_buckets(len(column))
+        self.normalize_buckets(self.size)
 
     def get_buckets(self):
         """Returns the histogram's buckets"""
@@ -118,14 +123,8 @@ class QuantileHistogram(object):
             the list that is to be split into chunks
         n : int
             the number of chunks
-
-        Returns
-        -------
-        list
-            yields a chuck of the list at a time
         """
-        for i in range(0, len(lst), n):
-            yield lst[i:i + n]
+        return np.array_split(lst, n)
 
     @staticmethod
     def get_sorted_ranks(column: list):
@@ -144,8 +143,16 @@ class QuantileHistogram(object):
         ndarray
             yields a chuck of the list at a time
         """
+        # return sorted(ss.rankdata(list(map(lambda x: float(x) if type(x) is int else x, column)), method='dense'))
         return ss.rankdata(sorted(map(lambda x: float(x) if type(x) is int else x, list(column)),
-                                  key=lambda item: ([str, float].index(type(item)), item)))
+                                  key=lambda item: ([str, float].index(type(item)), item)), method='dense')
+
+    @staticmethod
+    def get_global_ranks(column: list):
+        with open('cache/global_ranks/ranks.pkl', 'rb') as pkl_file:
+            global_ranks = pickle.load(pkl_file)
+            ranks = sorted([global_ranks[x]for x in column])
+            return ranks
 
     def copy_buckets_without_values(self):
         """Copies the bucket boundaries but not the values"""
@@ -185,9 +192,14 @@ class QuantileHistogram(object):
 
     def print_histogram(self):
         """Prints the histogram"""
+        print("Number of buckets: ", len(self.buckets.keys()))
         for k in self.buckets.keys():
-            print("Bucket "+str(k)+" with contents: ")
+            print("Bucket "+str(k)+" with size: "+str(self.buckets[k].size)+" with contents: ")
             print(self.buckets[k].contents)
+
+    def bucket_generator(self):
+        for bucket in self.buckets.values():
+            yield np.array(bucket.items), np.array(bucket.weights)
 
     def flatten_histogram(self):
         """Flattens the histogram by creating two lists with all the bucket values with their weights"""
@@ -198,3 +210,24 @@ class QuantileHistogram(object):
                 contents.append(c)
                 weights.append(w)
         return contents, weights
+
+    @property
+    def size(self):
+        size = 0
+        for bucket in self.buckets.values():
+            size = size + bucket.size
+        return size
+
+    @property
+    def probabilities(self):
+        probabilities = []
+        for bucket in self.buckets.values():
+            probabilities.append(sum(bucket.weights))
+        return probabilities
+
+    @property
+    def is_empty(self):
+        for bucket in self.buckets.values():
+            if bucket.size != 0:
+                return False
+        return True

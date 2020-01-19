@@ -1,10 +1,16 @@
 from pandas import DataFrame
-
+import numpy as np
 from clustering_scale.column_model_scale import Column
 from clustering_scale.emd_utils import quantile_emd, intersection_emd
 from clustering_scale.quantile_histogram.histogram import QuantileHistogram
 import pickle
+import math
 
+def normalize_emd(c):
+    emd_vals = np.array([d['e'] for d in c if d['e'] != math.inf])
+    emd_vals = emd_vals / emd_vals.sum()
+    print(c)
+    print(emd_vals)
 
 def compute_cutoff_threshold(C: list, threshold: float):
     """
@@ -26,6 +32,7 @@ def compute_cutoff_threshold(C: list, threshold: float):
     """
     C.append({'e': threshold, 'c': 0})
     C = sorted(C, key=lambda k: k['e'])
+    # normalize_emd(C)
     cutoff = 0.0
     gap = 0.0
     i = 0
@@ -34,7 +41,6 @@ def compute_cutoff_threshold(C: list, threshold: float):
             gap = C[i + 1]['e'] - C[i]['e']
             cutoff = C[i]['e']
         i += 1
-    del C
     return cutoff
 
 
@@ -60,10 +66,13 @@ def column_combinations(columns: list, quantiles: int, intersection: bool = Fals
     c_i = 0
     while c_i < c:
         name_i = columns[c_i]
+        table_i = name_i.split("__")[0]
         c_j = c_i + 1
         while c_j < c:
             name_j = columns[c_j]
-            yield (name_i, name_j), quantiles, intersection
+            table_j = name_j.split("__")[0]
+            if table_i != table_j:
+                yield (name_i, name_j), quantiles, intersection
             c_j = c_j + 1
         c_i = c_i + 1
 
@@ -159,7 +168,9 @@ def process_columns(tup: tuple):
     column_name, data, source_name, data_type, quantiles = tup
     column = Column(column_name, data, source_name, data_type, quantiles)
     print("Processing column: ", column.get_long_name())
-    column.quantile_histogram = QuantileHistogram(column.get_original_data(), column.quantiles)
+
+    column.quantile_histogram = QuantileHistogram(column.get_long_name(), column.get_original_data(),
+                                                  min(column.cardinality, quantiles))
     with open('cache/' + column.get_long_name() + '.pkl', 'wb') as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
 
@@ -176,6 +187,7 @@ def parallel_cutoff_threshold(tup: tuple):
     A, column, threshold = tup
     name_i = column.get_long_name()
     theta = compute_cutoff_threshold(A[name_i], threshold)
+    print("Cutoff threshold for ", name_i, " is ", theta)
     Nc = [(name_i, i['c']) for i in A[name_i] if i['e'] <= theta]
     return Nc
 

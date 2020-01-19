@@ -47,6 +47,7 @@ class Bucket(object):
         """
         self.lower_bound = math.inf
         self.upper_bound = -math.inf
+        self.size = 0
         self.contents = dict()
         if bucket_data is not None:
             self.create_bucket(bucket_data, column_size)
@@ -66,7 +67,8 @@ class Bucket(object):
             self.lower_bound = min(self.lower_bound, value)
             self.upper_bound = max(self.upper_bound, value)
             self.contents[value] = self.contents.get(value, 0) + 1
-        self.normalize_bucket(column_size)
+            self.size = self.size + 1
+        # self.normalize_bucket(column_size)
 
     def add_value(self, value: int):
         """
@@ -77,6 +79,7 @@ class Bucket(object):
         value : int
             the value to be added
         """
+        self.size = self.size + 1
         self.contents[value] = self.contents.get(value, 0) + 1
 
     def set_lower_bound(self, lb: int):
@@ -111,3 +114,11 @@ class Bucket(object):
             the column size
         """
         self.contents = {k: self.contents[k] / column_size for k, v in self.contents.items()}
+
+    @property
+    def items(self):
+        return list(self.contents.keys())
+
+    @property
+    def weights(self):
+        return list(self.contents.values())

@@ -1,6 +1,9 @@
 import timeit
+import json
 from pandas import DataFrame
 from multiprocessing import Pool
+from definitions import ROOT_DIR
+
 
 import clustering_scale.discovery_scale as discovery
 from clustering_scale.scale_utils import process_columns, ingestion_column_generator
@@ -18,7 +21,7 @@ class CorrelationClustering:
     threshold : float
         the global threshold described in [1]
     columns : list(str)
-        a list with all the compound column names (table_name + '_' + column_name)
+        a list with all the compound column names (table_name + '__' + column_name)
 
     Methods
     -------
@@ -57,7 +60,7 @@ class CorrelationClustering:
         """
         pool.map(process_columns, ingestion_column_generator(data, source_name, self.quantiles))
 
-        self.columns = self.columns + list(map(lambda name: source_name + '_' + name, data.columns))
+        self.columns = self.columns + list(map(lambda name: source_name + '__' + name, data.columns))
 
     def find_matches(self, pool: Pool, chunk_size: int = None):
         """
@@ -81,13 +84,16 @@ class CorrelationClustering:
 
         print('Time: ', stop - start)
 
+        self.write_clusters_to_json(connected_components, 'Distribution_Clusters.json')
+
         start = timeit.default_timer()
 
         print("Compute attributes ... \n")
         all_attributes = list()
         for components in connected_components:
-            edges = discovery.compute_attributes(list(components), self.threshold, pool, chunk_size, self.quantiles)
-            all_attributes.append((list(components), edges))
+            if len(components) > 1:
+                edges = discovery.compute_attributes(list(components), self.threshold, pool, chunk_size, self.quantiles)
+                all_attributes.append((list(components), edges))
 
         stop = timeit.default_timer()
 
@@ -109,12 +115,29 @@ class CorrelationClustering:
         print("Extract clusters ... \n")
         clusters = list()
         for result in results:
-            clusters.append(discovery.process_correlation_clustering_result(result))
+            clusters.extend(discovery.process_correlation_clustering_result(result, self.columns))
 
         stop = timeit.default_timer()
 
         print('Time: ', stop - start)
 
-        print(clusters)
+        self.write_clusters_to_json(clusters, 'Attribute_Clusters(Matches).json')
 
-        return clusters
+    @staticmethod
+    def write_clusters_to_json(clusters: list, file_name: str):
+        """
+        Writes the clusters with their attributes and their connections in a json file
+
+        Parameters
+        ---------
+        clusters : list(list(str))
+            a list with the clusters, their attributes and their connections
+        file_name : str
+            the name of the JSON file to write
+        """
+        d = {}
+        clusters.sort(key=lambda item: -len(item))
+        for (cluster, idx) in zip(clusters, range(len(clusters))):
+            d["Cluster " + str(idx + 1)] = list(cluster)
+        with open(ROOT_DIR + "/" + file_name, 'w') as fp:
+            json.dump(d, fp, indent=2)

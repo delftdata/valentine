@@ -5,7 +5,7 @@ class Column(object):
     Attributes
     ----------
     __long_name : str
-        a string containing (table_name + '_' + column_name)
+        a string containing (table_name + '__' + column_name)
     __name : str
         the name of the column
     data : list
@@ -51,12 +51,13 @@ class Column(object):
         quantiles: int
             The number of quantiles of the column's quantile histogram
         """
-        self.__long_name = source_name + '_' + name
+        self.__long_name = source_name + '__' + name
         self.__name = name
         self.data = list(filter(lambda d: d != '', data))  # remove the empty strings
         self.__data_type = data_type
         self.quantiles = quantiles
-        self.cardinality = len(set(list(data)))
+        self.cardinality = len(set(data))
+        self.size = len(data)
         self.quantile_histogram = None
 
     def get_histogram(self):
