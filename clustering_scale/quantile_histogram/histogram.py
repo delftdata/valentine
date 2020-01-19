@@ -87,11 +87,10 @@ class QuantileHistogram(object):
         """
         bucket_count = 0
         column_size = len(column)
-        for chunk in self.chunks(self.get_sorted_ranks(column), quantiles):
-        # for chunk in self.chunks(self.get_global_ranks(column), quantiles):
+        # for chunk in self.chunks(self.get_sorted_ranks(column), quantiles):
+        for chunk in self.chunks(self.get_global_ranks(column), quantiles):
             self.buckets[bucket_count] = Bucket(chunk, column_size)
             bucket_count = bucket_count + 1
-        self.normalize_buckets(self.size)
 
     def create_histogram_from_reference(self, column: list):
         """
@@ -103,10 +102,10 @@ class QuantileHistogram(object):
             the column's data
         """
         self.copy_buckets_without_values()
-        for rank in self.get_sorted_ranks(column):
-        # for rank in self.get_global_ranks(column):
+        # for rank in self.get_sorted_ranks(column):
+        for rank in self.get_global_ranks(column):
             self.add_value_to_bucket(rank)
-        self.normalize_buckets(self.size)
+        self.normalize_buckets(len(column))
 
     def get_buckets(self):
         """Returns the histogram's buckets"""
@@ -143,9 +142,9 @@ class QuantileHistogram(object):
         ndarray
             yields a chuck of the list at a time
         """
-        # return sorted(ss.rankdata(list(map(lambda x: float(x) if type(x) is int else x, column)), method='dense'))
-        return ss.rankdata(sorted(map(lambda x: float(x) if type(x) is int else x, list(column)),
-                                  key=lambda item: ([str, float].index(type(item)), item)), method='dense')
+        return sorted(ss.rankdata(list(map(lambda x: float(x) if type(x) is int else x, column)), method='dense'))
+        # return ss.rankdata(sorted(map(lambda x: float(x) if type(x) is int else x, list(column)),
+        #                           key=lambda item: ([str, float].index(type(item)), item)), method='dense')
 
     @staticmethod
     def get_global_ranks(column: list):
@@ -210,20 +209,6 @@ class QuantileHistogram(object):
                 contents.append(c)
                 weights.append(w)
         return contents, weights
-
-    @property
-    def size(self):
-        size = 0
-        for bucket in self.buckets.values():
-            size = size + bucket.size
-        return size
-
-    @property
-    def probabilities(self):
-        probabilities = []
-        for bucket in self.buckets.values():
-            probabilities.append(sum(bucket.weights))
-        return probabilities
 
     @property
     def is_empty(self):

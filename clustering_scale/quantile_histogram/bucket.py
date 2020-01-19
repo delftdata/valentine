@@ -68,7 +68,7 @@ class Bucket(object):
             self.upper_bound = max(self.upper_bound, value)
             self.contents[value] = self.contents.get(value, 0) + 1
             self.size = self.size + 1
-        # self.normalize_bucket(column_size)
+        self.normalize_bucket(column_size)
 
     def add_value(self, value: int):
         """

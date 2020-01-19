@@ -99,6 +99,7 @@ def get_results(path: str, threshold: float, quantiles: int, process_pool: Pool,
 
 
 if __name__ == "__main__":
-    with get_context("spawn").Pool(4) as p:  # Create a pool of processes
-        get_results("data/clustering/Customer_Example", threshold=0.1, quantiles=256, process_pool=p, chunk_size=1,
-                    clear_cache=False)
+    number_of_processes = 4
+    with get_context("spawn").Pool(number_of_processes) as p:  # Create a pool of processes
+        get_results("data/clustering/meeting_example", threshold=0.1, quantiles=256, process_pool=p, chunk_size=1,
+                    clear_cache=True)

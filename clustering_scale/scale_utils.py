@@ -6,11 +6,6 @@ from clustering_scale.quantile_histogram.histogram import QuantileHistogram
 import pickle
 import math
 
-def normalize_emd(c):
-    emd_vals = np.array([d['e'] for d in c if d['e'] != math.inf])
-    emd_vals = emd_vals / emd_vals.sum()
-    print(c)
-    print(emd_vals)
 
 def compute_cutoff_threshold(C: list, threshold: float):
     """
@@ -32,7 +27,6 @@ def compute_cutoff_threshold(C: list, threshold: float):
     """
     C.append({'e': threshold, 'c': 0})
     C = sorted(C, key=lambda k: k['e'])
-    # normalize_emd(C)
     cutoff = 0.0
     gap = 0.0
     i = 0
