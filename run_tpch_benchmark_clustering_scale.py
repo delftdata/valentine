@@ -38,10 +38,11 @@ def unix_sort_ranks(corpus):
         for var in corpus:
             print(str(var), file=out)
 
-    subprocess.Popen(['sort -n cache/sorts/unsorted_file.txt > cache/sorts/sorted_file.txt'],
-                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-
-    time.sleep(20)
+    proc = subprocess.Popen(['sort -n cache/sorts/unsorted_file.txt > cache/sorts/sorted_file.txt'],
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    time.sleep(1)
+    proc.terminate()
+    proc.communicate()
 
     rank = 1
     ranks = []
