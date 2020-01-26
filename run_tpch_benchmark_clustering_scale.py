@@ -128,5 +128,5 @@ def get_results(path: str, threshold1: float, threshold2: float, quantiles: int,
 
 if __name__ == "__main__":
     with get_context("spawn").Pool(4) as p:  # Create a pool of processes
-        get_results("data/Customer_Example/", threshold1=0.2, threshold2=0.1, quantiles=50, process_pool=p,
+        get_results("data/clustering/Customer_Example", threshold1=0.2, threshold2=0.1, quantiles=50, process_pool=p,
                     chunk_size=1, clear_cache=True)

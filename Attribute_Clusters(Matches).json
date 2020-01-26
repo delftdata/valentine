@@ -1,0 +1,52 @@
+{
+  "Cluster 1": [
+    "europe_customer__c_custkey",
+    "orders__o_custkey",
+    "customer__c_custkey",
+    "asia_customer__c_custkey"
+  ],
+  "Cluster 2": [
+    "nation__n_nationkey",
+    "europe_customer__c_nationkey",
+    "customer__c_nationkey",
+    "asia_customer__c_nationkey"
+  ],
+  "Cluster 3": [
+    "customer__c_name",
+    "asia_customer__c_name",
+    "europe_customer__c_name"
+  ],
+  "Cluster 4": [
+    "asia_customer__c_address",
+    "europe_customer__c_address",
+    "customer__c_address"
+  ],
+  "Cluster 5": [
+    "asia_customer__c_phone",
+    "customer__c_phone",
+    "europe_customer__c_phone"
+  ],
+  "Cluster 6": [
+    "asia_customer__c_comment",
+    "customer__c_comment",
+    "europe_customer__c_comment"
+  ],
+  "Cluster 7": [
+    "nation__n_name"
+  ],
+  "Cluster 8": [
+    "nation__n_regionkey"
+  ],
+  "Cluster 9": [
+    "nation__n_comment"
+  ],
+  "Cluster 10": [
+    "orders__o_orderkey"
+  ],
+  "Cluster 11": [
+    "orders__o_orderpriority"
+  ],
+  "Cluster 12": [
+    "orders__o_comment"
+  ]
+}
