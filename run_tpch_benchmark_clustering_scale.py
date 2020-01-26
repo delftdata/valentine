@@ -91,6 +91,9 @@ def create_cache_dirs():
         os.makedirs('cache')
     if not os.path.exists('cache/global_ranks'):
         os.makedirs('cache/global_ranks')
+    if not os.path.exists('cache/sorts'):
+        os.makedirs('cache/sorts')
+
 
 
 def get_results(path: str, threshold1: float, threshold2: float, quantiles: int, process_pool: Pool,
