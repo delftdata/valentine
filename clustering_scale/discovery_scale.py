@@ -48,7 +48,7 @@ def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, c
     print(A)
 
     edges_per_column = list(pool.map(parallel_cutoff_threshold, list(cuttoff_column_generator(A, columns, threshold))))
-    print(edges_per_column)
+    # print(edges_per_column)
     graph = create_graph(columns, edges_per_column)
 
     nx.draw(graph)
@@ -125,16 +125,16 @@ def correlation_clustering_pulp(vertexes, edges):
 
     set_u = vertexes
     set_v = vertexes
-    set_w = vertexes
+    # set_w = vertexes
 
     x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="{0}--{1}".format(i, j))
               for i in set_u for j in set_v}
 
-    constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
-                                               sense=plp.LpConstraintLE,
-                                               rhs=x_vars[i, j] + x_vars[j, k],
-                                               name="constraint_{0}_{1}_{2}".format(i, j, k))
-                   for i in set_u for j in set_v for k in set_w}
+    # constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
+    #                                            sense=plp.LpConstraintLE,
+    #                                            rhs=x_vars[i, j] + x_vars[j, k],
+    #                                            name="constraint_{0}_{1}_{2}".format(i, j, k))
+    #                for i in set_u for j in set_v for k in set_w}
 
     sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
     sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
@@ -151,8 +151,10 @@ def correlation_clustering_pulp(vertexes, edges):
     return result
 
 
-def process_correlation_clustering_result(result, columns):
-    clusters = [k for (k, v) in result.items() if v == 0]
+def process_correlation_clustering_result(results, columns):
+    clusters = []
+    for cluster in results:
+        clusters.extend([k for (k, v) in cluster.items() if v == 0])
     edges_per_column = []
     for match in clusters:
         table1, column1, table2, column2 = get_columns_tables_from_match(match)

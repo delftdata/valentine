@@ -1,10 +1,10 @@
 from pandas import DataFrame
-import numpy as np
+import pickle
+
+
 from clustering_scale.column_model_scale import Column
 from clustering_scale.emd_utils import quantile_emd, intersection_emd
 from clustering_scale.quantile_histogram.histogram import QuantileHistogram
-import pickle
-import math
 
 
 def compute_cutoff_threshold(C: list, threshold: float):
@@ -60,13 +60,13 @@ def column_combinations(columns: list, quantiles: int, intersection: bool = Fals
     c_i = 0
     while c_i < c:
         name_i = columns[c_i]
-        table_i = name_i.split("__")[0]
+        # table_i = name_i.split("__")[0]
         c_j = c_i + 1
         while c_j < c:
             name_j = columns[c_j]
-            table_j = name_j.split("__")[0]
-            if table_i != table_j:
-                yield (name_i, name_j), quantiles, intersection
+            # table_j = name_j.split("__")[0]
+            # if table_i != table_j:
+            yield (name_i, name_j), quantiles, intersection
             c_j = c_j + 1
         c_i = c_i + 1
 
@@ -162,9 +162,7 @@ def process_columns(tup: tuple):
     column_name, data, source_name, data_type, quantiles = tup
     column = Column(column_name, data, source_name, data_type, quantiles)
     print("Processing column: ", column.get_long_name())
-
-    column.quantile_histogram = QuantileHistogram(column.get_long_name(), column.get_original_data(),
-                                                  min(column.cardinality, quantiles))
+    column.quantile_histogram = QuantileHistogram(column.get_long_name(), column.ranks, column.size, quantiles)
     with open('cache/' + column.get_long_name() + '.pkl', 'wb') as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
 

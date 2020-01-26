@@ -3,7 +3,7 @@ import json
 from pandas import DataFrame
 from multiprocessing import Pool
 from definitions import ROOT_DIR
-
+import re
 
 import clustering_scale.discovery_scale as discovery
 from clustering_scale.scale_utils import process_columns, ingestion_column_generator
@@ -32,7 +32,7 @@ class CorrelationClustering:
         Returns the column name
 
     """
-    def __init__(self, quantiles: int, threshold: float):
+    def __init__(self, quantiles: int, threshold1: float, threshold2: float):
         """
         Parameters
         ----------
@@ -42,7 +42,8 @@ class CorrelationClustering:
             The global threshold described in [1]
         """
         self.quantiles = quantiles
-        self.threshold = threshold
+        self.threshold1 = threshold1
+        self.threshold2 = threshold2
         self.columns = list()
 
     def add_data(self, data: DataFrame, source_name: str, pool: Pool):
@@ -77,14 +78,15 @@ class CorrelationClustering:
 
         print("Compute distribution clusters ...\n")
 
-        connected_components = discovery.compute_distribution_clusters(self.columns, self.threshold, pool,
+        connected_components = discovery.compute_distribution_clusters(self.columns, self.threshold1, pool,
                                                                        chunk_size, self.quantiles)
 
         stop = timeit.default_timer()
 
         print('Time: ', stop - start)
 
-        self.write_clusters_to_json(connected_components, 'Distribution_Clusters.json')
+        self.write_clusters_to_json(connected_components,
+                                    'Distribution_Clusters.json')
 
         start = timeit.default_timer()
 
@@ -92,8 +94,10 @@ class CorrelationClustering:
         all_attributes = list()
         for components in connected_components:
             if len(components) > 1:
-                edges = discovery.compute_attributes(list(components), self.threshold, pool, chunk_size, self.quantiles)
+                edges = discovery.compute_attributes(list(components), self.threshold2, pool, chunk_size, self.quantiles)
                 all_attributes.append((list(components), edges))
+
+        print(all_attributes)
 
         stop = timeit.default_timer()
 
@@ -113,15 +117,16 @@ class CorrelationClustering:
         start = timeit.default_timer()
 
         print("Extract clusters ... \n")
-        clusters = list()
-        for result in results:
-            clusters.extend(discovery.process_correlation_clustering_result(result, self.columns))
+
+        attribute_clusters = discovery.process_correlation_clustering_result(results, self.columns)
 
         stop = timeit.default_timer()
 
         print('Time: ', stop - start)
 
-        self.write_clusters_to_json(clusters, 'Attribute_Clusters(Matches).json')
+        self.print_info(attribute_clusters)
+        self.write_clusters_to_json(attribute_clusters,
+                                    'Attribute_Clusters(Matches).json')
 
     @staticmethod
     def write_clusters_to_json(clusters: list, file_name: str):
@@ -141,3 +146,16 @@ class CorrelationClustering:
             d["Cluster " + str(idx + 1)] = list(cluster)
         with open(ROOT_DIR + "/" + file_name, 'w') as fp:
             json.dump(d, fp, indent=2)
+
+    @staticmethod
+    def print_info(clusters):
+        i = 0
+        for cluster in clusters:
+            i = i + 1
+            entries = []
+            for entry in cluster:
+                match_obj = re.match(r'(.*)__(.*)_(.*)', entry)
+                entries.append(match_obj.group(3))
+            unique_num = len(set(entries))
+            total = len(entries)
+            print("Cluster ", i, " number of unique ", unique_num, " out of ", total)

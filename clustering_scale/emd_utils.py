@@ -1,8 +1,5 @@
 import math
-import scipy.stats as ss
-from scipy.stats import wasserstein_distance
-import numpy as np
-
+from pyemd import emd
 from clustering_scale.column_model_scale import Column
 from clustering_scale.quantile_histogram.histogram import QuantileHistogram
 
@@ -29,26 +26,11 @@ def quantile_emd(column1: Column, column2: Column, quantiles: int = 256):
         the EMD value between column1 and column2
     """
     histogram1 = column1.get_histogram()
-    histogram2 = QuantileHistogram(column2.get_long_name(),
-                                   column2.get_original_data(), quantiles, reference_hist=histogram1)
-
+    histogram2 = QuantileHistogram(column2.get_long_name(), column2.ranks, column2.size, quantiles,
+                                   reference_hist=histogram1)
     if histogram2.is_empty:
-        del histogram2
         return math.inf
-    else:
-        e = bucket_emd(histogram1, histogram2, quantiles) / (column1.cardinality + column2.cardinality)
-        del histogram2
-        return e
-
-
-def bucket_emd(hist1: QuantileHistogram, hist2: QuantileHistogram, quantiles: int):
-    e = 0
-    for (v1, w1), (v2, w2) in zip(hist1.bucket_generator(), hist2.bucket_generator()):
-        if len(v2) != 0:
-            e = e + wasserstein_distance(v_values=v1, v_weights=w1, u_values=v2, u_weights=w2)
-        else:
-            e = e + sum(w1)
-    return e / quantiles
+    return emd(histogram1.get_values, histogram2.get_values, histogram1.dist_matrix)
 
 
 def intersection_emd(column1: Column, column2: Column, quantiles: int = 256):
@@ -84,7 +66,8 @@ def intersection_emd(column1: Column, column2: Column, quantiles: int = 256):
     intersection = [x for x in list(column1.get_original_data()) + list(column2.get_original_data())
                     if x in common_elements]  # The intersection of the two columns
 
-    intersection_column = Column("_", intersection, "_", "_", quantiles)
+    intersection_column = Column("Intersection of " + column1.get_long_name() + " " + column2.get_long_name(),
+                                 intersection, "", "", quantiles)
 
     e1 = quantile_emd(column1, intersection_column, quantiles)
     e2 = quantile_emd(column2, intersection_column, quantiles)

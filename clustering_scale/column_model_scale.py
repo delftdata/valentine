@@ -1,3 +1,8 @@
+import numpy as np
+import scipy.stats as ss
+import pickle
+
+
 class Column(object):
     """
     A class used to represent a column of a table
@@ -56,6 +61,7 @@ class Column(object):
         self.data = list(filter(lambda d: d != '', data))  # remove the empty strings
         self.__data_type = data_type
         self.quantiles = quantiles
+        self.ranks = self.get_global_ranks(self.data)
         self.cardinality = len(set(data))
         self.size = len(data)
         self.quantile_histogram = None
@@ -79,3 +85,10 @@ class Column(object):
     def get_data_type(self):
         """Returns the data type of the column"""
         return self.__data_type
+
+    @staticmethod
+    def get_global_ranks(column: list):
+        with open('cache/global_ranks/ranks.pkl', 'rb') as pkl_file:
+            global_ranks: dict = pickle.load(pkl_file)
+            ranks = np.array(sorted([global_ranks[x] for x in column]))
+            return ranks
