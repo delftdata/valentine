@@ -60,13 +60,13 @@ def column_combinations(columns: list, quantiles: int, intersection: bool = Fals
     c_i = 0
     while c_i < c:
         name_i = columns[c_i]
-        # table_i = name_i.split("__")[0]
+        table_i = name_i.split("__")[0]
         c_j = c_i + 1
         while c_j < c:
             name_j = columns[c_j]
-            # table_j = name_j.split("__")[0]
-            # if table_i != table_j:
-            yield (name_i, name_j), quantiles, intersection
+            table_j = name_j.split("__")[0]
+            if table_i != table_j:
+                yield (name_i, name_j), quantiles, intersection
             c_j = c_j + 1
         c_i = c_i + 1
 

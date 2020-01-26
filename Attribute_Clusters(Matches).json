@@ -1,8 +1,8 @@
 {
   "Cluster 1": [
-    "europe_customer__c_custkey",
-    "orders__o_custkey",
     "customer__c_custkey",
+    "orders__o_custkey",
+    "europe_customer__c_custkey",
     "asia_customer__c_custkey"
   ],
   "Cluster 2": [
@@ -12,19 +12,19 @@
     "asia_customer__c_nationkey"
   ],
   "Cluster 3": [
-    "customer__c_name",
     "asia_customer__c_name",
+    "customer__c_name",
     "europe_customer__c_name"
   ],
   "Cluster 4": [
     "asia_customer__c_address",
-    "europe_customer__c_address",
-    "customer__c_address"
+    "customer__c_address",
+    "europe_customer__c_address"
   ],
   "Cluster 5": [
-    "asia_customer__c_phone",
     "customer__c_phone",
-    "europe_customer__c_phone"
+    "europe_customer__c_phone",
+    "asia_customer__c_phone"
   ],
   "Cluster 6": [
     "asia_customer__c_comment",
