@@ -3,6 +3,7 @@ import time
 
 import pandas as pd
 import os
+import shutil
 import pickle
 from multiprocessing import get_context, Pool
 
@@ -52,6 +53,10 @@ def unix_sort_ranks(corpus):
         for var in txt.splitlines():
             ranks.append((convert_data_type(var.replace('\n', '')), rank))
             rank = rank + 1
+
+    shutil.rmtree('./cache/sorts')
+    os.mkdir('./cache/sorts')
+
     return dict(ranks)
 
 
