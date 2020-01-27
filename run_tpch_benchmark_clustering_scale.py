@@ -3,6 +3,7 @@ import time
 
 import pandas as pd
 import os
+import sys
 import shutil
 import pickle
 from multiprocessing import get_context, Pool
@@ -103,7 +104,7 @@ def create_cache_dirs():
 
 
 def get_results(path: str, threshold1: float, threshold2: float, quantiles: int, process_pool: Pool,
-                chunk_size: int = None, clear_cache: bool = False):
+                chunk_size: int = None, clear_cache: bool = True):
     """
     Runs the Schema Matching pipeline described in
     "Automatic Discovery of Attributes in Relational Databases" [1]
@@ -132,7 +133,24 @@ def get_results(path: str, threshold1: float, threshold2: float, quantiles: int,
     correlation_clustering.find_matches(process_pool, chunk_size)
 
 
+# if __name__ == "__main__":
+#     with get_context("spawn").Pool(4) as p:  # Create a pool of processes
+#         get_results("data/clustering/Customer_Example", threshold1=0.2, threshold2=0.1, quantiles=50, process_pool=p,
+#                     chunk_size=1, clear_cache=True)
+
 if __name__ == "__main__":
-    with get_context("spawn").Pool(4) as p:  # Create a pool of processes
-        get_results("data/clustering/Customer_Example", threshold1=0.2, threshold2=0.1, quantiles=50, process_pool=p,
-                    chunk_size=1, clear_cache=True)
+    """
+    argv[1] -> the dataset root path
+    argv[2] -> the global threshold phase 1
+    argv[3] -> the global threshold phase 2
+    argv[4] -> the number of quantiles 
+    argv[5] -> the number of processes to spawn
+    argv[6] -> the number of chunks of each job process
+    argv[7] -> clear cache or not
+
+    e.g. python3 run_tpch_benchmark.py data/TPCH/ 0.5 100 4 10 True
+    """
+    with get_context("spawn").Pool(int(sys.argv[4])) as p:  # Create a pool of processes
+        get_results(sys.argv[1], threshold1=float(sys.argv[2]), threshold2=float(sys.argv[3]),
+                    quantiles=int(sys.argv[4]), process_pool=p, chunk_size=int(sys.argv[5]),
+                    clear_cache=bool(sys.argv[6]))
