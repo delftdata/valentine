@@ -102,7 +102,6 @@ def create_cache_dirs():
         os.makedirs('cache/sorts')
 
 
-
 def get_results(path: str, threshold1: float, threshold2: float, quantiles: int, process_pool: Pool,
                 chunk_size: int = None, clear_cache: bool = True):
     """
@@ -150,7 +149,7 @@ if __name__ == "__main__":
 
     e.g. python3 run_tpch_benchmark.py data/TPCH/ 0.5 100 4 10 True
     """
-    with get_context("spawn").Pool(int(sys.argv[4])) as p:  # Create a pool of processes
+    with get_context("spawn").Pool(int(sys.argv[5])) as p:  # Create a pool of processes
         get_results(sys.argv[1], threshold1=float(sys.argv[2]), threshold2=float(sys.argv[3]),
-                    quantiles=int(sys.argv[4]), process_pool=p, chunk_size=int(sys.argv[5]),
-                    clear_cache=bool(sys.argv[6]))
+                    quantiles=int(sys.argv[4]), process_pool=p, chunk_size=int(sys.argv[6]),
+                    clear_cache=bool(sys.argv[7]))
