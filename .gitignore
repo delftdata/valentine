@@ -2,6 +2,7 @@
 .DS_Store
 .idea/
 __pycache__/
-data
 models
+data
 package-lock.json
+cache
