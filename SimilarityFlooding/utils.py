@@ -1,4 +1,6 @@
 import networkx as nx
+import json
+
 
 class Node:
 
@@ -91,4 +93,73 @@ def parseFile(dbname, schemaFile):
                     G.add_node(typenameNode)
                     G.add_edge(elementNode, typenameNode, label = 'name')
                     G.add_edge(Node("NodeID" + str(previousid), dbname), elementNode, label = 'SQLtype')
+    return G
+
+
+def parse_schema(schema_file, relation_name):
+
+    '''
+    Function to parse a schema file in .json format and return its corresponding graph representation
+    :param schema_file: the schema file
+    :param relation_name: the name of the relation that the schema describes
+    :return: a corresponding graph representation of the relation
+    '''
+
+    G = nx.DiGraph()
+
+    table = "Table"
+    column = "Column"
+    columntype = "ColumnType"
+
+    tableNode = Node(table, relation_name)
+    columnNode = Node(column, relation_name)
+    coltypeNode = Node(columntype, relation_name)
+    
+    G.add_node(tableNode)
+    G.add_node(columnNode)
+    G.add_node(coltypeNode)
+    unique_id = 1
+
+    with open(schema_file, "r") as file:
+
+        schema = json.load(file)
+
+        parentNode = Node("NodeID" + str(unique_id), relation_name)
+        relationNode = Node(relation_name, relation_name)
+
+        G.add_node(parentNode)
+        G.add_node(relationNode)
+        G.add_edge(parentNode, relationNode, label='name')
+        G.add_edge(parentNode, tableNode, label='type')
+
+        for attribute in schema.keys():
+
+            unique_id += 1
+
+            elementNode = Node("NodeID" + str(unique_id), relation_name)
+
+            G.add_node(elementNode)
+            G.add_edge(elementNode, columnNode, label='type')
+            G.add_edge(parentNode, elementNode, label='column')
+
+            attributeNode = Node(attribute, relation_name)
+
+            G.add_edge(elementNode, attributeNode, label='name')
+
+            if G.has_node(Node(schema[attribute]['type'], relation_name)):
+                G.add_edge(elementNode, [n for n in G.predecessors(Node(schema[attribute]['type'], relation_name))][0], label='SQLtype')
+            else:
+                previousid = unique_id
+                unique_id +=1
+                elementNode = Node("NodeID" + str(unique_id), relation_name)
+
+                G.add_node(elementNode)
+                G.add_edge(elementNode, coltypeNode, label='type')
+
+                typenameNode = Node(schema[attribute]['type'], relation_name)
+
+                G.add_node(typenameNode)
+                G.add_edge(elementNode, typenameNode, label='name')
+                G.add_edge(Node("NodeID" + str(previousid), relation_name), elementNode, label='SQLtype')
+
     return G
