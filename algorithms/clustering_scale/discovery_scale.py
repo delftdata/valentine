@@ -1,12 +1,11 @@
 import numpy as np
 import networkx as nx
 import pulp as plp
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 import re
 from multiprocessing import Pool
 
-from clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
+from algorithms.clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
     parallel_cutoff_threshold, cuttoff_column_generator, compute_cutoff_threshold, calc_chunksize
 
 
@@ -41,18 +40,12 @@ def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, c
     if chunk_size is None:
         chunk_size = int(calc_chunksize(pool._processes, total))
 
-    print("Total: ", total, " chunk size: ", chunk_size, " processes: ", pool._processes)
-
     A: dict = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, combinations, chunksize=chunk_size),
                                        total=total)))
-    print(A)
 
     edges_per_column = list(pool.map(parallel_cutoff_threshold, list(cuttoff_column_generator(A, columns, threshold))))
-    # print(edges_per_column)
-    graph = create_graph(columns, edges_per_column)
 
-    nx.draw(graph)
-    plt.show()
+    graph = create_graph(columns, edges_per_column)
 
     connected_components = list(nx.connected_components(graph))
 
@@ -89,8 +82,6 @@ def compute_attributes(DC: list, threshold: float, pool: Pool, chunk_size: int =
 
     if chunk_size is None:
         chunk_size = int(calc_chunksize(pool._processes, total))
-
-    print("Total: ", total, " chunk size: ", chunk_size, " processes: ", pool._processes)
 
     I = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, combinations, chunksize=chunk_size), total=total)))
 
@@ -161,9 +152,6 @@ def process_correlation_clustering_result(results, columns):
         edges_per_column.append([(table1+"__"+column1, table2+"__"+column2)])
 
     graph = create_graph(columns, edges_per_column)
-
-    nx.draw(graph)
-    plt.show()
 
     connected_components = list(nx.connected_components(graph))
 

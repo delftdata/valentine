@@ -1,8 +1,10 @@
 import numpy as np
 import pickle
 
+from data_loader.data_objects.column import Column
 
-class Column(object):
+
+class CorrelationClusteringColumn(Column):
     """
     A class used to represent a column of a table
 
@@ -40,7 +42,7 @@ class Column(object):
     get_data_type()
         Returns the data type of the column
     """
-    def __init__(self, name: str, data: list, source_name: str, data_type: str, quantiles: int):
+    def __init__(self, name: str, data: list, table_name: str, quantiles: int):
         """
         Parameters
         ----------
@@ -55,39 +57,32 @@ class Column(object):
         quantiles: int
             The number of quantiles of the column's quantile histogram
         """
-        self.__long_name = source_name + '__' + name
-        self.__name = name
-        self.data = list(filter(lambda d: d != '', data))  # remove the empty strings
-        self.__data_type = data_type
+        super().__init__(name, data, table_name)
         self.quantiles = quantiles
         self.ranks = self.get_global_ranks(self.data)
         self.cardinality = len(set(data))
-        self.size = len(data)
         self.quantile_histogram = None
 
     def get_histogram(self):
         """Returns the quantile histogram of the column"""
         return self.quantile_histogram
 
-    def get_original_name(self):
-        """Returns the column name"""
-        return self.__name
-
     def get_original_data(self):
         """Returns the original data instances"""
         return self.data
 
-    def get_long_name(self):
-        """Returns the compound name of the column (table_name + '_' + column_name)"""
-        return self.__long_name
-
-    def get_data_type(self):
-        """Returns the data type of the column"""
-        return self.__data_type
-
     @staticmethod
-    def get_global_ranks(column: list):
+    def convert_data_type(string: str):
+        try:
+            f = float(string)
+            if f.is_integer():
+                return int(f)
+            return f
+        except ValueError:
+            return string
+
+    def get_global_ranks(self, column: list):
         with open('cache/global_ranks/ranks.pkl', 'rb') as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
-            ranks = np.array(sorted([global_ranks[x] for x in column]))
+            ranks = np.array(sorted([global_ranks[self.convert_data_type(x)] for x in column]))
             return ranks

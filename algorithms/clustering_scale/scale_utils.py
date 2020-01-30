@@ -1,10 +1,12 @@
-from pandas import DataFrame
 import pickle
+import os
+import time
+import shutil
+import subprocess
 
-
-from clustering_scale.column_model_scale import Column
-from clustering_scale.emd_utils import quantile_emd, intersection_emd
-from clustering_scale.quantile_histogram.histogram import QuantileHistogram
+from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
+from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd
+from algorithms.clustering_scale.quantile_histogram.histogram import QuantileHistogram
 
 
 def compute_cutoff_threshold(C: list, threshold: float):
@@ -159,11 +161,10 @@ def process_columns(tup: tuple):
     tup : tuple
         tuple containing the information of the column to be processed
     """
-    column_name, data, source_name, data_type, quantiles = tup
-    column = Column(column_name, data, source_name, data_type, quantiles)
-    print("Processing column: ", column.get_long_name())
-    column.quantile_histogram = QuantileHistogram(column.get_long_name(), column.ranks, column.size, quantiles)
-    with open('cache/' + column.get_long_name() + '.pkl', 'wb') as output:
+    column_name, data, source_name, quantiles = tup
+    column = CorrelationClusteringColumn(column_name, data, source_name, quantiles)
+    column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
+    with open('cache/' + column.long_name + '.pkl', 'wb') as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
 
 
@@ -177,20 +178,18 @@ def parallel_cutoff_threshold(tup: tuple):
         tuple containing the information of the column to be processed
     """
     A, column, threshold = tup
-    name_i = column.get_long_name()
+    name_i = column.long_name
     theta = compute_cutoff_threshold(A[name_i], threshold)
-    print("Cutoff threshold for ", name_i, " is ", theta)
     Nc = [(name_i, i['c']) for i in A[name_i] if i['e'] <= theta]
     return Nc
 
 
-def ingestion_column_generator(data: DataFrame, source_name: str, quantiles: int):
+def ingestion_column_generator(columns: list, quantiles: int):
     """
     Generator of incoming pandas dataframe columns
     """
-    column_names = data.columns
-    for column_name in column_names:
-        yield column_name, data[column_name], source_name, data.dtypes[column_name], quantiles
+    for column in columns:
+        yield column.name, column.data, column.table_name, quantiles
 
 
 def cuttoff_column_generator(A: dict, columns: list, threshold: float):
@@ -203,7 +202,49 @@ def cuttoff_column_generator(A: dict, columns: list, threshold: float):
         yield A, column, threshold
 
 
-def calc_chunksize(n_workers: int, len_iterable: int, factor: int=4):
+def convert_data_type(string: str):
+    try:
+        f = float(string)
+        if f.is_integer():
+            return int(f)
+        return f
+    except ValueError:
+        return string
+
+
+def generate_global_ranks(data):
+    ranks = unix_sort_ranks(set(data))
+    with open('cache/global_ranks/ranks.pkl', 'wb') as output:
+        pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
+
+
+def unix_sort_ranks(corpus):
+    with open("./cache/sorts/unsorted_file.txt", 'w') as out:
+        for var in corpus:
+            print(str(var), file=out)
+
+    proc = subprocess.Popen(['sort -n cache/sorts/unsorted_file.txt > cache/sorts/sorted_file.txt'],
+                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    time.sleep(1)
+    proc.terminate()
+    proc.communicate()
+
+    rank = 1
+    ranks = []
+
+    with open('./cache/sorts/sorted_file.txt', 'r') as f:
+        txt = f.read()
+        for var in txt.splitlines():
+            ranks.append((convert_data_type(var.replace('\n', '')), rank))
+            rank = rank + 1
+
+    shutil.rmtree('./cache/sorts')
+    os.mkdir('./cache/sorts')
+
+    return dict(ranks)
+
+
+def calc_chunksize(n_workers: int, len_iterable: int, factor: int = 4):
     """
     Calculate chunksize argument for Pool-methods.
 
@@ -213,3 +254,12 @@ def calc_chunksize(n_workers: int, len_iterable: int, factor: int=4):
     if extra:
         chunksize += 1
     return chunksize
+
+
+def create_cache_dirs():
+    if not os.path.exists('cache'):
+        os.makedirs('cache')
+    if not os.path.exists('cache/global_ranks'):
+        os.makedirs('cache/global_ranks')
+    if not os.path.exists('cache/sorts'):
+        os.makedirs('cache/sorts')
