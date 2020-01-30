@@ -1,123 +1,77 @@
-"""This is a copy of clustering.emd_utils with swapping the dated pybloom package with pybloom_live
-    so that it works with conda and a small optimization on the function inputs"""
 import math
-import numbers
-from operator import itemgetter
-import numpy as np
-from pyemd.emd import emd_samples
-from scipy import stats
-from pybloom_live import ScalableBloomFilter
+from pyemd import emd
+from clustering_scale.column_model_scale import Column
+from clustering_scale.quantile_histogram.histogram import QuantileHistogram
 
 
-def quantile_emd(column_data1, column_data2, quantile=256):
+def quantile_emd(column1: Column, column2: Column, quantiles: int = 256):
     """
-    Computes the quantile Earth Mover's Distance (EMD)
+    Computes the Earth Mover's Distance (EMD) over two column quantile histograms
 
-    :param column1: First column to be compared
-    :type column1: column_model.Column
-    :param column2: Second column to be compared
-    :type column2: column_model.Column
-    :param quantile: How granular the data should be
-    :type quantile: int
-    :param intersection: Default False. True if the method is called from intersection_emd
-    :return: float
+    If the argument `quantiles` isn't passed in, the default of the paper
+    "Automatic Discovery of Attributes in Relational Databases" is used which is 256.
+
+    Parameters
+    ---------
+    column1 : Column
+        The first column
+    column2 : Column
+        The second column that we create its quantile histogram by doing a linear scan over the first's
+    quantiles: int, optional
+        The number of quantiles that the histograms are split on (default is 256)
+
+    Returns
+    -------
+    float
+        the EMD value between column1 and column2
     """
-    # get the unique values
-    set1 = set(column_data1)
-    set2 = set(column_data2)
-
-    # compute the union of the 2 columns
-    set_union = list(set1.union(set2))
-
-    # Some columns contain both numeric and string tokens that can't be sorted all together
-    # Get the numeric values and sort them ascending
-    numeric_values = np.array([x for x in set_union if isinstance(x, numbers.Number)]).astype(np.object)
-    numeric_values = np.sort(numeric_values)
-
-    # Get the string tokens and sort them ascending
-    string_values = np.array(list(filter(lambda x: x not in numeric_values, set_union)))
-    string_values = np.sort(string_values)
-
-    # Form a new sorted list that contains first the numbers and then the strings
-    sorted_set = np.append(numeric_values, string_values, axis=0)
-
-    # rank the sorted values
-    wmap = {key: i for (i, key) in enumerate(sorted_set)}
-
-    # get the ranks for each column
-    ranks1 = np.array(itemgetter(*list(set1))(wmap))
-    ranks2 = np.array(itemgetter(*list(set2))(wmap))
-
-    # check if the ranks contain more than 1 value and sort the lists
-    # python throws an error if you try to sort an empty list
-    if len(ranks1.shape) > 0:
-        ranks1 = sorted(ranks1)
-        l1 = len(ranks1)
-    else:
-        l1 = 1
-
-    if len(ranks2.shape) > 0:
-        ranks2 = sorted(ranks2)
-
-    # get the bin edges by using N-quantile
-    bin_edges1 = stats.mstats.mquantiles(ranks1, np.array(range(0, l1 + 1, quantile)) / l1)
-
-    # compute the quantile histogram
-    hist1, bins1 = np.histogram(ranks1, bins=bin_edges1)
-
-    # use the edges from the quantile histogram to find the number of values in each bin (hist2)
-    hist2, bins2 = np.histogram(ranks2, bins=bin_edges1)
-
-    # use quantiles to create new ranks
-    wmap = {key: int(i / quantile) for (i, key) in enumerate(sorted_set)}
-    ranks = np.array(list(set(wmap.values())))
-    ranks_l = len(ranks)
-
-    # find the distance matrix between each word
-    # D = pdist(ranks.reshape(-1, 1), 'minkowski', p=1.)
-
-    # if one of the histograms is empty, it means that they don't have any values in common, but
-    # emd will return 0 which is the perfect match, so instead I am returning math.inf
-    if len(hist1) == 0 or len(hist2) == 0:
+    histogram1 = column1.get_histogram()
+    histogram2 = QuantileHistogram(column2.get_long_name(), column2.ranks, column2.size, quantiles,
+                                   reference_hist=histogram1)
+    if histogram2.is_empty:
         return math.inf
-    # return emd(hist1 / ranks_l, hist2 / ranks_l, squareform(D)) / ranks_l
-    return emd_samples(hist1 / ranks_l, hist2 / ranks_l)
+    return emd(histogram1.get_values, histogram2.get_values, histogram1.dist_matrix)
 
 
-def intersection_emd(column_data1, column_data2, quantile, bloom_filter=False):
+def intersection_emd(column1: Column, column2: Column, quantiles: int = 256):
     """
-    Computes the intersection EMD
+    Computes the intersection Earth Mover's Distance (EMD) over two column quantile histograms as described in
+    "Automatic Discovery of Attributes in Relational Databases"
 
-    :param column_data1: First column
-    :type column_data1: tokens
-    :param column_data2: Second column
-    :type column_data2: tokens
-    :param quantile: How granular the data should be
-    :type quantile: int
-    :param bloom_filter: Default False. True if the data is large.
-    :return: float
+    Intersection_EMD(C, C') = (EMD(C, C∩C') + EMD(C', C∩C'))/2.
+
+    If the argument `quantiles` isn't passed in, the default of the paper
+    "Automatic Discovery of Attributes in Relational Databases" is used which is 256.
+
+    Parameters
+    ---------
+    column1 : Column
+        The first column
+    column2 : Column
+        The second column
+    quantiles: int, optional
+        The number of quantiles that the histograms are split on (default is 256)
+
+    Returns
+    -------
+    float
+        the intersection EMD value between column1 and column2
     """
+    common_elements = set(list(column1.get_original_data())).intersection(set(list(column2.get_original_data())))
 
-    # for large data, bloom filter is recommended
-    if bloom_filter:
-        set_intersection = __bloom_filter_intersection(column_data1, column_data2)
-    else:
-        set_intersection = list(set(column_data1).intersection(set(column_data2)))
-
-    # if the intersection is empty, then they don't have any values in common
-    if len(set_intersection) == 0:
+    # If the two columns do not share any common elements return inf
+    if len(common_elements) == 0:
         return math.inf
 
-    e1 = quantile_emd(column_data1, set_intersection, quantile)
-    e2 = quantile_emd(column_data2, set_intersection, quantile)
+    intersection = [x for x in list(column1.get_original_data()) + list(column2.get_original_data())
+                    if x in common_elements]  # The intersection of the two columns
+
+    intersection_column = Column("Intersection of " + column1.get_long_name() + " " + column2.get_long_name(),
+                                 intersection, "", "", quantiles)
+
+    e1 = quantile_emd(column1, intersection_column, quantiles)
+    e2 = quantile_emd(column2, intersection_column, quantiles)
+
+    del common_elements, intersection, intersection_column
 
     return (e1 + e2) / 2
-
-
-def __bloom_filter_intersection(column1, column2):
-    bloom_filter = ScalableBloomFilter(mode=ScalableBloomFilter.LARGE_SET_GROWTH)
-    # add the first column in the bloom filter
-    [bloom_filter.add(x) for x in column1]
-
-    # return the common values
-    return np.extract(list(map(lambda x: x in bloom_filter, column2)), column2)
