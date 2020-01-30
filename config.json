@@ -1,0 +1,30 @@
+{
+  "name": "Clustering_run_1",
+  "source": {
+    "type": "InstanceLoader",
+    "args": {
+      "data": "data/framework_tests/Prospect_approx_columns_test_source.csv",
+      "schema": "data/framework_tests/Prospect_approx_columns_test_source.json"
+    }
+  },
+  "target": {
+    "type": "InstanceLoader",
+    "args": {
+      "data": "data/framework_tests/Prospect_approx_columns_test_target.csv",
+      "schema": "data/framework_tests/Prospect_approx_columns_test_target.json"
+    }
+  },
+  "algorithm": {
+    "type": "CorrelationClustering",
+    "args": {
+      "threshold1": 0.1,
+      "threshold2": 0.1,
+      "quantiles": 256,
+      "process_num": 4,
+      "chunk_size": 1,
+      "clear_cache": true
+    }
+  },
+  "metrics": ["precision", "recall"],
+  "golden_standard": "data/framework_tests/Prospect_approx_columns_test_mapping.json"
+}
