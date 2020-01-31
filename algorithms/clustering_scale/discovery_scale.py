@@ -1,9 +1,11 @@
+from ast import literal_eval
+
 import numpy as np
 import networkx as nx
 import pulp as plp
 from tqdm import tqdm
-import re
 from multiprocessing import Pool
+import matplotlib.pyplot as plt
 
 from algorithms.clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
     parallel_cutoff_threshold, cuttoff_column_generator, compute_cutoff_threshold, calc_chunksize
@@ -118,7 +120,7 @@ def correlation_clustering_pulp(vertexes, edges):
     set_v = vertexes
     # set_w = vertexes
 
-    x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="{0}--{1}".format(i, j))
+    x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="({0}, {1})".format(i, j))
               for i in set_u for j in set_v}
 
     # constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
@@ -137,7 +139,7 @@ def correlation_clustering_pulp(vertexes, edges):
     result = dict()
 
     for v in opt_model.variables():
-        result[v.name] = v.varValue
+        result[literal_eval(v.name.replace(",_", ","))] = v.varValue
 
     return result
 
@@ -148,13 +150,10 @@ def process_correlation_clustering_result(results, columns):
         clusters.extend([k for (k, v) in cluster.items() if v == 0])
     edges_per_column = []
     for match in clusters:
-        table1, column1, table2, column2 = get_columns_tables_from_match(match)
-        edges_per_column.append([(table1+"__"+column1, table2+"__"+column2)])
-
+        m1, m2 = match
+        edges_per_column.append([(m1, m2)])
     graph = create_graph(columns, edges_per_column)
-
     connected_components = list(nx.connected_components(graph))
-
     return connected_components
 
 
@@ -165,8 +164,3 @@ def create_graph(nodes, edges_per_column):
     for edges in edges_per_column:
         graph.add_edges_from(edges)
     return graph
-
-
-def get_columns_tables_from_match(match: str):
-    match_obj = re.match(r'(.*)__(.*)__(.*)__(.*)', match)
-    return match_obj.group(1), match_obj.group(2), match_obj.group(3), match_obj.group(4)

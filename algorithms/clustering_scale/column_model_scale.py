@@ -2,6 +2,7 @@ import numpy as np
 import pickle
 
 from data_loader.data_objects.column import Column
+from utils.util import convert_data_type
 
 
 class CorrelationClusteringColumn(Column):
@@ -10,18 +11,10 @@ class CorrelationClusteringColumn(Column):
 
     Attributes
     ----------
-    __long_name : str
-        a string containing (table_name + '__' + column_name)
-    __name : str
-        the name of the column
     data : list
         the data contained in the column
-    __data_type : str
-        the data type of the column
     quantiles : int
         the number of quantiles used in the histogram creation
-    cardinality : int
-        the cardinality of the column
     quantile_histogram : QuantileHistogram
         the quantile histogram representation of the column using the sorted ranks of the data
 
@@ -50,17 +43,12 @@ class CorrelationClusteringColumn(Column):
             The name of the column
         data : list
             The data instances of the column
-        source_name : str
-            The name of the table
-        data_type: str
-            The data type of the column
         quantiles: int
             The number of quantiles of the column's quantile histogram
         """
         super().__init__(name, data, table_name)
         self.quantiles = quantiles
         self.ranks = self.get_global_ranks(self.data)
-        self.cardinality = len(set(data))
         self.quantile_histogram = None
 
     def get_histogram(self):
@@ -72,17 +60,8 @@ class CorrelationClusteringColumn(Column):
         return self.data
 
     @staticmethod
-    def convert_data_type(string: str):
-        try:
-            f = float(string)
-            if f.is_integer():
-                return int(f)
-            return f
-        except ValueError:
-            return string
-
-    def get_global_ranks(self, column: list):
+    def get_global_ranks(column: list):
         with open('cache/global_ranks/ranks.pkl', 'rb') as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
-            ranks = np.array(sorted([global_ranks[self.convert_data_type(x)] for x in column]))
+            ranks = np.array(sorted([global_ranks[convert_data_type(x)] for x in column]))
             return ranks

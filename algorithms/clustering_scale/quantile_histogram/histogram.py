@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats as ss
 
 
-class QuantileHistogram(object):
+class QuantileHistogram:
     """
     A class used to represent an equi depth quantile histogram
 
@@ -71,7 +71,8 @@ class QuantileHistogram(object):
         self.dist_matrix = self.calc_dist_matrix()
 
         if reference_hist is None:
-            self.add_buckets(ranks.min(), ss.mstats.mquantiles(ranks, np.array(list(range(1, quantiles + 1))) / quantiles))
+            self.add_buckets(ranks.min(),
+                             ss.mstats.mquantiles(ranks, np.array(list(range(1, quantiles + 1))) / quantiles))
             self.add_values(ranks)
         else:
             self.bucket_boundaries = reference_hist.bucket_boundaries
@@ -91,7 +92,6 @@ class QuantileHistogram(object):
         while i < len(bb) - 1:
             self.bucket_boundaries[i+1] = (bb[i], bb[i+1])
             i = i + 1
-        # self.bucket_boundaries[i] = (self.bucket_boundaries[i-1][1], math.inf)
 
     def add_values(self, values, norm=True):
         for i in range(len(self.bucket_boundaries.values())):
@@ -107,14 +107,14 @@ class QuantileHistogram(object):
         self.bucket_values = {k: v / self.normalization_factor for k, v in self.bucket_values.items()}
 
     def bucket_binary_search(self, x):
-        lelf = 0
+        left = 0
         right = self.quantiles - 1
-        while lelf <= right:
-            mid = lelf + (right - lelf) // 2
+        while left <= right:
+            mid = left + (right - left) // 2
             if self.bucket_boundaries[mid][0] <= x <= self.bucket_boundaries[mid][1]:
                 return mid
             elif self.bucket_boundaries[mid][1] < x:
-                lelf = mid + 1
+                left = mid + 1
             else:
                 right = mid - 1
         return -1

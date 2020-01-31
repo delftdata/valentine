@@ -20,10 +20,6 @@ class CorrelationClustering(BaseMatcher):
     ----------
     quantiles: int
         the number of quantiles of the histograms
-    threshold : float
-        the global threshold described in [1]
-    columns : list(str)
-        a list with all the compound column names (table_name + '__' + column_name)
 
     Methods
     -------
@@ -36,14 +32,12 @@ class CorrelationClustering(BaseMatcher):
     """
 
     def __init__(self, source: InstanceLoader, target: InstanceLoader, threshold1: float = 0.1, threshold2: float = 0.1,
-                 quantiles: int = 100, process_num: int = 1, chunk_size: int = None, clear_cache: bool = True):
+                 quantiles: int = 256, process_num: int = 1, chunk_size: int = None, clear_cache: bool = True):
         """
         Parameters
         ----------
         quantiles : int
             The number of quantiles of the column's quantile histogram
-        threshold : float
-            The global threshold described in [1]
         """
         self.quantiles = quantiles
         self.threshold1 = threshold1
@@ -100,7 +94,8 @@ class CorrelationClustering(BaseMatcher):
             if len(components) > 1:
                 print("Distribution cluster: ", i)
                 i = i + 1
-                edges = discovery.compute_attributes(list(components), self.threshold2, pool, chunk_size, self.quantiles)
+                edges = discovery.compute_attributes(list(components), self.threshold2, pool, chunk_size,
+                                                     self.quantiles)
                 all_attributes.append((list(components), edges))
 
         print("Solving linear program ...")
@@ -110,7 +105,8 @@ class CorrelationClustering(BaseMatcher):
 
         attribute_clusters = discovery.process_correlation_clustering_result(results, self.column_names)
 
-        attribute_clusters = self.write_clusters_to_json(attribute_clusters, 'Attribute_Clusters(Matches).json')
+        self.write_clusters_to_json(attribute_clusters, 'Attribute_Clusters(Matches).json')
+
         return self.rank_output(attribute_clusters)
 
     @staticmethod
@@ -128,18 +124,21 @@ class CorrelationClustering(BaseMatcher):
         d = {}
         clusters.sort(key=lambda item: -len(item))
         for (cluster, idx) in zip(clusters, range(len(clusters))):
-            d["Cluster " + str(idx + 1)] = list(cluster)
+            d["Cluster " + str(idx + 1)] = {}
+            table_names = list(map(lambda x: x[0], cluster))
+            for table_name in table_names:
+                column_names = map(lambda x: x[1], filter(lambda x: x[0] == table_name, cluster))
+                d["Cluster " + str(idx + 1)][table_name] = list(column_names)
         with open(ROOT_DIR + "/" + file_name, 'w') as fp:
             json.dump(d, fp, indent=2)
-        return d
 
-    def rank_output(self, attribute_clusters: dict):
+    def rank_output(self, attribute_clusters: list):
         emd_per_match = dict()
-        for cluster in attribute_clusters.values():
+        for cluster in attribute_clusters:
             if len(cluster) > 1:
                 for combination in combinations(cluster, 2):
-                    table1 = combination[0].split("__")[0]
-                    table2 = combination[1].split("__")[0]
+                    table1 = combination[0][0]
+                    table2 = combination[1][0]
                     if table1 != table2:
                         k, emd = process_emd(((combination[0], combination[1]), self.quantiles, False))
                         emd_per_match[k] = 1 / (1 + emd)

@@ -7,6 +7,7 @@ import subprocess
 from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
 from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd
 from algorithms.clustering_scale.quantile_histogram.histogram import QuantileHistogram
+from utils.util import convert_data_type
 
 
 def compute_cutoff_threshold(C: list, threshold: float):
@@ -62,11 +63,11 @@ def column_combinations(columns: list, quantiles: int, intersection: bool = Fals
     c_i = 0
     while c_i < c:
         name_i = columns[c_i]
-        table_i = name_i.split("__")[0]
+        table_i = name_i[0]
         c_j = c_i + 1
         while c_j < c:
             name_j = columns[c_j]
-            table_j = name_j.split("__")[0]
+            table_j = name_j[0]
             if table_i != table_j:
                 yield (name_i, name_j), quantiles, intersection
             c_j = c_j + 1
@@ -88,9 +89,9 @@ def process_emd(tup: tuple):
         a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
     """
     name_i, name_j, k, quantile, intersection = unwrap_process_input_tuple(tup)
-    with open('cache/'+name_i+'.pkl', 'rb') as pkl_file:
+    with open('cache/' + str(name_i) + '.pkl', 'rb') as pkl_file:
         c1 = pickle.load(pkl_file)
-    with open('cache/'+name_j+'.pkl', 'rb') as pkl_file:
+    with open('cache/' + str(name_j) + '.pkl', 'rb') as pkl_file:
         c2 = pickle.load(pkl_file)
     if intersection:
         return k, intersection_emd(c1, c2, quantile)
@@ -109,7 +110,7 @@ def unwrap_process_input_tuple(tup: tuple):
     """
     names, quantile, intersection = tup
     name_i, name_j = names
-    k = str(name_i) + "|" + str(name_j)
+    k = (name_i, name_j)
     return name_i, name_j, k, quantile, intersection
 
 
@@ -144,7 +145,7 @@ def transform_dict(dc: dict):
     """
     tmp_dict = dict()
     for k, v in dc.items():
-        k1, k2 = k.split("|")
+        k1, k2 = k
         v1 = {'e': v, 'c': k2}
         v2 = {'e': v, 'c': k1}
         insert_to_dict(tmp_dict, k1, v1)
@@ -164,7 +165,7 @@ def process_columns(tup: tuple):
     column_name, data, source_name, quantiles = tup
     column = CorrelationClusteringColumn(column_name, data, source_name, quantiles)
     column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
-    with open('cache/' + column.long_name + '.pkl', 'wb') as output:
+    with open('cache/' + str(column.long_name) + '.pkl', 'wb') as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
 
 
@@ -197,19 +198,9 @@ def cuttoff_column_generator(A: dict, columns: list, threshold: float):
     Generator of columns for the cutoff threshold computation
     """
     for column_name in columns:
-        with open('cache/' + column_name + '.pkl', 'rb') as pkl_file:
+        with open('cache/' + str(column_name) + '.pkl', 'rb') as pkl_file:
             column = pickle.load(pkl_file)
         yield A, column, threshold
-
-
-def convert_data_type(string: str):
-    try:
-        f = float(string)
-        if f.is_integer():
-            return int(f)
-        return f
-    except ValueError:
-        return string
 
 
 def generate_global_ranks(data):
