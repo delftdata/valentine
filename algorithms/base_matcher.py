@@ -4,14 +4,17 @@ from abc import ABC, abstractmethod
 class BaseMatcher(ABC):
 
     @abstractmethod
-    def get_matches(self, *args):
+    def get_matches(self, source_data_loader, target_data_loader):
         """
         Get the column matches from a schema matching algorithm
 
         Parameters
         ---------
-        args : Column
-            The first column
+        source_data_loader: BaseLoader
+            The data loader for the source that contains either the schema, the instances or both
+
+        target_data_loader: BaseLoader
+            The data loader for the source that contains either the schema, the instances or both
 
         Returns
         -------
