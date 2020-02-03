@@ -5,7 +5,6 @@ def get_tp_fn(matches: dict, golden_standard: GoldenStandardLoader):
     tp = 0
     fn = 0
     all_matches = list(map(lambda m: frozenset(m), list(matches.keys())))
-    print(all_matches)
     for expected_match in golden_standard.expected_matches:
         if expected_match in all_matches:
             tp = tp + 1

@@ -7,7 +7,7 @@ from parse_config import ConfigParser
 
 import data_loader.data_loaders as module_data
 import algorithms.algorithms as module_algorithms
-import algorithms.metrics.metrics as module_metric
+import metrics.metrics as module_metric
 
 
 def main(config):
@@ -24,7 +24,7 @@ def main(config):
     data_loader_target = config.initialize('target', module_data)
 
     # algorithms (Abstracted from BaseMatcher)
-    algorithm: BaseMatcher = config.initialize('algorithm', module_algorithms, data_loader_source, data_loader_target)
+    algorithm: BaseMatcher = config.initialize('algorithm', module_algorithms)
 
     # the result of the algorithm (ranked list of matches based on a similarity metric)
     matches = algorithm.get_matches(data_loader_source, data_loader_target)

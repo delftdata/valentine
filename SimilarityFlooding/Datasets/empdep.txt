@@ -1,9 +1,0 @@
-Employee
-EmpNo:int
-EmpName:varchar(50)
-DeptNo:int
-Salary:dec(15,2)
-Birthdate:date
-Department
-DeptNo:int
-DeptName:varchar(70)

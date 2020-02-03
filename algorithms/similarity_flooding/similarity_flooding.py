@@ -1,18 +1,34 @@
-from propagation_graph import PropagationGraph
-from utils import NodePair
+from algorithms.similarity_flooding.graph.graph import Graph
+from algorithms.similarity_flooding.graph.node_pair import NodePair
+from algorithms.similarity_flooding.graph.propagation_graph import PropagationGraph
 import Levenshtein as lv
 import math
 
+from algorithms.base_matcher import BaseMatcher
+from data_loader.schema_loader import SchemaLoader
 
-class SimilarityFlooding:
 
-    def __init__(self, graph1, graph2, coeff_policy, formula):
-        self.graph1 = graph1
-        self.graph2 = graph2
-        self.propagation_graph = None
+class SimilarityFlooding(BaseMatcher):
+
+    def __init__(self, coeff_policy, formula):
         self.coeff_policy = coeff_policy
         self.formula = formula  # formula used to update similarities of map-pairs as shown in page 10 of the paper
+        self.graph1 = None
+        self.graph2 = None
+        self.propagation_graph = None
         self.initial_map = None
+
+    def get_matches(self, source_data_loader: SchemaLoader, target_data_loader: SchemaLoader):
+        self.graph1 = Graph(source_data_loader).graph
+        self.graph2 = Graph(target_data_loader).graph
+
+        self.calculate_initial_mapping()
+
+        matches = self.fixpoint_computation(100, 0.001)
+
+        filtered_matches = self.filter_map(matches)
+
+        return self.format_output(filtered_matches)
 
     def calculate_initial_mapping(self):
         
@@ -28,12 +44,12 @@ class SimilarityFlooding:
 
     def fixpoint_computation(self, num_iter, residual_diff):
 
-        '''
+        """
 
         :param num_iter: maximum number of iterations
         :param error: error bound for stopping the iterative process
         :return: a dictionary with all similarities of all map pairs
-        '''
+        """
 
         PGbuilder = PropagationGraph(self.graph1, self.graph2, self.coeff_policy)
 
@@ -49,7 +65,7 @@ class SimilarityFlooding:
                     map_sim = previous_map[n]
                     
                     for e in PG.in_edges(n):
-                        l = PG.get_edge_data(e[0],e[1])
+                        l = PG.get_edge_data(e[0], e[1])
                         
                         weight = l.get('weight')
                         
@@ -63,7 +79,8 @@ class SimilarityFlooding:
                     next_map[key] = next_map[key]/maxmap
 
                 # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2) for key in set(previous_map) | set(next_map)}
+                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2)
+                                   for key in set(previous_map) | set(next_map)}
 
                 euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
 
@@ -81,7 +98,7 @@ class SimilarityFlooding:
                     map_sim = self.initial_map[n]
 
                     for e in PG.in_edges(n):
-                        l = PG.get_edge_data(e[0],e[1])
+                        l = PG.get_edge_data(e[0], e[1])
 
                         weight = l.get('weight')
 
@@ -95,7 +112,8 @@ class SimilarityFlooding:
                     next_map[key] = next_map[key]/maxmap
 
                 # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2) for key in set(previous_map) | set(next_map)}
+                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2)
+                                   for key in set(previous_map) | set(next_map)}
 
                 euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
 
@@ -111,7 +129,7 @@ class SimilarityFlooding:
                 map_sim = 0
 
                 for e in PG.in_edges(n):
-                    l = PG.get_edge_data(e[0],e[1])
+                    l = PG.get_edge_data(e[0], e[1])
 
                     weight = l.get('weight')
 
@@ -146,7 +164,8 @@ class SimilarityFlooding:
                     next_map[key] = next_map[key]/maxmap
 
                 # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2) for key in set(previous_map) | set(next_map)}
+                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2)
+                                   for key in set(previous_map) | set(next_map)}
 
                 euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
 
@@ -162,7 +181,7 @@ class SimilarityFlooding:
                 map_sim = self.initial_map[n]
 
                 for e in PG.in_edges(n):
-                    l = PG.get_edge_data(e[0],e[1])
+                    l = PG.get_edge_data(e[0], e[1])
 
                     weight = l.get('weight')
 
@@ -183,7 +202,7 @@ class SimilarityFlooding:
                     map_sim = previous_map[n]
 
                     for e in PG.in_edges(n):
-                        l = PG.get_edge_data(e[0],e[1])
+                        l = PG.get_edge_data(e[0], e[1])
 
                         weight = l.get('weight')
 
@@ -197,7 +216,8 @@ class SimilarityFlooding:
                     next_map[key] = next_map[key]/maxmap
 
                 # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2) for key in set(previous_map) | set(next_map)}
+                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0),2)
+                                   for key in set(previous_map) | set(next_map)}
 
                 euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
 
@@ -214,11 +234,11 @@ class SimilarityFlooding:
 
     def filter_map(self, prevmap):
 
-        '''
+        """
         Function that filters the matching results, so that only pairs of columns remain
         :param prevmap: the matching results of the iterative algorithm
         :return: the filtered matchings
-        '''
+        """
 
         filtered_map = prevmap.copy()
 
@@ -282,11 +302,11 @@ class SimilarityFlooding:
 
     def print_results(self, matches):
 
-        '''
+        """
 
         :param matches: dictionary holding the match similarities of map pairs
 
-        '''
+        """
 
         sortedmaps = {k: v for k, v in sorted(matches.items(), key=lambda item: item[1])}
 
@@ -296,11 +316,13 @@ class SimilarityFlooding:
                 name1 = "[" + key.node1.name + "=>"
                 if key.node1 in self.graph1.nodes():
                     for e in self.graph1.out_edges(key.node1):
-                        l = self.graph1.get_edge_data(e[0],e[1])
+                        l = self.graph1.get_edge_data(e[0], e[1])
+                        print("1) This is e[1].name: ", e[1].name)
                         name1 += l.get('label') + ":" + e[1].name + ", "
                 else:
                     for e in self.graph2.out_edges(key.node1):
-                        l = self.graph2.get_edge_data(e[0],e[1])
+                        l = self.graph2.get_edge_data(e[0], e[1])
+                        print("2) This is e[1].name: ", e[1].name)
                         name1 += l.get('label') + e[1].name + ", "
                 name1 += ']'
 
@@ -309,11 +331,38 @@ class SimilarityFlooding:
                 name2 = "[" + key.node2.name + "=>"
                 if key.node2 in self.graph1.nodes():
                     for e in self.graph1.out_edges(key.node2):
-                        l = self.graph1.get_edge_data(e[0],e[1])
+                        l = self.graph1.get_edge_data(e[0], e[1])
+                        print("3) This is e[1].name: ", e[1].name)
                         name2 += l.get('label') + ":" + e[1].name + ", "
                 else:
                     for e in self.graph2.out_edges(key.node2):
-                        l = self.graph2.get_edge_data(e[0],e[1])
+                        l = self.graph2.get_edge_data(e[0], e[1])
+                        print("4) This is e[1].name: ", e[1].name)
                         name2 += l.get('label') + ":" + e[1].name + ", "
                 name2 += ']'
             print(name1 + "-" + name2 + ":" + str(sortedmaps[key]))
+
+    def format_output(self, matches):
+        output = {}
+        sorted_maps = {k: v for k, v in sorted(matches.items(), key=lambda item: -item[1])}
+        for key in sorted_maps.keys():
+            output[self.get_node_name(key)] = sorted_maps[key]
+        return output
+
+    def get_node_name(self, key):
+        return self.get_attribute_tuple(key.node1), self.get_attribute_tuple(key.node2)
+
+    def get_attribute_tuple(self, node):
+        column_name = ""
+        if node in self.graph1.nodes():
+            for e in self.graph1.out_edges(node):
+                links = self.graph1.get_edge_data(e[0], e[1])
+                if links.get('label') == "name":
+                    column_name = e[1].name
+        else:
+            for e in self.graph2.out_edges(node):
+                links = self.graph2.get_edge_data(e[0], e[1])
+                if links.get('label') == "name":
+                    column_name = e[1].name
+        table_name = node.db
+        return table_name, column_name

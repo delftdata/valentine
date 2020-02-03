@@ -1,0 +1,24 @@
+{
+  "name": "Similarity_flooding_test_1",
+  "source": {
+    "type": "SchemaLoader",
+    "args": {
+      "schema": "data/framework_tests/Prospect_approx_columns_test_source.json"
+    }
+  },
+  "target": {
+    "type": "SchemaLoader",
+    "args": {
+      "schema": "data/framework_tests/Prospect_approx_columns_test_target.json"
+    }
+  },
+  "algorithm": {
+    "type": "SimilarityFlooding",
+    "args": {
+      "coeff_policy": "inverse_average",
+      "formula": "formula_c"
+    }
+  },
+  "metrics": ["precision", "recall"],
+  "golden_standard": "data/framework_tests/Prospect_approx_columns_test_mapping.json"
+}

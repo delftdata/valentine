@@ -31,7 +31,7 @@ class CorrelationClustering(BaseMatcher):
 
     """
 
-    def __init__(self, source: InstanceLoader, target: InstanceLoader, threshold1: float = 0.1, threshold2: float = 0.1,
+    def __init__(self, threshold1: float = 0.1, threshold2: float = 0.1,
                  quantiles: int = 256, process_num: int = 1, chunk_size: int = None, clear_cache: bool = True):
         """
         Parameters
@@ -44,17 +44,16 @@ class CorrelationClustering(BaseMatcher):
         self.threshold2 = threshold2
         self.process_num = process_num
         self.chunk_size = chunk_size
-
+        self.clear_cache = clear_cache
         self.column_names = list()
-
         create_cache_dirs()
 
-        if clear_cache:
+    def get_matches(self, source: InstanceLoader, target: InstanceLoader):
+
+        if self.clear_cache:
             data = list(source.table.get_data()) + list(target.table.get_data())
             generate_global_ranks(data)
             del data
-
-    def get_matches(self, source: InstanceLoader, target: InstanceLoader):
 
         with get_context("spawn").Pool(self.process_num) as process_pool:
             columns = list(source.table.columns.values()) + list(target.table.columns.values())

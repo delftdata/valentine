@@ -1,12 +1,13 @@
 import networkx as nx
-from utils import NodePair
+
+from algorithms.similarity_flooding.graph.node_pair import NodePair
 
 
 class PropagationGraph:
 
-    '''
+    """
         Class for constructing a Propagation Graph from two input graphs.
-    '''
+    """
 
     def __init__(self, graph1, graph2, policy):
         self.graph1 = graph1
@@ -20,7 +21,8 @@ class PropagationGraph:
             for e2 in self.graph2.edges():
                 l1 = self.graph1.get_edge_data(e1[0], e1[1])
                 l2 = self.graph2.get_edge_data(e2[0], e2[1])
-                if l1.get('label') == l2.get('label'):  # if the labels of both edges are equal then add a new pair of nodes in PG
+                # if the labels of both edges are equal then add a new pair of nodes in PG
+                if l1.get('label') == l2.get('label'):
                     np1 = NodePair(e1[0], e2[0])
                     CG.add_node(np1)
                     np2 = NodePair(e1[1], e2[1])
@@ -31,8 +33,8 @@ class PropagationGraph:
 
         for n in CG.nodes():
             PG.add_node(n)
-
-        if self.policy == 'inverse_product':  # inverse product strategy for computing propagation coefficients as described in the paper
+        # inverse product strategy for computing propagation coefficients as described in the paper
+        if self.policy == 'inverse_product':
             for n in PG.nodes():
 
                 in_edges = CG.in_edges(n)
@@ -72,7 +74,7 @@ class PropagationGraph:
 
                     label = l.get('label')
 
-                    PG.add_edge(e[1],e[0], weight=in_labels[label])
+                    PG.add_edge(e[1], e[0], weight=in_labels[label])
 
                 for e in out_edges:
                     l = CG.get_edge_data(e[0], e[1])
@@ -80,7 +82,8 @@ class PropagationGraph:
                     label = l.get('label')
 
                     PG.add_edge(e[0], e[1], weight=out_labels[label])
-        elif self.policy == 'inverse_average':  # inverse average strategy for computing propagation coefficients as described in the paper
+        # inverse average strategy for computing propagation coefficients as described in the paper
+        elif self.policy == 'inverse_average':
             for n in PG.nodes():
     
                 in_labels1 = {}
@@ -96,7 +99,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in in_labels1.keys():
-                            in_labels1[label] +=1
+                            in_labels1[label] += 1
                         else:
                             in_labels1[label] = 1
                      
@@ -106,7 +109,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in in_labels2.keys():
-                            in_labels2[label] +=1
+                            in_labels2[label] += 1
                         else:
                             in_labels2[label] = 1
 
@@ -116,7 +119,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in out_labels1.keys():
-                            out_labels1[label] +=1
+                            out_labels1[label] += 1
                         else:
                             out_labels1[label] = 1
                      
@@ -126,7 +129,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in out_labels2.keys():
-                            out_labels2[label] +=1
+                            out_labels2[label] += 1
                         else:
                             out_labels2[label] = 1
                 else:
@@ -137,7 +140,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in in_labels1.keys():
-                            in_labels1[label] +=1
+                            in_labels1[label] += 1
                         else:
                             in_labels1[label] = 1
                      
@@ -147,7 +150,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in in_labels2.keys():
-                            in_labels2[label] +=1
+                            in_labels2[label] += 1
                         else:
                             in_labels2[label] = 1
                             
@@ -157,7 +160,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in out_labels1.keys():
-                            out_labels1[label] +=1
+                            out_labels1[label] += 1
                         else:
                             out_labels1[label] = 1
                      
@@ -167,7 +170,7 @@ class PropagationGraph:
                         label = l.get('label')
                         
                         if label in out_labels2.keys():
-                            out_labels2[label] +=1
+                            out_labels2[label] += 1
                         else:
                             out_labels2[label] = 1
                 
@@ -187,24 +190,24 @@ class PropagationGraph:
                         out_labels[key] = out_labels2[key]
                 
                 for key in in_labels:        
-                    in_labels[key] = 2.0/float(in_labels[key])
+                    in_labels[key] = 2.0 / float(in_labels[key])
                 
                 for key in out_labels:        
-                    out_labels[key] = 2.0/float(out_labels[key])
+                    out_labels[key] = 2.0 / float(out_labels[key])
                     
                 for e in CG.in_edges(n):
                     l = CG.get_edge_data(e[0], e[1])
                     
                     label = l.get('label')
                     
-                    PG.add_edge(e[1],e[0], weight=in_labels[label])
+                    PG.add_edge(e[1], e[0], weight=in_labels[label])
                 
                 for e in CG.out_edges(n):
                     l = CG.get_edge_data(e[0], e[1])
                     
                     label = l.get('label')
                     
-                    PG.add_edge(e[0],e[1], weight=out_labels[label])
+                    PG.add_edge(e[0], e[1], weight=out_labels[label])
         else:
 
             print("Wrong policy!")

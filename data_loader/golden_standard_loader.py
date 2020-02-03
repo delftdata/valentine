@@ -7,7 +7,6 @@ class GoldenStandardLoader:
         self.expected_matches = set()
         self.size = 0
         self.load_golden_standard()
-        print(self.expected_matches)
 
     def load_golden_standard(self):
         with open(self.path) as json_file:
