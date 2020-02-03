@@ -1,5 +1,5 @@
 setuptools==45.1.0
-wheel==0.34.2
+wheel
 bitarray==1.2.0
 numpy==1.18.1
 scipy==1.4.1

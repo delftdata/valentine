@@ -3,6 +3,7 @@ import os
 import time
 import shutil
 import subprocess
+from functools import lru_cache
 
 from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
 from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd
@@ -89,14 +90,21 @@ def process_emd(tup: tuple):
         a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
     """
     name_i, name_j, k, quantile, intersection = unwrap_process_input_tuple(tup)
-    with open('cache/' + str(name_i) + '.pkl', 'rb') as pkl_file:
-        c1 = pickle.load(pkl_file)
-    with open('cache/' + str(name_j) + '.pkl', 'rb') as pkl_file:
-        c2 = pickle.load(pkl_file)
+
+    c1 = read_from_cache(name_i)
+    c2 = read_from_cache(name_j)
+
     if intersection:
         return k, intersection_emd(c1, c2, quantile)
     else:
         return k, quantile_emd(c1, c2, quantile)
+
+
+@lru_cache
+def read_from_cache(file_name):
+    with open('cache/' + str(file_name) + '.pkl', 'rb') as pkl_file:
+        data = pickle.load(pkl_file)
+    return data
 
 
 def unwrap_process_input_tuple(tup: tuple):
