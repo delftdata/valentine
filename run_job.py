@@ -3,7 +3,7 @@ import numpy as np
 
 from algorithms.base_matcher import BaseMatcher
 from data_loader.golden_standard_loader import GoldenStandardLoader
-from parse_config import ConfigParser
+from utils.parse_config import ConfigParser
 
 import data_loader.data_loaders as module_data
 import algorithms.algorithms as module_algorithms
