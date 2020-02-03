@@ -56,7 +56,7 @@ class QuantileHistogram:
         """
         Parameters
         ----------
-        ranks : list
+        ranks : ndarray
             the column's ranked data
         quantiles : int
             the number of quantiles
