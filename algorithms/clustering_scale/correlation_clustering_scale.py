@@ -4,11 +4,11 @@ from itertools import combinations
 
 from algorithms.base_matcher import BaseMatcher
 from data_loader.instance_loader import InstanceLoader
-from definitions import ROOT_DIR
 
 import algorithms.clustering_scale.discovery_scale as discovery
 from algorithms.clustering_scale.scale_utils import process_columns, ingestion_column_generator, create_cache_dirs, \
     generate_global_ranks, process_emd
+from utils.utils import get_project_root
 
 
 class CorrelationClustering(BaseMatcher):
@@ -128,7 +128,7 @@ class CorrelationClustering(BaseMatcher):
             for table_name in table_names:
                 column_names = map(lambda x: x[1], filter(lambda x: x[0] == table_name, cluster))
                 d["Cluster " + str(idx + 1)][table_name] = list(column_names)
-        with open(ROOT_DIR + "/" + file_name, 'w') as fp:
+        with open(str(get_project_root()) + "/" + file_name, 'w') as fp:
             json.dump(d, fp, indent=2)
 
     def rank_output(self, attribute_clusters: list):

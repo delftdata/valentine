@@ -2,7 +2,7 @@ import numpy as np
 import pickle
 
 from data_loader.data_objects.column import Column
-from utils.util import convert_data_type
+from utils.utils import convert_data_type
 
 
 class CorrelationClusteringColumn(Column):

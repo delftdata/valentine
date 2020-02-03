@@ -8,7 +8,7 @@ from functools import lru_cache
 from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
 from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd
 from algorithms.clustering_scale.quantile_histogram.histogram import QuantileHistogram
-from utils.util import convert_data_type
+from utils.utils import convert_data_type
 
 
 def compute_cutoff_threshold(C: list, threshold: float):

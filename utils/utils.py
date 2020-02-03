@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 def is_sorted(matches: dict):
     prev = None
     for value in matches.values():
@@ -17,3 +20,8 @@ def convert_data_type(string: str):
         return f
     except ValueError:
         return string
+
+
+def get_project_root() -> Path:
+    """Returns project root folder."""
+    return Path(__file__).parent.parent
