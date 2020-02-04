@@ -11,8 +11,8 @@ from tqdm import tqdm
 from os import listdir
 from os.path import isfile, join
 
-from cupid.cupid_model import Cupid
-from cupid.tree_match import tree_match, recompute_wsim, mapping_generation_leaves, mapping_generation_non_leaves
+from algorithms.cupid.cupid_model import Cupid
+from algorithms.cupid.tree_match import tree_match, mapping_generation_leaves
 
 CURRENT_DIR = os.path.dirname(__file__)
 RDB_SCHEMA = CURRENT_DIR + '/../data/cupid/rdb_schema.csv'

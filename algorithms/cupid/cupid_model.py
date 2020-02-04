@@ -2,8 +2,9 @@ import itertools
 
 from anytree import Node, RenderTree
 
-from cupid.linguistic_matching import normalization
-from cupid.tree_match import tree_match, recompute_wsim, mapping_generation_leaves, mapping_generation_non_leaves
+from algorithms.base_matcher import BaseMatcher
+from algorithms.cupid.linguistic_matching import normalization
+from algorithms.cupid.tree_match import tree_match, recompute_wsim, mapping_generation_leaves
 
 
 # TODO: make the code compatible for multiple categories
@@ -16,10 +17,21 @@ def create_cupid_element(data_type, element_name, source_name, category):
     return element
 
 
-class Cupid:
+class Cupid(BaseMatcher):
+
     def __init__(self):
         self.data = list()
         self.categories = dict()
+
+    def get_matches(self, source_data_loader, target_data_loader):
+        self.add_data("source", source_data_loader.schema_name, source_data_loader.column_name_type_pairs)
+        self.add_data("target", target_data_loader.schema_name, target_data_loader.column_name_type_pairs)
+        source_tree = self.get_schema_by_index(0)
+        target_tree = self.get_schema_by_index(1)
+        sims = tree_match(source_tree, target_tree, self.categories)
+        new_sims = recompute_wsim(source_tree, target_tree, sims)
+        # map1 = mapping_generation_leaves(source_tree, target_tree, sims)
+        print(sims)
 
     def add_data(self, schema_name, table_name, column_data_pairs, schema_type="none", table_type="none"):
         schema_node = self.get_schema_by_name(schema_name)
@@ -91,22 +103,3 @@ class Cupid:
         for tree in self.data:
             render_tree(tree)
             print()
-
-
-def example():
-    employees = ['EmployeeID', 'FirstName', 'LastName', 'Title', 'EmailName', 'Extension', 'Workphone']
-    et = ['EmployeeIdFk', 'TeritoryId']
-
-    cupid = Cupid()
-    cupid.add_data('rdb_schema1', 'employee', zip(employees, itertools.repeat("string")))
-    cupid.add_data('rdb_schema2', 'employee-territory', zip(et, itertools.repeat('str')))
-    cupid.print_data()
-
-    print('Computing matchings ... ')
-    source_tree = cupid.get_schema_by_name('rdb_schema1')
-    target_tree = cupid.get_schema_by_name('rdb_schema2')
-    sims = tree_match(source_tree, target_tree, cupid.get_categories())
-    new_sims = recompute_wsim(source_tree, target_tree, sims)
-
-    print("Leaf matchings:\n {}".format(mapping_generation_leaves(source_tree, target_tree, sims)))
-    # print("Non-leaf matchings:\n {}".format(mapping_generation_non_leaves(source_tree, target_tree, new_sims)))

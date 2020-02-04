@@ -10,7 +10,7 @@ from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
 from similarity.ngram import NGram
 
-from cupid.elements import SchemaElement, Token, TokenTypes
+from algorithms.cupid.elements import SchemaElement, Token, TokenTypes
 
 
 def normalization(element, schema_element=None):
@@ -87,8 +87,8 @@ def comparison(source_tree, target_tree, categories_source, categories_target, c
         for cat_t in keys_target:
             if compatibility_table[cat_s][cat_t] > th_ns:
                 all_compatible_nodes = product(categories_source[cat_s], categories_target[cat_t])
-                name_sim = {pair: name_similarity_elements(pair[0], pair[1]) for pair in all_compatible_nodes if pair in all_nodes}
-
+                name_sim.update({pair: name_similarity_elements(pair[0], pair[1]) for pair in all_compatible_nodes if pair in all_nodes})
+    print(name_sim)
     for s, t in name_sim.keys():
         s_cat = s.categories
         t_cat = t.categories
@@ -103,7 +103,10 @@ def comparison(source_tree, target_tree, categories_source, categories_target, c
 def name_similarity_tokens(token_set1, token_set2):
     sum1 = get_partial_similarity(token_set1, token_set2)
     sum2 = get_partial_similarity(token_set2, token_set1)
-
+    # print([token.data for token in token_set1])
+    # print((sum1 + sum2))
+    # print((len(token_set1) + len(token_set2)))
+    # print((sum1 + sum2) / (len(token_set1) + len(token_set2)))
     return (sum1 + sum2) / (len(token_set1) + len(token_set2))
 
 
@@ -142,7 +145,7 @@ def compute_similarity_wordnet(word1, word2):
 def compute_similarity_ngram(word1, word2, n):
     ngram = NGram(n)
     sim = ngram.distance(word1, word2)
-#     print(sim)
+    # print(sim)
     return sim
 
 
@@ -154,9 +157,11 @@ def name_similarity_elements(element1, element2):
     for tt in TokenTypes:
         if tt == TokenTypes.SYMBOLS:
             continue
+        print(tt)
         t1 = element1.get_tokens_by_token_type(tt)
         t2 = element2.get_tokens_by_token_type(tt)
-
+        print([token.data for token in t1])
+        print([token.data for token in t2])
         if len(t1) == 0 or len(t2) == 0:
             continue
 

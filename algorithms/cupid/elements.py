@@ -12,7 +12,7 @@ class SchemaElement:
         self.long_name = None
 
     def add_long_name(self, table_name, name):
-        self.long_name = table_name + '__' + name
+        self.long_name = (table_name, name)
 
     def add_category(self, category):
         self.categories.append(category)

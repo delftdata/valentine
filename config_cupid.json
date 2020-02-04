@@ -1,0 +1,21 @@
+{
+  "name": "Cupid_run_1",
+  "source": {
+    "type": "SchemaLoader",
+    "args": {
+      "schema": "data/framework_tests/frank.json"
+    }
+  },
+  "target": {
+    "type": "SchemaLoader",
+    "args": {
+      "schema": "data/framework_tests/frank.json"
+    }
+  },
+  "algorithm": {
+    "type": "Cupid",
+    "args": {}
+  },
+  "metrics": ["precision", "recall"],
+  "golden_standard": "data/framework_tests/Prospect_approx_columns_test_mapping.json"
+}

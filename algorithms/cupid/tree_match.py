@@ -5,9 +5,9 @@ from operator import getitem
 
 from anytree import PostOrderIter, LevelOrderIter
 
-from cupid.elements import SchemaElement
-from cupid.linguistic_matching import name_similarity_elements, normalization, compute_lsim, compute_compatibility, comparison
-from cupid.structural_similarity import compute_ssim, change_structural_similarity
+from algorithms.cupid.elements import SchemaElement
+from algorithms.cupid.linguistic_matching import name_similarity_elements, normalization, compute_lsim, compute_compatibility, comparison
+from algorithms.cupid.structural_similarity import compute_ssim, change_structural_similarity
 
 
 def compute_weighted_similarity(ssim, lsim, w_struct=0.5):

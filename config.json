@@ -3,15 +3,13 @@
   "source": {
     "type": "InstanceLoader",
     "args": {
-      "data": "data/framework_tests/Prospect_approx_columns_test_source.csv",
-      "schema": "data/framework_tests/Prospect_approx_columns_test_source.json"
+      "data": "data/framework_tests/Prospect_approx_columns_test_source.csv"
     }
   },
   "target": {
     "type": "InstanceLoader",
     "args": {
-      "data": "data/framework_tests/Prospect_approx_columns_test_target.csv",
-      "schema": "data/framework_tests/Prospect_approx_columns_test_target.json"
+      "data": "data/framework_tests/Prospect_approx_columns_test_target.csv"
     }
   },
   "algorithm": {
