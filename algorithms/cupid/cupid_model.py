@@ -19,7 +19,16 @@ def create_cupid_element(data_type, element_name, source_name, category):
 
 class Cupid(BaseMatcher):
 
-    def __init__(self):
+    def __init__(self, leaf_w_struct=0.5, w_struct=0.6, th_accept=0.5, th_high=0.6, th_low=0.35, c_inc=1.2, c_dec=0.9,
+                 th_ns=0.5):
+        self.leaf_w_struct = leaf_w_struct
+        self.w_struct = w_struct
+        self.th_accept = th_accept
+        self.th_high = th_high
+        self.th_low = th_low
+        self.c_inc = c_inc
+        self.c_dec = c_dec
+        self.th_ns = th_ns
         self.data = list()
         self.categories = dict()
 
@@ -28,10 +37,11 @@ class Cupid(BaseMatcher):
         self.add_data("target", target_data_loader.schema_name, target_data_loader.column_name_type_pairs)
         source_tree = self.get_schema_by_index(0)
         target_tree = self.get_schema_by_index(1)
-        sims = tree_match(source_tree, target_tree, self.categories)
+        sims = tree_match(source_tree, target_tree, self.categories, self.leaf_w_struct, self.w_struct, self.th_accept,
+                          self.th_high, self.th_low, self.c_inc, self.c_dec, self.th_ns)
         new_sims = recompute_wsim(source_tree, target_tree, sims)
-        # map1 = mapping_generation_leaves(source_tree, target_tree, sims)
-        print(sims)
+        map1 = mapping_generation_leaves(source_tree, target_tree, new_sims, self.th_accept)
+        return map1
 
     def add_data(self, schema_name, table_name, column_data_pairs, schema_type="none", table_type="none"):
         schema_node = self.get_schema_by_name(schema_name)

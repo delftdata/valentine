@@ -29,20 +29,23 @@ def main(config):
     # the result of the algorithm (ranked list of matches based on a similarity metric)
     matches = algorithm.get_matches(data_loader_source, data_loader_target)
 
-    # # the golden standard
-    # golden_standard = GoldenStandardLoader(config['golden_standard'])
-    #
-    # # load and print the specified metrics
-    # metric_fns = [getattr(module_metric, met) for met in config['metrics']]
-    #
-    # total_metrics = np.zeros(len(metric_fns))
-    #
-    # for i, metric in enumerate(metric_fns):
-    #     total_metrics[i] += metric(matches, golden_standard)
-    #
-    # final_metrics = {met.__name__: total_metrics[i].item() for i, met in enumerate(metric_fns)}
-    #
-    # print("Metrics: ", final_metrics)
+    # Uncomment if you want to see the matches
+    # print(matches)
+
+    # the golden standard
+    golden_standard = GoldenStandardLoader(config['golden_standard'])
+
+    # load and print the specified metrics
+    metric_fns = [getattr(module_metric, met) for met in config['metrics']]
+
+    total_metrics = np.zeros(len(metric_fns))
+
+    for i, metric in enumerate(metric_fns):
+        total_metrics[i] += metric(matches, golden_standard)
+
+    final_metrics = {met.__name__: total_metrics[i].item() for i, met in enumerate(metric_fns)}
+
+    print("Metrics: ", final_metrics)
 
 
 if __name__ == '__main__':

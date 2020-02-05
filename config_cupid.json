@@ -3,18 +3,27 @@
   "source": {
     "type": "SchemaLoader",
     "args": {
-      "schema": "data/framework_tests/frank.json"
+      "schema": "data/framework_tests/Prospect_approx_columns_test_source.json"
     }
   },
   "target": {
     "type": "SchemaLoader",
     "args": {
-      "schema": "data/framework_tests/frank.json"
+      "schema": "data/framework_tests/Prospect_approx_columns_test_target.json"
     }
   },
   "algorithm": {
     "type": "Cupid",
-    "args": {}
+    "args": {
+      "leaf_w_struct": 0.5,
+      "w_struct": 0.6,
+      "th_accept": 0.5,
+      "th_high": 0.6,
+      "th_low": 0.35,
+      "c_inc": 1.2,
+      "c_dec": 0.9,
+      "th_ns": 0.5
+    }
   },
   "metrics": ["precision", "recall"],
   "golden_standard": "data/framework_tests/Prospect_approx_columns_test_mapping.json"

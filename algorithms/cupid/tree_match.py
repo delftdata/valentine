@@ -1,12 +1,12 @@
 import math
 import time
 from itertools import product
-from operator import getitem
 
 from anytree import PostOrderIter, LevelOrderIter
 
 from algorithms.cupid.elements import SchemaElement
-from algorithms.cupid.linguistic_matching import name_similarity_elements, normalization, compute_lsim, compute_compatibility, comparison
+from algorithms.cupid.linguistic_matching import name_similarity_elements, normalization, compute_lsim, \
+    compute_compatibility, comparison
 from algorithms.cupid.structural_similarity import compute_ssim, change_structural_similarity
 
 
@@ -14,8 +14,8 @@ def compute_weighted_similarity(ssim, lsim, w_struct=0.5):
     return w_struct * ssim + (1 - w_struct) * lsim
 
 
-def tree_match(source_tree, target_tree, categories, leaf_w_struct=0.5, w_struct=0.6, th_accept=0.14, th_high=0.15,
-               th_low=0.13, c_inc=1.2, c_dec=0.9, th_ns=0.4):
+def tree_match(source_tree, target_tree, categories, leaf_w_struct, w_struct, th_accept, th_high, th_low, c_inc, c_dec,
+               th_ns):
 
     compatibility_table = compute_compatibility(categories[source_tree.name.initial_name].keys(),
                                                 categories[target_tree.name.initial_name].keys())
@@ -114,11 +114,14 @@ def recompute_wsim(source_tree, target_tree, sims, w_struct=0.6, th_accept=0.14)
     return sims
 
 
-def mapping_generation_leaves(source_tree, target_tree, sims, th_accept=0.14):
+def mapping_generation_leaves(source_tree, target_tree, sims, th_accept):
     s_leaves = list(map(lambda n: n.name.long_name, source_tree.leaves))
     t_leaves = list(map(lambda n: n.name.long_name, target_tree.leaves))
 
-    return list(filter(lambda s: sims[s]['wsim'] > th_accept, product(s_leaves, t_leaves)))
+    leave_combinations = list(product(s_leaves, t_leaves))
+
+    return {k: v['wsim'] for k, v in sorted(sims.items(), key=lambda item: -item[1]['wsim'])
+            if th_accept <= v['wsim'] and k in leave_combinations}
 
 
 def mapping_generation_non_leaves(source_tree, target_tree, sims, th_accept=0.14):
@@ -128,11 +131,7 @@ def mapping_generation_non_leaves(source_tree, target_tree, sims, th_accept=0.14
     non_leaves_s = list(map(lambda n: n.name.long_name, LevelOrderIter(source_tree.root, maxlevel=max_level_s)))
     non_leaves_t = list(map(lambda n: n.name.long_name, LevelOrderIter(target_tree.root, maxlevel=max_level_t)))
 
-    return list(filter(lambda s: sims[s]['wsim'] > th_accept, product(non_leaves_s, non_leaves_t)))
+    non_leaves_combinations = product(non_leaves_s, non_leaves_t)
 
-
-def get_matchings(sims, th_accept=0.14):
-    sorted_sims = sorted(sims.items(), key=lambda x: getitem(x[1], 'wsim'), reverse=True)
-    return list(filter(lambda s: s[1]['wsim'] > th_accept, sorted_sims))
-
-
+    return {k: v['wsim'] for k, v in sorted(sims.items(), key=lambda item: -item[1]['wsim'])
+            if th_accept <= v['wsim'] and k in non_leaves_combinations}
