@@ -4,7 +4,7 @@ class Column:
     def __init__(self, name: str, data: list, table_name: str):
         self.table_name = table_name
         self.name = name
-        self.data = data  # list(filter(lambda d: d != '', data))  # remove the empty strings
+        self.data = list(filter(lambda d: d != '', data))  # remove the empty strings
         self.size = len(data)
 
     @property
