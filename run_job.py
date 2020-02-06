@@ -1,5 +1,7 @@
 import argparse
 import numpy as np
+import json
+import os
 
 from algorithms.base_matcher import BaseMatcher
 from data_loader.golden_standard_loader import GoldenStandardLoader
@@ -8,6 +10,16 @@ from utils.parse_config import ConfigParser
 import data_loader.data_loaders as module_data
 import algorithms.algorithms as module_algorithms
 import metrics.metrics as module_metric
+from utils.utils import get_project_root
+
+
+def write_output(name: str, matches: dict, metrics: dict):
+    if not os.path.exists(str(get_project_root()) + "/data/output"):
+        os.makedirs(str(get_project_root()) + "/data/output")
+    with open(str(get_project_root()) + "/data/output" + "/" + name + ".json", 'w') as fp:
+        matches = {str(k): v for k, v in matches.items()}
+        output = {"name": name, "matches": matches, "metrics": metrics}
+        json.dump(output, fp, indent=2)
 
 
 def main(config):
@@ -36,16 +48,21 @@ def main(config):
     golden_standard = GoldenStandardLoader(config['golden_standard'])
 
     # load and print the specified metrics
-    metric_fns = [getattr(module_metric, met) for met in config['metrics']]
+    metric_fns = [getattr(module_metric, met) for met in config['metrics']['names']]
 
     total_metrics = np.zeros(len(metric_fns))
 
     for i, metric in enumerate(metric_fns):
-        total_metrics[i] += metric(matches, golden_standard)
+        if metric.__name__ != "precision_at_n_percent":
+            total_metrics[i] += metric(matches, golden_standard)
+        else:
+            total_metrics[i] += metric(matches, golden_standard, config['metrics']['args']['n'])
 
     final_metrics = {met.__name__: total_metrics[i].item() for i, met in enumerate(metric_fns)}
 
     print("Metrics: ", final_metrics)
+
+    write_output(config['name'], matches, final_metrics)
 
 
 if __name__ == '__main__':
