@@ -26,7 +26,7 @@ class SimilarityFlooding(BaseMatcher):
 
         matches = self.fixpoint_computation(100, 0.001)
 
-        filtered_matches = self.filter_map(matches)
+        filtered_matches = self.filterNto1matches(matches)
 
         return self.format_output(filtered_matches)
 
@@ -341,6 +341,32 @@ class SimilarityFlooding(BaseMatcher):
                         name2 += l.get('label') + ":" + e[1].name + ", "
                 name2 += ']'
             print(name1 + "-" + name2 + ":" + str(sortedmaps[key]))
+
+    def filterNto1matches(self, matches):
+
+        matchesNto1 = dict()
+        nodes_left = set()
+
+        for np in matches.keys():
+
+            nodes_left.add(np.node1)
+
+        for nd in nodes_left:
+
+            maxsim = 0
+
+            for np in matches.keys():
+
+                if nd == np.node1:
+
+                    if matches[np] > maxsim:
+
+                        maxsim = matches[np]
+                        maxnode = np
+
+            matchesNto1[maxnode] = maxsim
+
+        return matchesNto1
 
     def format_output(self, matches):
         output = {}
