@@ -23,6 +23,11 @@
       "clear_cache": true
     }
   },
-  "metrics": ["precision", "recall"],
+  "metrics": {
+    "names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
+    "args": {
+      "n": 50
+    }
+  },
   "golden_standard": "data/framework_tests/Prospect_approx_columns_test_mapping.json"
 }

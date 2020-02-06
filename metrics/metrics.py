@@ -1,10 +1,15 @@
 from data_loader.golden_standard_loader import GoldenStandardLoader
 
 
-def get_tp_fn(matches: dict, golden_standard: GoldenStandardLoader):
+def get_tp_fn(matches: dict, golden_standard: GoldenStandardLoader, n: int = None):
     tp = 0
     fn = 0
+
     all_matches = list(map(lambda m: frozenset(m), list(matches.keys())))
+
+    if n is not None:
+        all_matches = all_matches[:n]
+
     for expected_match in golden_standard.expected_matches:
         if expected_match in all_matches:
             tp = tp + 1
@@ -13,9 +18,14 @@ def get_tp_fn(matches: dict, golden_standard: GoldenStandardLoader):
     return tp, fn
 
 
-def get_fp(matches: dict, golden_standard: GoldenStandardLoader):
+def get_fp(matches: dict, golden_standard: GoldenStandardLoader, n: int = None):
     fp = 0
+
     all_matches = list(map(lambda m: frozenset(m), list(matches.keys())))
+
+    if n is not None:
+        all_matches = all_matches[:n]
+
     for possible_match in all_matches:
         if possible_match not in golden_standard.expected_matches:
             fp = fp + 1
@@ -33,21 +43,13 @@ def precision(matches: dict, golden_standard: GoldenStandardLoader):
     return tp / (tp + fp)
 
 
-# def top_10_accuracy(matches: dict, golden_standard: GoldenStandardLoader):
-#     if not is_sorted(matches):
-#         matches = dict(sorted(matches.items(), key=lambda x: -x[1]))  # assuming that matches = {match: similarity}
-#     top_10_matches = list(map(lambda m: frozenset(m.split("|")), list(matches.keys())[0:10]))
-#     correct = 0
-#     for expected_match in golden_standard.expected_matches:
-#         if expected_match in top_10_matches:
-#             correct = correct + 1
-#     return correct / golden_standard.size
+def precision_at_n_percent(matches: dict, golden_standard: GoldenStandardLoader, n: int):
+    number_to_keep = int((n / 100) * len(matches.keys()))
+    tp, fn = get_tp_fn(matches, golden_standard, number_to_keep)
+    fp = get_fp(matches, golden_standard, number_to_keep)
+    return tp / (tp + fp)
 
 
-# def accuracy(matches: dict, golden_standard: GoldenStandardLoader):
-#     all_matches = list(map(lambda m: frozenset(m.split("|")), list(matches.keys())))
-#     correct = 0
-#     for expected_match in golden_standard.expected_matches:
-#         if expected_match in all_matches:
-#             correct = correct + 1
-#     return correct / golden_standard.size
+def recall_at_sizeof_ground_truth(matches: dict, golden_standard: GoldenStandardLoader):
+    tp, fn = get_tp_fn(matches, golden_standard, golden_standard.size)
+    return tp / (tp + fn)
