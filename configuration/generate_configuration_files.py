@@ -5,7 +5,10 @@ from itertools import product
 from utils.utils import get_project_root
 
 algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding"]
-metrics = ["precision", "recall"]
+metrics = {"names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
+           "args": {
+               "n": 50
+           }}
 
 
 def get_file_paths(path: str):
