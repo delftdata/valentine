@@ -52,10 +52,12 @@ This script creates the model in .pkl format and other metadata files used in th
 ``
 
 ### Step 5
+Download the ontology: https://www.ebi.ac.uk/efo/ 
+
 Convert the ontology into pkl format by running create_pkl_ontology.sh <input_file.owl> <output_path.pkl>
 
 ``
-./create_pkl_ontology.sh efo /cache_onto/efo
+./create_pkl_ontology.sh path_to_the_downloaded_onto /cache_onto/efo
 ``
 
 > **Note**: The output file will be generated into aurum-datadiscovery folder. 
@@ -64,5 +66,16 @@ To convert the ontology from .owl to .pkl format takes a while.
 Moreover, the framework doens't give any update on the progress, so just be patient (e.g. efo.owl ontology took 25 mins to parse).
 
 ## Run
+
+### Before running
+1. Download the [glove.6B.zip](https://nlp.stanford.edu/projects/glove/)
+2. Create a folder _glove_ inside the _aurum_ repository and place the file **glove.6b.100d.txt**
+
 The _aurum_ repository contains a python script *run_semprop* that
 has configured the entire pipeline of SemProp as described in the paper [1]. 
+
+Running example:
+
+``
+python run_semprop.py models/chembl22/ efo cache_onto/efo.pkl glove/glove.6B.100d.txt raw/ MATCHINGS_GROUND_TRUTH_CHEMBL 
+``
