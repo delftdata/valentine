@@ -1,6 +1,6 @@
 # Seeping Semantics [1] - Tutorial
 
-[1] (Fernandez, Raul Castro, et al. "Seeping semantics: Linking datasets using word embeddings for data discovery." 2018 IEEE 34th International Conference on Data Engineering (ICDE). IEEE, 2018.)[http://da.qcri.org/ntang/pubs/icde2018semantic.pdf]
+[1] [Fernandez, Raul Castro, et al. "Seeping semantics: Linking datasets using word embeddings for data discovery." 2018 IEEE 34th International Conference on Data Engineering (ICDE). IEEE, 2018.](http://da.qcri.org/ntang/pubs/icde2018semantic.pdf)
 
 The following tutorial will walk you through the required steps to set up aurum and work with it.
 
