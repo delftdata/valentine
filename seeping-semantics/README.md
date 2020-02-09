@@ -1,4 +1,4 @@
-Seeping Semantics [1] - Tutorial
+# Seeping Semantics [1] - Tutorial
 
 [1] (Fernandez, Raul Castro, et al. "Seeping semantics: Linking datasets using word embeddings for data discovery." 2018 IEEE 34th International Conference on Data Engineering (ICDE). IEEE, 2018.)[http://da.qcri.org/ntang/pubs/icde2018semantic.pdf]
 
@@ -13,9 +13,11 @@ Clone/Fork https://github.com/AndraIonescu/aurum-datadiscovery in this directory
 This version is a fork from the original repository, that contains small updates to make it compatible with python3.6 and files to easily run the pipeline.
 
 ### Step 1 
+
 ``
 ./pipeline.sh 
 ``
+
 This will download ElasticSearch and will build the profiler (the module responsible with loading the data). 
 
 **Requirements**: jre and jdk 8, unzip 
@@ -26,14 +28,17 @@ This will download ElasticSearch and will build the profiler (the module respons
 Create an yml config file to access the database. The example file is access-db-movies.yml. Please use it as a template to create other config files.
 
 Next, run the following:
+
 ``
 ./load_db.sh <absolute_path_to_yml_file>
 ``
+
 >It is important to give the absolut path, because ES (which is in /tmp/) will look for the file. Be patient, loading the models takes a while.
 
 ### Step 3
 Create a python environment using your preferred library. 
 Install pip and the requirements from requirements-aurum.txt file. 
+
 ``
 pip install -r requirements-aurum.txt
 ``
@@ -41,12 +46,14 @@ pip install -r requirements-aurum.txt
 ### Step 4
 Create a model from the previously loaded db, by running create_pkl_model.sh. 
 This script creates the model in .pkl format and other metadata files used in the framework. 
+
 ``
 ./create_pkl_model.sh
 ``
 
 ### Step 5
 Convert the ontology into pkl format by running create_pkl_ontology.sh <input_file.owl> <output_path.pkl>
+
 ``
 ./create_pkl_ontology.sh efo /cache_onto/efo
 ``
