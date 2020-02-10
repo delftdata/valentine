@@ -1,3 +1,5 @@
+import math
+
 from data_loader.golden_standard_loader import GoldenStandardLoader
 
 
@@ -44,7 +46,7 @@ def precision(matches: dict, golden_standard: GoldenStandardLoader):
 
 
 def precision_at_n_percent(matches: dict, golden_standard: GoldenStandardLoader, n: int):
-    number_to_keep = int((n / 100) * len(matches.keys()))
+    number_to_keep = int(math.ceil((n / 100) * len(matches.keys())))
     tp, fn = get_tp_fn(matches, golden_standard, number_to_keep)
     fp = get_fp(matches, golden_standard, number_to_keep)
     return tp / (tp + fp)
