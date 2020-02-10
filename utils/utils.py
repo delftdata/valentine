@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 
 def is_sorted(matches: dict):
@@ -25,3 +26,8 @@ def convert_data_type(string: str):
 def get_project_root() -> Path:
     """Returns project root folder."""
     return Path(__file__).parent.parent
+
+
+def create_folder(path: str):
+    if not os.path.exists(path):
+        os.makedirs(path)
