@@ -10,7 +10,7 @@ algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLe
 
 metrics = {"names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {
-               "n": 50
+               "n": [10, 20, 30, 40, 50, 60, 70, 80, 90]
            }}
 
 

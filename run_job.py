@@ -50,15 +50,14 @@ def main(config):
     # load and print the specified metrics
     metric_fns = [getattr(module_metric, met) for met in config['metrics']['names']]
 
-    total_metrics = np.zeros(len(metric_fns))
+    final_metrics = dict()
 
-    for i, metric in enumerate(metric_fns):
+    for metric in metric_fns:
         if metric.__name__ != "precision_at_n_percent":
-            total_metrics[i] += metric(matches, golden_standard)
+            final_metrics[metric.__name__] = metric(matches, golden_standard)
         else:
-            total_metrics[i] += metric(matches, golden_standard, config['metrics']['args']['n'])
-
-    final_metrics = {met.__name__: total_metrics[i].item() for i, met in enumerate(metric_fns)}
+            for n in config['metrics']['args']['n']:
+                final_metrics[metric.__name__.replace('_n_', '_' + str(n) + '_')] = metric(matches, golden_standard, n)
 
     print("Metrics: ", final_metrics)
 
