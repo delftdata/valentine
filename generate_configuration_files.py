@@ -2,9 +2,12 @@ import os
 import json
 from itertools import product
 
-from utils.utils import get_project_root
+from algorithms.clustering_scale.scale_utils import create_cache_dirs, generate_global_ranks
+from data_loader.instance_loader import InstanceLoader
+from utils.utils import get_project_root, create_folder
 
-algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding"]
+algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher"]
+
 metrics = {"names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {
                "n": 50
@@ -19,7 +22,7 @@ def get_file_paths(path: str):
             for file in files:
                 if file.endswith("json"):
                     if file.split(".")[0].endswith("mapping"):
-                        configuration_dictionary["golden_standard"] = root+'/'+file
+                        configuration_dictionary["golden_standard"] = root + '/' + file
                     elif file.split(".")[0].endswith("source"):
                         configuration_dictionary["source"]["args"]["schema"] = root + '/' + file
                     elif file.split(".")[0].endswith("target"):
@@ -75,13 +78,14 @@ def get_all_parameter_combinations(args):
 
 
 def combine_data_algorithms(config_data: dict, config_algo: dict):
-    if not os.path.exists(str(get_project_root())+"/configuration/configuration_files"):
-        os.makedirs(str(get_project_root())+"/configuration/configuration_files")
+    create_folder(str(get_project_root())+"/configuration_files")
     for cfd_key, cfd_value in config_data.items():
+        create_folder(str(get_project_root()) + "/configuration_files/" + cfd_key)
         for cfa_key, cfa_value in config_algo.items():
-            with open(str(get_project_root())+"/configuration/configuration_files" + "/" +
-                      cfd_key + cfa_key + ".json", 'w') as fp:
+            with open(str(get_project_root())+"/configuration_files/" + cfd_key + '/' + cfa_key + ".json",
+                      'w') as fp:
                 configuration = {"name": cfd_key + cfa_key,
+                                 "dataset_name": cfd_key,
                                  "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
                                  "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
                                  "algorithm": cfa_value["algorithm"],
@@ -90,8 +94,24 @@ def combine_data_algorithms(config_data: dict, config_algo: dict):
                 json.dump(configuration, fp, indent=2)
 
 
-if __name__ == "__main__":
-    dtc = get_file_paths(str(get_project_root()) + "/data/prospect")
-    alc = get_algorithm_configurations(str(get_project_root()) + "/configuration/algorithm_configurations.json")
-    combine_data_algorithms(dtc, alc)
+def create_sorted_ranks(path: str):
+    create_cache_dirs()
+    for (root, dirs, files) in os.walk(os.path.join(path), topdown=True):
+        if not dirs:  # Get only leaf nodes
+            dataset_name = root.split('/')[-1]
+            if not os.path.isfile('cache/global_ranks/' + dataset_name + '.pkl'):
+                data = []
+                for file in files:
+                    if file.endswith("csv"):
+                        data.extend(InstanceLoader(data=root + '/' + file).table.get_data())
+                generate_global_ranks(data, dataset_name)
 
+
+if __name__ == "__main__":
+    d_path = str(get_project_root()) + "/data/prospect"
+    if "CorrelationClustering" in algorithms:
+        create_sorted_ranks(d_path)
+        print("Correlation Clustering's sorted ranks created")
+    dtc = get_file_paths(d_path)
+    alc = get_algorithm_configurations(str(get_project_root()) + "/algorithm_configurations.json")
+    combine_data_algorithms(dtc, alc)
