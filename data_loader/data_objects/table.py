@@ -19,3 +19,6 @@ class Table:
         for column in self.columns.values():
             data.extend(column.data)
         return data
+
+    def get_column_data(self, column_name):
+        return self.columns[column_name].data

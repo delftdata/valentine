@@ -118,6 +118,12 @@
         "max": 0.8,
         "min": 0.4,
         "step": 0.05
+      },
+      "process_num": {
+        "type": "values",
+        "data": [
+          4
+        ]
       }
     }
   }
