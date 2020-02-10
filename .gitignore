@@ -2,8 +2,8 @@
 .DS_Store
 .idea/
 __pycache__/
-models
 data
+configuration_files
 package-lock.json
 cache
 
@@ -11,4 +11,3 @@ cache
 Attribute_Clusters(Matches).json
 Distribution_Clusters.json
 
-configuration/configuration_files
