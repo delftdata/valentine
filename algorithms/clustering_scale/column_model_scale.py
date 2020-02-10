@@ -35,7 +35,7 @@ class CorrelationClusteringColumn(Column):
     get_data_type()
         Returns the data type of the column
     """
-    def __init__(self, name: str, data: list, table_name: str, quantiles: int):
+    def __init__(self, name: str, data: list, table_name: str, dataset_name: str, quantiles: int):
         """
         Parameters
         ----------
@@ -48,7 +48,8 @@ class CorrelationClusteringColumn(Column):
         """
         super().__init__(name, data, table_name)
         self.quantiles = quantiles
-        self.ranks = self.get_global_ranks(self.data)
+        self.dataset_name = dataset_name
+        self.ranks = self.get_global_ranks(self.data, self.dataset_name)
         self.quantile_histogram = None
 
     def get_histogram(self):
@@ -60,8 +61,8 @@ class CorrelationClusteringColumn(Column):
         return self.data
 
     @staticmethod
-    def get_global_ranks(column: list):
-        with open('cache/global_ranks/ranks.pkl', 'rb') as pkl_file:
+    def get_global_ranks(column: list, dataset_name: str):
+        with open('cache/global_ranks/' + dataset_name + '.pkl', 'rb') as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
             ranks = np.array(sorted([global_ranks[convert_data_type(x)] for x in column]))
             return ranks

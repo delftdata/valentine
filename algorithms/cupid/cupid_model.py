@@ -32,7 +32,7 @@ class Cupid(BaseMatcher):
         self.data = list()
         self.categories = dict()
 
-    def get_matches(self, source_data_loader, target_data_loader):
+    def get_matches(self, source_data_loader, target_data_loader, dataset_name: str):
         self.add_data("source", source_data_loader.schema_name, source_data_loader.column_name_type_pairs)
         self.add_data("target", target_data_loader.schema_name, target_data_loader.column_name_type_pairs)
         source_tree = self.get_schema_by_index(0)

@@ -18,7 +18,7 @@ class SimilarityFlooding(BaseMatcher):
         self.propagation_graph = None
         self.initial_map = None
 
-    def get_matches(self, source_data_loader: SchemaLoader, target_data_loader: SchemaLoader):
+    def get_matches(self, source_data_loader: SchemaLoader, target_data_loader: SchemaLoader, dataset_name: str):
         self.graph1 = Graph(source_data_loader).graph
         self.graph2 = Graph(target_data_loader).graph
 

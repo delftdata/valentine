@@ -39,7 +39,7 @@ def main(config):
     algorithm: BaseMatcher = config.initialize('algorithm', module_algorithms)
 
     # the result of the algorithm (ranked list of matches based on a similarity metric)
-    matches = algorithm.get_matches(data_loader_source, data_loader_target)
+    matches = algorithm.get_matches(data_loader_source, data_loader_target, config['dataset_name'])
 
     # Uncomment if you want to see the matches
     # print(matches)

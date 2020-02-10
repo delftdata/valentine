@@ -4,11 +4,12 @@ import time
 import shutil
 import subprocess
 from functools import lru_cache
+import numpy as np
 
 from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
 from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd
 from algorithms.clustering_scale.quantile_histogram.histogram import QuantileHistogram
-from utils.utils import convert_data_type
+from utils.utils import convert_data_type, create_folder
 
 
 def compute_cutoff_threshold(C: list, threshold: float):
@@ -170,8 +171,8 @@ def process_columns(tup: tuple):
     tup : tuple
         tuple containing the information of the column to be processed
     """
-    column_name, data, source_name, quantiles = tup
-    column = CorrelationClusteringColumn(column_name, data, source_name, quantiles)
+    column_name, data, source_name, dataset_name, quantiles = tup
+    column = CorrelationClusteringColumn(column_name, data, source_name, dataset_name, quantiles)
     column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
     with open('cache/' + str(column.long_name) + '.pkl', 'wb') as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
@@ -193,12 +194,12 @@ def parallel_cutoff_threshold(tup: tuple):
     return Nc
 
 
-def ingestion_column_generator(columns: list, quantiles: int):
+def ingestion_column_generator(columns: list, dataset_name: str, quantiles: int):
     """
     Generator of incoming pandas dataframe columns
     """
     for column in columns:
-        yield column.name, column.data, column.table_name, quantiles
+        yield column.name, column.data, column.table_name, dataset_name, quantiles
 
 
 def cuttoff_column_generator(A: dict, columns: list, threshold: float):
@@ -211,18 +212,22 @@ def cuttoff_column_generator(A: dict, columns: list, threshold: float):
         yield A, column, threshold
 
 
-def generate_global_ranks(data):
-    ranks = unix_sort_ranks(set(data))
-    with open('cache/global_ranks/ranks.pkl', 'wb') as output:
-        pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
+def generate_global_ranks(data, file_name):
+    if not os.path.isfile('cache/global_ranks/' + file_name + '.pkl'):
+        print("Generating ranks for ", file_name)
+        ranks = unix_sort_ranks(set(data), file_name)
+        with open('cache/global_ranks/' + file_name + '.pkl', 'wb') as output:
+            pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
 
-def unix_sort_ranks(corpus):
-    with open("./cache/sorts/unsorted_file.txt", 'w') as out:
+def unix_sort_ranks(corpus, file_name):
+    create_folder("./cache/sorts/" + file_name)
+    with open("./cache/sorts/" + file_name + "/unsorted_file.txt", 'w') as out:
         for var in corpus:
             print(str(var), file=out)
 
-    proc = subprocess.Popen(['sort -n cache/sorts/unsorted_file.txt > cache/sorts/sorted_file.txt'],
+    proc = subprocess.Popen(['sort -n cache/sorts/' + file_name + '/unsorted_file.txt > cache/sorts/' + file_name +
+                             '/sorted_file.txt'],
                             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     time.sleep(1)
     proc.terminate()
@@ -231,14 +236,14 @@ def unix_sort_ranks(corpus):
     rank = 1
     ranks = []
 
-    with open('./cache/sorts/sorted_file.txt', 'r') as f:
+    with open('./cache/sorts/' + file_name + '/sorted_file.txt', 'r') as f:
         txt = f.read()
         for var in txt.splitlines():
             ranks.append((convert_data_type(var.replace('\n', '')), rank))
             rank = rank + 1
 
-    shutil.rmtree('./cache/sorts')
-    os.mkdir('./cache/sorts')
+    shutil.rmtree('./cache/sorts/' + file_name)
+    os.mkdir('./cache/sorts/' + file_name)
 
     return dict(ranks)
 

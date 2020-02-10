@@ -48,18 +48,18 @@ class CorrelationClustering(BaseMatcher):
         self.column_names = list()
         create_cache_dirs()
 
-    def get_matches(self, source: InstanceLoader, target: InstanceLoader):
+    def get_matches(self, source: InstanceLoader, target: InstanceLoader, dataset_name: str):
 
         if self.clear_cache:
             data = list(source.table.get_data()) + list(target.table.get_data())
-            generate_global_ranks(data)
+            generate_global_ranks(data, dataset_name)
             del data
 
         with get_context("spawn").Pool(self.process_num) as process_pool:
             columns = list(source.table.columns.values()) + list(target.table.columns.values())
 
             print("Processing columns ...")
-            process_pool.map(process_columns, ingestion_column_generator(columns, self.quantiles))
+            process_pool.map(process_columns, ingestion_column_generator(columns, dataset_name, self.quantiles))
 
             del columns
 
