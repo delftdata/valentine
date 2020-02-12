@@ -26,7 +26,7 @@ class SimilarityFlooding(BaseMatcher):
 
         matches = self.fixpoint_computation(100, 0.001)
 
-        filtered_matches = self.filterNto1matches(matches)
+        filtered_matches = self.filter_map(matches)
 
         return self.format_output(filtered_matches)
 

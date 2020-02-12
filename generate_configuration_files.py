@@ -8,7 +8,7 @@ from utils.utils import get_project_root, create_folder
 
 algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher"]
 
-metrics = {"names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
+metrics = {"names": ["precision", "recall", "f1_score", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {
                "n": [10, 20, 30, 40, 50, 60, 70, 80, 90]
            }}
@@ -84,7 +84,7 @@ def combine_data_algorithms(config_data: dict, config_algo: dict):
         for cfa_key, cfa_value in config_algo.items():
             with open(str(get_project_root())+"/configuration_files/" + cfd_key + '/' + cfa_key + ".json",
                       'w') as fp:
-                configuration = {"name": cfd_key + cfa_key,
+                configuration = {"name": cfd_key + '__' + cfa_key,
                                  "dataset_name": cfd_key,
                                  "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
                                  "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
@@ -108,10 +108,10 @@ def create_sorted_ranks(path: str):
 
 
 if __name__ == "__main__":
-    d_path = str(get_project_root()) + "/data/prospect"
+    d_path = get_project_root() + "/data/prospect"
     if "CorrelationClustering" in algorithms:
         create_sorted_ranks(d_path)
         print("Correlation Clustering's sorted ranks created")
     dtc = get_file_paths(d_path)
-    alc = get_algorithm_configurations(str(get_project_root()) + "/algorithm_configurations.json")
+    alc = get_algorithm_configurations(get_project_root() + "/algorithm_configurations.json")
     combine_data_algorithms(dtc, alc)

@@ -1,18 +1,18 @@
 {
-  "name": "prospect_vertical_70_ec_evSimilarityFlooding{'coeff_policy': 'inverse_average', 'formula': 'formula_c'}",
-  "dataset_name": "prospect_vertical_70_ec_ev",
+  "name": "prospect_both_50_70_ac5_ev__SimilarityFlooding{'coeff_policy': 'inverse_average', 'formula': 'formula_c'}",
+  "dataset_name": "prospect_both_50_70_ac5_ev",
   "source": {
     "type": "SchemaLoader",
     "args": {
-      "data": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/exact_exact/prospect_vertical_70_ec_ev/prospect_vertical_70_ec_ev_source.csv",
-      "schema": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/exact_exact/prospect_vertical_70_ec_ev/prospect_vertical_70_ec_ev_source.json"
+      "data": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/approx_columns_exact_values/prospect_both_50_70_ac5_ev/prospect_both_50_70_ac5_ev_source.csv",
+      "schema": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/approx_columns_exact_values/prospect_both_50_70_ac5_ev/prospect_both_50_70_ac5_ev_source.json"
     }
   },
   "target": {
     "type": "SchemaLoader",
     "args": {
-      "data": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/exact_exact/prospect_vertical_70_ec_ev/prospect_vertical_70_ec_ev_target.csv",
-      "schema": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/exact_exact/prospect_vertical_70_ec_ev/prospect_vertical_70_ec_ev_target.json"
+      "data": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/approx_columns_exact_values/prospect_both_50_70_ac5_ev/prospect_both_50_70_ac5_ev_target.csv",
+      "schema": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/approx_columns_exact_values/prospect_both_50_70_ac5_ev/prospect_both_50_70_ac5_ev_target.json"
     }
   },
   "algorithm": {
@@ -26,6 +26,7 @@
     "names": [
       "precision",
       "recall",
+      "f1_score",
       "precision_at_n_percent",
       "recall_at_sizeof_ground_truth"
     ],
@@ -43,5 +44,5 @@
       ]
     }
   },
-  "golden_standard": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/exact_exact/prospect_vertical_70_ec_ev/prospect_vertical_70_ec_ev_mapping.json"
+  "golden_standard": "/home/kpsarakis/framework/schema-matching-benchmark/data/prospect/approx_columns_exact_values/prospect_both_50_70_ac5_ev/prospect_both_50_70_ac5_ev_mapping.json"
 }

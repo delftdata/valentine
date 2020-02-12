@@ -1,6 +1,7 @@
 import math
 
 from data_loader.golden_standard_loader import GoldenStandardLoader
+from utils.utils import one_to_one_matches
 
 
 def get_tp_fn(matches: dict, golden_standard: GoldenStandardLoader, n: int = None):
@@ -34,15 +35,27 @@ def get_fp(matches: dict, golden_standard: GoldenStandardLoader, n: int = None):
     return fp
 
 
-def recall(matches: dict, golden_standard: GoldenStandardLoader):
+def recall(matches: dict, golden_standard: GoldenStandardLoader, one_to_one=False):
+    if one_to_one:
+        matches = one_to_one_matches(matches)
     tp, fn = get_tp_fn(matches, golden_standard)
     return tp / (tp + fn)
 
 
-def precision(matches: dict, golden_standard: GoldenStandardLoader):
+def precision(matches: dict, golden_standard: GoldenStandardLoader, one_to_one=False):
+    if one_to_one:
+        matches = one_to_one_matches(matches)
     tp, fn = get_tp_fn(matches, golden_standard)
     fp = get_fp(matches, golden_standard)
     return tp / (tp + fp)
+
+
+def f1_score(matches: dict, golden_standard: GoldenStandardLoader, one_to_one=False):
+    pr = precision(matches, golden_standard, one_to_one)
+    re = recall(matches, golden_standard, one_to_one)
+    if pr + re == 0:
+        return 0
+    return 2 * ((pr * re) / (pr + re))
 
 
 def precision_at_n_percent(matches: dict, golden_standard: GoldenStandardLoader, n: int):

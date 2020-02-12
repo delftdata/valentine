@@ -4,7 +4,6 @@ import time
 import shutil
 import subprocess
 from functools import lru_cache
-import numpy as np
 
 from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
 from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd

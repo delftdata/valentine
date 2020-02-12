@@ -56,5 +56,5 @@ class Coma(BaseMatcher):
             m1, m2 = m.split(" <-> ")
             _, column1 = m1.split(".")
             _, column2 = m2.split(".")
-            formatted_output[((table1, column1), (table2, column2))] = similarity
+            formatted_output[((table1, column1), (table2, column2))] = float(similarity)
         return formatted_output

@@ -128,7 +128,7 @@ class CorrelationClustering(BaseMatcher):
             for table_name in table_names:
                 column_names = map(lambda x: x[1], filter(lambda x: x[0] == table_name, cluster))
                 d["Cluster " + str(idx + 1)][table_name] = list(column_names)
-        with open(str(get_project_root()) + "/" + file_name, 'w') as fp:
+        with open(get_project_root() + "/" + file_name, 'w') as fp:
             json.dump(d, fp, indent=2)
 
     def rank_output(self, attribute_clusters: list):
