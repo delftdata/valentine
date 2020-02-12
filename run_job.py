@@ -5,6 +5,8 @@ import timeit
 
 
 from algorithms.base_matcher import BaseMatcher
+from algorithms.clustering_scale.correlation_clustering_scale import CorrelationClustering
+from algorithms.coma.coma import Coma
 from data_loader.golden_standard_loader import GoldenStandardLoader
 from utils.parse_config import ConfigParser
 
@@ -45,7 +47,7 @@ def main(config):
 
     time_end = timeit.default_timer()
 
-    run_times = {"total_ time": time_end - time_start_load, "algorithm_time": time_end - time_start_algorithm}
+    run_times = {"total_time": time_end - time_start_load, "algorithm_time": time_end - time_start_algorithm}
 
     # Uncomment if you want to see the matches
     # print(matches)
@@ -60,7 +62,11 @@ def main(config):
 
     for metric in metric_fns:
         if metric.__name__ != "precision_at_n_percent":
-            final_metrics[metric.__name__] = metric(matches, golden_standard)
+            if metric.__name__ in ['precision', 'recall', 'f1_score'] \
+                    and type(algorithm) not in [Coma, CorrelationClustering]:
+                final_metrics[metric.__name__] = metric(matches, golden_standard, True)
+            else:
+                final_metrics[metric.__name__] = metric(matches, golden_standard)
         else:
             for n in config['metrics']['args']['n']:
                 final_metrics[metric.__name__.replace('_n_', '_' + str(n) + '_')] = metric(matches, golden_standard, n)
