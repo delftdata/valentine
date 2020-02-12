@@ -1,7 +1,8 @@
 import argparse
-import numpy as np
 import json
 import os
+import timeit
+
 
 from algorithms.base_matcher import BaseMatcher
 from data_loader.golden_standard_loader import GoldenStandardLoader
@@ -13,12 +14,12 @@ import metrics.metrics as module_metric
 from utils.utils import get_project_root
 
 
-def write_output(name: str, matches: dict, metrics: dict):
-    if not os.path.exists(str(get_project_root()) + "/data/output"):
-        os.makedirs(str(get_project_root()) + "/data/output")
-    with open(str(get_project_root()) + "/data/output" + "/" + name + ".json", 'w') as fp:
+def write_output(name: str, matches: dict, metrics: dict, run_times: dict):
+    if not os.path.exists(get_project_root() + "/data/output"):
+        os.makedirs(get_project_root() + "/data/output")
+    with open(get_project_root() + "/data/output" + "/" + name + ".json", 'w') as fp:
         matches = {str(k): v for k, v in matches.items()}
-        output = {"name": name, "matches": matches, "metrics": metrics}
+        output = {"name": name, "matches": matches, "metrics": metrics, "run_times": run_times}
         json.dump(output, fp, indent=2)
 
 
@@ -29,17 +30,22 @@ def main(config):
             parse_config.py for more information.
         Returns: Creates a schema matching job and runs it
     """
-
+    time_start_load = timeit.default_timer()
     # data loader (Schema, Instance, Combined)
     data_loader_source = config.initialize('source', module_data)
 
     data_loader_target = config.initialize('target', module_data)
 
+    time_start_algorithm = timeit.default_timer()
     # algorithms (Abstracted from BaseMatcher)
     algorithm: BaseMatcher = config.initialize('algorithm', module_algorithms)
 
     # the result of the algorithm (ranked list of matches based on a similarity metric)
     matches = algorithm.get_matches(data_loader_source, data_loader_target, config['dataset_name'])
+
+    time_end = timeit.default_timer()
+
+    run_times = {"total_ time": time_end - time_start_load, "algorithm_time": time_end - time_start_algorithm}
 
     # Uncomment if you want to see the matches
     # print(matches)
@@ -61,7 +67,7 @@ def main(config):
 
     print("Metrics: ", final_metrics)
 
-    write_output(config['name'], matches, final_metrics)
+    write_output(config['name'], matches, final_metrics, run_times)
 
 
 if __name__ == '__main__':
