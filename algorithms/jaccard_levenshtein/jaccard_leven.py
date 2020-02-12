@@ -50,7 +50,7 @@ class JaccardLevenMatcher(BaseMatcher):
 
         intersection_cnt = sum(intersection_cnt_list)
 
-        union_cnt = len(set1.union(set2))
+        union_cnt = len(set1) + len(set2) - intersection_cnt
 
         return float(intersection_cnt) / union_cnt
 
