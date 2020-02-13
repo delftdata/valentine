@@ -1,0 +1,3 @@
+[submodule "algorithms/sem_prop"]
+	path = algorithms/sem_prop
+	url = https://github.com/AndraIonescu/aurum-datadiscovery
