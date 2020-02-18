@@ -1,5 +1,4 @@
 import subprocess
-import time
 import os
 
 from algorithms.base_matcher import BaseMatcher
@@ -15,7 +14,8 @@ class Coma(BaseMatcher):
 
     def get_matches(self, source_data_loader: BaseLoader, target_data_loader: BaseLoader, dataset_name: str):
 
-        coma_output_path = get_project_root() + "/algorithms/coma/coma_output/output.txt"
+        coma_output_path = get_project_root() + "/algorithms/coma/coma_output/"+ dataset_name + str(self.max_n) \
+                           + self.strategy + ".txt"
 
         self.run_coma_jar(source_data_loader, target_data_loader, coma_output_path)
 
@@ -28,15 +28,14 @@ class Coma(BaseMatcher):
     def run_coma_jar(self, source_data_loader, target_data_loader, coma_output_path):
         jar_path = get_project_root() + "/algorithms/coma/artifact/coma.jar"
 
-        run_jar_command = "java -cp " + jar_path + " -DinputFile1=" + source_data_loader.data_path \
+        run_jar_command = "java -Xmx8192m -cp " + jar_path + " -DinputFile1=" + source_data_loader.data_path \
                           + " -DinputFile2=" + target_data_loader.data_path + \
                           " -DoutputFile=" + coma_output_path + " -DmaxN=" \
                           + str(self.max_n) + " -Dstrategy=" + self.strategy + " Main"
 
-        proc = subprocess.Popen(run_jar_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        time.sleep(1)
-        proc.terminate()
+        proc = subprocess.Popen(run_jar_command, shell=True)
         proc.communicate()
+        proc.wait()
 
     @staticmethod
     def read_coma_output(coma_output_path):
