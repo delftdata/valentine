@@ -4,13 +4,13 @@
   "source": {
     "type": "BaseLoader",
     "args": {
-      "data": "/Users/andra/TUDelft2/Thesis/schema_matching_tools/data/chembl/assays.csv"
+      "data": "/code/sem_prop_data/assays.csv"
     }
   },
   "target": {
     "type": "BaseLoader",
     "args": {
-      "data": "/Users/andra/TUDelft2/Thesis/schema_matching_tools/data/movies3/csv_files/rotten_tomatoes.csv"
+      "data": "/code/sem_prop_data/assays.csv"
     }
   },
   "algorithm": {
@@ -24,5 +24,5 @@
       "n": [10]
     }
   },
-  "golden_standard": "/Users/andra/TUDelft2/Thesis/schema_matching_tools/sem_prop_gold_standard_assays.json"
+  "golden_standard": "/code/sem_prop_gold_standard.json"
 }

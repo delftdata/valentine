@@ -3,6 +3,7 @@
 .idea/
 __pycache__/
 data
+output
 configuration_files
 package-lock.json
 cache
