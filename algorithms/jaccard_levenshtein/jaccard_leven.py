@@ -30,6 +30,8 @@ class JaccardLevenMatcher(BaseMatcher):
 
                 matches[((src_table, col_src_name), (trg_table, col_trg_name))] = sim
 
+        matches = dict(filter(lambda elem: elem[1] > 0, matches.items()))
+
         sorted_matches = {k: v for k, v in sorted(matches.items(), key=lambda item: item[1], reverse=True)}
 
         return sorted_matches

@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import timeit
-
+import sys
 
 from algorithms.base_matcher import BaseMatcher
 from algorithms.clustering_scale.correlation_clustering_scale import CorrelationClustering
@@ -32,6 +32,8 @@ def main(config):
             parse_config.py for more information.
         Returns: Creates a schema matching job and runs it
     """
+    sys.path.append(os.getcwd())
+
     time_start_load = timeit.default_timer()
     # data loader (Schema, Instance, Combined)
     data_loader_source = config.initialize('source', module_data)
