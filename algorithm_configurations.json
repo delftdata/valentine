@@ -4,14 +4,14 @@
     "args": {
       "threshold1": {
         "type": "range",
-        "max": 0.25,
-        "min": 0.05,
+        "max": 0.2,
+        "min": 0.1,
         "step": 0.05
       },
       "threshold2": {
         "type": "range",
-        "max": 0.25,
-        "min": 0.05,
+        "max": 0.2,
+        "min": 0.1,
         "step": 0.05
       },
       "quantiles": {
@@ -117,12 +117,30 @@
         "type": "range",
         "max": 0.8,
         "min": 0.4,
-        "step": 0.05
+        "step": 0.1
       },
       "process_num": {
         "type": "values",
         "data": [
           4
+        ]
+      }
+    }
+  },
+  "Coma": {
+    "data_loader_type": "BaseLoader",
+    "args": {
+      "max_n": {
+        "type": "values",
+        "data": [
+          0
+        ]
+      },
+      "strategy": {
+        "type": "values",
+        "data": [
+          "COMA_OPT",
+          "COMA_OPT_INST"
         ]
       }
     }

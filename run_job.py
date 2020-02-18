@@ -1,11 +1,8 @@
 import argparse
 import json
-import os
 import timeit
 
-
 from algorithms.base_matcher import BaseMatcher
-from algorithms.clustering_scale.correlation_clustering_scale import CorrelationClustering
 from algorithms.coma.coma import Coma
 from data_loader.golden_standard_loader import GoldenStandardLoader
 from utils.parse_config import ConfigParser
@@ -13,13 +10,13 @@ from utils.parse_config import ConfigParser
 import data_loader.data_loaders as module_data
 import algorithms.algorithms as module_algorithms
 import metrics.metrics as module_metric
-from utils.utils import get_project_root
+from utils.utils import get_project_root, create_folder
 
 
-def write_output(name: str, matches: dict, metrics: dict, run_times: dict):
-    if not os.path.exists(get_project_root() + "/data/output"):
-        os.makedirs(get_project_root() + "/data/output")
-    with open(get_project_root() + "/data/output" + "/" + name + ".json", 'w') as fp:
+def write_output(name: str, algorithm_name: str, matches: dict, metrics: dict, run_times: dict):
+    create_folder(get_project_root() + "/output")
+    create_folder(get_project_root() + "/output/" + algorithm_name)
+    with open(get_project_root() + "/output/" + algorithm_name + "/" + name + ".json", 'w') as fp:
         matches = {str(k): v for k, v in matches.items()}
         output = {"name": name, "matches": matches, "metrics": metrics, "run_times": run_times}
         json.dump(output, fp, indent=2)
@@ -63,7 +60,7 @@ def main(config):
     for metric in metric_fns:
         if metric.__name__ != "precision_at_n_percent":
             if metric.__name__ in ['precision', 'recall', 'f1_score'] \
-                    and type(algorithm) not in [Coma, CorrelationClustering]:
+                    and type(algorithm) != Coma:
                 final_metrics[metric.__name__] = metric(matches, golden_standard, True)
             else:
                 final_metrics[metric.__name__] = metric(matches, golden_standard)
@@ -73,7 +70,7 @@ def main(config):
 
     print("Metrics: ", final_metrics)
 
-    write_output(config['name'], matches, final_metrics, run_times)
+    write_output(config['name'], config['algorithm']['type'], matches, final_metrics, run_times)
 
 
 if __name__ == '__main__':
