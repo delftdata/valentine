@@ -1,0 +1,89 @@
+apply plugin: 'java'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'application'
+mainClassName = "core.Main"
+applicationDefaultJvmArgs = []
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs "drivers"
+    }
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'org.apache.logging.log4j:log4j-api:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-core:2.9.1'
+    compile 'org.apache.logging.log4j:log4j-to-slf4j:2.7'
+    compile 'net.sf.jopt-simple:jopt-simple:4.8'
+    // elastic 6
+    compile 'org.elasticsearch.client:transport:6.0.0'
+    // jetty + jersey
+    compile 'org.eclipse.jetty:jetty-server:9.2.9.v20150224'
+    compile 'org.eclipse.jetty:jetty-servlet:9.2.9.v20150224'
+    compile 'javax.ws.rs:javax.ws.rs-api:2.0-m03'
+    compile 'org.glassfish.jersey.core:jersey-server:2.22.2'
+    compile 'org.glassfish.jersey.core:jersey-common:2.22.2'
+    compile 'org.glassfish.jersey.containers:jersey-container-jetty-servlet:2.22.2'
+    // jackson
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.4'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.7.4'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.7.4'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.0'
+    // stream summarizer
+    compile 'com.clearspring.analytics:stream:2.9.2'
+    // opennlp
+    compile 'org.apache.opennlp:opennlp-tools:1.6.0'
+    // opencsv
+    compile 'net.sf.opencsv:opencsv:2.3'
+    //count-min sketch
+    compile 'com.clearspring.analytics:stream:2.7.0'
+    // mysql driver
+    compile 'mysql:mysql-connector-java:5.1.6'
+    // postgresql driver
+    compile 'postgresql:postgresql:9.4.1208.jre6'
+    // oracle 10g driver
+    compile 'com.oracle:ojdbc14:10.2.0.5'
+    // sqlserver driver 
+    compile 'com.microsoft.sqlserver:mssql-jdbc:6.2.2.jre8'
+    // hive driver
+    compile ('org.apache.hive:hive-jdbc:2.1.0'){
+        exclude group: 'io.netty', module:'netty-all'
+    }
+    compile 'org.apache.hive:hive-jdbc:2.1.0'
+    // metrics
+    compile 'io.dropwizard.metrics:metrics-core:3.1.0'
+    // connection pool
+    compile 'com.zaxxer:HikariCP:2.6.0'
+
+    testCompile 'junit:junit:4.11'
+}
+
+task fatJar(type: Jar) {
+    zip64 true
+    description "Creates self-contained fat jar"
+    zip64 true
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    {
+        exclude 'META-INF/*.RSA'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+    }
+    with jar
+    manifest {
+        attributes 'Main-Class': 'core.Main'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}

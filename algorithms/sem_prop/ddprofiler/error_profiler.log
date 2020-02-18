@@ -1,0 +1,32 @@
+#########
+sources.implementations.PostgresSource@16c54acc $FAILED$ cause-> null
+preanalysis.PreAnalyzer.calculateDataTypes(PreAnalyzer.java:132)
+preanalysis.PreAnalyzer.readRows(PreAnalyzer.java:67)
+core.Worker.run(Worker.java:105)
+java.lang.Thread.run(Thread.java:748)
+
+
+#########
+sources.implementations.PostgresSource@154f2c74 $FAILED$ cause-> null
+preanalysis.PreAnalyzer.calculateDataTypes(PreAnalyzer.java:132)
+preanalysis.PreAnalyzer.readRows(PreAnalyzer.java:67)
+core.Worker.run(Worker.java:105)
+java.lang.Thread.run(Thread.java:748)
+
+
+#########
+sources.implementations.PostgresSource@3d9d653f $FAILED$ cause-> null
+preanalysis.PreAnalyzer.calculateDataTypes(PreAnalyzer.java:132)
+preanalysis.PreAnalyzer.readRows(PreAnalyzer.java:67)
+core.Worker.run(Worker.java:105)
+java.lang.Thread.run(Thread.java:748)
+
+
+#########
+sources.implementations.PostgresSource@5ae3d6f0 $FAILED$ cause-> null
+preanalysis.PreAnalyzer.calculateDataTypes(PreAnalyzer.java:132)
+preanalysis.PreAnalyzer.readRows(PreAnalyzer.java:67)
+core.Worker.run(Worker.java:105)
+java.lang.Thread.run(Thread.java:748)
+
+
