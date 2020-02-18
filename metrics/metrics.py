@@ -39,6 +39,8 @@ def recall(matches: dict, golden_standard: GoldenStandardLoader, one_to_one=Fals
     if one_to_one:
         matches = one_to_one_matches(matches)
     tp, fn = get_tp_fn(matches, golden_standard)
+    if tp + fn == 0:
+        return 0
     return tp / (tp + fn)
 
 
@@ -47,6 +49,8 @@ def precision(matches: dict, golden_standard: GoldenStandardLoader, one_to_one=F
         matches = one_to_one_matches(matches)
     tp, fn = get_tp_fn(matches, golden_standard)
     fp = get_fp(matches, golden_standard)
+    if tp + fp == 0:
+        return 0
     return tp / (tp + fp)
 
 
@@ -62,9 +66,13 @@ def precision_at_n_percent(matches: dict, golden_standard: GoldenStandardLoader,
     number_to_keep = int(math.ceil((n / 100) * len(matches.keys())))
     tp, fn = get_tp_fn(matches, golden_standard, number_to_keep)
     fp = get_fp(matches, golden_standard, number_to_keep)
+    if tp + fp == 0:
+        return 0
     return tp / (tp + fp)
 
 
 def recall_at_sizeof_ground_truth(matches: dict, golden_standard: GoldenStandardLoader):
     tp, fn = get_tp_fn(matches, golden_standard, golden_standard.size)
+    if tp + fn == 0:
+        return 0
     return tp / (tp + fn)
