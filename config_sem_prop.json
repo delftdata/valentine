@@ -1,0 +1,28 @@
+{
+  "name": "Sem_Prop_1",
+  "dataset_name": "assays",
+  "source": {
+    "type": "BaseLoader",
+    "args": {
+      "data": "/Users/andra/TUDelft2/Thesis/schema_matching_tools/data/chembl/assays.csv"
+    }
+  },
+  "target": {
+    "type": "BaseLoader",
+    "args": {
+      "data": "/Users/andra/TUDelft2/Thesis/schema_matching_tools/data/movies3/csv_files/rotten_tomatoes.csv"
+    }
+  },
+  "algorithm": {
+    "type": "SemProp",
+    "args": {
+    }
+  },
+  "metrics": {
+    "names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
+    "args": {
+      "n": [10]
+    }
+  },
+  "golden_standard": "/Users/andra/TUDelft2/Thesis/schema_matching_tools/sem_prop_gold_standard_assays.json"
+}

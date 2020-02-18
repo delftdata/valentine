@@ -1,0 +1,5 @@
+fieldnetwork is the main hook to the system right now.
+
+However, next version is relying on EKGapi, which takes a config parameter to configure a backend of a specific type.
+In particular, it can configure inmemoryekg, which will be equivalent to fieldnetwork, or gindexekg, which is the new
+store, thought through for larger scenarios.
