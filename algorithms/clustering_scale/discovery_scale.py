@@ -5,14 +5,13 @@ import networkx as nx
 import pulp as plp
 from tqdm import tqdm
 from multiprocessing import Pool
-import matplotlib.pyplot as plt
 
 from algorithms.clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
     parallel_cutoff_threshold, cuttoff_column_generator, compute_cutoff_threshold, calc_chunksize
 
 
-def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, chunk_size: int = None,
-                                  quantiles: int = 256):
+def compute_distribution_clusters(columns: list, dataset_name: str, threshold: float, pool: Pool,
+                                  chunk_size: int = None, quantiles: int = 256, ):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
     algorithm captures which columns contain data with similar distributions based on the EMD distance metric.
@@ -35,7 +34,7 @@ def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, c
     list(list(str))
         a list that contains the distribution clusters that contain the column names in the cluster
     """
-    combinations = list(column_combinations(columns, quantiles, intersection=False))
+    combinations = list(column_combinations(columns, dataset_name, quantiles, intersection=False))
 
     total = len(combinations)
 
@@ -45,7 +44,8 @@ def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, c
     A: dict = transform_dict(dict(tqdm(pool.imap_unordered(process_emd, combinations, chunksize=chunk_size),
                                        total=total)))
 
-    edges_per_column = list(pool.map(parallel_cutoff_threshold, list(cuttoff_column_generator(A, columns, threshold))))
+    edges_per_column = list(pool.map(parallel_cutoff_threshold, list(cuttoff_column_generator(A, columns, dataset_name,
+                                                                                              threshold))))
 
     graph = create_graph(columns, edges_per_column)
 
@@ -54,7 +54,8 @@ def compute_distribution_clusters(columns: list, threshold: float, pool: Pool, c
     return connected_components
 
 
-def compute_attributes(DC: list, threshold: float, pool: Pool, chunk_size: int = None, quantiles: int = 256):
+def compute_attributes(DC: list, dataset_name: str, threshold: float, pool: Pool, chunk_size: int = None,
+                       quantiles: int = 256):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
     This algorithm creates the attribute graph of the distribution clusters computed in algorithm 2.
@@ -78,7 +79,7 @@ def compute_attributes(DC: list, threshold: float, pool: Pool, chunk_size: int =
         a dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = list(column_combinations(DC, quantiles, intersection=True))
+    combinations = list(column_combinations(DC, dataset_name, quantiles, intersection=True))
 
     total = len(combinations)
 
@@ -120,7 +121,9 @@ def correlation_clustering_pulp(vertexes, edges):
     set_v = vertexes
     # set_w = vertexes
 
-    x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="({0}, {1})".format(i, j))
+    x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="({0},{1})"
+                                     .format(str(i).replace(" ", "__WHITESPACE__").replace("-", "__DASH__"),
+                                             str(j).replace(" ", "__WHITESPACE__").replace("-", "__DASH__")))
               for i in set_u for j in set_v}
 
     # constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
@@ -139,7 +142,7 @@ def correlation_clustering_pulp(vertexes, edges):
     result = dict()
 
     for v in opt_model.variables():
-        result[literal_eval(v.name.replace(",_", ","))] = v.varValue
+        result[literal_eval(v.name.replace("__WHITESPACE__", " ").replace("__DASH__", "-"))] = v.varValue
 
     return result
 
