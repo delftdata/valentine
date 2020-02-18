@@ -1,6 +1,8 @@
 import argparse
 import json
 import timeit
+import sys
+import os
 
 from algorithms.base_matcher import BaseMatcher
 from algorithms.coma.coma import Coma
@@ -29,6 +31,8 @@ def main(config):
             parse_config.py for more information.
         Returns: Creates a schema matching job and runs it
     """
+    sys.path.append(os.getcwd())
+
     time_start_load = timeit.default_timer()
     # data loader (Schema, Instance, Combined)
     data_loader_source = config.initialize('source', module_data)

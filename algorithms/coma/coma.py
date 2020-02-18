@@ -56,4 +56,5 @@ class Coma(BaseMatcher):
             _, column1 = m1.split(".")
             _, column2 = m2.split(".")
             formatted_output[((table1, column1), (table2, column2))] = float(similarity)
+        formatted_output = dict(sorted(formatted_output.items(), key=lambda x: -x[1]))
         return formatted_output
