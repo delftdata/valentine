@@ -1,12 +1,13 @@
 import os
 import json
+import shutil
 from itertools import product
 
 from algorithms.clustering_scale.scale_utils import create_cache_dirs, generate_global_ranks
 from data_loader.instance_loader import InstanceLoader
 from utils.utils import get_project_root, create_folder
 
-algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher"]
+algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma"]
 
 metrics = {"names": ["precision", "recall", "f1_score", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {
@@ -77,21 +78,26 @@ def get_all_parameter_combinations(args):
     return list(product(*all_params))
 
 
-def combine_data_algorithms(config_data: dict, config_algo: dict):
-    create_folder(str(get_project_root())+"/configuration_files")
+def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs: dict):
+    create_folder(get_project_root()+"/configuration_files")
     for cfd_key, cfd_value in config_data.items():
-        create_folder(str(get_project_root()) + "/configuration_files/" + cfd_key)
         for cfa_key, cfa_value in config_algo.items():
-            with open(str(get_project_root())+"/configuration_files/" + cfd_key + '/' + cfa_key + ".json",
-                      'w') as fp:
-                configuration = {"name": cfd_key + '__' + cfa_key,
-                                 "dataset_name": cfd_key,
-                                 "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
-                                 "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
-                                 "algorithm": cfa_value["algorithm"],
-                                 "metrics": metrics,
-                                 "golden_standard": cfd_value["golden_standard"]}
-                json.dump(configuration, fp, indent=2)
+            name = cfd_key + '__' + cfa_key
+            if name not in completed_jobs[cfa_value["algorithm"]["type"]]:
+                create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
+                create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"]
+                              + '/' + cfd_key)
+                file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + '/' + \
+                            cfd_key + '/' + cfa_key + ".json"
+                with open(file_name, 'w') as fp:
+                    configuration = {"name": name,
+                                     "dataset_name": cfd_key,
+                                     "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
+                                     "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
+                                     "algorithm": cfa_value["algorithm"],
+                                     "metrics": metrics,
+                                     "golden_standard": cfd_value["golden_standard"]}
+                    json.dump(configuration, fp, indent=2)
 
 
 def create_sorted_ranks(path: str):
@@ -107,11 +113,28 @@ def create_sorted_ranks(path: str):
                 generate_global_ranks(data, dataset_name)
 
 
+def get_completed_jobs_of_algorithm(algorithm_name: str):
+    completed = []
+    output_path = get_project_root() + "/output/" + algorithm_name
+    for (root, dirs, files) in os.walk(os.path.join(output_path)):
+        if not dirs:  # Get only leaf nodes
+            for file in files:
+                with open(root + '/' + file) as f:
+                    data = json.load(f)
+                    completed.append(data["name"])
+    return completed
+
+
 if __name__ == "__main__":
-    d_path = get_project_root() + "/data/prospect"
+    if os.path.exists(get_project_root()+"/configuration_files"):
+        shutil.rmtree(get_project_root()+"/configuration_files")
+    cmpl_jobs = {}
+    for algo in algorithms:
+        cmpl_jobs[algo] = get_completed_jobs_of_algorithm(algo)
+    d_path = get_project_root() + "/data"
     if "CorrelationClustering" in algorithms:
         create_sorted_ranks(d_path)
         print("Correlation Clustering's sorted ranks created")
     dtc = get_file_paths(d_path)
     alc = get_algorithm_configurations(get_project_root() + "/algorithm_configurations.json")
-    combine_data_algorithms(dtc, alc)
+    combine_data_algorithms(dtc, alc, cmpl_jobs)

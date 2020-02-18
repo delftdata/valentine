@@ -34,6 +34,9 @@ def create_folder(path: str):
 
 
 def one_to_one_matches(matches: dict):
+    if len(matches) < 2:
+        return matches
+
     matched = dict()
 
     for key in matches.keys():

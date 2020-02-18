@@ -42,7 +42,7 @@ def compute_cutoff_threshold(C: list, threshold: float):
     return cutoff
 
 
-def column_combinations(columns: list, quantiles: int, intersection: bool = False):
+def column_combinations(columns: list, dataset_name: str, quantiles: int, intersection: bool = False):
     """
     All the unique combinations between all the columns
 
@@ -70,7 +70,7 @@ def column_combinations(columns: list, quantiles: int, intersection: bool = Fals
             name_j = columns[c_j]
             table_j = name_j[0]
             if table_i != table_j:
-                yield (name_i, name_j), quantiles, intersection
+                yield (name_i, name_j), dataset_name, quantiles, intersection
             c_j = c_j + 1
         c_i = c_i + 1
 
@@ -89,10 +89,10 @@ def process_emd(tup: tuple):
     tuple
         a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
     """
-    name_i, name_j, k, quantile, intersection = unwrap_process_input_tuple(tup)
+    name_i, name_j, k, dataset_name, quantile, intersection = unwrap_process_input_tuple(tup)
 
-    c1 = read_from_cache(name_i)
-    c2 = read_from_cache(name_j)
+    c1 = read_from_cache(name_i, dataset_name)
+    c2 = read_from_cache(name_j, dataset_name)
 
     if intersection:
         return k, intersection_emd(c1, c2, quantile)
@@ -101,9 +101,11 @@ def process_emd(tup: tuple):
 
 
 @lru_cache
-def read_from_cache(file_name):
-    with open('cache/' + str(file_name) + '.pkl', 'rb') as pkl_file:
-        data = pickle.load(pkl_file)
+def read_from_cache(file_name: str, dataset_name: str):
+    file_path = 'cache/' + dataset_name + '_' + str(file_name) + '.pkl'
+    if os.path.getsize(file_path) > 0:
+        with open(file_path, 'rb') as pkl_file:
+            data = pickle.load(pkl_file)
     return data
 
 
@@ -116,10 +118,10 @@ def unwrap_process_input_tuple(tup: tuple):
     tup : tuple
         the tuple to unwrap
     """
-    names, quantile, intersection = tup
+    names, dataset_name, quantile, intersection = tup
     name_i, name_j = names
     k = (name_i, name_j)
-    return name_i, name_j, k, quantile, intersection
+    return name_i, name_j, k, dataset_name, quantile, intersection
 
 
 def insert_to_dict(dc: dict, k: str, v: dict):
@@ -173,8 +175,10 @@ def process_columns(tup: tuple):
     column_name, data, source_name, dataset_name, quantiles = tup
     column = CorrelationClusteringColumn(column_name, data, source_name, dataset_name, quantiles)
     column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
-    with open('cache/' + str(column.long_name) + '.pkl', 'wb') as output:
-        pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
+    pickle_path = 'cache/' + dataset_name + '_' + str(column.long_name) + '.pkl'
+    if not os.path.isfile(pickle_path):
+        with open(pickle_path, 'wb') as output:
+            pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
 
 
 def parallel_cutoff_threshold(tup: tuple):
@@ -201,13 +205,15 @@ def ingestion_column_generator(columns: list, dataset_name: str, quantiles: int)
         yield column.name, column.data, column.table_name, dataset_name, quantiles
 
 
-def cuttoff_column_generator(A: dict, columns: list, threshold: float):
+def cuttoff_column_generator(A: dict, columns: list, dataset_name:str, threshold: float):
     """
     Generator of columns for the cutoff threshold computation
     """
     for column_name in columns:
-        with open('cache/' + str(column_name) + '.pkl', 'rb') as pkl_file:
-            column = pickle.load(pkl_file)
+        file_path = 'cache/' + dataset_name + '_' + str(column_name) + '.pkl'
+        if os.path.getsize(file_path) > 0:
+            with open(file_path, 'rb') as pkl_file:
+                column = pickle.load(pkl_file)
         yield A, column, threshold
 
 

@@ -46,9 +46,12 @@ class CorrelationClustering(BaseMatcher):
         self.chunk_size = chunk_size
         self.clear_cache = clear_cache
         self.column_names = list()
+        self.dataset_name = ""
         create_cache_dirs()
 
     def get_matches(self, source: InstanceLoader, target: InstanceLoader, dataset_name: str):
+
+        self.dataset_name = dataset_name
 
         if self.clear_cache:
             data = list(source.table.get_data()) + list(target.table.get_data())
@@ -81,10 +84,10 @@ class CorrelationClustering(BaseMatcher):
         """
         print("Computing distribution clusters ...")
 
-        connected_components = discovery.compute_distribution_clusters(self.column_names, self.threshold1, pool,
-                                                                       chunk_size, self.quantiles)
+        connected_components = discovery.compute_distribution_clusters(self.column_names, self.dataset_name,
+                                                                       self.threshold1, pool, chunk_size, self.quantiles)
 
-        self.write_clusters_to_json(connected_components, 'Distribution_Clusters.json')
+        # self.write_clusters_to_json(connected_components, 'Distribution_Clusters.json')
 
         print("Computing attributes ...")
         all_attributes = list()
@@ -93,8 +96,8 @@ class CorrelationClustering(BaseMatcher):
             if len(components) > 1:
                 print("Distribution cluster: ", i)
                 i = i + 1
-                edges = discovery.compute_attributes(list(components), self.threshold2, pool, chunk_size,
-                                                     self.quantiles)
+                edges = discovery.compute_attributes(list(components), self.dataset_name, self.threshold2, pool,
+                                                     chunk_size, self.quantiles)
                 all_attributes.append((list(components), edges))
 
         print("Solving linear program ...")
@@ -104,7 +107,7 @@ class CorrelationClustering(BaseMatcher):
 
         attribute_clusters = discovery.process_correlation_clustering_result(results, self.column_names)
 
-        self.write_clusters_to_json(attribute_clusters, 'Attribute_Clusters(Matches).json')
+        # self.write_clusters_to_json(attribute_clusters, 'Attribute_Clusters(Matches).json')
 
         return self.rank_output(attribute_clusters)
 
@@ -139,7 +142,8 @@ class CorrelationClustering(BaseMatcher):
                     table1 = combination[0][0]
                     table2 = combination[1][0]
                     if table1 != table2:
-                        k, emd = process_emd(((combination[0], combination[1]), self.quantiles, False))
+                        k, emd = process_emd(((combination[0], combination[1]),
+                                              self.dataset_name, self.quantiles, False))
                         emd_per_match[k] = 1 / (1 + emd)
         emd_per_match = dict(sorted(emd_per_match.items(), key=lambda x: -x[1]))
         return emd_per_match

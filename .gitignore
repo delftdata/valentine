@@ -5,6 +5,7 @@ __pycache__/
 data
 output
 configuration_files
+configuration_files_scaled
 package-lock.json
 cache
 
