@@ -49,5 +49,12 @@ RUN apt-get update && apt-get install -y elasticsearch systemd
 
 RUN cd /usr/local/bin  && ln -s /usr/bin/python3.8 python
 
-
 CMD ["python3.8"]
+
+# docker login etc in order to login on the docker hub and to be able to upload images
+# docker build .
+# docker images
+# docker tag ?????? asteriosk/sempropenv:3.8.5
+# docker push asteriosk/sempropenv
+#
+
