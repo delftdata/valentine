@@ -3,6 +3,8 @@ from collections import defaultdict
 
 import yaml
 import os
+import time
+import sys
 
 from algorithms.sem_prop.inputoutput import utils as io
 from algorithms.sem_prop.ontomatch import matcher_lib as matcherlib
@@ -45,9 +47,11 @@ def make_config_file(source_data_loader, dataset_name):
 
 
 def init_config(dataset_name):
-    ping = subprocess.call(
-        [PATH + '/pipeline.sh', CONFIG_FILE, dataset_name],
-        stdout=subprocess.PIPE)
+    ping = subprocess.Popen(PATH + '/pipeline.sh ' + CONFIG_FILE + ' ' + dataset_name, stdout=subprocess.PIPE,
+                            shell=True)
+    time.sleep(1)
+    ping.terminate()
+    ping.communicate()
     return ping
 
 
@@ -161,6 +165,9 @@ class SemProp(BaseMatcher):
         self.matchings = dict()
 
     def get_matches(self, source_data_loader, target_data_loader, dataset_name):
+
+        sys.path.append(os.getcwd())
+
         make_config_file(source_data_loader.data_path, dataset_name)
 
         status = init_config(dataset_name)

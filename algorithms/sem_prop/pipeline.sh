@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 if [ $# -gt 0 ]; then
     echo "File name detected: $1"
     echo "Data name detected: $2"
@@ -19,8 +21,12 @@ fi
 path="$(dirname "$0")"
 echo "$path"
 cd "$path" && \
-./run-es.sh && \
+#./run-es.sh && \
+service elasticsearch start && \
 
+sleep 15 && \
+
+curl localhost:9200 &&\
 
 cd ddprofiler || exit && \
 echo $'\n'Build ddprofiler$'\n' && \
