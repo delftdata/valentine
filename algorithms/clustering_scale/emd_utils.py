@@ -25,6 +25,9 @@ def quantile_emd(column1: CorrelationClusteringColumn, column2: CorrelationClust
     float
         the EMD value between column1 and column2
     """
+    if column1.size == 0 or column2.size == 0:
+        return math.inf
+
     histogram1 = column1.get_histogram()
     histogram2 = QuantileHistogram(column2.long_name, column2.ranks, column2.size, quantiles,
                                    reference_hist=histogram1)

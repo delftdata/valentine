@@ -174,7 +174,8 @@ def process_columns(tup: tuple):
     """
     column_name, data, source_name, dataset_name, quantiles = tup
     column = CorrelationClusteringColumn(column_name, data, source_name, dataset_name, quantiles)
-    column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
+    if column.size > 0:
+        column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
     pickle_path = 'cache/' + dataset_name + '_' + str(column.long_name) + '.pkl'
     if not os.path.isfile(pickle_path):
         with open(pickle_path, 'wb') as output:
