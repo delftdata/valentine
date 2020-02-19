@@ -1,5 +1,6 @@
 import subprocess
 from collections import defaultdict
+from itertools import combinations
 
 import yaml
 import os
@@ -24,26 +25,37 @@ ONTOLOGY_NAME = "efo"
 PATH_ONTOLOGY = "{}{}".format(PATH, "/cache_onto/")
 
 
-def make_config_file(source_data_loader, dataset_name):
-    parts = source_data_loader.split("/")
-    file_name = parts[len(parts) - 1]
-    relative = os.path.realpath('.')
-    parts = source_data_loader.split(relative)[1]
-    path = "../../.." + parts.split(file_name)[0]
+def make_config_file(source_data_loader, target_data_loader):
+    source_path, source_name = make_path(source_data_loader)
+    # target_path, target_name = make_path(target_data_loader)
 
-    f = open("access-db.yml", "w+")
     data = dict()
     data['api_version'] = 0
     data['sources'] = list()
+    data['sources'].append(make_config_yml(".".join(source_name.split('.')[:-1]), source_path))
+    # data['sources'].append(make_config_yml(".".join(target_name.split('.')[:-1]), target_path))
+
+    with open("access-db.yml", 'w+') as fp:
+        yaml.dump(data, fp)
+
+
+def make_config_yml(dataset_name, path):
     obj = dict()
     obj['config'] = dict()
     obj['config']['path'] = path
     obj['config']['separator'] = ','
     obj['name'] = dataset_name
     obj['type'] = 'csv'
-    data['sources'].append(obj)
-    yaml.dump(data, f)
-    f.close()
+    return obj
+
+
+def make_path(source_data_loader):
+    parts = source_data_loader.split("/")
+    file_name = parts[len(parts) - 1]
+    relative = os.path.realpath('.')
+    parts = source_data_loader.split(relative)[1]
+    path = "../../.." + parts.split(file_name)[0]
+    return path, file_name
 
 
 def init_config(dataset_name):
@@ -55,37 +67,41 @@ def init_config(dataset_name):
     return ping
 
 
-def generate_matchings(network, store_client, om, class_name_relation=False):
+def generate_matchings(network, store_client, om, minhash_sim_threshold, semantic_sim_threshold, coh_sem_sim_threshold,
+                       class_name_relation=False):
     print("Compute fuzzy content matching...")
     l7 = matcherlib.find_hierarchy_content_fuzzy(om.kr_handlers, store_client)
 
     l4 = None
     if class_name_relation:
         print("Compute syntactic relation-clss matching ...")
-        l4 = matcherlib.find_relation_class_name_matchings(network, om.kr_handlers, minhash_sim_threshold=0.1)
+        l4 = matcherlib.find_relation_class_name_matchings(network, om.kr_handlers,
+                                                           minhash_sim_threshold=minhash_sim_threshold)
 
     print("Compute syntactic attribute-class matching ...")
-    l5 = matcherlib.find_relation_class_attr_name_matching(network, om.kr_handlers, minhash_sim_threshold=0.1)
+    l5 = matcherlib.find_relation_class_attr_name_matching(network, om.kr_handlers,
+                                                           minhash_sim_threshold=minhash_sim_threshold)
 
     l42 = None
     neg_l42 = None
     if class_name_relation:
         print("Compute semantic relation-clss matching ...")
-        l42, neg_l42 = matcherlib.find_relation_class_name_sem_matchings(network, om.kr_handlers, sem_sim_threshold=0.5,
+        l42, neg_l42 = matcherlib.find_relation_class_name_sem_matchings(network, om.kr_handlers,
+                                                                         sem_sim_threshold=semantic_sim_threshold,
                                                                          negative_signal_threshold=0.1,
                                                                          add_exact_matches=False,
                                                                          penalize_unknown_word=True)
 
     print("Compute semantic attribute-class matching ...")
     l52, neg_l52 = matcherlib.find_relation_class_attr_name_sem_matchings(network, om.kr_handlers,
-                                                                                          semantic_sim_threshold=0.5,
-                                                                                          negative_signal_threshold=0.1,
-                                                                                          add_exact_matches=False,
-                                                                                          penalize_unknown_word=True)
+                                                                          semantic_sim_threshold=semantic_sim_threshold,
+                                                                          negative_signal_threshold=0.1,
+                                                                          add_exact_matches=False,
+                                                                          penalize_unknown_word=True)
     print("Compute coherent groups ...")
     l6, table_groups = matcherlib.find_sem_coh_matchings(network, om.kr_handlers,
-                                                                   sem_sim_threshold=0.2,
-                                                                   group_size_cutoff=1)
+                                                         sem_sim_threshold=coh_sem_sim_threshold,
+                                                         group_size_cutoff=1)
     return l4, l5, l42, l52, neg_l42, neg_l52, l6, l7
 
 
@@ -161,14 +177,17 @@ def combine_matchings(l4, l5, l42, l52, nl42, nl52, l6, l7, om, cutting_ratio=0.
 
 class SemProp(BaseMatcher):
 
-    def __init__(self):
+    def __init__(self, minhash_sim_threshold, semantic_sim_threshold, coh_sem_sim_threshold):
         self.matchings = dict()
+        self.minhash_sim_threshold = minhash_sim_threshold
+        self.semantic_sim_threshold = semantic_sim_threshold
+        self.coh_sem_sim_threshold = coh_sem_sim_threshold
 
     def get_matches(self, source_data_loader, target_data_loader, dataset_name):
 
         sys.path.append(os.getcwd())
 
-        make_config_file(source_data_loader.data_path, dataset_name)
+        make_config_file(source_data_loader.data_path, target_data_loader.data_path)
 
         status = init_config(dataset_name)
         if status == 0:
@@ -199,7 +218,10 @@ class SemProp(BaseMatcher):
         om.priv_build_content_sim(0.6)
 
         print("Generate matchings")
-        l4, l5, l42, l52, neg_l42, neg_l52, l6, l7 = generate_matchings(network, store_client, om)
+        l4, l5, l42, l52, neg_l42, neg_l52, l6, l7 = generate_matchings(network, store_client, om,
+                                                                        self.minhash_sim_threshold,
+                                                                        self.semantic_sim_threshold,
+                                                                        self.coh_sem_sim_threshold)
 
         print("Combine matchings")
         matchings = combine_matchings(l4, l5, l42, l52, neg_l42, neg_l52, l6, l7, om)
@@ -208,5 +230,14 @@ class SemProp(BaseMatcher):
         return self.matchings
 
     def process_matchings(self, matchings):
+        same_class = dict()
         for source, target in matchings:
-            self.matchings[((source[0], source[2]), target)] = 1
+            if target not in same_class:
+                same_class[target] = list()
+            same_class[target].append((source[1], source[2]))
+
+        for key, matches in same_class.items():
+            if len(matches) > 1:
+                for combination in combinations(matches, 2):
+                    self.matchings[(combination[0], combination[1])] = 1
+
