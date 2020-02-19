@@ -30,7 +30,7 @@ class JaccardLevenMatcher(BaseMatcher):
 
                 matches[((src_table, col_src_name), (trg_table, col_trg_name))] = sim
 
-        matches = dict(filter(lambda elem: elem[1] > 0, matches.items()))
+        matches = dict(filter(lambda elem: elem[1] > 0.0, matches.items()))
 
         sorted_matches = {k: v for k, v in sorted(matches.items(), key=lambda item: item[1], reverse=True)}
 
@@ -53,6 +53,9 @@ class JaccardLevenMatcher(BaseMatcher):
         intersection_cnt = sum(intersection_cnt_list)
 
         union_cnt = len(set1) + len(set2) - intersection_cnt
+
+        if union_cnt == 0:
+            return 0
 
         return float(intersection_cnt) / union_cnt
 

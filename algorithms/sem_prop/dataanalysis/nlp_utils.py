@@ -2,9 +2,8 @@ import nltk
 import re
 from nltk.corpus import stopwords
 
-nltk.download('stopwords')
-
 english = stopwords.words('english')
+
 
 def pos_tag_text(text):
     tagged = nltk.tag.pos_tag(text.split())

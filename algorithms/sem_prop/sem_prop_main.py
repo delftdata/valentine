@@ -239,5 +239,7 @@ class SemProp(BaseMatcher):
         for key, matches in same_class.items():
             if len(matches) > 1:
                 for combination in combinations(matches, 2):
-                    self.matchings[(combination[0], combination[1])] = 1
-
+                    combination = ((combination[0][0].replace(".csv", ""), combination[0][1]),
+                                   (combination[1][0].replace(".csv", ""), combination[1][1]))
+                    if combination[0][0] != combination[1][0]:
+                        self.matchings[(combination[0], combination[1])] = 1

@@ -7,7 +7,7 @@ from algorithms.clustering_scale.scale_utils import create_cache_dirs, generate_
 from data_loader.instance_loader import InstanceLoader
 from utils.utils import get_project_root, create_folder
 
-algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma"]
+algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma", "SemProp"]
 
 metrics = {"names": ["precision", "recall", "f1_score", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {
