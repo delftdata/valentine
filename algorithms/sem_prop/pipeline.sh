@@ -24,7 +24,7 @@ cd "$path" && \
 #./run-es.sh && \
 service elasticsearch start && \
 
-sleep 15 && \
+sleep 30 && \
 
 curl localhost:9200 &&\
 

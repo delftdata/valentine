@@ -82,22 +82,36 @@ def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs
     create_folder(get_project_root()+"/configuration_files")
     for cfd_key, cfd_value in config_data.items():
         for cfa_key, cfa_value in config_algo.items():
-            name = cfd_key + '__' + cfa_key
-            if name not in completed_jobs[cfa_value["algorithm"]["type"]]:
-                create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
-                create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"]
-                              + '/' + cfd_key)
-                file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + '/' + \
-                            cfd_key + '/' + cfa_key + ".json"
-                with open(file_name, 'w') as fp:
-                    configuration = {"name": name,
-                                     "dataset_name": cfd_key,
-                                     "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
-                                     "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
-                                     "algorithm": cfa_value["algorithm"],
-                                     "metrics": metrics,
-                                     "golden_standard": cfd_value["golden_standard"]}
-                    json.dump(configuration, fp, indent=2)
+            if (cfa_value["algorithm"]["type"] == "SemProp" and "assays" in cfd_key) \
+                    or cfa_value["algorithm"]["type"] != "SemProp":
+                name = cfd_key + '__' + cfa_key
+                if name not in completed_jobs[cfa_value["algorithm"]["type"]]:
+                    create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
+                    create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"]
+                                  + '/' + cfd_key)
+                    file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + '/' + \
+                                cfd_key + '/' + cfa_key + ".json"
+
+                    with open(file_name, 'w') as fp:
+                        configuration = {"name": name,
+                                         "dataset_name": cfd_key,
+                                         "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
+                                         "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
+                                         "algorithm": cfa_value["algorithm"],
+                                         "metrics": metrics,
+                                         "golden_standard": cfd_value["golden_standard"]}
+                        if cfa_value["algorithm"]["type"] == "SemProp":
+                            configuration["source"]["args"]["schema"] = configuration["source"]["args"]["schema"]\
+                                .replace(get_project_root(), "/code")
+                            configuration["source"]["args"]["data"] = configuration["source"]["args"]["data"]\
+                                .replace(get_project_root(), "/code")
+                            configuration["target"]["args"]["schema"] = configuration["target"]["args"]["schema"] \
+                                .replace(get_project_root(), "/code")
+                            configuration["target"]["args"]["data"] = configuration["target"]["args"]["data"] \
+                                .replace(get_project_root(), "/code")
+                            configuration["golden_standard"] = configuration["golden_standard"] \
+                                .replace(get_project_root(), "/code")
+                            json.dump(configuration, fp, indent=2)
 
 
 def create_sorted_ranks(path: str):

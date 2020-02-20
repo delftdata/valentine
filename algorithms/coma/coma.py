@@ -28,7 +28,7 @@ class Coma(BaseMatcher):
     def run_coma_jar(self, source_data_loader, target_data_loader, coma_output_path):
         jar_path = get_project_root() + "/algorithms/coma/artifact/coma.jar"
 
-        run_jar_command = "java -Xmx8192m -cp " + jar_path + " -DinputFile1=" + source_data_loader.data_path \
+        run_jar_command = "java -Xmx16384m -cp " + jar_path + " -DinputFile1=" + source_data_loader.data_path \
                           + " -DinputFile2=" + target_data_loader.data_path + \
                           " -DoutputFile=" + coma_output_path + " -DmaxN=" \
                           + str(self.max_n) + " -Dstrategy=" + self.strategy + " Main"
