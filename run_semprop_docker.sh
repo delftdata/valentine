@@ -1,5 +1,10 @@
 #!/bin/bash
 
-echo "$1"
+set -x
 
-docker run -i -v `pwd`:/code/  -w /code/ --entrypoint /bin/bash  asteriosk/sempropenv:3.8.5 -c "$1"
+docker run -i -v `pwd`:/code/  \
+		-w /code/ \
+		--entrypoint python  \
+		-e "PYTHONPATH=/code/"	\
+		asteriosk/sempropenv:3.8.5 \
+		run_job.py -c $1
