@@ -89,9 +89,8 @@ def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"]
                                   + '/' + cfd_key)
-                    file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + '/' + \
-                                cfd_key + '/' + cfa_key + ".json"
-
+                    file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + '/' \
+                                + cfd_key + '/' + cfa_key + ".json"
                     with open(file_name, 'w') as fp:
                         configuration = {"name": name,
                                          "dataset_name": cfd_key,
@@ -111,7 +110,7 @@ def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs
                                 .replace(get_project_root(), "/code")
                             configuration["golden_standard"] = configuration["golden_standard"] \
                                 .replace(get_project_root(), "/code")
-                            json.dump(configuration, fp, indent=2)
+                        json.dump(configuration, fp, indent=2)
 
 
 def create_sorted_ranks(path: str):
