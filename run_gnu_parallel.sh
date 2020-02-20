@@ -22,10 +22,10 @@ do
 
     for entry in "$folder"/*
     do
-      fixed=$( echo "$entry" | LC_ALL=C sed -e 's/[^a-zA-Z0-9,._+@%/-]/\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/')
-      docker_arguments+=("$fixed")
+      docker_arguments+=("$entry")
     done
 
+    # parallel --dry-run --jobs "$num_jobs" ./run_semprop_docker.sh ::: "${docker_arguments[@]}"
     parallel --jobs "$num_jobs" ./run_semprop_docker.sh ::: "${docker_arguments[@]}"
   else
     parallel --jobs "$num_jobs" python run_job.py -c ::: "$folder"/*
