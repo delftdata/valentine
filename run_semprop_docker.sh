@@ -8,7 +8,6 @@ set -x
 
 docker run --rm -i -v `pwd`:/code/  \
 		-w /code/ \
-		--cidfile=$temp_file \
 		--entrypoint=python  \
 		--env="PYTHONPATH=/code/" \
 		asteriosk/sempropenv:3.8.5 \
