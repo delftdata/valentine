@@ -5,7 +5,6 @@ set -x
 # temp_file=$(mktemp semprop-docker.XXXXXX) || { echo "Failed to create temp file"; exit 1; }
 
 # rm -f $temp_file
-
 docker run --rm -i -v `pwd`:/code_readonly/  \
 		-w /code_readonly/ \
 		# --cidfile=$temp_file \

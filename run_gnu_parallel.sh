@@ -15,19 +15,15 @@ fi
 algorithm_name=$1
 num_jobs=$2
 
-for folder in configuration_files/"$algorithm_name"/*
-do
-  if [ "$algorithm_name" = 'SemProp' ]
-  then
+declare -a docker_arguments
 
-    for entry in "$folder"/*
-    do
-      docker_arguments+=("$entry")
-    done
+#for file in `find -type d configuration_files/"$algorithm_name" | xargs ls `
+#do
+#  if [ "$algorithm_name" = 'SemProp' ]
+#  then
+#    docker_arguments+=("$file")
+#  fi
+#done
 
-    # parallel --dry-run --jobs "$num_jobs" ./run_semprop_docker.sh ::: "${docker_arguments[@]}"
-    parallel --jobs "$num_jobs" ./run_semprop_docker.sh ::: "${docker_arguments[@]}"
-  else
-    parallel --jobs "$num_jobs" python run_job.py -c ::: "$folder"/*
-  fi
-done
+# parallel --dry-run --jobs "$num_jobs" ./run_semprop_docker.sh ::: "${docker_arguments[@]}"
+parallel --jobs "$num_jobs" ./run_semprop_docker.sh ::: configuration_files/"$algorithm_name"/*/*

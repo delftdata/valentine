@@ -1,28 +1,49 @@
 {
-  "name": "Sem_Prop_1",
-  "dataset_name": "assays",
+  "name": "assays_both_0_1_ac1_av__SemProp{'minhash_sim_threshold': 0.1, 'semantic_sim_threshold': 0.4, 'coh_sem_sim_threshold': 0.2}",
+  "dataset_name": "assays_both_0_1_ac1_av",
   "source": {
     "type": "BaseLoader",
     "args": {
-      "data": "/code/sem_prop_data/assays.csv"
+      "data": "/code/data/assays/assays_both_0_1_ac1_av/assays_both_0_1_ac1_av_source.csv",
+      "schema": "/code/data/assays/assays_both_0_1_ac1_av/assays_both_0_1_ac1_av_source.json"
     }
   },
   "target": {
     "type": "BaseLoader",
     "args": {
-      "data": "/code/sem_prop_data/assays.csv"
+      "schema": "/code/data/assays/assays_both_0_1_ac1_av/assays_both_0_1_ac1_av_target.json",
+      "data": "/code/data/assays/assays_both_0_1_ac1_av/assays_both_0_1_ac1_av_target.csv"
     }
   },
   "algorithm": {
     "type": "SemProp",
     "args": {
+      "minhash_sim_threshold": 0.1,
+      "semantic_sim_threshold": 0.4,
+      "coh_sem_sim_threshold": 0.2
     }
   },
   "metrics": {
-    "names": ["precision", "recall", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
+    "names": [
+      "precision",
+      "recall",
+      "f1_score",
+      "precision_at_n_percent",
+      "recall_at_sizeof_ground_truth"
+    ],
     "args": {
-      "n": [10]
+      "n": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        70,
+        80,
+        90
+      ]
     }
   },
-  "golden_standard": "/code/sem_prop_gold_standard.json"
+  "golden_standard": "/code/data/assays/assays_both_0_1_ac1_av/assays_both_0_1_ac1_av_mapping.json"
 }

@@ -24,13 +24,13 @@ cd "$path" && \
 #./run-es.sh && \
 service elasticsearch start && \
 
-sleep 30 && \
+sleep 240  && \
 
 curl localhost:9200 &&\
 
 cd ddprofiler || exit && \
 echo $'\n'Build ddprofiler$'\n' && \
-./build.sh && \
+#./build.sh && \
 
 pid=$(ps -ef | grep elastic | tr -s " " | cut -d " " -f 2 | head -1) && \
 echo $'\n'Elastics Seach pid: "$pid"$'\n' && \
