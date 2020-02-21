@@ -1,6 +1,8 @@
-#!/bin/bash 
+#!/bin/bash
 
 set -x
+
+echo "$1"
 
 apt-get install -y rsync
 
@@ -15,7 +17,7 @@ DATA="$SOURCE""data"
 mkdir -p $TARGET
 rsync -av --progress $SOURCE $TARGET --exclude data --exclude output
 
-cd $TARGET 
+cd $TARGET
 
 ln -s $OUTPUT output
 ln -s $DATA data
