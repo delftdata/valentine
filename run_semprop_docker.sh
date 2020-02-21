@@ -6,13 +6,13 @@ set -x
 
 # rm -f $temp_file
 
-docker run --rm -i -v `pwd`:/code/  \
-		-w /code/ \
-		--cidfile=$temp_file \
-		--entrypoint=python  \
+docker run --rm -i -v `pwd`:/code_readonly/  \
+		-w /code_readonly/ \
+		# --cidfile=$temp_file \
+		--entrypoint=/bin/bash  \
 		--env="PYTHONPATH=/code/" \
 		asteriosk/sempropenv:3.8.5 \
-		run_job.py -c "$1"
+		-c entrypoint.sh "$1"
 
 # docker container wait `cat $temp_file`
 
