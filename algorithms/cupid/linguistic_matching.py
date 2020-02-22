@@ -57,10 +57,12 @@ def compute_compatibility(categories1, categories2):
 
     for cat1 in categories1:
         compatibility_table[cat1] = dict()
-        tokens1 = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(cat1)))
+        tokens1 = list(map(lambda t: Token().add_data(t),
+                           list(filter(lambda x: x.isalnum(), nltk.word_tokenize(cat1)))))
 
         for cat2 in categories2:
-            tokens2 = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(cat2)))
+            tokens2 = list(map(lambda t: Token().add_data(t),
+                               list(filter(lambda x: x.isalnum(), nltk.word_tokenize(cat2)))))
 
             if cat2 not in compatibility_table:
                 compatibility_table[cat2] = dict()
@@ -75,7 +77,7 @@ def compute_compatibility(categories1, categories2):
 def comparison(source_tree, target_tree, categories_source, categories_target, compatibility_table, th_ns):
     all_nodes_s = [node.name for node in LevelOrderIter(source_tree)]
     all_nodes_t = [node.name for node in LevelOrderIter(target_tree)]
-    all_nodes = product(all_nodes_s, all_nodes_t)
+    all_nodes = list(product(all_nodes_s, all_nodes_t))
 
     keys_source = categories_source.keys()
     keys_target = categories_target.keys()
@@ -86,7 +88,7 @@ def comparison(source_tree, target_tree, categories_source, categories_target, c
     for cat_s in keys_source:
         for cat_t in keys_target:
             if compatibility_table[cat_s][cat_t] > th_ns:
-                all_compatible_nodes = product(categories_source[cat_s], categories_target[cat_t])
+                all_compatible_nodes = list(product(categories_source[cat_s], categories_target[cat_t]))
                 name_sim.update({pair: name_similarity_elements(pair[0], pair[1])
                                  for pair in all_compatible_nodes if pair in all_nodes})
     for s, t in name_sim.keys():
@@ -157,7 +159,6 @@ def name_similarity_elements(element1, element2):
         t2 = element2.get_tokens_by_token_type(tt)
         if len(t1) == 0 or len(t2) == 0:
             continue
-
         sim = name_similarity_tokens(t1, t2)
         sum1 = sum1 + tt.weight * sim
         sum2 = sum2 + tt.weight  # * (len(t1) + len(t2))

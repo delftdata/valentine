@@ -62,9 +62,12 @@ class FieldNetwork:
 
     def get_info_for(self, nids):
         info = []
-        for nid in nids:
-            db_name, source_name, field_name, data_type = self.__id_names[nid]
-            info.append((nid, db_name, source_name, field_name))
+        try:
+            for nid in nids:
+                db_name, source_name, field_name, data_type = self.__id_names[nid]
+                info.append((nid, db_name, source_name, field_name))
+        except KeyError as e:
+            print(e)
         return info
 
     def get_hits_from_info(self, info):
