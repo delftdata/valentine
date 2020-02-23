@@ -6,6 +6,7 @@ import os
 
 from algorithms.base_matcher import BaseMatcher
 from algorithms.coma.coma import Coma
+from algorithms.sem_prop.sem_prop_main import SemProp
 from data_loader.golden_standard_loader import GoldenStandardLoader
 from utils.parse_config import ConfigParser
 
@@ -64,7 +65,7 @@ def main(config):
     for metric in metric_fns:
         if metric.__name__ != "precision_at_n_percent":
             if metric.__name__ in ['precision', 'recall', 'f1_score'] \
-                    and type(algorithm) != Coma:
+                    and type(algorithm) not in [Coma, SemProp]:
                 final_metrics[metric.__name__] = metric(matches, golden_standard, True)
             else:
                 final_metrics[metric.__name__] = metric(matches, golden_standard)
