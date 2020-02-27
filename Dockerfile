@@ -49,6 +49,10 @@ RUN apt-get update && apt-get install -y elasticsearch systemd
 
 RUN cd /usr/local/bin  && ln -s /usr/bin/python3.8 python
 
+RUN apt-get install -y rsync
+
+RUN echo vm.max_map_count=262144 >> /etc/sysctl.conf
+
 CMD ["python3.8"]
 
 # docker login etc in order to login on the docker hub and to be able to upload images
