@@ -2,6 +2,14 @@ from abc import ABC, abstractmethod
 
 
 class BaseMatcher(ABC):
+    """
+    An abstract class that is the base of a schema matching algorithm
+
+    Methods
+    -------
+    get_matches(source_data_loader, target_data_loader, dataset_name)
+        When implemented it should return a dictionary with matches and their similarity in descending order
+    """
 
     @abstractmethod
     def get_matches(self, source_data_loader, target_data_loader, dataset_name):
@@ -22,6 +30,6 @@ class BaseMatcher(ABC):
         Returns
         -------
         dict
-            a dictionary with matches and their similarity
+            A dictionary with matches and their similarity
         """
         raise NotImplementedError

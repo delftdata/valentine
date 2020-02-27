@@ -43,7 +43,12 @@ def one_to_one_matches(matches: dict):
         matched[key[0]] = False
         matched[key[1]] = False
 
-    median = list(matches.values())[math.ceil(len(matches)/2)]
+    set_match_values = set(matches.values())
+
+    if len(set_match_values) < 2:
+        return matches
+
+    median = list(set_match_values)[math.ceil(len(set_match_values)/2)]
 
     matches1to1 = dict()
 

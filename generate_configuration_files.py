@@ -3,7 +3,7 @@ import json
 import shutil
 from itertools import product
 
-from algorithms.clustering_scale.scale_utils import create_cache_dirs, generate_global_ranks
+from algorithms.distribution_based.clustering_utils import create_cache_dirs, generate_global_ranks
 from data_loader.instance_loader import InstanceLoader
 from utils.utils import get_project_root, create_folder
 

@@ -6,12 +6,12 @@ import pulp as plp
 from tqdm import tqdm
 from multiprocessing import Pool
 
-from algorithms.clustering_scale.scale_utils import transform_dict, process_emd, column_combinations, \
+from algorithms.distribution_based.clustering_utils import transform_dict, process_emd, column_combinations, \
     parallel_cutoff_threshold, cuttoff_column_generator, compute_cutoff_threshold, calc_chunksize
 
 
 def compute_distribution_clusters(columns: list, dataset_name: str, threshold: float, pool: Pool,
-                                  chunk_size: int = None, quantiles: int = 256, ):
+                                  chunk_size: int = None, quantiles: int = 256):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
     algorithm captures which columns contain data with similar distributions based on the EMD distance metric.
@@ -19,20 +19,22 @@ def compute_distribution_clusters(columns: list, dataset_name: str, threshold: f
     Parameters
     ---------
     columns : list(str)
-        the columns of the database
+        The columns of the database
+    dataset_name : str
+        Other name of the dataset
     threshold : float
-        the conservative global EMD cutoff threshold described in [1]
+        The conservative global EMD cutoff threshold described in [1]
     pool: multiprocessing.Pool
-        the process pool that will be used in the pre-processing of the table's columns
+        The process pool that will be used in the pre-processing of the table's columns
     chunk_size : int, optional
-        the number of chunks of each job process (default let the framework decide)
+        The number of chunks of each job process (default let the framework decide)
     quantiles : int, optional
-        ehe number of quantiles that the histograms are split on (default is 256)
+        The number of quantiles that the histograms are split on (default is 256)
 
     Returns
     -------
     list(list(str))
-        a list that contains the distribution clusters that contain the column names in the cluster
+        A list that contains the distribution clusters that contain the column names in the cluster
     """
     combinations = list(column_combinations(columns, dataset_name, quantiles, intersection=False))
 
@@ -63,20 +65,22 @@ def compute_attributes(DC: list, dataset_name: str, threshold: float, pool: Pool
     Parameters
     ---------
     DC : list(str)
-        the distribution clusters computed in algorithm 2
+        The distribution clusters computed in algorithm 2
+    dataset_name : str
+        Other name of the dataset
     threshold : float
-        the conservative global EMD cutoff threshold described in [1]
+        The conservative global EMD cutoff threshold described in [1]
     pool: multiprocessing.Pool
-        the process pool that will be used in the pre-processing of the table's columns
+        The process pool that will be used in the pre-processing of the table's columns
     chunk_size : int, optional
-        the number of chunks of each job process (default let the framework decide)
+        The number of chunks of each job process (default let the framework decide)
     quantiles : int, optional
-        ehe number of quantiles that the histograms are split on (default is 256)
+        The number of quantiles that the histograms are split on (default is 256)
 
     Returns
     -------
     dict
-        a dictionary that contains the attribute graph of the distribution clusters
+        A dictionary that contains the attribute graph of the distribution clusters
     """
 
     combinations = list(column_combinations(DC, dataset_name, quantiles, intersection=True))
@@ -113,24 +117,31 @@ def compute_attributes(DC: list, dataset_name: str, threshold: float, pool: Pool
     return GA
 
 
-def correlation_clustering_pulp(vertexes, edges):
+def correlation_clustering_pulp(vertexes: list, edges: dict):
+    """
+    The LP solver used to perform the correlation clustering
 
+    Parameters
+    ----------
+    vertexes : list
+        The vertices of the graph
+    edges : dict
+        The edges of the graph
+
+    Returns
+    -------
+    dict
+        The clusters
+    """
     opt_model = plp.LpProblem(name="MIP_Model", sense=plp.LpMinimize)
 
     set_u = vertexes
     set_v = vertexes
-    # set_w = vertexes
 
     x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="({0},{1})"
                                      .format(str(i).replace(" ", "__WHITESPACE__").replace("-", "__DASH__"),
                                              str(j).replace(" ", "__WHITESPACE__").replace("-", "__DASH__")))
               for i in set_u for j in set_v}
-
-    # constraints = {(i, j, k): plp.LpConstraint(e=x_vars[i, k],
-    #                                            sense=plp.LpConstraintLE,
-    #                                            rhs=x_vars[i, j] + x_vars[j, k],
-    #                                            name="constraint_{0}_{1}_{2}".format(i, j, k))
-    #                for i in set_u for j in set_v for k in set_w}
 
     sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
     sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
@@ -147,7 +158,22 @@ def correlation_clustering_pulp(vertexes, edges):
     return result
 
 
-def process_correlation_clustering_result(results, columns):
+def process_correlation_clustering_result(results: list, columns: list):
+    """
+    Function that takes the output of the correlation clustering and returns the connected components
+
+    Parameters
+    ----------
+    results : list(dict)
+        The clusters
+    columns : list
+        The columns of the database
+
+    Returns
+    -------
+    list
+        The connected components "matches"
+    """
     clusters = []
     for cluster in results:
         clusters.extend([k for (k, v) in cluster.items() if v == 0])
@@ -160,7 +186,22 @@ def process_correlation_clustering_result(results, columns):
     return connected_components
 
 
-def create_graph(nodes, edges_per_column):
+def create_graph(nodes: list, edges_per_column: list):
+    """
+    Simple function that creates a graph give the vertices and their corresponding edges
+
+    Parameters
+    ----------
+    nodes : list
+        The nodes of the graph (columns in our case)
+    edges_per_column : list
+        The edges of the graph (which columns connect with which)
+
+    Returns
+    -------
+    nx.Graph
+        The graph
+    """
     graph = nx.Graph()
     for node in nodes:
         graph.add_node(node)

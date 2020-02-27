@@ -5,9 +5,9 @@ import shutil
 import subprocess
 from functools import lru_cache
 
-from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
-from algorithms.clustering_scale.emd_utils import quantile_emd, intersection_emd
-from algorithms.clustering_scale.quantile_histogram.histogram import QuantileHistogram
+from algorithms.distribution_based.column_model import CorrelationClusteringColumn
+from algorithms.distribution_based.emd_utils import quantile_emd, intersection_emd
+from algorithms.distribution_based.quantile_histogram import QuantileHistogram
 from utils.utils import convert_data_type, create_folder
 
 
@@ -20,14 +20,14 @@ def compute_cutoff_threshold(C: list, threshold: float):
     Parameters
     ---------
     C : list
-        a list containing dicts of EMD/ColumnName pairs
+        A list containing dicts of EMD/ColumnName pairs
     threshold : float
-        the conservative global EMD cutoff threshold described in [1]
+        The conservative global EMD cutoff threshold described in [1]
 
     Returns
     -------
     float
-        the cutoff threshold of the input column
+        The cutoff threshold of the input column
     """
     C.append({'e': threshold, 'c': 0})
     C = sorted(C, key=lambda k: k['e'])
@@ -49,16 +49,18 @@ def column_combinations(columns: list, dataset_name: str, quantiles: int, inters
     Parameters
     ---------
     columns : list
-        a list that contains all the column names
+        A list that contains all the column names
+    dataset_name : str
+        Other name of the dataset
     quantiles : int
         The number of quantiles that the histograms are split on
     intersection : bool, optional
-        if true do the intersection EMD else the normal EMD
+        If true do the intersection EMD else the normal EMD
 
     Returns
     -------
     tuple
-        a tuple with ((column_name1, column_name1), quantiles, intersection)
+        A tuple with ((column_name1, column_name1), quantiles, intersection)
     """
     c = len(columns)
     c_i = 0
@@ -82,7 +84,7 @@ def process_emd(tup: tuple):
     Parameters
     ---------
     tup : tuple
-        a tuple with k
+        A tuple with ((column_name1, column_name1), quantiles, intersection)
 
     Returns
     -------
@@ -102,6 +104,20 @@ def process_emd(tup: tuple):
 
 @lru_cache
 def read_from_cache(file_name: str, dataset_name: str):
+    """
+    Function that reads from a pickle file lru cache a column after pre-processing
+
+    Parameters
+    ----------
+    file_name: str
+        The file name that contains the
+    dataset_name : str
+        The name of the dataset
+    Returns
+    -------
+    CorrelationClusteringColumn
+        The preprocessed column
+    """
     file_path = 'cache/' + dataset_name + '_' + str(file_name) + '.pkl'
     if os.path.getsize(file_path) > 0:
         with open(file_path, 'rb') as pkl_file:
@@ -218,7 +234,17 @@ def cuttoff_column_generator(A: dict, columns: list, dataset_name:str, threshold
         yield A, column, threshold
 
 
-def generate_global_ranks(data, file_name):
+def generate_global_ranks(data: list, file_name: str):
+    """
+    Function that creates a pickle file with the global ranks of all the values inside the database.
+
+    Parameters
+    ----------
+    data : list
+        All the values from every column
+    file_name
+        The name of the file to sore these "global" ranks
+    """
     if not os.path.isfile('cache/global_ranks/' + file_name + '.pkl'):
         print("Generating ranks for ", file_name)
         ranks = unix_sort_ranks(set(data), file_name)
@@ -226,7 +252,23 @@ def generate_global_ranks(data, file_name):
             pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
 
-def unix_sort_ranks(corpus, file_name):
+def unix_sort_ranks(corpus: set, file_name: str):
+    """
+    Function that takes a corpus sorts it with the unix sort -n command and generates the global ranks
+    for each value in the corpus.
+
+    Parameters
+    ----------
+    corpus: set
+        The corpus (all the unique values from every column)
+    file_name : str
+        The name of the file to sore these "global" ranks
+
+    Returns
+    -------
+    dict
+        The ranks in the form of k: value, v: the rank of the value
+    """
     create_folder("./cache/sorts/" + file_name)
     with open("./cache/sorts/" + file_name + "/unsorted_file.txt", 'w') as out:
         for var in corpus:
@@ -267,6 +309,7 @@ def calc_chunksize(n_workers: int, len_iterable: int, factor: int = 4):
 
 
 def create_cache_dirs():
+    """ Create the directories needed for the correlation clustering algorithm"""
     if not os.path.exists('cache'):
         os.makedirs('cache')
     if not os.path.exists('cache/global_ranks'):

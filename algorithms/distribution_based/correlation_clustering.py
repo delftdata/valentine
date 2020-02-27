@@ -5,9 +5,9 @@ from itertools import combinations
 from algorithms.base_matcher import BaseMatcher
 from data_loader.instance_loader import InstanceLoader
 
-import algorithms.clustering_scale.discovery_scale as discovery
-from algorithms.clustering_scale.scale_utils import process_columns, ingestion_column_generator, create_cache_dirs, \
-    generate_global_ranks, process_emd
+import algorithms.distribution_based.discovery as discovery
+from algorithms.distribution_based.clustering_utils import process_columns, ingestion_column_generator, \
+    create_cache_dirs, generate_global_ranks, process_emd
 from utils.utils import get_project_root
 
 
@@ -18,16 +18,31 @@ class CorrelationClustering(BaseMatcher):
 
     Attributes
     ----------
+    threshold1: float
+        The threshold for phase 1
+    threshold2: float
+        The threshold for phase 2
     quantiles: int
         the number of quantiles of the histograms
+    process_num: int
+        The number of processes to spawn
+    chunk_size: int, optional
+        The size of each chunk to process
+    clear_cache: bool, optional
+        Clear cached files or not
+    column_names: list
+        List containing all the column names
+    dataset_name: str
+        The name of the dataset
 
     Methods
     -------
-    add_data(data, source_name, pool)
-        Returns the quantile histogram of the column
+    find_matches(pool, chunk_size)
+         A dictionary with matches and their similarity
 
-    find_matches(pool)
-        Returns the column name
+    rank_output(attribute_clusters)
+        Take the attribute clusters that the algorithm produces and give a ranked list of matches based on the the EMD
+        between each pair inside an attribute cluster
 
     """
 
@@ -36,8 +51,18 @@ class CorrelationClustering(BaseMatcher):
         """
         Parameters
         ----------
-        quantiles : int
-            The number of quantiles of the column's quantile histogram
+        threshold1: float
+            The threshold for phase 1
+        threshold2: float
+            The threshold for phase 2
+        quantiles: int
+            the number of quantiles of the histograms
+        process_num: int
+            The number of processes to spawn
+        chunk_size: int, optional
+            The size of each chunk to process
+        clear_cache: bool, optional
+            Clear cached files or not
         """
         self.quantiles = quantiles
         self.threshold1 = threshold1
@@ -50,7 +75,25 @@ class CorrelationClustering(BaseMatcher):
         create_cache_dirs()
 
     def get_matches(self, source: InstanceLoader, target: InstanceLoader, dataset_name: str):
+        """
+        Overridden function of the BaseMatcher tha gets the source, the target data loaders and the dataset name.
+        Next it gives as an output a ranked list of column pair matches.
 
+
+        Parameters
+        ----------
+        source: InstanceLoader
+            The source dataset
+        target: InstanceLoader
+            The target dataset
+        dataset_name: str
+            The name of the dataset
+
+        Returns
+        -------
+        dict
+            A dictionary with matches and their similarity
+        """
         self.dataset_name = dataset_name
 
         if self.clear_cache:
@@ -85,7 +128,8 @@ class CorrelationClustering(BaseMatcher):
         print("Computing distribution clusters ...")
 
         connected_components = discovery.compute_distribution_clusters(self.column_names, self.dataset_name,
-                                                                       self.threshold1, pool, chunk_size, self.quantiles)
+                                                                       self.threshold1, pool, chunk_size,
+                                                                       self.quantiles)
 
         # self.write_clusters_to_json(connected_components, 'Distribution_Clusters.json')
 
@@ -135,6 +179,20 @@ class CorrelationClustering(BaseMatcher):
             json.dump(d, fp, indent=2)
 
     def rank_output(self, attribute_clusters: list):
+        """
+        Take the attribute clusters that the algorithm produces and give a ranked list of matches based on the the EMD
+        between each pair inside an attribute cluster . The ranked list will look like:
+        ((table_name1, column_name1), (table_name2, column_name2)): similarity
+
+        Parameters
+        ----------
+        attribute_clusters: list
+            The attribute clusters
+        Returns
+        -------
+        dict
+            A ranked list that will look like: ((table_name1, column_name1), (table_name2, column_name2)): similarity
+        """
         emd_per_match = dict()
         for cluster in attribute_clusters:
             if len(cluster) > 1:

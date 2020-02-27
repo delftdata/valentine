@@ -1,7 +1,7 @@
 import math
 from pyemd import emd
-from algorithms.clustering_scale.column_model_scale import CorrelationClusteringColumn
-from algorithms.clustering_scale.quantile_histogram.histogram import QuantileHistogram
+from algorithms.distribution_based.column_model import CorrelationClusteringColumn
+from algorithms.distribution_based.quantile_histogram import QuantileHistogram
 
 
 def quantile_emd(column1: CorrelationClusteringColumn, column2: CorrelationClusteringColumn, quantiles: int = 256):
