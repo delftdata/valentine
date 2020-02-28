@@ -6,6 +6,8 @@ Data generator: [valentine-generator](https://github.com/delftdata/valentine-gen
 
 Paper results and visualizations: [valentine-paper-results](https://github.com/delftdata/valentine-paper-results)
 
+The datasets used for experiments in Valentine can be found in the [datasets-archive](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku).
+
 ## Project structure
 
 * [`algorithms`](https://github.com/delftdata/valentine-suite/tree/master/algorithms) Module containing all the implemented algorithms in the suite.
