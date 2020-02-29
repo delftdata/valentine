@@ -1,5 +1,6 @@
 import subprocess
 import os
+from os import path
 
 from algorithms.base_matcher import BaseMatcher
 from data_loader.base_loader import BaseLoader
@@ -14,8 +15,17 @@ class Coma(BaseMatcher):
 
     def get_matches(self, source_data_loader: BaseLoader, target_data_loader: BaseLoader, dataset_name: str):
 
-        coma_output_path = get_project_root() + "/algorithms/coma/coma_output/"+ dataset_name + str(self.max_n) \
+        coma_output_path = get_project_root() + "/algorithms/coma/coma_output/" + dataset_name + str(self.max_n) \
                            + self.strategy + ".txt"
+
+        previous_wd = os.getcwd()
+
+        os.chdir(get_project_root() + "/algorithms/coma")
+
+        if not path.exists("artifact/coma.jar"):
+            subprocess.call(["./build_coma.sh"])
+
+        os.chdir(previous_wd)
 
         self.run_coma_jar(source_data_loader, target_data_loader, coma_output_path)
 
