@@ -1,7 +1,7 @@
 from algorithms.similarity_flooding.graph.graph import Graph
 from algorithms.similarity_flooding.graph.node_pair import NodePair
 from algorithms.similarity_flooding.graph.propagation_graph import PropagationGraph
-import Levenshtein as lv
+import Levenshtein as Lv
 import math
 
 from algorithms.base_matcher import BaseMatcher
@@ -9,6 +9,9 @@ from data_loader.schema_loader import SchemaLoader
 
 
 class SimilarityFlooding(BaseMatcher):
+    """
+    Class containing the methods for implementing the Similarity Flooding matcher.
+    """
 
     def __init__(self, coeff_policy, formula):
         self.coeff_policy = coeff_policy
@@ -31,7 +34,6 @@ class SimilarityFlooding(BaseMatcher):
         return self.format_output(filtered_matches)
 
     def calculate_initial_mapping(self):
-        
         self.initial_map = {}
 
         for n1 in self.graph1.nodes():
@@ -39,15 +41,13 @@ class SimilarityFlooding(BaseMatcher):
                 if n1.name[0:6] == "NodeID" or n2.name[0:6] == "NodeID":
                     self.initial_map[NodePair(n1, n2)] = 0.0
                 else:
-                    similarity = lv.ratio(n1.name, n2.name)
+                    similarity = Lv.ratio(n1.name, n2.name)
                     self.initial_map[NodePair(n1, n2)] = similarity
 
     def fixpoint_computation(self, num_iter, residual_diff):
-
         """
-
         :param num_iter: maximum number of iterations
-        :param error: error bound for stopping the iterative process
+        :param residual_diff: error bound for stopping the iterative process
         :return: a dictionary with all similarities of all map pairs
         """
 
@@ -233,7 +233,6 @@ class SimilarityFlooding(BaseMatcher):
         return previous_map  # the dictionary storing the final similarities of map pairs
 
     def filter_map(self, prevmap):
-
         """
         Function that filters the matching results, so that only pairs of columns remain
         :param prevmap: the matching results of the iterative algorithm
@@ -243,25 +242,18 @@ class SimilarityFlooding(BaseMatcher):
         filtered_map = prevmap.copy()
 
         for key in prevmap.keys():
-
             flag = False
             if key.node1.name[0:6] == 'NodeID':
-
                 if key.node1 in self.graph1.nodes():
-
                     for e in self.graph1.out_edges(key.node1):
-
                         if e[1].name == 'Column':
                             flag = True
-
                             break
                 else:
 
                     for e in self.graph2.out_edges(key.node1):
-
                         if e[1].name == 'Column':
                             flag = True
-
                             break
             else:
 
@@ -343,24 +335,19 @@ class SimilarityFlooding(BaseMatcher):
             print(name1 + "-" + name2 + ":" + str(sortedmaps[key]))
 
     def filterNto1matches(self, matches):
-
         matchesNto1 = dict()
         nodes_left = set()
 
         for np in matches.keys():
-
             nodes_left.add(np.node1)
 
+        maxnode = None
+
         for nd in nodes_left:
-
             maxsim = 0
-
             for np in matches.keys():
-
                 if nd == np.node1:
-
                     if matches[np] > maxsim:
-
                         maxsim = matches[np]
                         maxnode = np
 

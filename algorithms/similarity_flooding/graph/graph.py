@@ -5,7 +5,9 @@ from data_loader.schema_loader import SchemaLoader
 
 
 class Graph:
-
+    """
+    Class for describing a graph.
+    """
     def __init__(self, schema_loader: SchemaLoader):
         self.graph = nx.DiGraph()
         self.schema = schema_loader.schema

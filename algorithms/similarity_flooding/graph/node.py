@@ -1,6 +1,6 @@
 class Node:
     """
-        Class for describing a node of a graph.
+    Class for describing a node of a graph.
     """
 
     def __init__(self, name, db):

@@ -17,6 +17,22 @@ from utils.utils import get_project_root, create_folder
 
 
 def write_output(name: str, algorithm_name: str, matches: dict, metrics: dict, run_times: dict):
+    """
+    Function that writes the output of a schema matching job
+
+    Parameters
+    ----------
+    name : str
+        The experiment unique name
+    algorithm_name : str
+        The name of the algorithm
+    matches : dict
+        Dictionary containing the ranked list of matches based on their similarity sorted in descending order
+    metrics : dict
+        Dictionary containing the metrics calculated in the schema matching job
+    run_times : dict
+        Dictionary containing the metrics measured in the schema matching job
+    """
     create_folder(get_project_root() + "/output")
     create_folder(get_project_root() + "/output/" + algorithm_name)
     with open(get_project_root() + "/output/" + algorithm_name + "/" + name + ".json", 'w') as fp:
@@ -27,10 +43,12 @@ def write_output(name: str, algorithm_name: str, matches: dict, metrics: dict, r
 
 def main(config):
     """
-        Args:
-            config (ConfigParser): A class containing all of the job's configuration parameters look into
-            parse_config.py for more information.
-        Returns: Creates a schema matching job and runs it
+    Creates a schema matching job and runs it
+
+    Parameters
+    ---------
+    config : ConfigParser
+        A class containing all of the job's configuration parameters look into parse_config.py for more information.
     """
     sys.path.append(os.getcwd())
 
@@ -65,7 +83,7 @@ def main(config):
     for metric in metric_fns:
         if metric.__name__ != "precision_at_n_percent":
             if metric.__name__ in ['precision', 'recall', 'f1_score'] \
-                    and type(algorithm) not in [Coma, SemProp]:
+                    and type(algorithm) not in [Coma, SemProp]:  # Do not use the 1-1 match filter on Coma and SemProp
                 final_metrics[metric.__name__] = metric(matches, golden_standard, True)
             else:
                 final_metrics[metric.__name__] = metric(matches, golden_standard)

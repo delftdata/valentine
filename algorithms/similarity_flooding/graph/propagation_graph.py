@@ -6,7 +6,7 @@ from algorithms.similarity_flooding.graph.node_pair import NodePair
 class PropagationGraph:
 
     """
-        Class for constructing a Propagation Graph from two input graphs.
+    Class for constructing a Propagation Graph from two input graphs.
     """
 
     def __init__(self, graph1, graph2, policy):

@@ -89,13 +89,15 @@ def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"]
                                   + '/' + cfd_key)
-                    file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + '/' \
-                                + cfd_key + '/' + cfa_key + ".json"
+                    file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + \
+                                                        '/' + cfd_key + '/' + cfa_key + ".json"
                     with open(file_name, 'w') as fp:
                         configuration = {"name": name,
                                          "dataset_name": cfd_key,
-                                         "source": {"type": cfa_value["data_loader"], "args": cfd_value["source"]["args"]},
-                                         "target": {"type": cfa_value["data_loader"], "args": cfd_value["target"]["args"]},
+                                         "source": {"type": cfa_value["data_loader"],
+                                                    "args": cfd_value["source"]["args"]},
+                                         "target": {"type": cfa_value["data_loader"],
+                                                    "args": cfd_value["target"]["args"]},
                                          "algorithm": cfa_value["algorithm"],
                                          "metrics": metrics,
                                          "golden_standard": cfd_value["golden_standard"]}

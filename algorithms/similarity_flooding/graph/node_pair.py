@@ -1,6 +1,6 @@
 class NodePair:
     """
-        Class for describing a map pair in the propagation graph
+    Class for describing a map pair in the propagation graph
     """
 
     def __init__(self, node1, node2):
