@@ -16,6 +16,8 @@ mvn -Dmaven.test.skip=true clean package && \
 
 # MOVE THE CREATED JAR TO THE CORRECT FOLDER
 cd .. && \
+mkdir artifact && \
+mkdir coma_output && \
 mv coma-project/coma-engine/target/coma-engine-0.1-CE-SNAPSHOT-jar-with-dependencies.jar artifact/coma.jar && \
 
 # CLEANUP
