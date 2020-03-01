@@ -7,7 +7,8 @@ set -x
 svn checkout http://svn.code.sf.net/p/coma-ce/mysvn/coma-project && \
 
 # PATCH COMA TO BE COMPATIBLE WITH THE VALENTINE BENCHMARK
-patch -ruN -p1 -d coma-project < valentine.patch && \
+find . -type f -exec dos2unix {} \; && \
+patch -ruN -p1 -d  coma-project < valentine.patch && \
 
 # BUILD THE PATCHED COMA
 cd coma-project && \

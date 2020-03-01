@@ -4,7 +4,7 @@
 
 sudo apt update && \
 
-sudo apt install build-essential parallel maven subversion docker.io -y && \
+sudo apt install build-essential parallel maven subversion docker.io dos2unix -y && \
 
 sudo systemctl start docker && \
 sudo systemctl enable docker && \
@@ -22,4 +22,7 @@ python -m nltk.downloader stopwords && \
 python -m nltk.downloader punkt  && \
 python -m nltk.downloader wordnet && \
 
-algorithms/coma/build_coma.sh
+sudo apt install openjdk-8-jdk -y && \
+
+cd algorithms/coma && \
+./build_coma.sh
