@@ -4,7 +4,10 @@
 
 sudo apt update && \
 
-sudo apt install openjdk-8-jdk gcc g++ make parallel maven subversion docker.io dos2unix -y && \
+sudo apt install openjdk-8-jdk gcc g++ make parallel maven subversion patch docker.io dos2unix -y && \
+
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64/ && \
+export PATH=$PATH:${JAVA_HOME} && \
 
 sudo systemctl start docker && \
 sudo systemctl enable docker && \
