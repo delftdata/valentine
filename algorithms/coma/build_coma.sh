@@ -4,10 +4,9 @@
 set -x
 
 # DOWNLOAD COMA SOURCES
-svn checkout http://svn.code.sf.net/p/coma-ce/mysvn && \
+svn checkout http://svn.code.sf.net/p/coma-ce/mysvn/coma-project && \
 
 # PATCH COMA TO BE COMPATIBLE WITH THE VALENTINE BENCHMARK
-cp -a mysvn/coma-project . && \
 patch -ruN -p1 -d coma-project < valentine.patch && \
 
 # BUILD THE PATCHED COMA
@@ -21,5 +20,4 @@ mkdir coma_output && \
 mv coma-project/coma-engine/target/coma-engine-0.1-CE-SNAPSHOT-jar-with-dependencies.jar artifact/coma.jar && \
 
 # CLEANUP
-rm -rf mysvn && \
 rm -rf coma-project
