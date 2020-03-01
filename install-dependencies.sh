@@ -4,7 +4,7 @@
 
 sudo apt update && \
 
-sudo apt install openjdk-8-jdk build-essential parallel maven subversion docker.io dos2unix -y && \
+sudo apt install openjdk-8-jdk gcc g++ make parallel maven subversion docker.io dos2unix -y && \
 
 sudo systemctl start docker && \
 sudo systemctl enable docker && \

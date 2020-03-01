@@ -12,7 +12,8 @@ patch -ruN -p1 -d  coma-project < valentine.patch && \
 
 # BUILD THE PATCHED COMA
 cd coma-project && \
-mvn -Dmaven.test.skip=true clean package && \
+mvn clean && \
+mvn -Dmaven.test.skip=true package && \
 
 # MOVE THE CREATED JAR TO THE CORRECT FOLDER
 cd .. && \
