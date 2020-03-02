@@ -12,7 +12,9 @@ The datasets used for experiments in Valentine can be found in the [datasets-arc
 The following instructions have been tested on a newly created Ubuntu 18.04 LTS VM.
 
 1. Clone the repo to your machine using git `git clone https://github.com/delftdata/valentine-suite`
-2. To install all the dependencies required by the suite, run the `install-dependencies.sh` script. `NOTE: This script installs programs and hence requires sudo rights in some parts` 
+2. To install all the dependencies required by the suite, run the [`install-dependencies.sh`](https://github.com/delftdata/valentine-suite/blob/master/install-dependencies.sh) script. 
+
+> NOTE: This script installs programs and hence requires `sudo` rights in some parts
 
 After these two steps, the framework should not require anything more regarding dependencies.
 
@@ -23,8 +25,12 @@ After these two steps, the framework should not require anything more regarding 
 
 3. Activate the conda environment created in the installation phase with the following command `conda activate valentine-suite` and run the [generate_configuration_files.py](https://github.com/delftdata/valentine-suite/blob/master/generate_configuration_files.py) script with the command `python generate_configuration_files.py`. This will create all the configuration files that specify a schema matching job (Run a specific method with specific parameters on a specific dataset). 
 
+> NOTE: if your systsem does not find conda you might need to run `source ~/.bashrc`
+
 4. To run the schema matching jobs in parallel run the script [run_experiments.sh](https://github.com/delftdata/valentine-suite/blob/master/run_experiments.sh) with the command `./run_experiments.sh {method_name} {number_of_parallel_jobs}` e.g. to run 40 Cupid jobs concurently run `./run_experiments.sh Cupid 40` (This would require a 40 CPU VM to run smoothly). The output will be written in the output folder in the project root level.
 
+## Integrate new methods
+Since Valentine is an experiment suit, it is designed to be extendable with the addition of more schema matching methods. To extend Valentine with such methods please visit the following wiki [guide](https://github.com/delftdata/valentine-suite/wiki/Integrate-new-methods-guide) on how to do so. 
 
 ## Project structure
 
