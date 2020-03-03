@@ -36,16 +36,14 @@ class Coma(BaseMatcher):
         return self.process_coma_output(raw_output, source_data_loader.data_path, target_data_loader.data_path)
 
     def run_coma_jar(self, source_data_loader, target_data_loader, coma_output_path):
-        jar_path = get_project_root() + "/algorithms/coma/artifact/coma.jar"
-
-        run_jar_command = "java -Xmx16384m -cp " + jar_path + " -DinputFile1=" + source_data_loader.data_path \
-                          + " -DinputFile2=" + target_data_loader.data_path + \
-                          " -DoutputFile=" + coma_output_path + " -DmaxN=" \
-                          + str(self.max_n) + " -Dstrategy=" + self.strategy + " Main"
-
-        proc = subprocess.Popen(run_jar_command, shell=True)
-        proc.communicate()
-        proc.wait()
+        subprocess.call(['java', '-Xmx16384m',
+                         '-cp', get_project_root() + "/algorithms/coma/artifact/coma.jar",
+                         '-DinputFile1=' + source_data_loader.data_path,
+                         '-DinputFile2=' + target_data_loader.data_path,
+                         '-DoutputFile=' + coma_output_path,
+                         '-DmaxN=' + str(self.max_n),
+                         '-Dstrategy=' + self.strategy,
+                         'Main'])
 
     @staticmethod
     def read_coma_output(coma_output_path):
