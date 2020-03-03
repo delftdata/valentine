@@ -1,6 +1,5 @@
 import pickle
 import os
-import time
 import shutil
 import subprocess
 from functools import lru_cache
@@ -274,12 +273,8 @@ def unix_sort_ranks(corpus: set, file_name: str):
         for var in corpus:
             print(str(var), file=out)
 
-    proc = subprocess.Popen(['sort -n cache/sorts/' + file_name + '/unsorted_file.txt > cache/sorts/' + file_name +
-                             '/sorted_file.txt'],
-                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    time.sleep(1)
-    proc.terminate()
-    proc.communicate()
+    with open('cache/sorts/' + file_name + '/sorted_file.txt', 'w') as f:
+        subprocess.call(['sort', '-n', 'cache/sorts/' + file_name + '/unsorted_file.txt'], stdout=f)
 
     rank = 1
     ranks = []
