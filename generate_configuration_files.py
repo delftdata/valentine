@@ -1,11 +1,12 @@
 import os
 import json
 import shutil
+import re
 from itertools import product
 
 from algorithms.distribution_based.clustering_utils import create_cache_dirs, generate_global_ranks
 from data_loader.instance_loader import InstanceLoader
-from utils.utils import get_project_root, create_folder
+from utils.utils import get_project_root, create_folder, get_relative_path
 
 algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma", "SemProp"]
 
@@ -23,16 +24,16 @@ def get_file_paths(path: str):
             for file in files:
                 if file.endswith("json"):
                     if file.split(".")[0].endswith("mapping"):
-                        configuration_dictionary["golden_standard"] = root + '/' + file
+                        configuration_dictionary["golden_standard"] = get_relative_path(root + '/' + file)
                     elif file.split(".")[0].endswith("source"):
-                        configuration_dictionary["source"]["args"]["schema"] = root + '/' + file
+                        configuration_dictionary["source"]["args"]["schema"] = get_relative_path(root + '/' + file)
                     elif file.split(".")[0].endswith("target"):
-                        configuration_dictionary["target"]["args"]["schema"] = root + '/' + file
+                        configuration_dictionary["target"]["args"]["schema"] = get_relative_path(root + '/' + file)
                 elif file.endswith("csv"):
                     if file.split(".")[0].endswith("source"):
-                        configuration_dictionary["source"]["args"]["data"] = root + '/' + file
+                        configuration_dictionary["source"]["args"]["data"] = get_relative_path(root + '/' + file)
                     elif file.split(".")[0].endswith("target"):
-                        configuration_dictionary["target"]["args"]["data"] = root + '/' + file
+                        configuration_dictionary["target"]["args"]["data"] = get_relative_path(root + '/' + file)
             configuration_dictionaries[root.split('/')[-1]] = configuration_dictionary
     return configuration_dictionaries
 
@@ -89,6 +90,7 @@ def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"]
                                   + '/' + cfd_key)
+                    cfa_key = re.sub('\\W+', '_', cfa_key)
                     file_name = str(get_project_root())+"/configuration_files/" + cfa_value["algorithm"]["type"] + \
                                                         '/' + cfd_key + '/' + cfa_key + ".json"
                     with open(file_name, 'w') as fp:

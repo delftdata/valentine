@@ -54,6 +54,11 @@ def get_project_root():
     return str(Path(__file__).parent.parent)
 
 
+def get_relative_path(path: str):
+    """ Return the relative path of a file from the project root """
+    return os.path.relpath(path, get_project_root())
+
+
 def create_folder(path: str):
     """ Create a folder on the given path """
     if not os.path.exists(path):

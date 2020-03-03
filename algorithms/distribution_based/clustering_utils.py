@@ -1,5 +1,6 @@
 import pickle
 import os
+import re
 import shutil
 import subprocess
 from functools import lru_cache
@@ -117,7 +118,8 @@ def read_from_cache(file_name: str, dataset_name: str):
     CorrelationClusteringColumn
         The preprocessed column
     """
-    file_path = 'cache/' + dataset_name + '_' + str(file_name) + '.pkl'
+
+    file_path = 'cache/' + dataset_name + '_' + re.sub('\\W+', '_', str(file_name)) + '.pkl'
     if os.path.getsize(file_path) > 0:
         with open(file_path, 'rb') as pkl_file:
             data = pickle.load(pkl_file)
@@ -191,7 +193,7 @@ def process_columns(tup: tuple):
     column = CorrelationClusteringColumn(column_name, data, source_name, dataset_name, quantiles)
     if column.size > 0:
         column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
-    pickle_path = 'cache/' + dataset_name + '_' + str(column.long_name) + '.pkl'
+    pickle_path = 'cache/' + dataset_name + '_' + re.sub('\\W+', '_', str(column.long_name)) + '.pkl'
     if not os.path.isfile(pickle_path):
         with open(pickle_path, 'wb') as output:
             pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
@@ -226,7 +228,7 @@ def cuttoff_column_generator(A: dict, columns: list, dataset_name:str, threshold
     Generator of columns for the cutoff threshold computation
     """
     for column_name in columns:
-        file_path = 'cache/' + dataset_name + '_' + str(column_name) + '.pkl'
+        file_path = 'cache/' + dataset_name + '_' + re.sub('\\W+', '_', str(column_name)) + '.pkl'
         if os.path.getsize(file_path) > 0:
             with open(file_path, 'rb') as pkl_file:
                 column = pickle.load(pkl_file)
