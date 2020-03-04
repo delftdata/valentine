@@ -3,6 +3,7 @@ import json
 import timeit
 import sys
 import os
+import re
 
 from algorithms.base_matcher import BaseMatcher
 from algorithms.coma.coma import Coma
@@ -35,7 +36,8 @@ def write_output(name: str, algorithm_name: str, matches: dict, metrics: dict, r
     """
     create_folder(get_project_root() + "/output")
     create_folder(get_project_root() + "/output/" + algorithm_name)
-    with open(get_project_root() + "/output/" + algorithm_name + "/" + name + ".json", 'w') as fp:
+    with open(get_project_root() + "/output/" + algorithm_name + "/" +
+              re.sub('\\W+', '_', str(name)) + ".json", 'w') as fp:
         matches = {str(k): v for k, v in matches.items()}
         output = {"name": name, "matches": matches, "metrics": metrics, "run_times": run_times}
         json.dump(output, fp, indent=2)
