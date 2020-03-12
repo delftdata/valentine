@@ -9,7 +9,7 @@ Paper results and visualizations: [valentine-paper-results](https://github.com/d
 The datasets used for experiments in Valentine can be found in the [datasets-archive](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku).
 
 ## Installation instructions
-The following instructions have been tested on a newly created Ubuntu 18.04 LTS VM.
+The following instructions have been tested on a newly created Ubuntu 18.04 LTS VM. If you prefer to run the entire suite on docker skip this and the [Run experiments](#run-experiments) sections and go directly to the [Run with docker](#run-with-docker) section.
 
 1. Clone the repo to your machine using git `git clone https://github.com/delftdata/valentine-suite`
 2. To install all the dependencies required by the suite, run the [`install-dependencies.sh`](https://github.com/delftdata/valentine-suite/blob/master/install-dependencies.sh) script. 
@@ -28,6 +28,18 @@ After these two steps, the framework should not require anything more regarding 
 > NOTE: if your systsem does not find conda you might need to run `source ~/.bashrc`
 
 4. To run the schema matching jobs in parallel run the script [run_experiments.sh](https://github.com/delftdata/valentine-suite/blob/master/run_experiments.sh) with the command `./run_experiments.sh {method_name} {number_of_parallel_jobs}` e.g. to run 40 Cupid jobs concurently run `./run_experiments.sh Cupid 40` (This would require a 40 CPU VM to run smoothly). The output will be written in the output folder in the project root level.
+
+## Run with docker
+The entirer suite is also available as a docker image with name [`kpsarakis/valentine-suite:1.0`](https://hub.docker.com/layers/kpsarakis/valentine-suite/1.0/images/sha256-a3e4a359bb45d05687475af6d19104a85c494b2ac91384373d6d1a769639e62e?context=repo). The steps to run with docker are the following: 
+
+1. Run the following command ` sudo docker run --privileged=true -it -v /var/run/docker.sock:/var/run/docker.sock kpsarakis/valentine-suite:1.0` this will download the image and start a shell on the image containing the valentine suite.
+
+2. Activate the conda environmet by running `conda activate valentine-suite`
+
+3. Go into the folder of the suite using `cd /home/valentine-benchmark`
+
+4. Now you are able to run the suite with the data used in the paper **The Valentine Experiment Suite for Schema Matching** by running `./run_experiments.sh {method_name} {number_of_parallel_jobs}` e.g. to run 40 Cupid jobs concurently run `./run_experiments.sh Cupid 40` (This would require a 40 CPU VM to run smoothly). The output will be written in the output folder in the project root level i.e. `\home\valentine-benchmark\output`.
+
 
 ## Integrate new methods
 Since Valentine is an experiment suit, it is designed to be extendable with the addition of more schema matching methods. To extend Valentine with such methods please visit the following wiki [guide](https://github.com/delftdata/valentine-suite/wiki/Integrate-new-methods-guide) on how to do so. 
