@@ -275,8 +275,11 @@ def unix_sort_ranks(corpus: set, file_name: str):
         for var in corpus:
             print(str(var), file=out)
 
+    sort_env = os.environ.copy()
+    sort_env['LC_ALL'] = 'C'
+
     with open('cache/sorts/' + file_name + '/sorted_file.txt', 'w') as f:
-        subprocess.call(['sort', '-n', 'cache/sorts/' + file_name + '/unsorted_file.txt'], stdout=f)
+        subprocess.call(['sort', '-n', 'cache/sorts/' + file_name + '/unsorted_file.txt'], stdout=f, env=sort_env)
 
     rank = 1
     ranks = []
