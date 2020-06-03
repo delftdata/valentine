@@ -5,9 +5,11 @@ set -x
 
 # DOWNLOAD COMA SOURCES
 svn checkout http://svn.code.sf.net/p/coma-ce/mysvn/coma-project && \
+cd coma-project && \
+find . -type f -exec dos2unix {} \; && \
+cd .. && \
 
 # PATCH COMA TO BE COMPATIBLE WITH THE VALENTINE BENCHMARK
-find . -type f -exec dos2unix {} \; && \
 patch -ruN -p1 -d  coma-project < valentine.patch && \
 
 # BUILD THE PATCHED COMA

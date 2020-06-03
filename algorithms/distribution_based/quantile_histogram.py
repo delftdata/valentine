@@ -1,6 +1,7 @@
 from numpy import ndarray
 import numpy as np
 import scipy.stats as ss
+import math
 
 
 class QuantileHistogram:
@@ -44,12 +45,12 @@ class QuantileHistogram:
          Compute the distance matrix between all buckets.
     """
 
-    def __init__(self, name: str, ranks: ndarray, normalization: int, quantiles: int, reference_hist=None):
+    def __init__(self, name: tuple, ranks: ndarray, normalization: int, quantiles: int, reference_hist=None):
         """
         Parameters
         ----------
-        name : str
-            The column name
+        name : tuple
+            The column name (table_name, column_name)
         ranks : ndarray
             The column's ranked data
         normalization : int
@@ -66,7 +67,7 @@ class QuantileHistogram:
         self.quantiles = quantiles
         self.dist_matrix = self.calc_dist_matrix()
         if reference_hist is None:
-            self.add_buckets(ranks.min(),
+            self.add_buckets(ranks.min(initial=math.inf),
                              ss.mstats.mquantiles(ranks, np.array(list(range(1, quantiles + 1))) / quantiles))
             self.add_values(ranks)
         else:

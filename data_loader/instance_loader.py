@@ -2,6 +2,7 @@ import pandas as pd
 
 from data_loader.base_loader import BaseLoader
 from data_loader.data_objects.table import Table
+from utils.utils import get_encoding, get_delimiter
 
 
 class InstanceLoader(BaseLoader):
@@ -38,7 +39,10 @@ class InstanceLoader(BaseLoader):
     def load_instances(self):
         """ Function that loads the data instances """
         assert self.data_path, 'Data path not set for Instance Loader'
-        table_df = pd.read_csv(self.data_path, index_col=False).fillna('')
+        table_df = pd.read_csv(self.data_path,
+                               index_col=False,
+                               encoding=get_encoding(self.data_path),
+                               sep=get_delimiter(self.data_path)).fillna('')
         table_name = self.data_path.split("/")[-1].split(".")[0]
         self.table = Table(table_name, table_df)
 

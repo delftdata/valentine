@@ -178,7 +178,7 @@ class CorrelationClustering(BaseMatcher):
         with open(get_project_root() + "/" + file_name, 'w') as fp:
             json.dump(d, fp, indent=2)
 
-    def rank_output(self, attribute_clusters: list):
+    def rank_output(self, attribute_clusters: iter):
         """
         Take the attribute clusters that the algorithm produces and give a ranked list of matches based on the the EMD
         between each pair inside an attribute cluster . The ranked list will look like:

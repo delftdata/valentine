@@ -1,5 +1,7 @@
 from pathlib import Path
 import math
+import chardet
+import csv
 import os
 
 
@@ -52,6 +54,11 @@ def convert_data_type(value: str):
 def get_project_root():
     """ Return the root of the project as a string """
     return str(Path(__file__).parent.parent)
+
+
+def get_relative_path(path: str):
+    """ Return the relative path of a file from the project root """
+    return os.path.relpath(path, get_project_root())
 
 
 def create_folder(path: str):
@@ -107,3 +114,17 @@ def one_to_one_matches(matches: dict):
 def get_table_from_dataset_path(ds_path: str):
     """ Returns the table name from the dataset path """
     return ds_path.split(".")[0].split("/")[-1]
+
+
+def get_encoding(ds_path: str) -> str:
+    """ Returns the encoding of the file """
+    with open(ds_path, 'rb') as f:
+        return chardet.detect(f.read())['encoding']
+
+
+def get_delimiter(ds_path: str) -> str:
+    """ Returns the encoding of the csv file """
+    with open(ds_path) as f:
+        first_line = f.readline()
+        s = csv.Sniffer()
+        return s.sniff(first_line).delimiter
