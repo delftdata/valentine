@@ -42,7 +42,7 @@ The entirer suite is also available as a docker image with name [`kpsarakis/vale
 
 
 ## Integrate new methods
-Since Valentine is an experiment suit, it is designed to be extendable with the addition of more schema matching methods. To extend Valentine with such methods please visit the following wiki [guide](https://github.com/delftdata/valentine-suite/wiki/Integrate-new-methods-guide) on how to do so. 
+Since Valentine is an experiment suit, it is designed to be extendable with the addition of more schema matching methods. To extend Valentine with such methods please visit the following wiki [guide](https://github.com/delftdata/valentine-suite/wiki/Integrate-new-methods) on how to do so. 
 
 ## Project structure
 
