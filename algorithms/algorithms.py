@@ -8,3 +8,4 @@ from algorithms.cupid.cupid_model import Cupid
 from algorithms.jaccard_levenshtein.jaccard_leven import JaccardLevenMatcher
 from algorithms.coma.coma import Coma
 from algorithms.sem_prop.sem_prop_main import SemProp
+from algorithms.embdi.embdi import EmbDI

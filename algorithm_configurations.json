@@ -167,6 +167,29 @@
         "step": 0.2
       }
     }
+  },
+  "EmbDI": {
+    "data_loader_type": "InstanceLoader",
+    "args": {
+      "with_cid": {
+        "type": "values",
+        "data": [
+          "all"
+        ]
+      },
+      "with_rid": {
+        "type": "values",
+        "data": [
+          "first"
+        ]
+      },
+      "flatten": {
+        "type": "values",
+        "data": [
+          "all"
+        ]
+      }
+    }
   }
 }
 
