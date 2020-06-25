@@ -94,7 +94,7 @@ def calculate_matches(embeddings, dataset):
     for value in sorted_cand:
         if flag:
             v1, v2, rank = value
-            cands.append((v1.split('_')[1], v2.split('_')[1], rank))
+            cands.append(("_".join(v1.split("_")[1:]), "_".join(v2.split("_")[1:]), rank))
             flag = False
         else:
             flag = True

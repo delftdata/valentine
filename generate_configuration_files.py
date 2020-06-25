@@ -8,7 +8,7 @@ from algorithms.distribution_based.clustering_utils import create_cache_dirs, ge
 from data_loader.instance_loader import InstanceLoader
 from utils.utils import get_project_root, create_folder, get_relative_path
 
-algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma", "SemProp", "EmbDI"]
+algorithms = ["EmbDI"]
 
 metrics = {"names": ["precision", "recall", "f1_score", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {
@@ -83,8 +83,8 @@ def combine_data_algorithms(config_data: dict, config_algo: dict, completed_jobs
     create_folder(get_project_root()+"/configuration_files")
     for cfd_key, cfd_value in config_data.items():
         for cfa_key, cfa_value in config_algo.items():
-            if (cfa_value["algorithm"]["type"] == "SemProp" and "assays" in cfd_key) \
-                    or cfa_value["algorithm"]["type"] != "SemProp":
+            if (cfa_value["algorithm"]["type"] == "SemProp" and "assays" in cfd_key and "SemProp" in algorithms) \
+                    or (cfa_value["algorithm"]["type"] != "SemProp" and cfa_value["algorithm"]["type"] in algorithms):
                 name = cfd_key + '__' + cfa_key
                 if name not in completed_jobs[cfa_value["algorithm"]["type"]]:
                     create_folder(str(get_project_root()) + "/configuration_files/" + cfa_value["algorithm"]["type"])
