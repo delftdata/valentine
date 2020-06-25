@@ -1,7 +1,6 @@
 import numpy as np
 from algorithms.embdi.EmbDI.graph import Graph
 import pandas as pd
-import os
 
 dataset_name = 'walmart_amazon'
 case = 'master'

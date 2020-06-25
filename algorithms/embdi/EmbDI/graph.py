@@ -41,16 +41,15 @@ class Node:
         for i, _ in enumerate(['isfirst', 'isroot', 'isappear']):
             self.node_class[_] = bool(int(bb[i]))
 
-
     def set_frequency(self, frequency):
         self.frequency = frequency
 
     def _prepare_aliased_randomizer(self, weights):
-        '''Implemented according to the alias method.
-
+        """
+        Implemented according to the alias method.
         :param weights:
         :return: Aliased randomizer
-        '''
+        """
         N = len(weights)
         if N == 0:
             raise ValueError('Node {} has no neighbors. Check the input dataset. '.format(self.name))
@@ -68,17 +67,17 @@ class Node:
             else:
                 small = next(smalls, None)
 
-        def weighted_random():
-            r = random.random() * N
-            i = int(r)
-            odds, alias = aliases[i]
-            if (r - i) > odds:
-                return self.neighbor_names[alias]
-            else:
-                return self.neighbor_names[i]
-            # return alias if (r - i) > odds else i
-
-        return weighted_random
+        # def weighted_random():
+        #     r = random.random() * N
+        #     i = int(r)
+        #     odds, alias = aliases[i]
+        #     if (r - i) > odds:
+        #         return self.neighbor_names[alias]
+        #     else:
+        #         return self.neighbor_names[i]
+        #     # return alias if (r - i) > odds else i
+        #
+        # return weighted_random
 
     def get_random_start(self):
         if len(self.startfrom) > 0:
@@ -105,14 +104,12 @@ class Node:
     def get_random_replacement(self):
         return random.choices(self.similar_tokens, weights=self.similar_distance, k=1)[0]
 
-
     def normalize_neighbors(self):
         self.neighbor_names = np.array(list(self.neighbors.keys()))
         # self.neighbor_frequencies = np.array(list(self.neighbors.values()))
         self.random_neigh = self._prepare_aliased_randomizer(np.array(list(self.neighbors.values())))
         self.startfrom = np.array(self.startfrom)
         self.neighbors = None
-
 
     def rebuild(self):
         raise NotImplementedError
@@ -236,7 +233,7 @@ class Graph:
             raise ValueError('No node class with "isappear"==True is present. '
                              'All random walks will be empty. Terminating. ')
 
-    def __init__(self, edgelist, prefixes, sim_list=None, flatten=[]):
+    def __init__(self, edgelist, prefixes, sim_list=None, flatten=None):
         """Data structure used to represent dataframe df as a graph. The data structure contains a list of all nodes
         in the graph, built according to the parameters passed to the function.
 
@@ -245,6 +242,8 @@ class Graph:
         :param smoothing_method: one of {no, smooth, inverse_smooth, log, inverse}
         :param flatten: if present and different from "all", expand the strings of all nodes whose type is in the list.
         """
+        if flatten is None:
+            flatten = []
         self.nodes = {}
         self.edges = set()
         self.node_classes = {}

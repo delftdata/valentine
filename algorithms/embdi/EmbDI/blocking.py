@@ -2,7 +2,7 @@ import datetime as dt
 
 import numpy as np
 
-from side_scripts import lsh
+from ..side_scripts import lsh
 
 
 def create_lsh(K, L):

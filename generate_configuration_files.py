@@ -8,7 +8,7 @@ from algorithms.distribution_based.clustering_utils import create_cache_dirs, ge
 from data_loader.instance_loader import InstanceLoader
 from utils.utils import get_project_root, create_folder, get_relative_path
 
-algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma", "SemProp"]
+algorithms = ["CorrelationClustering", "Cupid", "SimilarityFlooding", "JaccardLevenMatcher", "Coma", "SemProp", "EmbDI"]
 
 metrics = {"names": ["precision", "recall", "f1_score", "precision_at_n_percent", "recall_at_sizeof_ground_truth"],
            "args": {

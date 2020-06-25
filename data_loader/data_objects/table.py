@@ -35,6 +35,7 @@ class Table:
         """
         self.name = name
         self.columns = self.init_columns(df)
+        self.df = df
 
     def init_columns(self, df: pd.DataFrame):
         """
@@ -83,3 +84,7 @@ class Table:
             The Column object attached to the column name
         """
         return self.columns[column_name].data
+
+    @property
+    def as_df(self):
+        return self.df

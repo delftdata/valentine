@@ -5,13 +5,12 @@ from gensim.models import Word2Vec, FastText
 import multiprocessing as mp
 
 
-def learn_embeddings(output_embeddings_file, walks, write_walks, dimensions, window_size, training_algorithm='word2vec',
+def learn_embeddings(walks, write_walks, dimensions, window_size, training_algorithm='word2vec',
                      learning_method='skipgram', workers=mp.cpu_count(), sampling_factor=0.001):
     """Function used to train the embeddings based on the given walks corpus. Multiple parameters are available to
     tweak the training procedure. The resulting embedding file will be saved in the given path to be used later in the
     experimental phase.
 
-    :param output_embeddings_file: path to save the embeddings file into.
     :param walks: path to the walks file (if write_walks == True), list of walks otherwise.
     :param write_walks: flag used to read walks from a file rather than taking them from memory.
     :param dimensions: number of dimensions to be used when training the model
@@ -31,19 +30,19 @@ def learn_embeddings(output_embeddings_file, walks, write_walks, dimensions, win
             model = Word2Vec(corpus_file=walks, size=dimensions, window=window_size, min_count=2, sg=sg,
                              workers=workers,
                              sample=sampling_factor)
-            model.wv.save_word2vec_format(output_embeddings_file, binary=False)
+            # model.wv.save_word2vec_format(output_embeddings_file, binary=False)
         else:
             model = Word2Vec(sentences=walks, size=dimensions, window=window_size, min_count=2, sg=sg, workers=workers,
                              sample=sampling_factor)
-            model.wv.save_word2vec_format(output_embeddings_file, binary=False)
+            # model.wv.save_word2vec_format(output_embeddings_file, binary=False)
     elif training_algorithm == 'fasttext':
         print('Using Fasttext')
         if write_walks:
             model = FastText(corpus_file=walks, window=window_size, min_count=2, workers=workers, size=dimensions)
-            model.wv.save(output_embeddings_file)
+            # model.wv.save(output_embeddings_file)
         else:
             model = FastText(sentences=walks, size=dimensions, workers=workers, min_count=2, window=window_size)
-            model.wv.save(output_embeddings_file)
+            # model.wv.save(output_embeddings_file)
     return model
 
 def return_combined(row, wv, n_dimensions):

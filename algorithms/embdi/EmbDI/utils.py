@@ -6,8 +6,6 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 
-from EmbDI.logging import *
-
 import os
 
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'

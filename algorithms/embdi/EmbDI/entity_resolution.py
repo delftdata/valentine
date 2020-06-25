@@ -1,14 +1,15 @@
 import argparse
 import datetime as dt
 import pickle
+import csv
 from operator import itemgetter
 
 import gensim.models as models
 import mlflow
 from tqdm import tqdm
 
-from EmbDI.blocking import execute_blocking
-from EmbDI.utils import *
+from .blocking import execute_blocking
+from .utils import *
 
 
 NGT_NOT_FOUND = ANNOY_NOT_FOUND = FAISS_NOT_FOUND = False

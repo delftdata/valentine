@@ -1,6 +1,6 @@
-import sys
 import argparse
 import pandas as pd
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -10,6 +10,7 @@ def parse_args():
 
     args = parser.parse_args()
     return args
+
 
 args = parse_args()
 
@@ -25,7 +26,6 @@ if args.dataset_file is not None:
     f_classes = open(out_filename + '_classes.txt', 'w')
     for col in df.columns:
         col_uniques[col] = df[col].unique()
-
 
 
 fin = open(in_filename, 'r') 

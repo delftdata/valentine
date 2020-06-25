@@ -3,14 +3,12 @@ import re
 from text_unidecode import unidecode
 from data_loader.instance_loader import InstanceLoader
 from algorithms.embdi.edgelist import EdgeList
-import pandas as pd
 from operator import itemgetter
 
 from algorithms.embdi.EmbDI.embeddings import learn_embeddings
 from algorithms.embdi.EmbDI.sentence_generation_strategies import generate_walks
 from algorithms.embdi.EmbDI.utils import *
 
-from algorithms.embdi.EmbDI.testing_functions import test_driver
 from algorithms.embdi.EmbDI.graph import Graph
 import warnings
 
@@ -22,47 +20,49 @@ class EmbDI(BaseMatcher):
         self.with_rid = with_rid
         self.flatten = flatten
 
-    def get_matches(self, source: InstanceLoader, target: InstanceLoader):
-
-        src_table = preprocess_relation(source.table)
-        trg_table = preprocess_relation(target.table)
-
+    def get_matches(self, source: InstanceLoader, target: InstanceLoader, dataset_name):
+        print("Starting matching tables")
+        src_table = preprocess_relation(source.table.as_df)
+        trg_table = preprocess_relation(target.table.as_df)
+        print("Data prepared")
         merged_table = merge_relations(src_table, trg_table)
-
+        print("Creating edge list")
         el = EdgeList(merged_table)
+
         edgelist = el.get_edgelist()
         prefixes = el.get_pref()
         configuration = return_default_values(self.flatten, self.with_cid, self.with_rid)
         emb_model = training_driver(configuration, prefixes, edgelist)
-        test_driver(emb_model, merged_table, configuration)
-
+        print("Calculating matches")
         matches_list = calculate_matches(emb_model, merged_table)
 
         matches = dict()
 
         for map_pair in matches_list:
             v1, v2, sim = map_pair
-            matches[((src_table.table.name, v1), (trg_table.table.name, v2))] = sim
+            matches[((source.table.name, v1), (target.table.name, v2))] = sim
 
         matches = dict(filter(lambda elem: elem[1] > 0.0, matches.items()))  # Remove the pairs with zero similarity
 
-        sorted_matches = {k: v for k, v in sorted(matches.items(), key=lambda item: item[1], reverse=True)}
+        sorted_matches = {k: float(v) for k, v in sorted(matches.items(), key=lambda item: item[1], reverse=True)}
 
         return sorted_matches
 
 
 def training_driver(configuration, prefixes, edgelist):
-    '''This function trains local embeddings according to the parameters specified in the configuration. The input dataset is transformed into a graph,
+    """
+    This function trains local embeddings according to the parameters specified in the configuration.
+    The input dataset is transformed into a graph,
     then random walks are generated and the result is passed to the embeddings training algorithm.
-
-    '''
-
+    """
+    print("Creating graph")
     graph = graph_generation(configuration, edgelist, prefixes)
 
     configuration['n_sentences'] = graph.compute_n_sentences(int(configuration['sentence_length']))
+    print("Walking :P")
     walks = random_walks_generation(configuration, None, graph)
-    del graph # Graph is not needed anymore, so it is deleted to reduce memory cost
-
+    del graph  # Graph is not needed anymore, so it is deleted to reduce memory cost
+    print("training")
     model = embeddings_generation(walks, configuration)
     return model
 
@@ -94,7 +94,7 @@ def calculate_matches(embeddings, dataset):
     for value in sorted_cand:
         if flag:
             v1, v2, rank = value
-            cands.append((v1.split('_')[0], v2.split('_')[1], rank))
+            cands.append((v1.split('_')[1], v2.split('_')[1], rank))
             flag = False
         else:
             flag = True
@@ -103,12 +103,6 @@ def calculate_matches(embeddings, dataset):
 
 
 def graph_generation(configuration, edgelist, prefixes, dictionary=None):
-    """
-    Generate the graph for the given dataframe following the specifications in configuration.
-    :param df: dataframe to transform in graph.
-    :param configuration: dictionary with all the run parameters
-    :return: the generated graph
-    """
     # Read external info file to perform replacement.
     if configuration['walks_strategy'] == 'replacement':
         print('# Reading similarity file {}'.format(configuration['similarity_file']))
@@ -173,21 +167,12 @@ def random_walks_generation(configuration, df, graph):
 
 
 def embeddings_generation(walks, configuration):
-    """
-    Take the generated walks and train embeddings using the walks as training corpus.
-    :param walks:
-    :param configuration:
-    :param dictionary:
-    :return:
-    """
-
     model = learn_embeddings(walks, write_walks=configuration['write_walks'],
-                     dimensions=int(configuration['n_dimensions']),
-                     window_size=int(configuration['window_size']),
-                     training_algorithm=configuration['training_algorithm'],
-                     learning_method=configuration['learning_method'],
-                     sampling_factor=configuration['sampling_factor'])
-
+                             dimensions=int(configuration['n_dimensions']),
+                             window_size=int(configuration['window_size']),
+                             training_algorithm=configuration['training_algorithm'],
+                             learning_method=configuration['learning_method'],
+                             sampling_factor=configuration['sampling_factor'])
     return model
 
 
@@ -211,18 +196,18 @@ def return_default_values(flatten_choice, with_cid_choice, with_rid_choice):
         'ntop': 10,
         'ncand': 1,
         'max_rank': 3,
-        'follow_sub': 'false',
+        'follow_sub': False,
         'smoothing_method': 'no',
-        'backtrack': 'True',
+        'backtrack': True,
         'training_algorithm': 'word2vec',
-        'write_walks': 'false',
+        'write_walks': False,
         'indexing': 'basic',
         'epsilon': 0.1,
         'num_trees': 250,
         'flatten': flatten_choice,
         'with_cid': with_cid_choice,
         'with_rid': with_rid_choice,
-        'compression': 'False',
+        'compression': False,
         'n_sentences': 'default',
         'walks_strategy': 'basic',
         'learning_method': 'skipgram',
@@ -230,13 +215,13 @@ def return_default_values(flatten_choice, with_cid_choice, with_rid_choice):
         'window_size': 3,
         'n_dimensions': 300,
         'numeric': 'no',
-        'intersection': 'false',
+        'intersection': False,
         'walks_file': None,
         'refinement_task': 'rotation',
         'mlflow': False,
         'repl_numbers': False,
         'repl_strings': False,
-        'sampling_factor':0.001
+        'sampling_factor': 0.001
     }
 
     for k in default_values:
