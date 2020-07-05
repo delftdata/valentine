@@ -99,6 +99,7 @@ def main(config):
 
 
 if __name__ == '__main__':
+    print("Running job")
     args = argparse.ArgumentParser(description='Schema matching job')
     args.add_argument('-c', '--config', default=None, type=str,
                       help='config file path (default: None)')
