@@ -21,19 +21,15 @@ class EmbDI(BaseMatcher):
         self.flatten = flatten
 
     def get_matches(self, source: InstanceLoader, target: InstanceLoader, dataset_name):
-        print("Starting matching tables")
         src_table = preprocess_relation(source.table.as_df)
         trg_table = preprocess_relation(target.table.as_df)
-        print("Data prepared")
         merged_table = merge_relations(src_table, trg_table)
-        print("Creating edge list")
         el = EdgeList(merged_table)
 
         edgelist = el.get_edgelist()
         prefixes = el.get_pref()
         configuration = return_default_values(self.flatten, self.with_cid, self.with_rid)
         emb_model = training_driver(configuration, prefixes, edgelist)
-        print("Calculating matches")
         matches_list = calculate_matches(emb_model, merged_table)
 
         matches = dict()
@@ -55,14 +51,11 @@ def training_driver(configuration, prefixes, edgelist):
     The input dataset is transformed into a graph,
     then random walks are generated and the result is passed to the embeddings training algorithm.
     """
-    print("Creating graph")
     graph = graph_generation(configuration, edgelist, prefixes)
 
     configuration['n_sentences'] = graph.compute_n_sentences(int(configuration['sentence_length']))
-    print("Walking :P")
     walks = random_walks_generation(configuration, None, graph)
     del graph  # Graph is not needed anymore, so it is deleted to reduce memory cost
-    print("training")
     model = embeddings_generation(walks, configuration)
     return model
 
