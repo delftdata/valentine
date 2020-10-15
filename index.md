@@ -7,7 +7,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 ## Authors
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
-    <a href="https://ckoutras.github.io/"><img src="./assets/img/christos_koutras.png" height="auto" width="80" style="border-radius:50%"/></a>
+    <a href="https://ckoutras.github.io/"><img src="./assets/img/christos_koutras.jpg" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">Christos Koutras <br>TU Delft</figcaption>
 </figure>
 
@@ -22,7 +22,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
-    <img src="./assets/img/kyriakos_psarakis.png" height="auto" width="80" style="border-radius:50%"/>
+    <img src="./assets/img/kyriakos_psarakis.jpeg" height="auto" width="80" style="border-radius:50%"/>
     <figcaption class="caption" style="display:block">Kyriakos Psarakis <br>TU Delft</figcaption>
 </figure>
 
@@ -32,7 +32,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
-    <a href="http://mariosfragkoulis.gr/"><img src="./assets/img/marios_fragkoulis.png" height="auto" width="80" style="border-radius:50%"/></a>
+    <a href="http://mariosfragkoulis.gr/"><img src="./assets/img/marios_fragkoulis.jpg" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">Marios Fragkoulis <br> TU Delft</figcaption>
 </figure>
 
@@ -42,7 +42,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
-    <a href="https://perso.liris.cnrs.fr/angela.bonifati/"><img src="./assets/img/angela_bonifati.png" height="120" width="80" style="border-radius:50%"/></a>    <figcaption class="caption" style="display:block">Angela Bonifati <br>Lyon 1 University</figcaption>
+    <a href="https://perso.liris.cnrs.fr/angela.bonifati/"><img src="./assets/img/angela_bonifati.jpg" height="auto" width="80" style="border-radius:50%"/></a>    <figcaption class="caption" style="display:block">Angela Bonifati <br>Lyon 1 University</figcaption>
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
