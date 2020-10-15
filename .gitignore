@@ -1,0 +1,15 @@
+.ipynb_checkpoints
+.DS_Store
+.idea/
+__pycache__/
+data
+output
+configuration_files
+configuration_files_scaled
+package-lock.json
+cache
+
+# ignore the files produced by clustering scale
+Attribute_Clusters(Matches).json
+Distribution_Clusters.json
+
