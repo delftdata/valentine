@@ -6,46 +6,46 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 
 ## Authors
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <a href="https://ckoutras.github.io/"><img src="./assets/img/christos_koutras.png" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">C. Koutras <br>TU Delft</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <a href="https://www.tudelft.nl/ewi/over-de-faculteit/afdelingen/software-technology/web-information-systems/people/georgios-siachamis/"><img src="./assets/img/georgios_siachamis.jpg" height="auto" width="80" style="border-radius:50%"/></a>
-    <figcaption class="caption" style="display:block">G.  Siachamis TUDelft</figcaption>
+    <figcaption class="caption" style="display:block">G. Siachamis TU Delft</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
    <a href="https://andraionescu.github.io/"><img src="./assets/img/andra_ionescu.jpg" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">A. Ionescu <br>TU Delft</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <img src="./assets/img/kyriakos_psarakis.jpeg" height="120" width="80" style="border-radius:50%"/>
     <figcaption class="caption" style="display:block">K. Psarakis <br>TU Delft</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <img src="./assets/img/jerry_brons.jpg" height="auto" width="80" style="border-radius:50%"/>
     <figcaption class="caption" style="display:block">J. Brons <br>ING</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <a href="http://mariosfragkoulis.gr/"><img src="./assets/img/marios_fragkoulis.png" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">M. Fragkoulis TU Delft</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <a href="https://www.tudelft.nl/ewi/over-de-faculteit/afdelingen/software-technology/web-information-systems/people/christoph-lofi/"><img src="./assets/img/christoph_lofi.jpg" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">C. Lofi <br>TU Delft</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <a href="https://perso.liris.cnrs.fr/angela.bonifati/"><img src="./assets/img/angela_bonifati.png" height="120" width="80" style="border-radius:50%"/></a>    <figcaption class="caption" style="display:block">A. Bonifati <br>Lyon 1 University</figcaption>
 </figure>
 
-<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:100px">
+<figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
     <a href="http://asterios.katsifodimos.com/"><img src="./assets/img/asterios_katsifodimos.jpg" height="auto" width="80" style="border-radius:50%"/></a>
     <figcaption class="caption" style="display:block">A. Katsifodimos TU Delft</figcaption>
 </figure>
