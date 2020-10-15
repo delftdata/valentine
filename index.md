@@ -22,7 +22,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
-    <img src="./assets/img/kyriakos_psarakis.jpeg" height="120" width="80" style="border-radius:50%"/>
+    <img src="./assets/img/kyriakos_psarakis.png" height="auto" width="80" style="border-radius:50%"/>
     <figcaption class="caption" style="display:block">Kyriakos Psarakis <br>TU Delft</figcaption>
 </figure>
 
