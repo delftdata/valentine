@@ -27,7 +27,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:80px">
-    <img src="./assets/img/christos_koutras.png" height="auto" width="80" style="border-radius:50%"/>
+    <img src="./assets/img/jerry_brons.jpg" height="auto" width="80" style="border-radius:50%"/>
     <figcaption class="caption" style="display:block">J. Brons ING</figcaption>
 </figure>
 
