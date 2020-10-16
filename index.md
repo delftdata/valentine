@@ -59,12 +59,19 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 - All dataset pairs used in Valentine can be found [here](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku)
 
 ## Valentine Paper
-- [[arXiV]()] Valentine: Evaluating Matching Techniques for Dataset Discovery 
+- [[arXiV](https://arxiv.org/abs/2010.07386)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
 
 ## Cite Valentine
 
 ```
-@article{}
+@misc{koutras2020valentine,
+      title={Valentine: Evaluating Matching Techniques for Dataset Discovery}, 
+      author={Christos Koutras and George Siachamis and Andra Ionescu and Kyriakos Psarakis and Jerry Brons and Marios Fragkoulis and Christoph Lofi and Angela Bonifati and Asterios Katsifodimos},
+      year={2020},
+      eprint={2010.07386},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB}
+}
 
 ```
 
