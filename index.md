@@ -59,7 +59,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 - All dataset pairs used in Valentine can be found [here](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku)
 
 ## Valentine Paper
-- [[arXiV](https://arxiv.org/abs/2010.07386)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
+- [[arXiv](https://arxiv.org/abs/2010.07386)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
 
 ## Cite Valentine
 
