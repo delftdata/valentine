@@ -50,13 +50,36 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
     <figcaption class="caption" style="display:block">Asterios Katsifodimos <br>TU Delft</figcaption>
 </figure>
 
+## Datasets
+
+Valentine offers a wide spectrum of dataset pairs with ground truth containing valid matches among theri corresponding columns. These dataset pairs have been fabricated by Valentines dataset relatedness scenario generator. In our paper, we classify relatedness of two datasets into the following four categories: i) *Unionable datasets*, ii) *View-Unionable datasets*, iii) *Joinable datasets*, and iv) *Semantically-Joinable datasets*.
+
+In the table below, we specify the dataset sources and links to the corresponding fabricated dataset pairs, with respect to each relatedness scenario. We also specify min and max number of rows and columns of the fabricated datasets.
+
+|Dataset Source | #Pairs |     #Rows     | #Columns |                            Links                           |
+|----------------|:------:|:-------------:|:--------:|:----------------------------------------------------------:|
+|[TPC-DI](http://www.vldb.org/pvldb/vol7/p1367-poess.pdf)         |   180  |  7492 - 14983 |  11 - 22 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fprospect%2FUnionable), [View-Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fprospect%2FView-Unionable), [Joinable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fprospect%2FJoinable), [Semantically-Joinable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fprospect%2FSemantically-Joinable) |
+|[Open Data](http://www.vldb.org/pvldb/vol11/p813-nargesian.pdf)      |   180  | 11628 - 23255 |  26 - 51 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fmiller2%2FUnionable), [View-Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fmiller2%2FView%20-Unionable), [Joinable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fmiller2%2FJoinable), [Semantically-Joinable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fmiller2%2FSemantically-Joinable) |
+|[ChEMBL](https://www.ebi.ac.uk/chembl/)         |   180  |  7500 - 15000 |  12 - 23 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fassays%2FUnionable), [View-Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fassays%2FView-Unionable), [Joinable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fassays%2FJoinable), [Semantically-Joinable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2Fassays%2FSemantically-Joinable) |
+|[WikiData](https://www.wikidata.org)       |    4   |  5423 - 10846 |  13 - 20 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_unionable), [View-Unionable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_viewunion), [Joinable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_joinable), [Semantically-Joinable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_semjoinable) |
+|[Magellan Data](https://sites.google.com/site/anhaidgroup/useful-stuff/data)| 7| 864 - 131099 | 3 - 7 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/UGXDisdjZXlzTtN?path=%2FDeepMDatasets) |
+
+### Filename Naming
+
+The filename naming conventions we use for the above datasets are explained as follows:
+
+- *ac* and *ec* mean that the dataset pairs have noisy or verbatim schemata respectively.
+- *av* and *ac* mean that the dataset pairs have noisy or verbatim instances.
+- *horizontal_p* means that the datasets are derived from a horizontal split of p% row overlap based on the original dataset.
+- *vertical_p* means that the datasets are derived from a vertical split of p% column overlap based on the original dataset.
+- *both_p1\_p2* means that the datasets are derived from both a horizontal slit of p1% row overlap and a vertical split of p2% column overlap based on the original dataset.
+
 
 ## Repositories
 
 - <https://github.com/delftdata/valentine> : Main repository containing the Valentine framework source code.
 - <https://github.com/delftdata/valentine-generator> : Contains the source code of the dataset generator of Valentine.
 - <https://github.com/delftdata/valentine-paper-results> : Contains detailed experimental results and plots based on the paper's evaluation.
-- All dataset pairs used in Valentine can be found [here](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku)
 
 ## Valentine Paper
 - [[arXiv](https://arxiv.org/abs/2010.07386)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
