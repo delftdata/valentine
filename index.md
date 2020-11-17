@@ -64,9 +64,9 @@ In the table below, we specify the dataset sources and links to the correspondin
 |[WikiData](https://www.wikidata.org)       |    4   |  5423 - 10846 |  13 - 20 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_unionable), [View-Unionable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_viewunion), [Joinable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_joinable), [Semantically-Joinable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FWikidata%2FMusicians%2FMusicians_semjoinable) |
 |[Magellan Data](https://sites.google.com/site/anhaidgroup/useful-stuff/data)| 7| 864 - 131099 | 3 - 7 | [Unionable](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku?path=%2FDeepMDatasets) |
 
-### Filename Naming
+### Filename Conventions
 
-The filename naming conventions we use for the above datasets are explained as follows:
+The filename conventions we use for the above datasets are explained as follows:
 
 - *ac* and *ec* mean that the dataset pairs have noisy or verbatim schemata respectively.
 - *av* and *ac* mean that the dataset pairs have noisy or verbatim instances.
