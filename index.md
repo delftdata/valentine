@@ -52,15 +52,15 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 
 ## Valentine Methods
 
-The schema matching methtods included in Valentine are the following:
+The schema matching methods included in Valentine are the following:
 
-1. COMA: Python wrapper around COMA 3.0 Community Edition.
-2. Cupid: Contains the Python implementation of the paper *"Generic Schema Matching with Cupid"* (VLDB 2001).
-3. Distribution-based: Contains the python implementation of the paper *"Automatic Discovery of Attributes in Relational Databases"* (SIGMOD 2011).
-4. EmbDI: Contains the code of EmbDI provided by the authors in their GitLab repository and the paper *"Creating Embeddings of Heterogeneous Relational Datasets for Data Integration Tasks"* (SIGMOD 2020).
-5. Jaccard Levenshtein: Contains our own baseline that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance.
-6. SemProp: Contains the code of the method discussed in *"Seeping semantics: Linking datasets using word embeddings for data discovery"* (ICDE 2018), which is provided in the code repository of the paper *"Aurum: A Data Discovery System"* (ICDE 2018).
-7. Similarity Flooding: Contains the python implementation of the paper *"Similarity Flooding: A Versatile Graph Matching Algorithm and its Application to Schema Matching"* (ICDE 2002).
+1. **COMA**: Python wrapper around COMA 3.0 Community Edition.
+2. **Cupid**: Contains the Python implementation of the paper *"Generic Schema Matching with Cupid"* (VLDB 2001).
+3. **Distribution-based**: Contains the python implementation of the paper *"Automatic Discovery of Attributes in Relational Databases"* (SIGMOD 2011).
+4. **EmbDI**: Contains the code of EmbDI provided by the authors in their GitLab repository and the paper *"Creating Embeddings of Heterogeneous Relational Datasets for Data Integration Tasks"* (SIGMOD 2020).
+5. **Jaccard Levenshtein**: Contains our own baseline that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance.
+6. **SemProp**: Contains the code of the method discussed in *"Seeping semantics: Linking datasets using word embeddings for data discovery"* (ICDE 2018), which is provided in the code repository of the paper *"Aurum: A Data Discovery System"* (ICDE 2018).
+7. **Similarity Flooding**: Contains the python implementation of the paper *"Similarity Flooding: A Versatile Graph Matching Algorithm and its Application to Schema Matching"* (ICDE 2002).
 
 
 
