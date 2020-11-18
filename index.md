@@ -50,6 +50,20 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
     <figcaption class="caption" style="display:block">Asterios Katsifodimos <br>TU Delft</figcaption>
 </figure>
 
+## Valentine Methods
+
+The schema matching methtods included in Valentine are the following:
+
+1. COMA: Python wrapper around COMA 3.0 Community Edition.
+2. Cupid: Contains the Python implementation of the paper *"Generic Schema Matching with Cupid"* (VLDB 2001).
+3. Distribution-based: Contains the python implementation of the paper *"Automatic Discovery of Attributes in Relational Databases"* (SIGMOD 2011).
+4. EmbDI: Contains the code of EmbDI provided by the authors in their GitLab repository and the paper *"Creating Embeddings of Heterogeneous Relational Datasets for Data Integration Tasks"* (SIGMOD 2020).
+5. Jaccard Levenshtein: Contains our own baseline that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance.
+6. SemProp: Contains the code of the method discussed in *"Seeping semantics: Linking datasets using word embeddings for data discovery"* (ICDE 2018), which is provided in the code repository of the paper *"Aurum: A Data Discovery System"* (ICDE 2018).
+7. Similarity Flooding: Contains the python implementation of the paper *"Similarity Flooding: A Versatile Graph Matching Algorithm and its Application to Schema Matching"* (ICDE 2002).
+
+
+
 ## Datasets
 
 Valentine offers a wide spectrum of dataset pairs with ground truth containing valid matches among theri corresponding columns. These dataset pairs have been fabricated by Valentines dataset relatedness scenario generator. In our paper, we classify relatedness of two datasets into the following four categories: i) *Unionable datasets*, ii) *View-Unionable datasets*, iii) *Joinable datasets*, and iv) *Semantically-Joinable datasets*.
