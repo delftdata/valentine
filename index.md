@@ -83,7 +83,7 @@ In the table below, we specify the dataset sources and links to the correspondin
 The filename conventions we use for the above datasets are explained as follows:
 
 - *ac* and *ec* mean that the dataset pairs have noisy or verbatim schemata respectively.
-- *av* and *ac* mean that the dataset pairs have noisy or verbatim instances.
+- *av* and *ev* mean that the dataset pairs have noisy or verbatim instances.
 - *horizontal_p* means that the datasets are derived from a horizontal split of p% row overlap based on the original dataset.
 - *vertical_p* means that the datasets are derived from a vertical split of p% column overlap based on the original dataset.
 - *both_p1\_p2* means that the datasets are derived from both a horizontal slit of p1% row overlap and a vertical split of p2% column overlap based on the original dataset.
