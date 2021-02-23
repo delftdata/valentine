@@ -104,10 +104,10 @@ The filename conventions we use for the above datasets are explained as follows:
 @misc{koutras2021valentine,
       title={Valentine: Evaluating Matching Techniques for Dataset Discovery}, 
       author={Christos Koutras and George Siachamis and Andra Ionescu and Kyriakos Psarakis and Jerry Brons and Marios Fragkoulis and Christoph Lofi and Angela Bonifati and Asterios Katsifodimos},
-  booktitle = {37th {IEEE} International Conference on Data Engineering, {ICDE} 2021},
+  booktitle = {37th IEEE International Conference on Data Engineering, ICDE 2021},
   pages     = {1--12},
-  publisher = {{IEEE}},
-  year      = {2021},
+  publisher = {IEEE},
+  year      = {2021}
 }
 
 ```
