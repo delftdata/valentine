@@ -60,3 +60,16 @@ Since Valentine is an experiment suit, it is designed to be extended with more s
 * [`data_loader`](https://github.com/delftdata/valentine-suite/tree/master/data_loader) Module used to load the relational data coming from the [valentine-generator](https://github.com/delftdata/valentine-generator)
 * [`metrics`](https://github.com/delftdata/valentine-suite/tree/master/metrics) Module containing the metrics that the framework supports (e.g. Precision, Recall, ...) 
 * [`utils`](https://github.com/delftdata/valentine-suite/tree/master/utils) Module containing some utility functions used throughout the framework
+
+
+## Cite Valentine
+```
+@misc{koutras2021valentine,
+      title={Valentine: Evaluating Matching Techniques for Dataset Discovery}, 
+      author={Christos Koutras and George Siachamis and Andra Ionescu and Kyriakos Psarakis and Jerry Brons and Marios Fragkoulis and Christoph Lofi and Angela Bonifati and Asterios Katsifodimos},
+  booktitle = {37th IEEE International Conference on Data Engineering, ICDE 2021},
+  pages     = {1--12},
+  publisher = {IEEE},
+  year      = {2021}
+}
+```
