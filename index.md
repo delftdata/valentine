@@ -98,6 +98,9 @@ The filename conventions we use for the above datasets are explained as follows:
 ## Valentine Paper
 - [[arXiv](https://arxiv.org/abs/2010.07386)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
 
+## ICDE 2021 Presentation Video
+- Video can be found in this [link](https://drive.google.com/file/d/1YpyeTgDNKrJ0YAt20CRkdl-Gea3BjK7r/view?usp=sharing)
+
 ## Cite Valentine
 
 ```
