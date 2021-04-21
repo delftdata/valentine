@@ -22,7 +22,7 @@ We aim to rectify the problem of evaluating the effectiveness and efficiency of 
 </figure>
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
-    <a href="https://kpsarakis.github.io/"><img src="./assets/img/kyriakos_psarakis.jpeg" height="auto" width="80" style="border-radius:50%"/></a>
+    <img src="./assets/img/kyriakos_psarakis.jpeg" height="auto" width="80" style="border-radius:50%"/>
     <figcaption class="caption" style="display:block">Kyriakos Psarakis <br>TU Delft</figcaption>
 </figure>
 
@@ -107,10 +107,10 @@ The filename conventions we use for the above datasets are explained as follows:
 @misc{koutras2021valentine,
       title={Valentine: Evaluating Matching Techniques for Dataset Discovery}, 
       author={Christos Koutras and George Siachamis and Andra Ionescu and Kyriakos Psarakis and Jerry Brons and Marios Fragkoulis and Christoph Lofi and Angela Bonifati and Asterios Katsifodimos},
-  booktitle = {37th IEEE International Conference on Data Engineering, ICDE 2021},
-  pages     = {1--12},
-  publisher = {IEEE},
-  year      = {2021}
+      year={2021},
+      eprint={2010.07386},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB}
 }
 
 ```
