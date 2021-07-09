@@ -68,7 +68,7 @@ The schema matching methods included in Valentine are the following:
 
 Valentine offers a wide spectrum of dataset pairs with ground truth containing valid matches among theri corresponding columns. These dataset pairs have been fabricated by Valentines dataset relatedness scenario generator. In our paper, we classify relatedness of two datasets into the following four categories: i) *Unionable datasets*, ii) *View-Unionable datasets*, iii) *Joinable datasets*, and iv) *Semantically-Joinable datasets*.
 
-In the table below, we specify the dataset sources and links to the corresponding fabricated dataset pairs, with respect to each relatedness scenario. We also specify min and max number of rows and columns of the fabricated datasets.
+The datasets used in the paper are [hosted on Zenodo](https://zenodo.org/record/5084605#.YOgWHBMzY-Q) with DOI: **10.5281/zenodo.5084605**. In the table below, we specify the dataset sources and dedicated links to the corresponding fabricated dataset pairs, with respect to each relatedness scenario. We also specify min and max number of rows and columns of the fabricated datasets.
 
 |Dataset Source | #Pairs |     #Rows     | #Columns |                            Links                           |
 |----------------|:------:|:-------------:|:--------:|:----------------------------------------------------------:|
@@ -106,9 +106,9 @@ The filename conventions we use for the above datasets are explained as follows:
 ```
 @inproceedings{koutras2021valentine,
   title={Valentine: Evaluating Matching Techniques for Dataset Discovery},
-  author={Koutras, Christos and Siachamis, George and Ionescu, Andra and Psarakis, Kyriakos and Brons, Jery and Fragkoulis, Marios and Lofi, Christoph and Bonifati, Angela and Katsifodimos, Asterios},
+  author={Koutras, Christos and Siachamis, George and Ionescu, Andra and Psarakis, Kyriakos and Brons, Jerry and Fragkoulis, Marios and Lofi, Christoph and Bonifati, Angela and Katsifodimos, Asterios},
   booktitle={2021 IEEE 37th International Conference on Data Engineering (ICDE)},
-  pages={},
+  pages={468--479},
   year={2021},
   organization={IEEE}
 }
