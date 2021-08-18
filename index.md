@@ -1,9 +1,7 @@
 ## Description
 
-Data scientists today search large data lakes to discover and integrate datasets. In order to bring together disparate data sources, dataset discovery methods rely on some form of schema matching: the process of establishing correspondences between datasets. Traditionally, schema matching has been used to find matching pairs of columns between a source and a target schema. However, the use of schema matching in dataset discovery methods differs from its original use. Nowadays schema matching serves as a building block for indicating and ranking inter-dataset relationships. Surprisingly, although a discovery method’s success relies highly on the quality of the underlying matching algorithms, the latest discovery methods employ existing schema matching algorithms in an ad-hoc fashion due to the lack of openly-available datasets with ground truth, reference method implementations, and evaluation metrics.
 
-We aim to rectify the problem of evaluating the effectiveness and efficiency of schema matching methods for the specific needs of dataset discovery. To this end, we propose ***Valentine***, an extensible open-source experiment suite to execute and organize large-scale automated matching experiments on tabular data. Valentine includes implementations of seminal schema matching methods that we either implemented from scratch (due to absence of open source code) or imported from open repositories. The contributions of Valentine are: *i)* the definition of four schema matching scenarios as encountered in dataset discovery methods, *ii)* a principled dataset fabrication process tailored to the scope of dataset discovery methods and *iii)* the most comprehensive evaluation of schema matching techniques to date, offering insight on the strengths and weaknesses of existing techniques, that can serve as a guide for employing schema matching in future dataset discovery methods.
-
+***Valentine*** is an extensible open-source product to execute and organize large-scale automated matching processes on tabular data either for experimentation or deployment in real world data. Valentine includes implementations of seminal schema matching methods that we either implemented from scratch (due to absence of open source code) or imported from open repositories. To enable proper evaluation, Valentine offers a fabricator for creating evaluation dataset pairs that respect specific semantics. It also comes with a GUI that makes it easier than ever to: i) evaluate schema matching methods on dataset pairs that respect specific relatedness semantics (joinable/unionable), and ii) scale SotA methods to holistic matching in big data repositories or data lakes in order to find relationships among disparate tabular data. 
 ## Authors
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
@@ -91,15 +89,26 @@ The filename conventions we use for the above datasets are explained as follows:
 
 ## Repositories
 
+- <https://github.com/delftdata/valentine-system> : Contains Valentine system + GUI to easily deploy it for evaluation or holistic matching in data lakes.
 - <https://github.com/delftdata/valentine> : Main repository containing the Valentine framework source code.
 - <https://github.com/delftdata/valentine-generator> : Contains the source code of the dataset generator of Valentine.
 - <https://github.com/delftdata/valentine-paper-results> : Contains detailed experimental results and plots based on the paper's evaluation.
 
-## Valentine Paper
-- [[arXiv](https://arxiv.org/abs/2010.07386)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
+## Valentine Papers
+- [[ICDE 2021 Proceedings](https://ieeexplore.ieee.org/abstract/document/9458921/)] Valentine: Evaluating Matching Techniques for Dataset Discovery 
+- [[VLDB 2021 Demo](https://t.co/UA8RPLFJP1?amp=1)] Valentine in Action: Matching Tabular Data at Scale
 
 ## ICDE 2021 Presentation Video
-- Video can be found in this [link](https://drive.google.com/file/d/1YpyeTgDNKrJ0YAt20CRkdl-Gea3BjK7r/view?usp=sharing)
+
+- ICDE 2021 Presentation by Christos
+
+[![ICDE 2021 Presentation](https://img.youtube.com/vi/lk9gYF4G758/0.jpg)](https://www.youtube.com/watch?v=lk9gYF4G758)
+
+- VLDB 2021 Demonstration by Kyriakos
+
+[![VLDB 2021 Demonstration](https://img.youtube.com/vi/EOwD-kHuAkI/0.jpg)](https://www.youtube.com/watch?v=EOwD-kHuAkI)
+
+
 
 ## Cite Valentine
 
