@@ -38,7 +38,7 @@ snakecase==1.0.1
 SPARQLWrapper==1.8.5
 strsim==0.0.3
 tqdm==4.42.0
-urllib3==1.25.8
+urllib3==1.26.5
 webencodings==0.5.1
 # EmbDI
 mlflow==1.9.0
