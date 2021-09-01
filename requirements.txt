@@ -27,7 +27,7 @@ pyparsing==2.4.6
 python-dateutil==2.8.1
 python-Levenshtein==0.12.0
 pytz==2019.3
-PyYAML==5.3
+PyYAML==5.4
 rdflib==4.2.2
 rdflib-jsonld==0.4.0
 requests==2.22.0
