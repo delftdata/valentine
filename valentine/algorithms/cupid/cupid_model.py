@@ -1,13 +1,10 @@
-from typing import Union
-
 from .schema_tree import SchemaTree
 from .tree_match import tree_match, recompute_wsim, mapping_generation_leaves
 from ..base_matcher import BaseMatcher
-from ...data_sources.base_db import BaseDB
 from ...data_sources.base_table import BaseTable
 
-# FIXME Find a way to get the nltk corpora in the setup.py
-
+# TODO (1) Find a way to get the nltk corpora in the setup.py
+# TODO (2) Replace lambdas with list comprehension
 
 class Cupid(BaseMatcher):
     # Optimal parameters suggested in the paper
@@ -25,7 +22,7 @@ class Cupid(BaseMatcher):
         self.categories = set()
         self.schemata = dict()  # schema name:str, schema_tree
 
-    def get_matches(self, source_input: Union[BaseDB, BaseTable], target_input: Union[BaseDB, BaseTable]):
+    def get_matches(self, source_input: BaseTable, target_input: BaseTable):
         for table in source_input.get_tables().values():
             self.add_data("DB__"+source_input.name, table)
         for table in target_input.get_tables().values():

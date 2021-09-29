@@ -3,7 +3,7 @@ from ..base_column import BaseColumn
 
 class LocalFSColumn(BaseColumn):
 
-    def __init__(self, column_name: str, data: list, d_type: str, table_guid: tuple):
+    def __init__(self, column_name: str, data: list, d_type: str, table_guid: str):
         self.__column_name = column_name
         self.__data = data
         self.__d_type = d_type

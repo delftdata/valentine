@@ -144,8 +144,8 @@ def data_type_similarity(token_set1, token_set2):
     for tt in TokenTypes:
         if tt == TokenTypes.SYMBOLS:
             continue
-        t1 = list(filter(lambda t: t.token_type == tt, token_set1))
-        t2 = list(filter(lambda t: t.token_type == tt, token_set2))
+        t1 = [t for t in token_set1 if t.token_type == tt]
+        t2 = [t for t in token_set2 if t.token_type == tt]
         if len(t1) == 0 or len(t2) == 0:
             continue
         sim = name_similarity_tokens(t1, t2)

@@ -1,12 +1,10 @@
 from itertools import product
 from multiprocessing import get_context
-from typing import Union
 
 import Levenshtein as Lv
 
 from ..base_matcher import BaseMatcher
 from ..match import Match
-from ...data_sources.base_db import BaseDB
 from ...data_sources.base_table import BaseTable
 
 # FIXME (1) make multithreading easy to use
@@ -34,7 +32,7 @@ class JaccardLevenMatcher(BaseMatcher):
         self.threshold_leven = float(threshold_leven)
         self.process_num = int(process_num)
 
-    def get_matches(self, source_input: Union[BaseDB, BaseTable], target_input: Union[BaseDB, BaseTable]):
+    def get_matches(self, source_input: BaseTable, target_input: BaseTable):
         source_id = source_input.db_belongs_uid if isinstance(source_input, BaseTable) \
             else source_input.unique_identifier
         target_id = target_input.db_belongs_uid if isinstance(target_input, BaseTable) \

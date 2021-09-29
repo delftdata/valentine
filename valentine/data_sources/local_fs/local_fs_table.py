@@ -1,21 +1,22 @@
+import os
 import pandas as pd
 from typing import List, Dict
 
+from .local_fs_column import LocalFSColumn
+from .local_fs_utils import get_columns_from_local_fs_csv_file, get_pandas_df_from_local_fs_csv_file
 from ..base_column import BaseColumn
 from ..base_table import BaseTable
-from local_fs_column import LocalFSColumn
-from local_fs_utils import correct_file_ending, get_columns_from_local_fs_csv_file, get_pandas_df_from_local_fs_csv_file
 from ...utils.utils import is_date
 
 
 class LocalFSTable(BaseTable):
 
-    def __init__(self, table_path: str, table_name: str, db_name: str, load_data: bool):
+    def __init__(self, table_path: str, load_data: bool):
         self.__table_path = table_path
-        self.__table_name = table_name  # file name
-        self.__db_name = db_name  # bucket name
+        self.__table_name = self.__table_path.replace(os.path.sep, '_').split('.')[0]
         self.__columns = dict()
         self.__column_names = self.__get_column_names()
+        self.__df = None
         if load_data:
             self.__get_columns_from_local_fs()
 
@@ -27,15 +28,11 @@ class LocalFSTable(BaseTable):
 
     @property
     def unique_identifier(self) -> str:
-        return f'{self.__db_name}:{self.__table_name}'
-
-    @property
-    def db_belongs_uid(self) -> object:
-        return self.__db_name
+        return self.__table_path
 
     @property
     def name(self) -> str:
-        return correct_file_ending(self.__table_name).replace('/', '_').split('.')[0]
+        return self.__table_name
 
     def get_columns(self) -> List[BaseColumn]:
         if not self.__columns:
@@ -48,18 +45,12 @@ class LocalFSTable(BaseTable):
                 self.__get_columns_from_local_fs()
             else:
                 column_names: List[str] = self.__get_column_names()
-                self.__columns = {column_name: LocalFSColumn(column_name, [], 'NULL', self.unique_identifier)
+                self.__columns = {column_name: LocalFSColumn(column_name, [], 'NULL', self.name)
                                   for column_name in column_names}
         return {self.name: self}
 
     def get_table_str_guids(self) -> List[str]:
         return [str(self.unique_identifier)]
-
-    def remove_table(self, guid: object) -> BaseTable:
-        pass
-
-    def add_table(self, table: BaseTable) -> None:
-        pass
 
     @property
     def is_empty(self) -> bool:
@@ -68,12 +59,15 @@ class LocalFSTable(BaseTable):
     def get_table_guids(self) -> List[object]:
         return [self.unique_identifier]
 
+    def get_df(self) -> pd.DataFrame:
+        return self.__df
+
     def __get_column_names(self) -> List[str]:
         return get_columns_from_local_fs_csv_file(self.__table_path)
 
     def __get_columns_from_local_fs(self):
-        table_df: pd.DataFrame = get_pandas_df_from_local_fs_csv_file(self.__table_path)
-        for (column_name, column_data) in table_df.iteritems():
+        self.__df: pd.DataFrame = get_pandas_df_from_local_fs_csv_file(self.__table_path)
+        for (column_name, column_data) in self.__df.iteritems():
             d_type = str(column_data.dtype)
             data = list(column_data.dropna().values)
             if len(data) != 0:

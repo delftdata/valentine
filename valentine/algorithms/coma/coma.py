@@ -1,90 +1,72 @@
 import subprocess
 import os
-import csv
+import tempfile
 import time
-from itertools import product
-from typing import List, Dict
+from typing import AnyStr
 
 from ..base_matcher import BaseMatcher
 from ..match import Match
-from ...data_sources.base_db import BaseDB
 from ...data_sources.base_table import BaseTable
-from ...utils.utils import create_folder, get_project_root
-
-# FIXME (1) use tmpdir everywhere
-# FIXME (2) figure out how to access the jar (licensing etc)
-# FIXME (3) figure out a way to specify the Xmx jar parameter
+from ...utils.utils import get_project_root
 
 
 class Coma(BaseMatcher):
 
-    def __init__(self, max_n: int = 0, strategy: str = "COMA_OPT"):
+    def __init__(self, max_n: int = 0, strategy: str = "COMA_OPT", java_xmx: str = "4096m"):
         self.max_n = int(max_n)
         self.strategy = strategy
+        self.java_XmX = java_xmx
         self.source_guid = None
         self.target_guid = None
 
-    def get_matches(self, source_input: BaseDB, target_input: BaseDB) -> List[Dict]:
-        tmp_folder_path: str = get_project_root() + '/algorithms/coma/tmp_data/'
-        create_folder(tmp_folder_path)
+    def get_matches(self,
+                    source_input: BaseTable,
+                    target_input: BaseTable) -> list[dict]:
 
-        coma_output_path: str = get_project_root() + '/algorithms/coma/coma_output/'
-        create_folder(coma_output_path)
+        self.source_guid = source_input.unique_identifier
+        self.target_guid = target_input.unique_identifier
+        matches: list = []
 
-        dataset_name: str = source_input.name + "____" + target_input.name
-        coma_output_file: str = coma_output_path + '/' + dataset_name + str(self.max_n) + self.strategy + ".txt"
-
-        matches = []
-
-        source_tables = [table for table in source_input.get_tables().values()]
-        target_tables = [table for table in target_input.get_tables().values()]
-
-        self.source_guid = source_input.db_belongs_uid if isinstance(source_input, BaseTable) \
-            else source_input.unique_identifier
-        self.target_guid = target_input.db_belongs_uid if isinstance(target_input, BaseTable) \
-            else target_input.unique_identifier
-
-        for s_table, t_table in product(source_tables, target_tables):
-            s_f_name, t_f_name = self.write_schema_csv_files(s_table, t_table)
-            self.run_coma_jar(s_f_name, t_f_name, coma_output_file)
-            raw_output = self.read_coma_output(s_f_name, t_f_name, coma_output_file)
-            matches.extend(self.process_coma_output(raw_output, t_table, s_table))
-            delete_file(s_f_name)
-            delete_file(t_f_name)
-
-        delete_file(coma_output_file)
+        with tempfile.TemporaryDirectory() as tmp_folder_path:
+            s_f_name, t_f_name = self.write_schema_csv_files(source_input, target_input, tmp_folder_path)
+            dataset_name: str = f'{source_input.name}____{target_input.name}{self.max_n}{self.strategy}.txt'
+            coma_output_file: str = os.path.join(tmp_folder_path, dataset_name)
+            self.run_coma_jar(s_f_name, t_f_name, coma_output_file, tmp_folder_path)
+            raw_output = self.read_coma_output(s_f_name, t_f_name, coma_output_file, tmp_folder_path)
+            matches.extend(self.process_coma_output(raw_output, target_input, source_input))
 
         return matches
 
-    def run_coma_jar(self, source_table_f_name: str, target_table_f_name: str, coma_output_path):
-        jar_path = get_project_root() + '/algorithms/coma/artifact/coma.jar'
-        jar_path = os.path.relpath(jar_path, get_project_root())
+    def run_coma_jar(self,
+                     source_table_f_name: str,
+                     target_table_f_name: str,
+                     coma_output_path: str,
+                     tmp_folder_path: str):
+        jar_path = os.path.join(get_project_root(), 'algorithms', 'coma', 'artifact', 'coma.jar')
         source_data = os.path.relpath(source_table_f_name, get_project_root())
         target_data = os.path.relpath(target_table_f_name, get_project_root())
         coma_output_path = os.path.relpath(coma_output_path, get_project_root())
-        fh = open("NUL", "w")
-        subprocess.call(['java', '-Xmx4000m',  # YOU MIGHT NEED TO INCREASE THE MEMORY HERE WITH BIGGER TABLES
-                         '-cp', jar_path,
-                         '-DinputFile1=' + source_data,
-                         '-DinputFile2=' + target_data,
-                         '-DoutputFile=' + coma_output_path,
-                         '-DmaxN=' + str(self.max_n),
-                         '-Dstrategy=' + self.strategy,
-                         'Main'], stdout=fh, stderr=fh)
+        with open(os.path.join(tmp_folder_path, "NUL"), "w") as fh:
+            subprocess.call(['java', f'-Xmx{self.java_XmX}',
+                             '-cp', jar_path,
+                             '-DinputFile1=' + source_data,
+                             '-DinputFile2=' + target_data,
+                             '-DoutputFile=' + coma_output_path,
+                             '-DmaxN=' + str(self.max_n),
+                             '-Dstrategy=' + self.strategy,
+                             'Main'], stdout=fh, stderr=fh)
 
-    def write_schema_csv_files(self, table1: BaseTable, table2: BaseTable):
-        f_name1 = self.write_csv_file(table1.name,
-                                      list(map(lambda x: x.name, table1.get_columns())))
-        f_name2 = self.write_csv_file(table2.name,
-                                      list(map(lambda x: x.name, table2.get_columns())))
+    def write_schema_csv_files(self, table1: BaseTable, table2: BaseTable, tmp_folder_path: str):
+        f_name1 = self.write_csv_file(table1, tmp_folder_path)
+        f_name2 = self.write_csv_file(table2, tmp_folder_path)
         return f_name1, f_name2
 
-    def process_coma_output(self, matches, t_table: BaseTable, s_table: BaseTable) -> List:
+    def process_coma_output(self, matches, t_table: BaseTable, s_table: BaseTable) -> list:
         if matches is None:
             return []
         formatted_output = []
-        t_lookup = t_table.get_guid_column_lookup
-        s_lookup = s_table.get_guid_column_lookup
+        t_lookup = t_table.get_guid_column_lookup()
+        s_lookup = s_table.get_guid_column_lookup()
         for match in matches:
             m, similarity = match.split(":")
             m1, m2 = m.split(" <-> ")
@@ -99,7 +81,7 @@ class Coma(BaseMatcher):
                                           float(similarity)).to_dict)
         return formatted_output
 
-    def read_coma_output(self, s_f_name, t_f_name, coma_output_path, retries=0):
+    def read_coma_output(self, s_f_name, t_f_name, coma_output_path, tmp_folder_path, retries=0):
         try:
             with open(coma_output_path) as f:
                 matches = f.readlines()
@@ -107,21 +89,19 @@ class Coma(BaseMatcher):
             matches.pop()
         except FileNotFoundError:
             if retries == 1:
-                self.run_coma_jar(s_f_name, t_f_name, coma_output_path)
+                self.run_coma_jar(s_f_name, t_f_name, coma_output_path, tmp_folder_path)
             elif retries == 3:
                 return []
             else:
                 time.sleep(1)
-            self.read_coma_output(s_f_name, t_f_name, coma_output_path, retries + 1)
+            self.read_coma_output(s_f_name, t_f_name, coma_output_path, tmp_folder_path, retries + 1)
         else:
             return matches
 
     @staticmethod
-    def write_csv_file(table_name: str, data: List[str]) -> str:
-        f_name: str = correct_file_ending(get_project_root() + '/algorithms/coma/tmp_data/' + table_name)
-        with open(f_name, 'w', newline='') as out:
-            writer = csv.writer(out)
-            writer.writerow(data)
+    def write_csv_file(table: BaseTable, tmp_folder_path: str) -> str:
+        f_name: AnyStr = os.path.join(tmp_folder_path, table.name + ".csv")
+        table.get_df().to_csv(f_name, index=False)
         return f_name
 
     @staticmethod

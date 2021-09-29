@@ -1,7 +1,7 @@
 import uuid
 from multiprocessing import Pool, get_context
 from itertools import combinations
-from typing import List, Union
+from typing import List
 
 from . import discovery
 from .clustering_utils import create_cache_dirs, generate_global_ranks, process_columns, ingestion_column_generator, \
@@ -9,7 +9,6 @@ from .clustering_utils import create_cache_dirs, generate_global_ranks, process_
 from ..base_matcher import BaseMatcher
 from ..match import Match
 from ...data_sources.base_column import BaseColumn
-from ...data_sources.base_db import BaseDB
 from ...data_sources.base_table import BaseTable
 
 
@@ -76,7 +75,7 @@ class CorrelationClustering(BaseMatcher):
         self.source_guid: object = None
         create_cache_dirs(self.uuid)
 
-    def get_matches(self, source_input: Union[BaseDB, BaseTable], target_input: Union[BaseDB, BaseTable]):
+    def get_matches(self, source_input: BaseTable, target_input: BaseTable):
         """
         Overridden function of the BaseMatcher tha gets the source, the target data loaders and the dataset name.
         Next it gives as an output a ranked list of column pair matches.
@@ -92,7 +91,7 @@ class CorrelationClustering(BaseMatcher):
         self.target_guid = target_input.db_belongs_uid if isinstance(target_input, BaseTable) \
             else target_input.unique_identifier
 
-        all_tables: List[Union[BaseTable, BaseDB]] = \
+        all_tables: List[BaseTable] = \
             list(source_input.get_tables().values()) + list(target_input.get_tables().values())
 
         if self.clear_cache:

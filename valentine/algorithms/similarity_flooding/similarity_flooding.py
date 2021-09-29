@@ -3,12 +3,11 @@ from typing import Union
 import Levenshtein as Lv
 import math
 
-from .graph import Graph
+from .graph.graph import Graph
 from .node_pair import NodePair
 from .propagation_graph import PropagationGraph
 from ..match import Match
 from ..base_matcher import BaseMatcher
-from ...data_sources.base_db import BaseDB
 from ...data_sources.base_table import BaseTable
 
 
@@ -24,7 +23,7 @@ class SimilarityFlooding(BaseMatcher):
         self.source_guid = None
         self.target_guid = None
 
-    def get_matches(self, source_input: Union[BaseDB, BaseTable], target_input: Union[BaseDB, BaseTable]):
+    def get_matches(self, source_input: BaseTable, target_input: BaseTable):
         self.graph1 = Graph(source_input).graph
         self.graph2 = Graph(target_input).graph
         self.calculate_initial_mapping()

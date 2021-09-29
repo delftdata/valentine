@@ -1,6 +1,6 @@
 import networkx as nx
 
-from algorithms.similarity_flooding.graph.node import Node
+from valentine.algorithms.similarity_flooding.graph.node import Node
 from valentine.data_loader.schema_loader import SchemaLoader
 
 

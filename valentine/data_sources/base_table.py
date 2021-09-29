@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import pandas as pd
 
 from .base_column import BaseColumn
 
@@ -15,16 +16,15 @@ class BaseTable(ABC):
 
     @property
     @abstractmethod
-    def db_belongs_uid(self) -> object:
-        raise NotImplementedError
-
-    @property
-    @abstractmethod
     def name(self) -> str:
         raise NotImplementedError
 
     @abstractmethod
     def get_columns(self) -> list[BaseColumn]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_df(self) -> pd.DataFrame:
         raise NotImplementedError
 
     @property
