@@ -37,7 +37,6 @@ class TestAlgorithms(unittest.TestCase):
         # Test the CUPID matcher
         cu_matcher = Cupid()
         matches_cu_matcher = cu_matcher.get_matches(d1, d2)
-        print(matches_cu_matcher)
         assert len(matches_cu_matcher) > 0  # Check that it actually produced output
 
     def test_distribution_based(self):

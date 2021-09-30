@@ -1,3 +1,5 @@
+import nltk
+
 from .schema_tree import SchemaTree
 from .tree_match import tree_match, recompute_wsim, mapping_generation_leaves
 from ..base_matcher import BaseMatcher
@@ -31,17 +33,24 @@ class Cupid(BaseMatcher):
     def get_matches(self,
                     source_input: BaseTable,
                     target_input: BaseTable):
-        self.add_data("DB__"+source_input.name, source_input)
-        self.add_data("DB__"+target_input.name, target_input)
-        source_tree = self.get_schema_by_name("DB__"+source_input.name)
-        target_tree = self.get_schema_by_name("DB__"+target_input.name)
-        sims = tree_match(source_tree, target_tree, self.categories, self.leaf_w_struct, self.w_struct, self.th_accept,
-                          self.th_high, self.th_low, self.c_inc, self.c_dec, self.th_ns, self.parallelism)
-        new_sims = recompute_wsim(source_tree, target_tree, sims)
-        source_id = source_input.unique_identifier
-        target_id = target_input.unique_identifier
-        matches = mapping_generation_leaves(source_id, target_id, source_tree, target_tree, new_sims, self.th_accept)
-        return matches
+        try:
+            self.add_data("DB__"+source_input.name, source_input)
+            self.add_data("DB__"+target_input.name, target_input)
+            source_tree = self.get_schema_by_name("DB__"+source_input.name)
+            target_tree = self.get_schema_by_name("DB__"+target_input.name)
+            sims = tree_match(source_tree, target_tree, self.categories, self.leaf_w_struct, self.w_struct, self.th_accept,
+                              self.th_high, self.th_low, self.c_inc, self.c_dec, self.th_ns, self.parallelism)
+            new_sims = recompute_wsim(source_tree, target_tree, sims)
+            source_id = source_input.unique_identifier
+            target_id = target_input.unique_identifier
+            matches = mapping_generation_leaves(source_id, target_id, source_tree, target_tree, new_sims, self.th_accept)
+        except LookupError:
+            nltk.download('punkt')
+            nltk.download('stopwords')
+            nltk.download('wordnet')
+            self.get_matches(source_input, target_input)
+        else:
+            return matches
 
     def add_data(self,
                  schema_name: str,
