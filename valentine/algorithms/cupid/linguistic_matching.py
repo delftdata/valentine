@@ -39,8 +39,13 @@ def normalization(element,
                   schema_element=None):
     if schema_element is None:
         schema_element = SchemaElement(element)
-
-    tokens = nltk.word_tokenize(element)
+    try:
+        tokens = nltk.word_tokenize(element)
+    except LookupError:
+        nltk.download('punkt')
+        nltk.download('stopwords')
+        nltk.download('wordnet')
+        tokens = nltk.word_tokenize(element)
 
     for token in tokens:
         token_obj = Token()

@@ -14,4 +14,3 @@ PuLP==2.5.1
 pyemd==0.5.1
 # data loading
 python-dateutil==2.8.2
-requests==2.26.0
