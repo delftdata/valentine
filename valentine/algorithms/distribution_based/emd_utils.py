@@ -5,7 +5,9 @@ from .column_model import CorrelationClusteringColumn
 from .quantile_histogram import QuantileHistogram
 
 
-def quantile_emd(column1: CorrelationClusteringColumn, column2: CorrelationClusteringColumn, quantiles: int = 256):
+def quantile_emd(column1: CorrelationClusteringColumn,
+                 column2: CorrelationClusteringColumn,
+                 quantiles: int = 256):
     """
     Computes the Earth Mover's Distance (EMD) over two column quantile histograms
 
@@ -37,7 +39,10 @@ def quantile_emd(column1: CorrelationClusteringColumn, column2: CorrelationClust
     return emd(histogram1.get_values, histogram2.get_values, histogram1.dist_matrix)
 
 
-def intersection_emd(column1: CorrelationClusteringColumn, column2: CorrelationClusteringColumn, quantiles: int = 256):
+def intersection_emd(column1: CorrelationClusteringColumn,
+                     column2: CorrelationClusteringColumn,
+                     tmp_folder_path: str,
+                     quantiles: int = 256):
     """
     Computes the intersection Earth Mover's Distance (EMD) over two column quantile histograms as described in
     "Automatic Discovery of Attributes in Relational Databases"
@@ -53,6 +58,8 @@ def intersection_emd(column1: CorrelationClusteringColumn, column2: CorrelationC
         The first column
     column2 : Column
         The second column
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     quantiles: int, optional
         The number of quantiles that the histograms are split on (default is 256)
 
@@ -72,7 +79,7 @@ def intersection_emd(column1: CorrelationClusteringColumn, column2: CorrelationC
 
     intersection_column = CorrelationClusteringColumn(
         "", "Intersection of " + str(column1.long_name) + " " + str(column2.long_name),
-        intersection, "", "", quantiles, column1.task_uuid)
+        intersection, "", "", quantiles, tmp_folder_path)
 
     e1 = quantile_emd(column1, intersection_column, quantiles)
     e2 = quantile_emd(column2, intersection_column, quantiles)

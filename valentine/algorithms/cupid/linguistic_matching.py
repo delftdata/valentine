@@ -35,7 +35,8 @@ DATATYPE_COMPATIBILITY_TABLE = {
 }
 
 
-def normalization(element, schema_element=None):
+def normalization(element,
+                  schema_element=None):
     if schema_element is None:
         schema_element = SchemaElement(element)
 
@@ -93,13 +94,10 @@ def compute_compatibility(categories):
             compatibility_table[cat1][cat2] = DATATYPE_COMPATIBILITY_TABLE[cat1][cat2]
             compatibility_table[cat2][cat1] = DATATYPE_COMPATIBILITY_TABLE[cat1][cat2]
         else:
-            tokens1 = list(map(lambda t: Token().add_data(t),
-                               list(filter(lambda x: x.isalnum(), nltk.word_tokenize(cat1)))))
+            tokens1 = [Token().add_data(t) for t in nltk.word_tokenize(cat1) if t.isalnum()]
             for token in tokens1:
                 token.token_type = add_token_type(token)
-
-            tokens2 = list(map(lambda t: Token().add_data(t),
-                               list(filter(lambda x: x.isalnum(), nltk.word_tokenize(cat2)))))
+            tokens2 = [Token().add_data(t) for t in nltk.word_tokenize(cat2) if t.isalnum()]
             for token in tokens2:
                 token.token_type = add_token_type(token)
             compatibility = data_type_similarity(tokens1, tokens2)
@@ -108,7 +106,11 @@ def compute_compatibility(categories):
     return compatibility_table
 
 
-def comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism):
+def comparison(source_tree,
+               target_tree,
+               compatibility_table,
+               th_ns,
+               parallelism):
     elements_to_compare = generate_parallel_l_sim_input(source_tree, target_tree, compatibility_table, th_ns)
     if parallelism == 1:
         l_sim = {k: v for k, v in [l_sim_proc(pair, compatibility_table) for pair in elements_to_compare]}
@@ -118,7 +120,10 @@ def comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism
     return l_sim
 
 
-def generate_parallel_l_sim_input(source_tree, target_tree, compatibility_table, th_ns):
+def generate_parallel_l_sim_input(source_tree,
+                                  target_tree,
+                                  compatibility_table,
+                                  th_ns):
     all_nodes_s = [node for node in LevelOrderIter(source_tree.root)]
     all_nodes_t = [node for node in LevelOrderIter(target_tree.root)]
     all_nodes = product(all_nodes_s, all_nodes_t)
@@ -129,7 +134,8 @@ def generate_parallel_l_sim_input(source_tree, target_tree, compatibility_table,
             yield pair
 
 
-def l_sim_proc(pair: tuple, compatibility_table: dict):
+def l_sim_proc(pair: tuple,
+               compatibility_table: dict):
     s, t = pair
     s_cat = s.categories
     t_cat = t.categories
@@ -138,7 +144,8 @@ def l_sim_proc(pair: tuple, compatibility_table: dict):
     return (s.long_name, t.long_name), name_similarity_elements(s, t) * max(max_s)
 
 
-def data_type_similarity(token_set1, token_set2):
+def data_type_similarity(token_set1,
+                         token_set2):
     sum1 = 0
     sum2 = 0
     for tt in TokenTypes:
@@ -156,14 +163,16 @@ def data_type_similarity(token_set1, token_set2):
     return sum1 / sum2
 
 
-# max = 1
-def name_similarity_tokens(token_set1, token_set2):
+# max is 1
+def name_similarity_tokens(token_set1,
+                           token_set2):
     sum1 = get_partial_similarity(token_set1, token_set2)
     sum2 = get_partial_similarity(token_set2, token_set1)
     return (sum1 + sum2) / (len(token_set1) + len(token_set2))
 
 
-def get_partial_similarity(token_set1, token_set2):
+def get_partial_similarity(token_set1,
+                           token_set2):
     total_sum = 0
     for t1 in token_set1:
         max_sim = -math.inf
@@ -181,7 +190,8 @@ def get_partial_similarity(token_set1, token_set2):
 
 
 # the higher, the better
-def compute_similarity_wordnet(word1, word2):
+def compute_similarity_wordnet(word1,
+                               word2):
     allsyns1 = set(ss for ss in wn.synsets(word1))
     allsyns2 = set(ss for ss in wn.synsets(word2))
     if len(allsyns1) == 0 or len(allsyns2) == 0:
@@ -191,19 +201,23 @@ def compute_similarity_wordnet(word1, word2):
 
 
 # the lower, the better
-def compute_similarity_ngram(word1, word2, n):
+def compute_similarity_ngram(word1,
+                             word2,
+                             n):
     ngram = NGram(n)
     sim = ngram.distance(word1, word2)
     return sim
 
 
 # Higher the better
-def compute_similarity_leven(word1, word2):
+def compute_similarity_leven(word1,
+                             word2):
     return Lv.ratio(word1, word2)
 
 
 # max is 0.5
-def name_similarity_elements(element1, element2):
+def name_similarity_elements(element1,
+                             element2):
     sum1 = 0
     sum2 = 0
 
@@ -224,21 +238,22 @@ def name_similarity_elements(element1, element2):
     return sum1 / sum2
 
 
-def compute_lsim(element1, element2):
+def compute_lsim(element1,
+                 element2):
     name_similarity = name_similarity_elements(element1, element2)
     max_category = get_max_ns_category(element1.categories, element2.categories)
 
     return name_similarity * max_category
 
 
-def get_max_ns_category(categories_e1, categories_e2):
+def get_max_ns_category(categories_e1,
+                        categories_e2):
     max_category = -math.inf
 
     for c1 in categories_e1:
-        c1_tokens = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(c1)))
-
+        c1_tokens = [Token().add_data(t) for t in nltk.word_tokenize(c1)]
         for c2 in categories_e2:
-            c2_tokens = list(map(lambda t: Token().add_data(t), nltk.word_tokenize(c2)))
+            c2_tokens = [Token().add_data(t) for t in nltk.word_tokenize(c2)]
             name_similarity_categories = name_similarity_tokens(c1_tokens, c2_tokens)
 
             if name_similarity_categories > max_category:

@@ -12,7 +12,9 @@ from .clustering_utils import column_combinations, transform_dict, process_emd, 
     cuttoff_column_generator, compute_cutoff_threshold
 
 
-def compute_distribution_clusters(columns: List[Tuple[str, str, str, str]], threshold: float, uuid: str,
+def compute_distribution_clusters(columns: List[Tuple[str, str, str, str]],
+                                  threshold: float,
+                                  tmp_folder_path: str,
                                   quantiles: int = 256):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
@@ -24,21 +26,21 @@ def compute_distribution_clusters(columns: List[Tuple[str, str, str, str]], thre
         The column names of the database
     threshold : float
         The conservative global EMD cutoff threshold described in [1]
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     quantiles : int, optional
         The number of quantiles that the histograms are split on (default is 256)
-    uuid:
-        The unique identifier of the run
 
     Returns
     -------
     list(list(str))
         A list that contains the distribution clusters that contain the column names in the cluster
     """
-    combinations = column_combinations(columns, quantiles, uuid, intersection=False)
+    combinations = column_combinations(columns, quantiles, tmp_folder_path, intersection=False)
 
     matrix_a: dict = transform_dict({k: v for k, v in [process_emd(cmb) for cmb in combinations]})
 
-    ctf_clm_gnr = cuttoff_column_generator(matrix_a, columns, threshold, uuid)
+    ctf_clm_gnr = cuttoff_column_generator(matrix_a, columns, threshold, tmp_folder_path)
 
     edges_per_column: list = [parallel_cutoff_threshold(tup) for tup in ctf_clm_gnr]
 
@@ -49,7 +51,10 @@ def compute_distribution_clusters(columns: List[Tuple[str, str, str, str]], thre
     return connected_components
 
 
-def compute_distribution_clusters_parallel(columns: list, threshold: float, pool: Pool, uuid: str,
+def compute_distribution_clusters_parallel(columns: list,
+                                           threshold: float,
+                                           pool: Pool,
+                                           tmp_folder_path: str,
                                            quantiles: int = 256):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
@@ -63,21 +68,23 @@ def compute_distribution_clusters_parallel(columns: list, threshold: float, pool
         The conservative global EMD cutoff threshold described in [1]
     pool: multiprocessing.Pool
         The process pool that will be used in the pre-processing of the table's columns
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     quantiles : int, optional
         The number of quantiles that the histograms are split on (default is 256)
-    uuid:
-        The unique identifier of the run
 
     Returns
     -------
     list(list(str))
         A list that contains the distribution clusters that contain the column names in the cluster
     """
-    combinations = column_combinations(columns, quantiles, uuid, intersection=False)
+    combinations = column_combinations(columns, quantiles, tmp_folder_path, intersection=False)
     matrix_a: dict = transform_dict(dict(pool.map(process_emd, combinations, chunksize=1)))
 
-    edges_per_column = list(pool.map(parallel_cutoff_threshold, cuttoff_column_generator(matrix_a, columns, threshold,
-                                                                                         uuid), chunksize=1))
+    edges_per_column = list(pool.map(parallel_cutoff_threshold, cuttoff_column_generator(matrix_a,
+                                                                                         columns,
+                                                                                         threshold,
+                                                                                         tmp_folder_path), chunksize=1))
 
     graph = create_graph(columns, edges_per_column)
 
@@ -86,7 +93,9 @@ def compute_distribution_clusters_parallel(columns: list, threshold: float, pool
     return connected_components
 
 
-def compute_attributes(distribution_clusters: list, threshold: float, uuid: str,
+def compute_attributes(distribution_clusters: list,
+                       threshold: float,
+                       tmp_folder_path: str,
                        quantiles: int = 256):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
@@ -98,10 +107,10 @@ def compute_attributes(distribution_clusters: list, threshold: float, uuid: str,
         The distribution clusters computed in algorithm 2
     threshold : float
         The conservative global EMD cutoff threshold described in [1]
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     quantiles : int, optional
         The number of quantiles that the histograms are split on (default is 256)
-    uuid:
-        The unique identifier of the run
 
     Returns
     -------
@@ -109,14 +118,17 @@ def compute_attributes(distribution_clusters: list, threshold: float, uuid: str,
         A dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = column_combinations(distribution_clusters, quantiles, uuid, intersection=True)
+    combinations = column_combinations(distribution_clusters, quantiles, tmp_folder_path, intersection=True)
 
     matrix_i: dict = transform_dict({k: v for k, v in [process_emd(cmb) for cmb in combinations]})
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
 
-def compute_attributes_parallel(distribution_clusters: list, threshold: float, pool: Pool, uuid: str,
+def compute_attributes_parallel(distribution_clusters: list,
+                                threshold: float,
+                                pool: Pool,
+                                tmp_folder_path: str,
                                 quantiles: int = 256):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
@@ -130,10 +142,10 @@ def compute_attributes_parallel(distribution_clusters: list, threshold: float, p
         The conservative global EMD cutoff threshold described in [1]
     pool: multiprocessing.Pool
         The process pool that will be used in the pre-processing of the table's columns
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     quantiles : int, optional
         The number of quantiles that the histograms are split on (default is 256)
-    uuid:
-        The unique identifier of the run
 
     Returns
     -------
@@ -141,14 +153,16 @@ def compute_attributes_parallel(distribution_clusters: list, threshold: float, p
         A dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = column_combinations(distribution_clusters, quantiles, uuid, intersection=True)
+    combinations = column_combinations(distribution_clusters, quantiles, tmp_folder_path, intersection=True)
 
     matrix_i = transform_dict(dict(pool.map(process_emd, combinations, chunksize=1)))
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
 
-def get_attribute_graph(distribution_clusters: list, matrix_i: dict, threshold: float):
+def get_attribute_graph(distribution_clusters: list,
+                        matrix_i: dict,
+                        threshold: float):
     g_a = dict()
     matrix_e = np.zeros((len(distribution_clusters), len(distribution_clusters)))
 
@@ -173,7 +187,8 @@ def get_attribute_graph(distribution_clusters: list, matrix_i: dict, threshold: 
     return g_a
 
 
-def correlation_clustering_pulp(vertexes: list, edges: dict):
+def correlation_clustering_pulp(vertexes: list,
+                                edges: dict):
     """
     The LP solver used to perform the correlation clustering
 
@@ -226,7 +241,8 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
     return result
 
 
-def process_correlation_clustering_result(results: list, columns: list):
+def process_correlation_clustering_result(results: list,
+                                          columns: list):
     """
     Function that takes the output of the correlation clustering and returns the connected components
 
@@ -254,7 +270,8 @@ def process_correlation_clustering_result(results: list, columns: list):
     return connected_components
 
 
-def create_graph(nodes: list, edges_per_column: list):
+def create_graph(nodes: list,
+                 edges_per_column: list):
     """
     Simple function that creates a graph give the vertices and their corresponding edges
 

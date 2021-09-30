@@ -2,7 +2,7 @@ import subprocess
 import os
 import tempfile
 import time
-from typing import AnyStr
+from typing import AnyStr, List, Dict, Tuple
 
 from ..base_matcher import BaseMatcher
 from ..match import Match
@@ -12,7 +12,10 @@ from ...utils.utils import get_project_root
 
 class Coma(BaseMatcher):
 
-    def __init__(self, max_n: int = 0, strategy: str = "COMA_OPT", java_xmx: str = "4096m"):
+    def __init__(self,
+                 max_n: int = 0,
+                 strategy: str = "COMA_OPT",
+                 java_xmx: str = "4096m"):
         self.max_n = int(max_n)
         self.strategy = strategy
         self.java_XmX = java_xmx
@@ -21,7 +24,8 @@ class Coma(BaseMatcher):
 
     def get_matches(self,
                     source_input: BaseTable,
-                    target_input: BaseTable) -> list[dict]:
+                    target_input: BaseTable
+                    ) -> List[Dict]:
 
         self.source_guid = source_input.unique_identifier
         self.target_guid = target_input.unique_identifier
@@ -41,7 +45,8 @@ class Coma(BaseMatcher):
                      source_table_f_name: str,
                      target_table_f_name: str,
                      coma_output_path: str,
-                     tmp_folder_path: str):
+                     tmp_folder_path: str
+                     ) -> None:
         jar_path = os.path.join(get_project_root(), 'algorithms', 'coma', 'artifact', 'coma.jar')
         source_data = os.path.relpath(source_table_f_name, get_project_root())
         target_data = os.path.relpath(target_table_f_name, get_project_root())
@@ -56,12 +61,20 @@ class Coma(BaseMatcher):
                              '-Dstrategy=' + self.strategy,
                              'Main'], stdout=fh, stderr=fh)
 
-    def write_schema_csv_files(self, table1: BaseTable, table2: BaseTable, tmp_folder_path: str):
+    def write_schema_csv_files(self,
+                               table1: BaseTable,
+                               table2: BaseTable,
+                               tmp_folder_path: str
+                               ) -> Tuple[str, str]:
         f_name1 = self.write_csv_file(table1, tmp_folder_path)
         f_name2 = self.write_csv_file(table2, tmp_folder_path)
         return f_name1, f_name2
 
-    def process_coma_output(self, matches, t_table: BaseTable, s_table: BaseTable) -> list:
+    def process_coma_output(self,
+                            matches,
+                            t_table: BaseTable,
+                            s_table: BaseTable
+                            ) -> list:
         if matches is None:
             return []
         formatted_output = []
@@ -81,7 +94,12 @@ class Coma(BaseMatcher):
                                           float(similarity)).to_dict)
         return formatted_output
 
-    def read_coma_output(self, s_f_name, t_f_name, coma_output_path, tmp_folder_path, retries=0):
+    def read_coma_output(self,
+                         s_f_name,
+                         t_f_name,
+                         coma_output_path,
+                         tmp_folder_path,
+                         retries=0):
         try:
             with open(coma_output_path) as f:
                 matches = f.readlines()
@@ -99,7 +117,9 @@ class Coma(BaseMatcher):
             return matches
 
     @staticmethod
-    def write_csv_file(table: BaseTable, tmp_folder_path: str) -> str:
+    def write_csv_file(table: BaseTable,
+                       tmp_folder_path: str
+                       ) -> str:
         f_name: AnyStr = os.path.join(tmp_folder_path, table.name + ".csv")
         table.get_df().to_csv(f_name, index=False)
         return f_name

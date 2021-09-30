@@ -1,6 +1,5 @@
 import csv
 from pathlib import Path
-import os
 from dateutil.parser import parse
 import chardet
 
@@ -28,13 +27,6 @@ def convert_data_type(string: str):
 
 def get_project_root():
     return str(Path(__file__).parent.parent)
-
-
-def create_folder(path: str):
-    try:
-        os.makedirs(path)
-    except OSError:
-        pass
 
 
 def allowed_csv_file(filename: str):

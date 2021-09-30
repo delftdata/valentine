@@ -45,7 +45,12 @@ class QuantileHistogram:
          Compute the distance matrix between all buckets.
     """
 
-    def __init__(self, name: tuple, ranks: ndarray, normalization: int, quantiles: int, reference_hist=None):
+    def __init__(self,
+                 name: tuple,
+                 ranks: ndarray,
+                 normalization: int,
+                 quantiles: int,
+                 reference_hist=None):
         """
         Parameters
         ----------
@@ -98,7 +103,9 @@ class QuantileHistogram:
         """
         return np.sum(self.get_values) == 0
 
-    def add_buckets(self, min_val: int, bb: list):
+    def add_buckets(self,
+                    min_val: int,
+                    bb: list):
         """
         Create the buckets with the given bucket boundaries
 
@@ -115,7 +122,9 @@ class QuantileHistogram:
             self.bucket_boundaries[i+1] = (bb[i], bb[i+1])
             i = i + 1
 
-    def add_values(self, values, norm=True):
+    def add_values(self,
+                   values,
+                   norm=True):
         """
         Add all values to buckets
 

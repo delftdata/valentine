@@ -1,8 +1,10 @@
+import os
+
 import numpy as np
 import pickle
 
 from ...data_sources.base_column import BaseColumn
-from ...utils.utils import convert_data_type, get_project_root
+from ...utils.utils import convert_data_type
 
 
 class CorrelationClusteringColumn(BaseColumn):
@@ -28,8 +30,14 @@ class CorrelationClusteringColumn(BaseColumn):
     get_original_data()
         Returns the original data instances
     """
-    def __init__(self, name: str, column_uid: str, data: list,
-                 table_name: str, table_guid: str, quantiles: int, uuid: str):
+    def __init__(self,
+                 name: str,
+                 column_uid: str,
+                 data: list,
+                 table_name: str,
+                 table_guid: str,
+                 quantiles: int,
+                 tmp_folder_path: str):
         """
         Parameters
         ----------
@@ -48,8 +56,8 @@ class CorrelationClusteringColumn(BaseColumn):
         self.__table_name = table_name
         self.__table_guid = table_guid
         self.__quantiles = quantiles
-        self.task_uuid = uuid
-        self.__ranks = self.get_global_ranks(self.__data, self.task_uuid)
+        self.__tmp_dir = tmp_folder_path
+        self.__ranks = self.get_global_ranks(self.__data, self.__tmp_dir)
         self.quantile_histogram = None
 
     @property
@@ -81,7 +89,7 @@ class CorrelationClusteringColumn(BaseColumn):
         return self.__ranks
 
     @staticmethod
-    def get_global_ranks(column: list, task_uuid: str):
+    def get_global_ranks(column: list, tmp_folder_path: str):
         """
         Function that gets the column data, reads the pickled global ranks and produces a ndarray that contains the
         ranks of the data .
@@ -90,16 +98,15 @@ class CorrelationClusteringColumn(BaseColumn):
         ----------
         column : list
             The column data
-        task_uuid : str
-            The unique identifier of the task
+        tmp_folder_path: str
+            The path of the temporary folder that will serve as a cache for the run
 
         Returns
         -------
         ndarray
             The ndarray that contains the ranks of the data
         """
-        with open(f'{get_project_root()}/algorithms/distribution_based/cache/global_ranks/{task_uuid}/ranks.pkl',
-                  'rb') as pkl_file:
+        with open(os.path.join(tmp_folder_path, 'ranks.pkl'), 'rb') as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
             ranks = np.array(sorted([global_ranks[dt_x] for x in column
                                      if (dt_x := convert_data_type(x)) in global_ranks]))

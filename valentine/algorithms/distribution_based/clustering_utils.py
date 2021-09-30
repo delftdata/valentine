@@ -1,6 +1,5 @@
 import pickle
 import os
-import shutil
 import subprocess
 from functools import lru_cache
 from typing import List, Tuple
@@ -9,7 +8,7 @@ from .column_model import CorrelationClusteringColumn
 from .emd_utils import intersection_emd, quantile_emd
 from .quantile_histogram import QuantileHistogram
 from ...data_sources.base_column import BaseColumn
-from ...utils.utils import convert_data_type, create_folder, get_project_root
+from ...utils.utils import convert_data_type
 
 
 def compute_cutoff_threshold(matrix_c: list, threshold: float):
@@ -43,7 +42,9 @@ def compute_cutoff_threshold(matrix_c: list, threshold: float):
     return cutoff
 
 
-def column_combinations(columns: List[Tuple], quantiles: int, uuid: str,
+def column_combinations(columns: List[Tuple],
+                        quantiles: int,
+                        tmp_folder_path: str,
                         intersection: bool = False):
     """
     All the unique combinations between all the columns
@@ -54,10 +55,10 @@ def column_combinations(columns: List[Tuple], quantiles: int, uuid: str,
         A list that contains all the column names
     quantiles : int
         The number of quantiles that the histograms are split on
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     intersection : bool, optional
         If true do the intersection EMD else the normal EMD
-    uuid:
-        The unique identifier of the run
 
     Returns
     -------
@@ -72,7 +73,7 @@ def column_combinations(columns: List[Tuple], quantiles: int, uuid: str,
         while c_j < c:
             _, table_guid_j, _, column_guid_j = columns[c_j]
             if table_guid_i != table_guid_j:
-                yield (columns[c_i], columns[c_j]), quantiles, intersection, uuid
+                yield (columns[c_i], columns[c_j]), quantiles, intersection, tmp_folder_path
             c_j = c_j + 1
         c_i = c_i + 1
 
@@ -91,19 +92,19 @@ def process_emd(tup: tuple):
     tuple
         a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
     """
-    name_i, name_j, k, quantile, intersection, uuid = unwrap_process_input_tuple(tup)
+    name_i, name_j, k, quantile, intersection, tmp_folder_path = unwrap_process_input_tuple(tup)
     tn_i, _, cn_i, _ = name_i
     tn_j, _, cn_j, _ = name_j
-    c1 = read_from_cache(f'{tn_i}_{cn_i}', uuid)
-    c2 = read_from_cache(f'{tn_j}_{cn_j}', uuid)
+    c1 = read_from_cache(f'{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}', tmp_folder_path)
+    c2 = read_from_cache(f'{make_filename_safe(tn_j)}_{make_filename_safe(cn_j)}', tmp_folder_path)
     if intersection:
-        return k, intersection_emd(c1, c2, quantile)
+        return k, intersection_emd(c1, c2, tmp_folder_path, quantile)
     else:
         return k, quantile_emd(c1, c2, quantile)
 
 
 @lru_cache(maxsize=32)
-def read_from_cache(file_name: str, uuid: str):
+def read_from_cache(file_name: str, tmp_folder_path):
     """
     Function that reads from a pickle file lru cache a column after pre-processing
 
@@ -111,14 +112,15 @@ def read_from_cache(file_name: str, uuid: str):
     ----------
     file_name: str
         The file name that contains the
-    uuid:
-        The unique identifier of the run
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
+
     Returns
     -------
     CorrelationClusteringColumn
         The preprocessed column
     """
-    return get_column_from_store(file_name, uuid)
+    return get_column_from_store(file_name, tmp_folder_path)
 
 
 def unwrap_process_input_tuple(tup: tuple):
@@ -130,10 +132,10 @@ def unwrap_process_input_tuple(tup: tuple):
     tup : tuple
         the tuple to unwrap
     """
-    names, quantile, intersection, uuid = tup
+    names, quantile, intersection, tmp_folder_path = tup
     name_i, name_j = names
     k = (name_i, name_j)
-    return name_i, name_j, k, quantile, intersection, uuid
+    return name_i, name_j, k, quantile, intersection, tmp_folder_path
 
 
 def insert_to_dict(dc: dict, k: str, v: dict):
@@ -184,13 +186,12 @@ def process_columns(tup: tuple):
     tup : tuple
         tuple containing the information of the column to be processed
     """
-    column_name, column_uid, data, source_name, source_guid, quantiles, uuid = tup
-    column = CorrelationClusteringColumn(column_name, column_uid, data, source_name, source_guid, quantiles, uuid)
+    column_name, column_uid, data, source_name, source_guid, quantiles, tmp_folder_path = tup
+    column = CorrelationClusteringColumn(column_name, column_uid, data, source_name, source_guid, quantiles, tmp_folder_path)
     if column.size > 0:
         column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
-    folder = get_project_root() + '/algorithms/distribution_based/cache/column_store/' + uuid
-    create_folder(folder)
-    with open(make_filename_safe(f'{folder}/{column.table_name}_{column.name}.pkl'),
+    with open(os.path.join(tmp_folder_path,
+                           f'{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}.pkl'),
               'wb') as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
     del column
@@ -212,27 +213,33 @@ def parallel_cutoff_threshold(tup: tuple):
     return n_c
 
 
-def ingestion_column_generator(columns: List[BaseColumn], table_name: str, table_guid: object, quantiles: int,
-                               uuid: str):
+def ingestion_column_generator(columns: List[BaseColumn],
+                               table_name: str,
+                               table_guid: object,
+                               quantiles: int,
+                               tmp_folder_path: str):
     """
     Generator of incoming pandas dataframe columns
     """
     for column in columns:
-        yield column.name, column.unique_identifier, column.data, table_name, table_guid, quantiles, uuid
+        yield column.name, column.unique_identifier, column.data, table_name, table_guid, quantiles, tmp_folder_path
 
 
-def cuttoff_column_generator(matrix_a: dict, columns: List[Tuple[str, str, str, str]], threshold: float, uuid: str):
+def cuttoff_column_generator(matrix_a: dict,
+                             columns: List[Tuple[str, str, str, str]],
+                             threshold: float,
+                             tmp_folder_path: str):
     """
     Generator of columns for the cutoff threshold computation
     """
     for column_name in columns:
         tn_i, _, cn_i, _ = column_name
-        f_name = f'{tn_i}_{cn_i}'
-        column = get_column_from_store(f_name, uuid)
+        f_name = f'{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}'
+        column = get_column_from_store(f_name, tmp_folder_path)
         yield matrix_a, column, threshold
 
 
-def generate_global_ranks(data: list, uuid: str):
+def generate_global_ranks(data: list, tmp_folder_path: str):
     """
     Function that creates a pickle file with the global ranks of all the values inside the database.
 
@@ -240,16 +247,16 @@ def generate_global_ranks(data: list, uuid: str):
     ----------
     data : list
         All the values from every column
-    uuid:
-        The unique identifier of the run
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
     """
-    ranks = unix_sort_ranks(set(data), uuid)
-    with open(f'{get_project_root()}/algorithms/distribution_based/cache/global_ranks/{uuid}/ranks.pkl',
-              'wb') as output:
+    ranks = unix_sort_ranks(set(data), tmp_folder_path)
+    with open(os.path.join(tmp_folder_path, 'ranks.pkl'), 'wb') as output:
         pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
 
-def unix_sort_ranks(corpus: set, uuid: str):
+def unix_sort_ranks(corpus: set,
+                    tmp_folder_path: str):
     """
     Function that takes a corpus sorts it with the unix sort -n command and generates the global ranks
     for each value in the corpus.
@@ -258,34 +265,37 @@ def unix_sort_ranks(corpus: set, uuid: str):
     ----------
     corpus: set
         The corpus (all the unique values from every column)
-    uuid:
-        The unique identifier of the run
+    tmp_folder_path: str
+        The path of the temporary folder that will serve as a cache for the run
 
     Returns
     -------
     dict
         The ranks in the form of k: value, v: the rank of the value
     """
-    with open(f'{get_project_root()}/algorithms/distribution_based/cache/sorts/{uuid}/unsorted_file.txt', 'w') as out:
+    unsorted_file_path = os.path.join(tmp_folder_path, 'unsorted_file.txt')
+    sorted_file_path = os.path.join(tmp_folder_path, 'sorted_file.txt')
+
+    with open(unsorted_file_path, 'w') as out:
         for var in corpus:
             print(str(var), file=out)
 
-    with open(f'{get_project_root()}/algorithms/distribution_based/cache/sorts/{uuid}/sorted_file.txt', 'w') as f:
+    with open(sorted_file_path, 'w') as f:
         if os.name == 'nt':
             subprocess.call(['sort',
-                             f'{get_project_root()}/algorithms/distribution_based/cache/sorts/{uuid}/unsorted_file.txt'],
+                             unsorted_file_path],
                             stdout=f)
         else:
             sort_env = os.environ.copy()
             sort_env['LC_ALL'] = 'C'
             subprocess.call(['sort', '-n',
-                             f'{get_project_root()}/algorithms/distribution_based/cache/sorts/{uuid}/unsorted_file.txt'],
+                             unsorted_file_path],
                             stdout=f, env=sort_env)
 
     rank = 1
     ranks = []
 
-    with open(f'{get_project_root()}/algorithms/distribution_based/cache/sorts/{uuid}/sorted_file.txt', 'r') as f:
+    with open(sorted_file_path, 'r') as f:
         txt = f.read()
         for var in txt.splitlines():
             ranks.append((convert_data_type(var.replace('\n', '')), rank))
@@ -294,28 +304,8 @@ def unix_sort_ranks(corpus: set, uuid: str):
     return dict(ranks)
 
 
-def create_cache_dirs(uuid: str):
-    """ Create the directories needed for the correlation clustering algorithm"""
-    primary_folder: str = get_project_root() + '/algorithms/distribution_based/cache'
-    create_folder(primary_folder)
-    create_folder(primary_folder + '/global_ranks')
-    create_folder(primary_folder + '/column_store')
-    create_folder(primary_folder + '/sorts')
-    create_folder(primary_folder + '/global_ranks/' + uuid)
-    create_folder(primary_folder + '/column_store/' + uuid)
-    create_folder(primary_folder + '/sorts/' + uuid)
-
-
-def cleanup_files(uuid: str):
-    primary_folder: str = get_project_root() + '/algorithms/distribution_based/cache'
-    shutil.rmtree(primary_folder + '/global_ranks/' + uuid)
-    shutil.rmtree(primary_folder + '/column_store/' + uuid)
-    shutil.rmtree(primary_folder + '/sorts/' + uuid)
-
-
-def get_column_from_store(file_name: str, uuid: str):
-    file_path = make_filename_safe(
-        f'{get_project_root()}/algorithms/distribution_based/cache/column_store/{uuid}/{file_name}.pkl')
+def get_column_from_store(file_name: str, tmp_folder_path: str):
+    file_path = os.path.join(tmp_folder_path, f'{file_name}.pkl')
     if os.path.getsize(file_path) > 0:
         with open(file_path, 'rb') as pkl_file:
             data = pickle.load(pkl_file)

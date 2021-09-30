@@ -7,7 +7,6 @@ from ..base_matcher import BaseMatcher
 from ..match import Match
 from ...data_sources.base_table import BaseTable
 
-# FIXME (1) make multithreading easy to use
 
 class JaccardLevenMatcher(BaseMatcher):
     """
@@ -20,7 +19,9 @@ class JaccardLevenMatcher(BaseMatcher):
 
     """
 
-    def __init__(self, threshold_leven: float = 0.8, process_num: int = 1):
+    def __init__(self,
+                 threshold_leven: float = 0.8,
+                 process_num: int = 1):
         """
         Parameters
         ----------
@@ -32,37 +33,43 @@ class JaccardLevenMatcher(BaseMatcher):
         self.threshold_leven = float(threshold_leven)
         self.process_num = int(process_num)
 
-    def get_matches(self, source_input: BaseTable, target_input: BaseTable):
-        source_id = source_input.db_belongs_uid if isinstance(source_input, BaseTable) \
-            else source_input.unique_identifier
-        target_id = target_input.db_belongs_uid if isinstance(target_input, BaseTable) \
-            else target_input.unique_identifier
+    def get_matches(self,
+                    source_input: BaseTable,
+                    target_input: BaseTable):
+        source_id = source_input.unique_identifier
+        target_id = target_input.unique_identifier
         matches = []
         if self.process_num == 1:
-            for combination in self.get_column_combinations(source_input.get_tables().values(),
-                                                            target_input.get_tables().values(), self.threshold_leven,
-                                                            target_id, source_id):
+            for combination in self.get_column_combinations(source_input,
+                                                            target_input,
+                                                            self.threshold_leven,
+                                                            target_id,
+                                                            source_id):
                 matches.append(process_jaccard_leven(combination))
         else:
             with get_context("spawn").Pool(self.process_num) as process_pool:
                 matches = list(process_pool.map(process_jaccard_leven,
-                                                self.get_column_combinations(source_input.get_tables().values(),
-                                                                             target_input.get_tables().values(),
+                                                self.get_column_combinations(source_input,
+                                                                             target_input,
                                                                              self.threshold_leven,
-                                                                             target_id, source_id)))
-        matches = list(filter(lambda elem: elem['sim'] > 0.0, matches))  # Remove the pairs with zero similarity
+                                                                             target_id,
+                                                                             source_id)))
+        matches = [elem for elem in matches if elem['sim'] > 0.0]  # Remove the pairs with zero similarity
         sorted_matches = list(sorted(matches, key=lambda item: item['sim'], reverse=True))
         return sorted_matches
 
     @staticmethod
-    def get_column_combinations(source_tables, target_tables, threshold, target_id, source_id):
-        for source_table, target_table in product(source_tables, target_tables):
-            for source_column, target_column in product(source_table.get_columns(), target_table.get_columns()):
-                yield source_column.data, target_column.data, threshold, target_id, \
-                      target_table.name, target_table.unique_identifier, \
-                      target_column.name, target_column.unique_identifier, \
-                      source_table.name, source_table.unique_identifier, source_id, \
-                      source_column.name, source_column.unique_identifier
+    def get_column_combinations(source_table: BaseTable,
+                                target_table: BaseTable,
+                                threshold,
+                                target_id,
+                                source_id):
+        for source_column, target_column in product(source_table.get_columns(), target_table.get_columns()):
+            yield source_column.data, target_column.data, threshold, target_id, \
+                  target_table.name, target_table.unique_identifier, \
+                  target_column.name, target_column.unique_identifier, \
+                  source_table.name, source_table.unique_identifier, source_id, \
+                  source_column.name, source_column.unique_identifier
 
 
 def process_jaccard_leven(tup: tuple):
@@ -100,7 +107,9 @@ def process_jaccard_leven(tup: tuple):
                  sim).to_dict
 
 
-def get_set_combinations(set1: set, set2: set, threshold: float):
+def get_set_combinations(set1: set,
+                         set2: set,
+                         threshold: float):
     """
     Function that creates combination between elements of set1 and set2
 

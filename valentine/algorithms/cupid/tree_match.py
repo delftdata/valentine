@@ -12,21 +12,25 @@ def compute_weighted_similarity(s_sim, l_sim, w_struct=0.5):
     return w_struct * s_sim + (1 - w_struct) * l_sim
 
 
+def get_sims(s_leaves, t_leaves, compatibility_table, l_sims, leaf_w_struct):
+    sims = dict()
+    for s, t in product(s_leaves, t_leaves):
+        if s.data_type in compatibility_table and t.data_type in compatibility_table:
+            s_sim = compatibility_table[s.data_type][t.data_type]
+            w_sim = compute_weighted_similarity(s_sim, l_sims.get((s.long_name, t.long_name), 0), leaf_w_struct)
+            sims[(s.long_name, t.long_name)] = {'ssim': s_sim, 'lsim': l_sims.get((s.long_name, t.long_name), 0),
+                                                'wsim': w_sim}
+    return sims
+
+
 def tree_match(source_tree, target_tree, categories, leaf_w_struct, w_struct, th_accept, th_high, th_low, c_inc, c_dec,
                th_ns, parallelism):
     compatibility_table = compute_compatibility(categories)
     l_sims = comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism)
     s_leaves = source_tree.get_leaves()
     t_leaves = target_tree.get_leaves()
-    all_leaves = product(s_leaves, t_leaves)
-    sims = dict()
 
-    for s, t in all_leaves:
-        if s.data_type in compatibility_table and t.data_type in compatibility_table:
-            s_sim = compatibility_table[s.data_type][t.data_type]
-            w_sim = compute_weighted_similarity(s_sim, l_sims.get((s.long_name, t.long_name), 0), leaf_w_struct)
-            sims[(s.long_name, t.long_name)] = {'ssim': s_sim, 'lsim': l_sims.get((s.long_name, t.long_name), 0),
-                                                'wsim': w_sim}
+    sims = get_sims(s_leaves, t_leaves, compatibility_table, l_sims, leaf_w_struct)
 
     s_post_order = [node for node in PostOrderIter(source_tree.root)]
     t_post_order = [node for node in PostOrderIter(target_tree.root)]
@@ -58,12 +62,16 @@ def tree_match(source_tree, target_tree, categories, leaf_w_struct, w_struct, th
                 sims[(s_name, t_name)] = {'ssim': ssim, 'lsim': l_sims[(s.long_name, t.long_name)], 'wsim': wsim}
 
             if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] > th_high:
-                change_structural_similarity(list(map(lambda n: n.long_name, s.leaves)),
-                                             list(map(lambda n: n.long_name, t.leaves)), sims, c_inc)
+                change_structural_similarity([n.long_name for n in s.leaves],
+                                             [n.long_name for n in t.leaves],
+                                             sims,
+                                             c_inc)
 
             if (s_name, t_name) in sims and sims[(s_name, t_name)]['wsim'] < th_low:
-                change_structural_similarity(list(map(lambda n: n.long_name, s.leaves)),
-                                             list(map(lambda n: n.long_name, t.leaves)), sims, c_dec)
+                change_structural_similarity([n.long_name for n in s.leaves],
+                                             [n.long_name for n in t.leaves],
+                                             sims,
+                                             c_dec)
     return sims
 
 
@@ -122,7 +130,7 @@ def mapping_generation_non_leaves(source_tree, target_tree, sims, th_accept=0.14
     max_level_s = source_tree.height - 1
     max_level_t = target_tree.height - 1
 
-    non_leaves_s = list(map(lambda n: n.long_name, LevelOrderIter(source_tree.root, maxlevel=max_level_s)))
-    non_leaves_t = list(map(lambda n: n.long_name, LevelOrderIter(target_tree.root, maxlevel=max_level_t)))
+    non_leaves_s = [n.long_name for n in LevelOrderIter(source_tree.root, maxlevel=max_level_s)]
+    non_leaves_t = [n.long_name for n in LevelOrderIter(target_tree.root, maxlevel=max_level_t)]
 
-    return list(filter(lambda s: sims[s]['wsim'] > th_accept, product(non_leaves_s, non_leaves_t)))
+    return [s for s in product(non_leaves_s, non_leaves_t) if sims[s]['wsim'] > th_accept]

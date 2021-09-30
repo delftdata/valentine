@@ -3,7 +3,8 @@ from enum import Enum
 
 
 class SchemaElement:
-    def __init__(self, name):
+    def __init__(self,
+                 name):
         super(SchemaElement, self).__init__()
         # an element can belong to multiple categories
         self.categories = list()
@@ -12,36 +13,44 @@ class SchemaElement:
         self.initial_name = name
         self.long_name = None
 
-    def add_long_name(self, table_name, table_guid, column_name, column_guid):
+    def add_long_name(self,
+                      table_name,
+                      table_guid,
+                      column_name,
+                      column_guid):
         self.long_name = (table_name, table_guid, column_name, column_guid)
 
-    def add_category(self, category):
+    def add_category(self,
+                     category):
         self.categories.append(category)
 
-    def add_token(self, token):
+    def add_token(self,
+                  token):
         if isinstance(token, Token):
             self.tokens.append(token)
         else:
             print("Incorrect token type. The type should be 'Token'")
 
-    def get_tokens_data(self, tokens=None):
+    def get_tokens_data(self,
+                        tokens=None):
         if tokens is None:
-            return list(map(lambda t: t.data, self.tokens))
+            return [t.data for t in self.tokens]
         else:
-            return list(map(lambda t: t.data, tokens))
+            return [t.data for t in tokens]
 
-    def get_tokens_data_and_type(self, tokens=None):
+    def get_tokens_data_and_type(self,
+                                 tokens=None):
         if tokens is None:
-            return list(map(lambda t: (t.data, t.token_type), self.tokens))
+            return [(t.data, t.token_type) for t in self.tokens]
         else:
-            return list(map(lambda t: (t.data, t.token_type), tokens))
+            return [(t.data, t.token_type) for t in tokens]
 
     def sort_by_token_type(self):
         return sorted(self.tokens, key=lambda token: token.token_type.token_name)
 
     def get_tokens_by_token_type(self, token_type):
         sorted_tokens = self.sort_by_token_type()
-        return list(filter(lambda t: t.token_type == token_type, sorted_tokens))
+        return [t for t in sorted_tokens if t.token_type == token_type]
 
 
 class Token:
@@ -50,7 +59,8 @@ class Token:
         self.data = None
         self.token_type = None
 
-    def add_data(self, data):
+    def add_data(self,
+                 data):
         self.data = data
         return self
 

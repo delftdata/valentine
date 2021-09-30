@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Dict, List
+
 import pandas as pd
 
 from .base_column import BaseColumn
@@ -20,7 +22,7 @@ class BaseTable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_columns(self) -> list[BaseColumn]:
+    def get_columns(self) -> List[BaseColumn]:
         raise NotImplementedError
 
     @abstractmethod
@@ -32,5 +34,5 @@ class BaseTable(ABC):
     def is_empty(self) -> bool:
         raise NotImplementedError
 
-    def get_guid_column_lookup(self) -> dict[str, object]:
+    def get_guid_column_lookup(self) -> Dict[str, object]:
         return {column.name:  column.unique_identifier for column in self.get_columns()}

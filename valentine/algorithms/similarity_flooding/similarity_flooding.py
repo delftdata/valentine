@@ -1,9 +1,7 @@
-from typing import Union
-
 import Levenshtein as Lv
 import math
 
-from .graph.graph import Graph
+from .graph import Graph
 from .node_pair import NodePair
 from .propagation_graph import PropagationGraph
 from ..match import Match
@@ -27,10 +25,8 @@ class SimilarityFlooding(BaseMatcher):
         self.graph1 = Graph(source_input).graph
         self.graph2 = Graph(target_input).graph
         self.calculate_initial_mapping()
-        self.source_guid = source_input.db_belongs_uid if isinstance(source_input, BaseTable) \
-            else source_input.unique_identifier
-        self.target_guid = target_input.db_belongs_uid if isinstance(target_input, BaseTable) \
-            else target_input.unique_identifier
+        self.source_guid = source_input.unique_identifier
+        self.target_guid = target_input.unique_identifier
         matches = self.fixpoint_computation(100, 0.001)
 
         filtered_matches = self.filter_map(matches)

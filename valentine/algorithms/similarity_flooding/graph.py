@@ -1,12 +1,12 @@
 import networkx as nx
 
 from .node import Node
-from ...data_sources.base_db import BaseDB
+from ...data_sources.base_table import BaseTable
 
 
 class Graph:
 
-    def __init__(self, schema: BaseDB):
+    def __init__(self, schema: BaseTable):
         self.graph = nx.DiGraph()
         self.__schema = schema
         self.schema_name = schema.name
