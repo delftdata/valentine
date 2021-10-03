@@ -64,6 +64,9 @@ class Token:
         self.data = data
         return self
 
+    def __repr__(self):
+        return self.data
+
 
 TokenType = namedtuple('TokenType', ['token_name', 'weight'])
 

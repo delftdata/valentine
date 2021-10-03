@@ -26,8 +26,6 @@ class DistributionBased(BaseMatcher):
         the number of quantiles of the histograms
     process_num: int
         The number of processes to spawn
-    column_names: list
-        List containing all the column names
 
     Methods
     -------
@@ -57,14 +55,12 @@ class DistributionBased(BaseMatcher):
         process_num: int
             The number of processes to spawn
         """
-        self.quantiles: int = int(quantiles)
-        self.threshold1: float = float(threshold1)
-        self.threshold2: float = float(threshold2)
-        self.process_num: int = int(process_num)
-        self.column_names: list = []
-        self.target_name: str = ""
-        self.target_guid: object = None
-        self.source_guid: object = None
+        self.__quantiles: int = int(quantiles)
+        self.__threshold1: float = float(threshold1)
+        self.__threshold2: float = float(threshold2)
+        self.__process_num: int = int(process_num)
+        self.__column_names: list = []
+        self.__target_name: str = ""
 
     def get_matches(self,
                     source_input: BaseTable,
@@ -78,9 +74,7 @@ class DistributionBased(BaseMatcher):
         dict
             A dictionary with matches and their similarity
         """
-        self.target_name = target_input.name
-        self.source_guid = source_input.unique_identifier
-        self.target_guid = target_input.unique_identifier
+        self.__target_name = target_input.name
 
         all_tables: List[BaseTable] = [source_input, target_input]
         with tempfile.TemporaryDirectory() as tmp_folder_path:
@@ -91,40 +85,40 @@ class DistributionBased(BaseMatcher):
             generate_global_ranks(data, tmp_folder_path)
             del data
 
-            if self.process_num == 1:
+            if self.__process_num == 1:
                 for table in all_tables:
 
-                    self.column_names.extend([(table.name, table.unique_identifier,
-                                               x.name, x.unique_identifier) for x in table.get_columns()])
+                    self.__column_names.extend([(table.name, table.unique_identifier,
+                                                 x.name, x.unique_identifier) for x in table.get_columns()])
 
                     columns: List[BaseColumn] = table.get_columns()
                     for tup in ingestion_column_generator(columns,
                                                           table.name,
                                                           table.unique_identifier,
-                                                          self.quantiles,
+                                                          self.__quantiles,
                                                           tmp_folder_path):
                         process_columns(tup)
-                matches = self.find_matches(tmp_folder_path)
+                matches = self.__find_matches(tmp_folder_path)
             else:
-                with get_context("spawn").Pool(self.process_num) as process_pool:
+                with get_context("spawn").Pool(self.__process_num) as process_pool:
                     for table in all_tables:
-                        self.column_names.extend([(table.name, table.unique_identifier,
-                                                   x.name, x.unique_identifier) for x in table.get_columns()])
+                        self.__column_names.extend([(table.name, table.unique_identifier,
+                                                     x.name, x.unique_identifier) for x in table.get_columns()])
                         columns: List[BaseColumn] = table.get_columns()
                         process_pool.map(process_columns, ingestion_column_generator(columns,
                                                                                      table.name,
                                                                                      table.unique_identifier,
-                                                                                     self.quantiles,
+                                                                                     self.__quantiles,
                                                                                      tmp_folder_path), chunksize=1)
-                    matches = self.find_matches_parallel(tmp_folder_path, process_pool)
+                    matches = self.__find_matches_parallel(tmp_folder_path, process_pool)
 
         return matches
 
-    def find_matches(self, tmp_folder_path: str):
-        connected_components = discovery.compute_distribution_clusters(self.column_names,
-                                                                       self.threshold1,
+    def __find_matches(self, tmp_folder_path: str):
+        connected_components = discovery.compute_distribution_clusters(self.__column_names,
+                                                                       self.__threshold1,
                                                                        tmp_folder_path,
-                                                                       self.quantiles)
+                                                                       self.__quantiles)
 
         all_attributes = list()
         i = 1
@@ -132,22 +126,22 @@ class DistributionBased(BaseMatcher):
             if len(components) > 1:
                 i = i + 1
                 edges = discovery.compute_attributes(list(components),
-                                                     self.threshold2,
+                                                     self.__threshold2,
                                                      tmp_folder_path,
-                                                     self.quantiles)
+                                                     self.__quantiles)
                 all_attributes.append((list(components), edges))
 
         results = list()
         for components, edges in all_attributes:
             results.append(discovery.correlation_clustering_pulp(components, edges))
 
-        attribute_clusters = discovery.process_correlation_clustering_result(results, self.column_names)
+        attribute_clusters = discovery.process_correlation_clustering_result(results, self.__column_names)
 
-        return self.rank_output(attribute_clusters, tmp_folder_path)
+        return self.__rank_output(attribute_clusters, tmp_folder_path)
 
-    def find_matches_parallel(self,
-                              tmp_folder_path: str,
-                              pool: Pool):
+    def __find_matches_parallel(self,
+                                tmp_folder_path: str,
+                                pool: Pool):
         """
         "Main" function of [1] that will calculate first the distribution clusters and then the attribute clusters
 
@@ -158,11 +152,11 @@ class DistributionBased(BaseMatcher):
         pool: multiprocessing.Pool
             the process pool that will be used in the algorithms 1, 2 and 3 of [1]
         """
-        connected_components = discovery.compute_distribution_clusters_parallel(self.column_names,
-                                                                                self.threshold1,
+        connected_components = discovery.compute_distribution_clusters_parallel(self.__column_names,
+                                                                                self.__threshold1,
                                                                                 pool,
                                                                                 tmp_folder_path,
-                                                                                self.quantiles)
+                                                                                self.__quantiles)
 
         all_attributes = list()
         i = 1
@@ -170,23 +164,23 @@ class DistributionBased(BaseMatcher):
             if len(components) > 1:
                 i = i + 1
                 edges = discovery.compute_attributes_parallel(list(components),
-                                                              self.threshold2,
+                                                              self.__threshold2,
                                                               pool,
                                                               tmp_folder_path,
-                                                              self.quantiles)
+                                                              self.__quantiles)
                 all_attributes.append((list(components), edges))
 
         results = list()
         for components, edges in all_attributes:
             results.append(discovery.correlation_clustering_pulp(components, edges))
 
-        attribute_clusters = discovery.process_correlation_clustering_result(results, self.column_names)
+        attribute_clusters = discovery.process_correlation_clustering_result(results, self.__column_names)
 
-        return self.rank_output(attribute_clusters, tmp_folder_path)
+        return self.__rank_output(attribute_clusters, tmp_folder_path)
 
-    def rank_output(self,
-                    attribute_clusters: iter,
-                    tmp_folder_path: str):
+    def __rank_output(self,
+                      attribute_clusters: iter,
+                      tmp_folder_path: str):
         """
         Take the attribute clusters that the algorithm produces and give a ranked list of matches based on the the EMD
         between each pair inside an attribute cluster . The ranked list will look like:
@@ -204,7 +198,7 @@ class DistributionBased(BaseMatcher):
         dict
             A ranked list that will look like: ((table_name1, column_name1), (table_name2, column_name2)): similarity
         """
-        matches = []
+        matches = {}
         for cluster in attribute_clusters:
             if len(cluster) > 1:
                 for combination in combinations(cluster, 2):
@@ -212,24 +206,20 @@ class DistributionBased(BaseMatcher):
                     table2 = combination[1][0]
                     if table1 != table2:
                         k, emd = process_emd(((combination[0], combination[1]),
-                                              self.quantiles,
+                                              self.__quantiles,
                                               False,
                                               tmp_folder_path))
                         sim = 1 / (1 + emd)
                         tn_i, tguid_i, cn_i, cguid_i = k[0]
                         tn_j, tguid_j, cn_j, cguid_j = k[1]
-                        if self.target_name == tn_i:
-                            matches.append(Match(self.target_guid,
-                                                 tn_i, tguid_i, cn_i, cguid_i,
-                                                 self.source_guid,
-                                                 tn_j, tguid_j, cn_j, cguid_j,
+                        if self.__target_name == tn_i:
+                            matches.update(Match(tn_i, cn_i,
+                                                 tn_j, cn_j,
                                                  sim)
                                            .to_dict)
                         else:
-                            matches.append(Match(self.target_guid,
-                                                 tn_j, tguid_j, cn_j, cguid_j,
-                                                 self.source_guid,
-                                                 tn_i, tguid_i, cn_i, cguid_i,
+                            matches.update(Match(tn_j, cn_j,
+                                                 tn_i, cn_i,
                                                  sim)
                                            .to_dict)
         return matches

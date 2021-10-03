@@ -15,8 +15,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: install requirements
-      run: pip install -r requirements.txt
+    - name: install valentine
+      run: pip install .
 
     - name: run tests
       run: python -m unittest discover tests

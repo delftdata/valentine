@@ -11,28 +11,8 @@ from nltk.corpus import wordnet as wn
 import Levenshtein as Lv
 from similarity.ngram import NGram
 
+from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
-
-DATATYPE_COMPATIBILITY_TABLE = {
-    "text": {"keyword": 1.0, "varchar": 1.0, "nvarchar": 0.9, "nchar": 0.8, "char": 0.6},
-    "keyword": {"text": 1.0, "varchar": 1.0, "nvarchar": 0.9, "nchar": 0.8, "char": 0.6},
-    "varchar": {"text": 1.0, "keyword": 1.0, "nvarchar": 0.9, "nchar": 0.8, "char": 0.6},
-    "nvarchar": {"text": 0.9, "keyword":  0.9, "varchar": 0.9, "nchar": 0.8, "char": 0.6},
-    "nchar": {"text": 0.7, "keyword":  0.7, "varchar": 0.7, "nvarchar": 1.0, "char": 0.7},
-    "char": {"text": 0.7, "keyword":  0.7, "varchar": 0.7, "nchar": 0.8, "nvarchar": 0.6},
-    "date": {"double": 0.1, "int": 0.1, "decimal": 0.1, "bit": 0.1},
-    "double": {"date": 0.1, "float": 1.0, "decimal": 1.0},
-    "decimal": {"date": 0.1, "float": 1.0, "double": 1.0},
-    "int": {"date": 0.1, "long": 0.8, "short": 0.7, "smallint": 0.7, "integer": 1.0},
-    "integer": {"date": 0.1, "long": 0.8, "short": 0.7, "smallint": 0.7, "int": 1.0},
-    "bit": {"time": 0.1, "date": 0.1},
-    "time": {"bit": 0.1},
-    "float": {"double": 0.9},
-    "long": {"short": 0.6, "int": 0.8, "bigint": 1.0, "smallint": 0.6, "integer": 0.8},
-    "bigint": {"short": 0.6, "int": 0.8, "long": 1.0, "smallint": 0.6, "integer": 0.8},
-    "short": {"long": 0.6, "int": 0.8, "bigint": 0.6, "smallint": 1.0, "integer": 0.8},
-    "smallint": {"long": 0.6, "int": 0.8, "bigint": 0.6, "short": 1.0, "integer": 0.8}
-}
 
 
 def normalization(element,
@@ -95,7 +75,10 @@ def compute_compatibility(categories):
             compatibility_table[cat1] = dict()
         if cat2 not in compatibility_table:
             compatibility_table[cat2] = dict()
-        if cat1 in DATATYPE_COMPATIBILITY_TABLE and cat2 in DATATYPE_COMPATIBILITY_TABLE[cat1]:
+        if cat1 == cat2:
+            compatibility_table[cat1][cat2] = 1.0
+            compatibility_table[cat2][cat1] = 1.0
+        elif cat1 in DATATYPE_COMPATIBILITY_TABLE and cat2 in DATATYPE_COMPATIBILITY_TABLE[cat1]:
             compatibility_table[cat1][cat2] = DATATYPE_COMPATIBILITY_TABLE[cat1][cat2]
             compatibility_table[cat2][cat1] = DATATYPE_COMPATIBILITY_TABLE[cat1][cat2]
         else:
@@ -182,9 +165,12 @@ def get_partial_similarity(token_set1,
     for t1 in token_set1:
         max_sim = -math.inf
         for t2 in token_set2:
-            sim = compute_similarity_wordnet(t1.data, t2.data)
-            if math.isnan(sim):
-                sim = compute_similarity_leven(t1.data, t2.data)
+            if t1.data == t2.data:
+                sim = 1.0
+            else:
+                sim = compute_similarity_wordnet(t1.data, t2.data)
+                if math.isnan(sim):
+                    sim = compute_similarity_leven(t1.data, t2.data)
 
             if sim > max_sim:
                 max_sim = sim
@@ -194,11 +180,18 @@ def get_partial_similarity(token_set1,
     return total_sum
 
 
+def get_synonyms(word) -> set:
+    return set(ss for ss in wn.synsets(word))
+
+
 # the higher, the better
 def compute_similarity_wordnet(word1,
                                word2):
-    allsyns1 = set(ss for ss in wn.synsets(word1))
-    allsyns2 = set(ss for ss in wn.synsets(word2))
+    wn_lemmas = set(wn.all_lemma_names())
+    if word1 not in wn_lemmas or word2 not in wn_lemmas:
+        return math.nan
+    allsyns1 = get_synonyms(word1)
+    allsyns2 = get_synonyms(word2)
     if len(allsyns1) == 0 or len(allsyns2) == 0:
         return math.nan
     best = max(wn.wup_similarity(s1, s2) or math.nan for s1, s2 in product(allsyns1, allsyns2))

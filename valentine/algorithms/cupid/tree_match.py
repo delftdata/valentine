@@ -1,5 +1,6 @@
 import math
 from itertools import product
+from typing import Dict, Tuple
 from anytree import PostOrderIter, LevelOrderIter
 
 from .linguistic_matching import compute_compatibility, comparison, compute_lsim
@@ -29,12 +30,9 @@ def tree_match(source_tree, target_tree, categories, leaf_w_struct, w_struct, th
     l_sims = comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism)
     s_leaves = source_tree.get_leaves()
     t_leaves = target_tree.get_leaves()
-
     sims = get_sims(s_leaves, t_leaves, compatibility_table, l_sims, leaf_w_struct)
-
     s_post_order = [node for node in PostOrderIter(source_tree.root)]
     t_post_order = [node for node in PostOrderIter(target_tree.root)]
-
     for s in s_post_order:
         s_name = s.long_name
 
@@ -108,21 +106,25 @@ def recompute_wsim(source_tree, target_tree, sims, w_struct=0.6, th_accept=0.14)
     return sims
 
 
-def mapping_generation_leaves(source_guid, target_guid, source_tree, target_tree, sims, th_accept):
+def mapping_generation_leaves(source_tree,
+                              target_tree,
+                              sims,
+                              th_accept) -> Dict[Tuple[Tuple[str, str], Tuple[str, str]], float]:
     s_leaves = source_tree.get_leaf_names()
     t_leaves = target_tree.get_leaf_names()
     leave_combinations = list(product(s_leaves, t_leaves))
-    return [create_output_dict(k, v['wsim'], source_guid, target_guid)
-            for k, v in sorted(sims.items(), key=lambda item: -item[1]['wsim'])
-            if th_accept <= v['wsim'] and k in leave_combinations]
+    matches = {}
+    for k, v in sorted(sims.items(), key=lambda item: -item[1]['wsim']):
+        if th_accept <= v['wsim'] and k in leave_combinations:
+            matches.update(create_output_dict(k, v['wsim']))
+    return matches
 
 
-def create_output_dict(match: tuple, similarity, source_guid, target_guid) -> dict:
+def create_output_dict(match: tuple, similarity) -> dict:
     s, t = match
     s_t_name, s_t_guid, s_c_name, s_c_guid = s
     t_t_name, t_t_guid, t_c_name, t_c_guid = t
-    return Match(target_guid, t_t_name, t_t_guid, t_c_name, t_c_guid,
-                 source_guid, s_t_name, s_t_guid, s_c_name, s_c_guid,
+    return Match(t_t_name, t_c_name, s_t_name, s_c_name,
                  float(similarity)).to_dict
 
 
