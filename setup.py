@@ -13,6 +13,8 @@ setuptools.setup(
     author_email='delftdatasystems@gmail.com',
     maintainer='Delft Data',
     maintainer_email='delftdatasystems@gmail.com',
+    url='https://delftdata.github.io/valentine/',
+    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.0.tar.gz',
     packages=setuptools.find_packages(exclude=('tests*',)),
     install_requires=[
         'numpy>=1.21,<2.0',
