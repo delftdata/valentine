@@ -13,7 +13,44 @@ class PropagationGraph:
         self.graph2 = graph2
         self.policy = policy  # policy corresponds to the policy used to compute propagation coefficients
 
-    def construct_graph(self):
+    @staticmethod
+    def __inverse_label_values(labels, m=1.0):
+        for key, value in labels.items():
+            labels[key] = m/value
+
+    def __add_propagation_edges(self, c_graph, p_graph, node, case_in):
+
+        if case_in:
+            edges = c_graph.in_edges(node)
+        else:
+            edges = c_graph.out_edges(node)
+
+        labels = dict()
+        for e in edges:
+            edge_data = c_graph.get_edge_data(e[0], e[1])
+
+            label = edge_data.get('label')
+
+            if label in labels.keys():
+                labels[label] += 1.0
+            else:
+                labels[label] = 1.0
+
+        self.__inverse_label_values(labels)
+
+        for e in edges:
+            edge_data = c_graph.get_edge_data(e[0], e[1])
+
+            label = edge_data.get('label')
+
+            if case_in:
+                p_graph.add_edge(e[1], e[0], weight=labels[label])
+            else:
+                p_graph.add_edge(e[0], e[1], weight=labels[label])
+
+        return p_graph
+
+    def __construct_connectivity_graph(self):
         c_g = nx.DiGraph()  # initialize the connectivity graph
 
         for e1 in self.graph1.edges():
@@ -27,6 +64,62 @@ class PropagationGraph:
                     np2 = NodePair(e1[1], e2[1])
                     c_g.add_node(np2)
                     c_g.add_edge(np1, np2, label=l1.get('label'))
+        return c_g
+
+    @staticmethod
+    def __create_label_dicts(graph1, graph2, node):
+
+        in_labels1 = {}
+        out_labels1 = {}
+
+        in_labels2 = {}
+        out_labels2 = {}
+
+        for e in graph1.in_edges(node.node1):
+            edge_data = graph1.get_edge_data(e[0], e[1])
+
+            label = edge_data.get('label')
+
+            if label in in_labels1.keys():
+                in_labels1[label] += 1.0
+            else:
+                in_labels1[label] = 1.0
+
+        for e in graph2.in_edges(node.node2):
+            edge_data = graph2.get_edge_data(e[0], e[1])
+
+            label = edge_data.get('label')
+
+            if label in in_labels2.keys():
+                in_labels2[label] += 1.0
+            else:
+                in_labels2[label] = 1.0
+
+        for e in graph1.out_edges(node.node1):
+            edge_data = graph1.get_edge_data(e[0], e[1])
+
+            label = edge_data.get('label')
+
+            if label in out_labels1.keys():
+                out_labels1[label] += 1.0
+            else:
+                out_labels1[label] = 1.0
+
+        for e in graph2.out_edges(node.node2):
+            edge_data = graph2.get_edge_data(e[0], e[1])
+
+            label = edge_data.get('label')
+
+            if label in out_labels2.keys():
+                out_labels2[label] += 1.0
+            else:
+                out_labels2[label] = 1.0
+
+        return in_labels1, in_labels2, out_labels1, out_labels2
+
+    def construct_graph(self):
+
+        c_g = self.__construct_connectivity_graph()
 
         p_g = nx.DiGraph()  # initialize the similarity propagation graph
 
@@ -34,143 +127,19 @@ class PropagationGraph:
             p_g.add_node(n)
         # inverse product strategy for computing propagation coefficients as described in the paper
         if self.policy == 'inverse_product':
-            for n in p_g.nodes():
-
-                in_edges = c_g.in_edges(n)
-                out_edges = c_g.out_edges(n)
-
-                in_labels = {}
-                out_labels = {}
-
-                for e in in_edges:
-                    edge_data = c_g.get_edge_data(e[0], e[1])
-
-                    label = edge_data.get('label')
-
-                    if label in in_labels.keys():
-                        in_labels[label] += 1
-                    else:
-                        in_labels[label] = 1
-
-                for e in out_edges:
-                    edge_data = c_g.get_edge_data(e[0], e[1])
-
-                    label = edge_data.get('label')
-
-                    if label in out_labels.keys():
-                        out_labels[label] += 1
-                    else:
-                        out_labels[label] = 1
-
-                for key in in_labels:
-                    in_labels[key] = 1.0/float(in_labels[key])
-
-                for key in out_labels:
-                    out_labels[key] = 1.0/float(out_labels[key])
-
-                for e in in_edges:
-                    edge_data = c_g.get_edge_data(e[0], e[1])
-
-                    label = edge_data.get('label')
-
-                    p_g.add_edge(e[1], e[0], weight=in_labels[label])
-
-                for e in out_edges:
-                    edge_data = c_g.get_edge_data(e[0], e[1])
-
-                    label = edge_data.get('label')
-
-                    p_g.add_edge(e[0], e[1], weight=out_labels[label])
+            for node in p_g.nodes():
+                p_g = self.__add_propagation_edges(c_g, p_g, node, case_in=True)
+                p_g = self.__add_propagation_edges(c_g, p_g, node, case_in=False)
         # inverse average strategy for computing propagation coefficients as described in the paper
         elif self.policy == 'inverse_average':
             for n in p_g.nodes():
-                in_labels1 = {}
-                out_labels1 = {}
-
-                in_labels2 = {}
-                out_labels2 = {}
 
                 if n.node1 in self.graph1.nodes():
-                    for e in self.graph1.in_edges(n.node1):
-                        edge_data = self.graph1.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in in_labels1.keys():
-                            in_labels1[label] += 1
-                        else:
-                            in_labels1[label] = 1
-
-                    for e in self.graph2.in_edges(n.node2):
-                        edge_data = self.graph2.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in in_labels2.keys():
-                            in_labels2[label] += 1
-                        else:
-                            in_labels2[label] = 1
-
-                    for e in self.graph1.out_edges(n.node1):
-                        edge_data = self.graph1.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in out_labels1.keys():
-                            out_labels1[label] += 1
-                        else:
-                            out_labels1[label] = 1
-
-                    for e in self.graph2.out_edges(n.node2):
-                        l = self.graph2.get_edge_data(e[0], e[1])
-
-                        label = l.get('label')
-
-                        if label in out_labels2.keys():
-                            out_labels2[label] += 1
-                        else:
-                            out_labels2[label] = 1
+                    in_labels1, in_labels2, out_labels1, out_labels2 = self.__create_label_dicts(self.graph1,
+                                                                                                 self.graph2, n)
                 else:
-
-                    for e in self.graph2.in_edges(n.node1):
-                        edge_data = self.graph2.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in in_labels1.keys():
-                            in_labels1[label] += 1
-                        else:
-                            in_labels1[label] = 1
-
-                    for e in self.graph1.in_edges(n.node2):
-                        edge_data = self.graph1.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in in_labels2.keys():
-                            in_labels2[label] += 1
-                        else:
-                            in_labels2[label] = 1
-
-                    for e in self.graph2.out_edges(n.node1):
-                        edge_data = self.graph2.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in out_labels1.keys():
-                            out_labels1[label] += 1
-                        else:
-                            out_labels1[label] = 1
-
-                    for e in self.graph1.out_edges(n.node2):
-                        edge_data = self.graph1.get_edge_data(e[0], e[1])
-
-                        label = edge_data.get('label')
-
-                        if label in out_labels2.keys():
-                            out_labels2[label] += 1
-                        else:
-                            out_labels2[label] = 1
+                    in_labels1, in_labels2, out_labels1, out_labels2 = self.__create_label_dicts(self.graph2,
+                                                                                                 self.graph1, n)
 
                 in_labels = in_labels1.copy()
                 out_labels = out_labels1.copy()
@@ -187,11 +156,8 @@ class PropagationGraph:
                     else:
                         out_labels[key] = out_labels2[key]
 
-                for key in in_labels:
-                    in_labels[key] = 2.0 / float(in_labels[key])
-
-                for key in out_labels:
-                    out_labels[key] = 2.0 / float(out_labels[key])
+                self.__inverse_label_values(in_labels, m=2.0)
+                self.__inverse_label_values(out_labels, m=2.0)
 
                 for e in c_g.in_edges(n):
                     edge_data = c_g.get_edge_data(e[0], e[1])
@@ -204,7 +170,7 @@ class PropagationGraph:
                     edge_data = c_g.get_edge_data(e[0], e[1])
 
                     label = edge_data.get('label')
-                    
+
                     p_g.add_edge(e[0], e[1], weight=out_labels[label])
         else:
 

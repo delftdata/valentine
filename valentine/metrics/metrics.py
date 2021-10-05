@@ -176,7 +176,7 @@ def precision(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
 
 def f1_score(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
              golden_standard: List[Tuple[str, str]],
-             one_to_one=False):
+             one_to_one=True):
     """
     Function that calculates the F1 score of the matches against the golden standard. If one_to_one is set to true, it
     also performs an 1-1 match filer. Meaning that each column will match only with another one.

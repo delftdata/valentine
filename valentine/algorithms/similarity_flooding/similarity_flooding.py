@@ -28,7 +28,7 @@ class SimilarityFlooding(BaseMatcher):
         self.__graph1 = Graph(source_input).graph
         self.__graph2 = Graph(target_input).graph
         self.__calculate_initial_mapping()
-        matches = self.__fixpoint_computation(100, 0.001)
+        matches = self.__fixpoint_computation(100, 1e-4)
 
         filtered_matches = self.__filter_map(matches)
 
@@ -45,6 +45,46 @@ class SimilarityFlooding(BaseMatcher):
                     similarity = Lv.ratio(n1.name, n2.name)
                     self.__initial_map[NodePair(n1, n2)] = similarity
 
+    @staticmethod
+    def __get_euc_residual_vector(previous_map, next_map):
+        # residual vector
+        residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0), 2)
+                           for key in set(previous_map) | set(next_map)}
+        return math.sqrt(sum(residual_vector.values())) # compute euclidean length of residual vector
+
+    def __get_next_map(self, previous_map, p_graph, formula):
+        next_map = dict()
+
+        max_map = 0
+        for n in p_graph.nodes():
+            if formula == 'formula_a':
+                map_sim = self.__initial_map[n]
+            elif formula == 'formula_b':
+                map_sim = 0
+            else:
+                map_sim = previous_map[n]
+
+            for e in p_graph.in_edges(n):
+                edge_data = p_graph.get_edge_data(e[0], e[1])
+
+                weight = edge_data.get('weight')
+
+                if formula == 'formula_a' or formula == 'basic':
+                    map_sim += weight * previous_map[e[0]]
+                elif formula == 'formula_b':
+                    map_sim += weight * self.__initial_map[e[0]]
+                else:
+                    map_sim += self.__initial_map[e[0]] + weight * (previous_map[e[0]] + self.__initial_map[e[0]])
+
+            if map_sim > max_map:
+                max_map = map_sim
+
+            next_map[n] = map_sim
+        for key in next_map.keys():
+            next_map[key] = next_map[key] / max_map
+
+        return next_map
+
     def __fixpoint_computation(self, num_iter, residual_diff):
 
         p_g_builder = PropagationGraph(self.__graph1, self.__graph2, self.__coeff_policy)
@@ -54,174 +94,59 @@ class SimilarityFlooding(BaseMatcher):
         if self.__formula == 'basic':  # using the basing formula
 
             previous_map = self.__initial_map.copy()
-            next_map = {}
+
             for _ in range(0, num_iter):
-                max_map = 0
-                for n in p_g.nodes():
-                    map_sim = previous_map[n]
-                    
-                    for e in p_g.in_edges(n):
-                        edge_data = p_g.get_edge_data(e[0], e[1])
-                        
-                        weight = edge_data.get('weight')
-                        
-                        map_sim += weight*previous_map[e[0]]
-                        
-                    if map_sim > max_map:
-                        max_map = map_sim
-                    
-                    next_map[n] = map_sim
-                for key in next_map.keys():
-                    next_map[key] = next_map[key]/max_map
+                next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
-                # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0), 2)
-                                   for key in set(previous_map) | set(next_map)}
-
-                euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
+                euc_len = self.__get_euc_residual_vector(previous_map, next_map)
 
                 if euc_len <= residual_diff:  # check whether the algo has converged
                     break
 
                 previous_map = next_map.copy()
-                next_map = {}
+
         elif self.__formula == 'formula_a':  # using formula A
             previous_map = self.__initial_map.copy()
-            next_map = {}
+
             for _ in range(0, num_iter):
-                max_map = 0
-                for n in p_g.nodes():
-                    map_sim = self.__initial_map[n]
+                next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
-                    for e in p_g.in_edges(n):
-                        edge_data = p_g.get_edge_data(e[0], e[1])
-
-                        weight = edge_data.get('weight')
-
-                        map_sim += weight*previous_map[e[0]]
-
-                    if map_sim > max_map:
-                        max_map = map_sim
-
-                    next_map[n] = map_sim
-                for key in next_map.keys():
-                    next_map[key] = next_map[key]/max_map
-
-                # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0), 2)
-                                   for key in set(previous_map) | set(next_map)}
-
-                euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
+                euc_len = self.__get_euc_residual_vector(previous_map, next_map)
 
                 if euc_len <= residual_diff:  # check whether the algo has converged
                     break
 
                 previous_map = next_map.copy()
-                next_map = {}
+
         elif self.__formula == 'formula_b':  # using formula B
-            next_map = {}
-            max_map = 0
-            for n in p_g.nodes():
-                map_sim = 0
-
-                for e in p_g.in_edges(n):
-                    edge_data = p_g.get_edge_data(e[0], e[1])
-
-                    weight = edge_data.get('weight')
-
-                    map_sim += weight*self.__initial_map[e[0]]
-
-                if map_sim > max_map:
-                    max_map = map_sim
-
-                next_map[n] = map_sim
-            for key in next_map.keys():
-                next_map[key] = next_map[key]/max_map
+            next_map = self.__get_next_map(None, p_g, self.__formula)
             previous_map = next_map.copy()
-            next_map = {}
 
             for _ in range(0, num_iter-1):
-                max_map = 0
-                for n in p_g.nodes():
-                    map_sim = 0
+                next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
-                    for e in p_g.in_edges(n):
-                        edge_data = p_g.get_edge_data(e[0], e[1])
-
-                        weight = edge_data.get('weight')
-
-                        map_sim += weight*(previous_map[e[0]]+self.__initial_map[e[0]])
-
-                    if map_sim > max_map:
-                        max_map = map_sim
-
-                    next_map[n] = map_sim
-                for key in next_map.keys():
-                    next_map[key] = next_map[key]/max_map
-
-                # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0), 2)
-                                   for key in set(previous_map) | set(next_map)}
-
-                euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
+                euc_len = self.__get_euc_residual_vector(previous_map, next_map)
 
                 if euc_len <= residual_diff:  # check whether the algo has converged
                     break
 
                 previous_map = next_map.copy()
-                next_map = {}
+
         elif self.__formula == 'formula_c':  # using formula C which is claimed to be the best one
-            next_map = {}
-            max_map = 0
-            for n in p_g.nodes():
-                map_sim = self.__initial_map[n]
-
-                for e in p_g.in_edges(n):
-                    edge_data = p_g.get_edge_data(e[0], e[1])
-
-                    weight = edge_data.get('weight')
-
-                    map_sim += weight*self.__initial_map[e[0]]
-
-                if map_sim > max_map:
-                    max_map = map_sim
-
-                next_map[n] = map_sim
-            for key in next_map.keys():
-                next_map[key] = next_map[key]/max_map
+            previous_map = self.__initial_map.copy()
+            next_map = self.__get_next_map(previous_map, p_g, 'formula_b')
             previous_map = next_map.copy()
-            next_map = {}
 
             for _ in range(0, num_iter-1):
-                max_map = 0
-                for n in p_g.nodes():
-                    map_sim = previous_map[n]
+                next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
-                    for e in p_g.in_edges(n):
-                        edge_data = p_g.get_edge_data(e[0], e[1])
-
-                        weight = edge_data.get('weight')
-
-                        map_sim += self.__initial_map[e[0]] + weight*(previous_map[e[0]]+self.__initial_map[e[0]])
-
-                    if map_sim > max_map:
-                        max_map = map_sim
-
-                    next_map[n] = map_sim
-                for key in next_map.keys():
-                    next_map[key] = next_map[key]/max_map
-
-                # residual vector
-                residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0), 2)
-                                   for key in set(previous_map) | set(next_map)}
-
-                euc_len = math.sqrt(sum(residual_vector.values()))  # compute euclidean length of residual vector
-
+                euc_len = self.__get_euc_residual_vector(previous_map, next_map)
+                 
                 if euc_len <= residual_diff:  # check whether the algo has converged
                     break
 
                 previous_map = next_map.copy()
-                next_map = {}
+
         else:
             print("Wrong formula option!")
             return {}
@@ -296,47 +221,6 @@ class SimilarityFlooding(BaseMatcher):
 
         return filtered_map
 
-    def __print_results(self, matches):
-
-        """
-
-        :param matches: dictionary holding the match similarities of map pairs
-
-        """
-
-        sortedmaps = {k: v for k, v in sorted(matches.items(), key=lambda item: item[1])}
-
-        for key in sortedmaps.keys():
-            name1 = key.node1.name
-            if key.node1.name[0:6] == 'NodeID':
-                name1 = "[" + key.node1.name + "=>"
-                if key.node1 in self.__graph1.nodes():
-                    for e in self.__graph1.out_edges(key.node1):
-                        edge_data = self.__graph1.get_edge_data(e[0], e[1])
-                        print("1) This is e[1].name: ", e[1].name)
-                        name1 += edge_data.get('label') + ":" + e[1].name + ", "
-                else:
-                    for e in self.__graph2.out_edges(key.node1):
-                        edge_data = self.__graph2.get_edge_data(e[0], e[1])
-                        print("2) This is e[1].name: ", e[1].name)
-                        name1 += edge_data.get('label') + e[1].name + ", "
-                name1 += ']'
-
-            name2 = key.node2.name
-            if key.node2.name[0:6] == 'NodeID':
-                name2 = "[" + key.node2.name + "=>"
-                if key.node2 in self.__graph1.nodes():
-                    for e in self.__graph1.out_edges(key.node2):
-                        edge_data = self.__graph1.get_edge_data(e[0], e[1])
-                        print("3) This is e[1].name: ", e[1].name)
-                        name2 += edge_data.get('label') + ":" + e[1].name + ", "
-                else:
-                    for e in self.__graph2.out_edges(key.node2):
-                        edge_data = self.__graph2.get_edge_data(e[0], e[1])
-                        print("4) This is e[1].name: ", e[1].name)
-                        name2 += edge_data.get('label') + ":" + e[1].name + ", "
-                name2 += ']'
-            print(name1 + "-" + name2 + ":" + str(sortedmaps[key]))
 
     @staticmethod
     def __filter_n_to_1_matches(matches):
