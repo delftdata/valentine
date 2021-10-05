@@ -13,7 +13,7 @@ def main():
 
     # Instantiate matcher and run
     # Coma requires java to be installed on your machine
-    # If java is not an option, all the other algirithms are in Python (e.g. Cupid)
+    # If java is not an option, all the other algorithms are in Python (e.g., Cupid)
     matcher = Coma(strategy="COMA_OPT")
     matches = valentine_match(df1, df2, matcher)
 
