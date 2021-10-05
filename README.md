@@ -1,5 +1,7 @@
 # Valentine: Matching DataFrames Easily
 
+[![build](https://github.com/delftdata/valentine/actions/workflows/build.yml/badge.svg)](https://github.com/delftdata/valentine/actions/workflows/build.yml)
+
 A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
 
 
