@@ -5,7 +5,7 @@ from tests import df1, df2
 from valentine.algorithms import Coma
 
 
-class TestAlgorithms(unittest.TestCase):
+class TestValentine(unittest.TestCase):
 
     def test_match(self):
         matches = valentine_match(df1, df2, Coma(strategy="COMA_OPT_INST"))
