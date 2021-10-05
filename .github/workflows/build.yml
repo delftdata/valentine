@@ -2,9 +2,9 @@ name: Run Python unit tests
 
 on:
   push:
-    branches: [ main, package ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, package ]
+    branches: [ main ]
 
 jobs:
 
