@@ -2,3 +2,5 @@
 .DS_Store
 .idea/
 __pycache__/
+dist
+valentine.egg-info
