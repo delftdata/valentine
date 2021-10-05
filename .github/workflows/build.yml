@@ -1,0 +1,22 @@
+name: Run Python unit tests
+
+on:
+  push:
+    branches: [ main, package ]
+  pull_request:
+    branches: [ main, package ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: install valentine
+      run: pip install .
+
+    - name: run tests
+      run: python -m unittest discover tests
