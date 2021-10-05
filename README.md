@@ -1,75 +1,141 @@
-# Valentine: Evaluating Matching Techniques for Dataset Discovery
+# Valentine: Matching DataFrames Easily
 
-Project page: https://delftdata.github.io/valentine/
+A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
 
-This is the main repository that contains the framework used in the paper **Valentine: Evaluating Matching Techniques for Dataset Discovery**. The data generator and the framework's output and visualizations are on the following repositories:
-
-Data generator: [valentine-generator](https://github.com/delftdata/valentine-generator)
-
-Paper results and visualizations: [valentine-paper-results](https://github.com/delftdata/valentine-paper-results)
-
-The datasets used for experiments in Valentine can be found in the [datasets-archive](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku).
 
 ## Installation instructions
-The following instructions have been tested on a newly created Ubuntu 18.04 LTS VM. If you prefer to run the entire suite on docker, skip this and the [Run experiments](#run-experiments) sections and go directly to the [Run with docker](#run-with-docker) section.
+To install Valentine simply run
 
-1. Clone the repo to your machine using git `git clone https://github.com/delftdata/valentine-suite`
-2. To install all the dependencies required by the suite, run the [`install-dependencies.sh`](https://github.com/delftdata/valentine-suite/blob/master/install-dependencies.sh) script. 
+```
+pip install valentine
+```
 
-> NOTE: This script installs programs and hence requires `sudo` rights in some parts
+## Installation requirements
 
-After these two steps, the framework should not require anything more regarding dependencies.
-
-## Run experiments
-1. Download the data from the [datasets-archive](https://surfdrive.surf.nl/files/index.php/s/QU5oxyNMuVguEku) and put them into a folder called data on the project root level. 
-
-2. Set the grid-search configuration that you want to run for all the algorithms in the file [algorithm_configurations.json](https://github.com/delftdata/valentine-suite/blob/master/algorithm_configurations.json)
-
-3. Activate the conda environment created in the installation phase with the following command `conda activate valentine-suite` and run the [generate_configuration_files.py](https://github.com/delftdata/valentine-suite/blob/master/generate_configuration_files.py) script with the command `python generate_configuration_files.py`. This will create all the configuration files that specify a schema matching job (Run a specific method with specific parameters on a specific dataset). 
-
-> NOTE: if your system does not find conda you might need to run `source ~/.bashrc`
-
-4. To run the schema matching jobs in parallel run the script [run_experiments.sh](https://github.com/delftdata/valentine-suite/blob/master/run_experiments.sh) with the command `./run_experiments.sh {method_name} {number_of_parallel_jobs}` e.g. to run 40 Cupid jobs concurrently run `./run_experiments.sh Cupid 40` (This would require a 40 CPU VM to run smoothly). The output will be written in the output folder at the project root level.
-
-## Run with docker
-The entire suite is also available as a docker image with name [`kpsarakis/valentine-suite:1.0`](https://hub.docker.com/layers/kpsarakis/valentine-suite/1.0/images/sha256-a3e4a359bb45d05687475af6d19104a85c494b2ac91384373d6d1a769639e62e?context=repo). The steps to run with docker are the following: 
-
-1. Run the following command ` sudo docker run --privileged=true -it -v /var/run/docker.sock:/var/run/docker.sock kpsarakis/valentine-suite:1.0` this will download the image and start a shell on the image containing the valentine suite.
-
-2. Activate the conda environment by running `conda activate valentine-suite`
-
-3. Go into the folder of the suite using `cd /home/valentine-benchmark`
-
-4. Now you are able to run the suite with the data used in the paper **Valentine: Evaluating Matching Techniques for Dataset Discovery** by running `./run_experiments.sh {method_name} {number_of_parallel_jobs}` e.g. to run 40 Cupid jobs concurrently run `./run_experiments.sh Cupid 40` (This would require a 40 CPU VM to run smoothly). The output will be written in the output folder in the project root level, i.e. `\home\valentine-benchmark\output`.
+* Python 3.7 or later
 
 
-## Integrate new methods
-Since Valentine is an experiment suit, it is designed to be extended with more schema matching methods. To extend Valentine with such methods, please visit the following wiki [guide](https://github.com/delftdata/valentine-suite/wiki/Integrate-new-methods) on how to do so. 
 
-## Project structure
+## Usage
+Valentine can be used to find matches among columns of a given pair of pandas DataFrames. 
 
-* [`algorithms`](https://github.com/delftdata/valentine-suite/tree/master/algorithms) Module containing all the implemented algorithms in the suite.
-   * [`coma`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/coma) Python wrapper around [COMA 3.0 Comunity edition](https://sourceforge.net/projects/coma-ce/)
-   * [`cupid`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/cupid) Contains the python implementation of the paper [Generic Schema Matching with Cupid](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.79.4079&rep=rep1&type=pdf)
-   * [`distribution_based`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/distribution_based) Contains the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl-acm-org.tudelft.idm.oclc.org/doi/pdf/10.1145/1989323.1989336)
-    * [`embdi`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/embdi) Contains the code of [EmbDI](https://dl.acm.org/doi/10.1145/3318464.3389742) provided by the authors in their [GitLab repository](https://gitlab.eurecom.fr/cappuzzo/embdi)
-   * [`jaccard_levenshtein`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/jaccard_levenshtein) Contains a baseline that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance
-   * [`sem_prop`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/sem_prop) Contains the code of [Seeping Semantics](http://da.qcri.org/ntang/pubs/icde2018semantic.pdf) provided in [Aurum](https://github.com/mitdbg/aurum-datadiscovery)
-   * [`similarity_flooding`](https://github.com/delftdata/valentine-suite/tree/master/algorithms/similarity_flooding) Contains the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](http://p8090-ilpubs.stanford.edu.tudelft.idm.oclc.org/730/1/2002-1.pdf)
-   
-* [`data_loader`](https://github.com/delftdata/valentine-suite/tree/master/data_loader) Module used to load the relational data coming from the [valentine-generator](https://github.com/delftdata/valentine-generator)
-* [`metrics`](https://github.com/delftdata/valentine-suite/tree/master/metrics) Module containing the metrics that the framework supports (e.g. Precision, Recall, ...) 
-* [`utils`](https://github.com/delftdata/valentine-suite/tree/master/utils) Module containing some utility functions used throughout the framework
+### Matching methods
+In order to do so, the user can choose one of the following 5 matching methods:
 
+ 1. `Coma(int: max_n str: strategy)` is a python wrapper around [COMA 3.0 Comunity edition](https://sourceforge.net/projects/coma-ce/)
+ 	* **Parameters**: 
+ 		* **max_n**(*int*) - Accept similarity threshold, default is 0.
+ 		* **strategy**(*str*) - Choice of "COMA\_OPT" (schema based matching - default) or "COMA\_OPT\_INST" (schema and instance based matching)
+ 2.  `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.79.4079&rep=rep1&type=pdf)
+ 	* **Parameters**: 
+ 		* **w_struct**(*float*) - Structural similarity threshold, default is 0.2.
+ 		* **leaf_w_struct**(*float*) - Structural similarity threshold, leaf level, default is 0.2.
+ 		* **th_accept**(*float*) - Accept similarity threshold, default is 0.7.
+
+ 3.  `DistributionBased(float: threshold1, float: threshold2)` is the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl-acm-org.tudelft.idm.oclc.org/doi/pdf/10.1145/1989323.1989336)
+ 	* **Parameters**: 
+ 		* **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
+ 		* **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
+ 4.  `JaccardLevenMatcher(float: threshold_leven)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance
+ 	* **Parameters**: 
+ 		* **threshold_leven**(*float*) - Levenshtein ratio threshold for deciding whether two instances are same or not, default is 0.8.
+ 		
+
+ 5. `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](http://p8090-ilpubs.stanford.edu.tudelft.idm.oclc.org/730/1/2002-1.pdf)
+	* **Parameters**: 
+ 		* **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
+ 		* **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
+
+### Matching DataFrames
+
+After selecting one of the 5 matching methods, the user can initiate the matching process in the following way:
+
+```python
+matches = valentine_match(df1, df2, matcher, df1_name, df2_name)
+```
+
+where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a dictionary storing as keys column pairs from the two DataFrames and as keys the corresponding similarity scores.
+
+### Measuring effectiveness
+
+Based on the matches retrieved by calling `valentine_match` the user can use 
+
+```python 
+metrics = valentine_metrics.all_metrics(matches, ground_truth)
+``` 
+
+in order to get all effectiveness metrics, such as Precision, Recall, F1-score and others as described in the original Valentine paper. In order to do so, the user needs to also input the ground truth of matches based on which the metrics will be calculated. The ground truth can be given as a list of tuples representing column matches that should hold.
+
+
+### Example
+The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about authors and their publications, and then 2) how to assess its effectiveness based on a given ground truth (as found in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/package/examples/valentine_example.py)):
+
+```python
+# Load data using pandas
+d1_path = os.path.join('data', 'authors1.csv')
+d2_path = os.path.join('data', 'authors2.csv')
+df1 = pd.read_csv(d1_path)
+df2 = pd.read_csv(d2_path)
+
+# Instantiate matcher and run
+matcher = Coma(strategy="COMA_OPT")
+matches = valentine_match(df1, df2, matcher)
+
+print(matches)
+
+# If ground truth available valentine could calculate the metrics
+ground_truth = [('Cited by', 'Cited by'),
+                ('Authors', 'Authors'),
+                ('EID', 'EID')]
+
+metrics = valentine_metrics.all_metrics(matches, ground_truth)
+    
+print(metrics)
+```
+
+The output of the above code block is:
+
+```
+{(('table_1', 'Cited by'), ('table_2', 'Cited by')): 0.8374313, 
+(('table_1', 'Authors'), ('table_2', 'Authors')): 0.83498037, 
+(('table_1', 'EID'), ('table_2', 'EID')): 0.8214057}
+{'precision': 1.0, 'recall': 1.0, 'f1_score': 1.0, 
+'precision_at_10_percent': 1.0, 
+'precision_at_30_percent': 1.0,
+'precision_at_50_percent': 1.0, 
+'precision_at_70_percent': 1.0, 
+'precision_at_90_percent': 1.0, 
+'recall_at_sizeof_ground_truth': 1.0}
+
+```
+## Experimental suite version
+
+The original experimental suite version of Valentine, as first published for the needs of the research paper, can be still found [here](https://github.com/delftdata/valentine/tree/v1.1).
+
+## Project page
+
+The project page containing information about the research supporting Valentine can be accessed [here](https://delftdata.github.io/valentine/).
 
 ## Cite Valentine
 ```
-@misc{koutras2021valentine,
-      title={Valentine: Evaluating Matching Techniques for Dataset Discovery}, 
-      author={Christos Koutras and George Siachamis and Andra Ionescu and Kyriakos Psarakis and Jerry Brons and Marios Fragkoulis and Christoph Lofi and Angela Bonifati and Asterios Katsifodimos},
-  booktitle = {37th IEEE International Conference on Data Engineering, ICDE 2021},
-  pages     = {1--12},
-  publisher = {IEEE},
-  year      = {2021}
+Original Valentine paper:
+@inproceedings{koutras2021valentine,
+  title={Valentine: Evaluating Matching Techniques for Dataset Discovery},
+  author={Koutras, Christos and Siachamis, George and Ionescu, Andra and Psarakis, Kyriakos and Brons, Jerry and Fragkoulis, Marios and Lofi, Christoph and Bonifati, Angela and Katsifodimos, Asterios},
+  booktitle={2021 IEEE 37th International Conference on Data Engineering (ICDE)},
+  pages={468--479},
+  year={2021},
+  organization={IEEE}
+}
+Demo Paper:
+@article{koutras2021demo,
+  title={Valentine in Action: Matching Tabular Data at Scale},
+  author={Koutras, Christos and Psarakis, Kyriakos and Ionescu, Andra and Fragkoulis, Marios and Bonifati, Angela and Katsifodimos, Asterios},
+  journal={VLDB},
+  volume={14},
+  number={12},
+  pages={2871--2874},
+  year={2021},
+  publisher={VLDB Endowment}
 }
 ```

@@ -6,8 +6,8 @@ from valentine.algorithms import Coma
 
 def main():
     # Load data using pandas
-    d1_path = os.path.join('data', 'tiny_authors_1_joinable_vertical_co30_target.csv')
-    d2_path = os.path.join('data', 'tiny_authors_1_joinable_vertical_co30_source.csv')
+    d1_path = os.path.join('data', 'authors1.csv')
+    d2_path = os.path.join('data', 'authors2.csv')
     df1 = pd.read_csv(d1_path)
     df2 = pd.read_csv(d2_path)
 
@@ -17,12 +17,12 @@ def main():
 
     print(matches)
 
-    # If golden standard available valentine could calculate the metrics
-    golden_standard = [('Cited by', 'Cited by'),
+    # If ground truth available valentine could calculate the metrics
+    ground_truth = [('Cited by', 'Cited by'),
                        ('Authors', 'Authors'),
                        ('EID', 'EID')]
 
-    metrics = valentine_metrics.all_metrics(matches, golden_standard)
+    metrics = valentine_metrics.all_metrics(matches, ground_truth)
 
     print(metrics)
 

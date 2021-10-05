@@ -1,4 +1,8 @@
 import setuptools
+from pathlib import Path
+
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name='valentine',
@@ -7,6 +11,8 @@ setuptools.setup(
     license_files=('LICENSE',),
     author='Delft Data',
     author_email='delftdatasystems@gmail.com',
+    maintainer='Delft Data',
+    maintainer_email='delftdatasystems@gmail.com',
     packages=setuptools.find_packages(exclude=('tests*',)),
     install_requires=[
         'numpy>=1.21,<2.0',
@@ -24,6 +30,8 @@ setuptools.setup(
         'pyemd==0.5.1',
         'python-dateutil>=2.8,<2.9'
     ],
+    keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
     include_package_data=True,
-    python_requires='>=3.7'
+    python_requires='>=3.7',
+    long_description=long_description
 )
