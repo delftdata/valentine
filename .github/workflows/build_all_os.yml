@@ -21,3 +21,5 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install valentine
         run: pip install .
+      - name: run tests
+        run: python -m unittest discover tests
