@@ -15,7 +15,7 @@ class Coma(BaseMatcher):
     def __init__(self,
                  max_n: int = 0,
                  strategy: str = "COMA_OPT",
-                 java_xmx: str = "4096m"):
+                 java_xmx: str = "1024m"):
         self.__max_n = int(max_n)
         self.__strategy = strategy
         self.__java_XmX = java_xmx
@@ -42,9 +42,9 @@ class Coma(BaseMatcher):
                        tmp_folder_path: str
                        ) -> None:
         jar_path = os.path.join(get_project_root(), 'algorithms', 'coma', 'artifact', 'coma.jar')
-        source_data = os.path.relpath(source_table_f_name, get_project_root())
-        target_data = os.path.relpath(target_table_f_name, get_project_root())
-        coma_output_path = os.path.relpath(coma_output_path, get_project_root())
+        source_data = os.path.join(tmp_folder_path, source_table_f_name)
+        target_data = os.path.join(tmp_folder_path, target_table_f_name)
+        coma_output_path = os.path.join(tmp_folder_path, coma_output_path)
         with open(os.path.join(tmp_folder_path, "NUL"), "w") as fh:
             subprocess.call(['java', f'-Xmx{self.__java_XmX}',
                              '-cp', jar_path,
