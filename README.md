@@ -17,7 +17,7 @@ pip install valentine
 
 ## Installation requirements
 
-* Python 3.8 or later
+* Python 3.8, 3.9
 
 
 
