@@ -11,6 +11,10 @@ schema_instance_algorithms = [Coma.__name__]
 all_matchers = schema_only_algorithms + instance_only_algorithms + schema_instance_algorithms
 
 __all__ = [
+    "schema_only_algorithms",
+    "instance_only_algorithms",
+    "schema_instance_algorithms",
+    "all_matchers",
     "Coma",
     "Cupid",
     "DistributionBased",

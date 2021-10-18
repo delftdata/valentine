@@ -1,6 +1,6 @@
+from statistics import quantiles
 from numpy import ndarray
 import numpy as np
-import scipy.stats as ss
 import math
 
 
@@ -49,7 +49,7 @@ class QuantileHistogram:
                  name: tuple,
                  ranks: ndarray,
                  normalization: int,
-                 quantiles: int,
+                 n_quantiles: int,
                  reference_hist=None):
         """
         Parameters
@@ -60,7 +60,7 @@ class QuantileHistogram:
             The column's ranked data
         normalization : int
             The number that normalizes the histogram values
-        quantiles : int
+        n_quantiles : int
             The number of quantiles
         reference_hist : QuantileHistogram, optional
             The reference histogram that provides the bucket boundaries
@@ -69,11 +69,11 @@ class QuantileHistogram:
         self.bucket_values = {}
         self.name = name
         self.normalization_factor = normalization
-        self.quantiles = quantiles
+        self.quantiles = n_quantiles
         self.dist_matrix = self.calc_dist_matrix()
         if reference_hist is None:
             self.add_buckets(ranks.min(initial=math.inf),
-                             ss.mstats.mquantiles(ranks, np.array(list(range(1, quantiles + 1))) / quantiles))
+                             [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method='inclusive')])
             self.add_values(ranks)
         else:
             self.bucket_boundaries = reference_hist.bucket_boundaries
