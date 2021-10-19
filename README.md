@@ -18,6 +18,7 @@ pip install valentine
 ## Installation requirements
 
 * Python>=3.7,<3.10
+* For the Coma matcher it is required to have java (jre) installed
 
 
 
