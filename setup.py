@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name='valentine',
-    version='0.1.2',
+    version='0.1.3',
     description='Valentine Matcher',
     license_files=('LICENSE',),
     author='Delft Data',
@@ -14,7 +14,7 @@ setuptools.setup(
     maintainer='Delft Data',
     maintainer_email='delftdatasystems@gmail.com',
     url='https://delftdata.github.io/valentine/',
-    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.2.tar.gz',
+    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.3.tar.gz',
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'numpy>=1.21,<2.0',
@@ -33,7 +33,7 @@ setuptools.setup(
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
     include_package_data=True,
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     long_description=long_description,
     long_description_content_type='text/markdown'
 )
