@@ -3,7 +3,7 @@
 [![build](https://github.com/delftdata/valentine/actions/workflows/build.yml/badge.svg)](https://github.com/delftdata/valentine/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/delftdata/valentine/branch/master/graph/badge.svg?token=4QR0X315CL)](https://codecov.io/gh/delftdata/valentine)
 [![PyPI version](https://badge.fury.io/py/valentine.svg)](https://badge.fury.io/py/valentine)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7|3.8|3.9|3.10-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7|3.8|3.9-blue.svg)](https://www.python.org/downloads/release/python-380/)
 
 A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
 
@@ -17,7 +17,7 @@ pip install valentine
 
 ## Installation requirements
 
-* Python>=3.7
+* Python>=3.7,<3.10
 
 
 

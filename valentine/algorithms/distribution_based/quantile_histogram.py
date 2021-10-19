@@ -1,4 +1,4 @@
-from statistics import quantiles
+import scipy.stats as ss
 from numpy import ndarray
 import numpy as np
 import math
@@ -73,7 +73,7 @@ class QuantileHistogram:
         self.dist_matrix = self.calc_dist_matrix()
         if reference_hist is None:
             self.add_buckets(ranks.min(initial=math.inf),
-                             [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method='inclusive')])
+                             ss.mstats.mquantiles(ranks, np.array(list(range(1, self.quantiles + 1))) / self.quantiles))
             self.add_values(ranks)
         else:
             self.bucket_boundaries = reference_hist.bucket_boundaries

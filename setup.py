@@ -18,6 +18,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'numpy>=1.21,<2.0',
+        'scipy>=1.6,<2.0',
         'pandas>=1.3,<1.4',
         'nltk>=3.6,<3.7',
         'snakecase>=1.0,<2.0',
@@ -33,7 +34,7 @@ setuptools.setup(
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
     include_package_data=True,
-    python_requires='>=3.7',
+    python_requires='>=3.7,<3.10',
     long_description=long_description,
     long_description_content_type='text/markdown'
 )
