@@ -27,16 +27,25 @@ class TestAlgorithms(unittest.TestCase):
         cu_matcher = Cupid()
         matches_cu_matcher = cu_matcher.get_matches(d1, d2)
         assert len(matches_cu_matcher) > 0  # Check that it actually produced output
+        cu_matcher = Cupid(parallelism=2)
+        matches_cu_matcher = cu_matcher.get_matches(d1, d2)
+        assert len(matches_cu_matcher) > 0  # Check that it actually produced output
 
     def test_distribution_based(self):
         # Test the Distribution based matcher
         distribution_based_matcher = DistributionBased()
         matches_db_matcher = distribution_based_matcher.get_matches(d1, d2)
         assert len(matches_db_matcher) > 0  # Check that it actually produced output
+        distribution_based_matcher = DistributionBased(process_num=2)
+        matches_db_matcher = distribution_based_matcher.get_matches(d1, d2)
+        assert len(matches_db_matcher) > 0  # Check that it actually produced output
 
     def test_jaccard_levenshtein(self):
         # Test the Jaccard Levenshtein matcher
         jl_matcher = JaccardLevenMatcher()
+        matches_jl_matcher = jl_matcher.get_matches(d1, d2)
+        assert len(matches_jl_matcher) > 0  # Check that it actually produced output
+        jl_matcher = JaccardLevenMatcher(threshold_leven=0.5, process_num=2)
         matches_jl_matcher = jl_matcher.get_matches(d1, d2)
         assert len(matches_jl_matcher) > 0  # Check that it actually produced output
 

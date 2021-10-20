@@ -46,19 +46,21 @@ class JaccardLevenMatcher(BaseMatcher):
                                                               self.__threshold_leven,
                                                               target_id,
                                                               source_id):
-                matches.update(self.__process_jaccard_leven(combination))
+                matches.update(self.process_jaccard_leven(combination))
         else:
             with get_context("spawn").Pool(self.__process_num) as process_pool:
-                matches = dict(process_pool.map(self.__process_jaccard_leven,
-                                                self.__get_column_combinations(source_input,
-                                                                               target_input,
-                                                                               self.__threshold_leven,
-                                                                               target_id,
-                                                                               source_id)))
+                matches = {}
+                list_of_matches = process_pool.map(self.process_jaccard_leven,
+                                                   self.__get_column_combinations(source_input,
+                                                                                  target_input,
+                                                                                  self.__threshold_leven,
+                                                                                  target_id,
+                                                                                  source_id))
+                [matches.update(match) for match in list_of_matches]
         matches = {k: v for k, v in matches.items() if v > 0.0}  # Remove the pairs with zero similarity
         return matches
 
-    def __process_jaccard_leven(self, tup: tuple):
+    def process_jaccard_leven(self, tup: tuple):
 
         source_data, target_data, threshold, target_id, target_table_name, target_table_unique_identifier, \
             target_column_name, target_column_unique_identifier, source_table_name, source_table_unique_identifier, \
