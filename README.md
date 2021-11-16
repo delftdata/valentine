@@ -3,9 +3,13 @@
 [![build](https://github.com/delftdata/valentine/actions/workflows/build.yml/badge.svg)](https://github.com/delftdata/valentine/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/delftdata/valentine/branch/master/graph/badge.svg?token=4QR0X315CL)](https://codecov.io/gh/delftdata/valentine)
 [![PyPI version](https://badge.fury.io/py/valentine.svg)](https://badge.fury.io/py/valentine)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7|3.8|3.9-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7|3.8|3.9|3.10-blue.svg)](https://www.python.org/downloads/release/python-380/)
 
 A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
+
+## Experimental suite version
+
+The original experimental suite version of Valentine, as first published for the needs of the research paper, can be still found [here](https://github.com/delftdata/valentine/tree/v1.1).
 
 
 ## Installation instructions
@@ -17,7 +21,7 @@ pip install valentine
 
 ## Installation requirements
 
-* Python>=3.7,<3.10
+* Python>=3.7,<3.11
 * For the Coma matcher it is required to have java (jre) installed
 
 
@@ -114,9 +118,6 @@ The output of the above code block is:
 'recall_at_sizeof_ground_truth': 1.0}
 
 ```
-## Experimental suite version
-
-The original experimental suite version of Valentine, as first published for the needs of the research paper, can be still found [here](https://github.com/delftdata/valentine/tree/v1.1).
 
 ## Project page
 
