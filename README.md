@@ -34,28 +34,29 @@ Valentine can be used to find matches among columns of a given pair of pandas Da
 In order to do so, the user can choose one of the following 5 matching methods:
 
  1. `Coma(int: max_n str: strategy)` is a python wrapper around [COMA 3.0 Comunity edition](https://sourceforge.net/projects/coma-ce/)
- 	* **Parameters**: 
- 		* **max_n**(*int*) - Accept similarity threshold, default is 0.
- 		* **strategy**(*str*) - Choice of "COMA\_OPT" (schema based matching - default) or "COMA\_OPT\_INST" (schema and instance based matching)
+   * **Parameters**: 
+     * **max_n**(*int*) - Accept similarity threshold, default is 0.
+     * **strategy**(*str*) - Choice of "COMA\_OPT" (schema based matching - default) or "COMA\_OPT\_INST" (schema and instance based matching)
+
  2.  `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.79.4079&rep=rep1&type=pdf)
- 	* **Parameters**: 
- 		* **w_struct**(*float*) - Structural similarity threshold, default is 0.2.
- 		* **leaf_w_struct**(*float*) - Structural similarity threshold, leaf level, default is 0.2.
- 		* **th_accept**(*float*) - Accept similarity threshold, default is 0.7.
+  * **Parameters**:
+    * **w_struct**(*float*) - Structural similarity threshold, default is 0.2.
+    * **leaf_w_struct**(*float*) - Structural similarity threshold, leaf level, default is 0.2.
+    * **th_accept**(*float*) - Accept similarity threshold, default is 0.7.
 
  3.  `DistributionBased(float: threshold1, float: threshold2)` is the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl-acm-org.tudelft.idm.oclc.org/doi/pdf/10.1145/1989323.1989336)
- 	* **Parameters**: 
- 		* **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
- 		* **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
+   * **Parameters**: 
+     * **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
+     * **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
+
  4.  `JaccardLevenMatcher(float: threshold_leven)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance
- 	* **Parameters**: 
- 		* **threshold_leven**(*float*) - Levenshtein ratio threshold for deciding whether two instances are same or not, default is 0.8.
- 		
+   * **Parameters**: 
+     * **threshold_leven**(*float*) - Levenshtein ratio threshold for deciding whether two instances are same or not, default is 0.8.
 
  5. `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](http://p8090-ilpubs.stanford.edu.tudelft.idm.oclc.org/730/1/2002-1.pdf)
-	* **Parameters**: 
- 		* **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
- 		* **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
+   * **Parameters**: 
+     * **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
+     * **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
 
 ### Matching DataFrames
 
