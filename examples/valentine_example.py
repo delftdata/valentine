@@ -2,6 +2,7 @@ import os
 import pandas as pd
 from valentine import valentine_match, valentine_metrics
 from valentine.algorithms import Coma
+import json
 
 
 def main():
@@ -26,7 +27,7 @@ def main():
 
     metrics = valentine_metrics.all_metrics(matches, ground_truth)
 
-    print(metrics)
+    print(json.dumps(metrics, sort_keys=True, indent=4))
 
 
 if __name__ == '__main__':
