@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from valentine import valentine_match, valentine_metrics
 from valentine.algorithms import Coma
-import json
+import pprint
 
 
 def main():
@@ -18,8 +18,6 @@ def main():
     matcher = Coma(strategy="COMA_OPT")
     matches = valentine_match(df1, df2, matcher)
 
-    print(matches)
-
     # If ground truth available valentine could calculate the metrics
     ground_truth = [('Cited by', 'Cited by'),
                        ('Authors', 'Authors'),
@@ -27,7 +25,16 @@ def main():
 
     metrics = valentine_metrics.all_metrics(matches, ground_truth)
 
-    print(json.dumps(metrics, sort_keys=True, indent=4))
+    pp = pprint.PrettyPrinter(indent=4)
+    print("Found the following matches:")
+    pp.pprint(matches)
+
+    print("\nAccording to the ground truth:")
+    pp.pprint(ground_truth)
+    
+    print("\nThese are the scores of the matcher:")
+    pp.pprint(metrics)
+
 
 
 if __name__ == '__main__':
