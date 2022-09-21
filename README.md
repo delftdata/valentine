@@ -13,16 +13,17 @@ The original experimental suite version of Valentine, as first published for the
 
 
 ## Installation instructions
-To install Valentine simply run
+### Requirements
+
+* *Python* >=3.7,<3.11
+* *Java*: For the Coma matcher it is required to have java (jre) installed
+
+To install Valentine simply run:
 
 ```
 pip install valentine
 ```
 
-## Installation requirements
-
-* Python>=3.7,<3.11
-* For the Coma matcher it is required to have java (jre) installed
 
 
 
