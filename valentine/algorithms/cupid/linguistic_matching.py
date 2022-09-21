@@ -9,7 +9,7 @@ from anytree import LevelOrderIter
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
 import Levenshtein as Lv
-from similarity.ngram import NGram
+from strsimpy.ngram import NGram
 
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
@@ -23,6 +23,7 @@ def normalization(element,
         tokens = nltk.word_tokenize(element)
     except LookupError:
         nltk.download('punkt')
+        nltk.download('omw-1.4')
         nltk.download('stopwords')
         nltk.download('wordnet')
         tokens = nltk.word_tokenize(element)
