@@ -1,4 +1,4 @@
-# Valentine: Matching DataFrames Easily
+# Valentine: (Schema-) Matching DataFrames Made Easy
 
 [![build](https://github.com/delftdata/valentine/actions/workflows/build.yml/badge.svg)](https://github.com/delftdata/valentine/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/delftdata/valentine/branch/master/graph/badge.svg?token=4QR0X315CL)](https://codecov.io/gh/delftdata/valentine)
