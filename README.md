@@ -7,6 +7,8 @@
 
 A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
 
+You can find more information about the research supporting Valentine [here](https://delftdata.github.io/valentine/).
+
 ## Experimental suite version
 
 The original experimental suite version of Valentine, as first published for the needs of the research paper, can be still found [here](https://github.com/delftdata/valentine/tree/v1.1).
@@ -120,10 +122,6 @@ The output of the above code block is:
 'recall_at_sizeof_ground_truth': 1.0}
 
 ```
-
-## Project page
-
-The project page containing information about the research supporting Valentine can be accessed [here](https://delftdata.github.io/valentine/).
 
 ## Cite Valentine
 ```
