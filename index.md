@@ -1,7 +1,10 @@
 ## Description
 
+***Valentine*** is an extensible open-source product to execute and organize large-scale automated matching processes on tabular data either for experimentation or deployment in real world data. Valentine includes implementations of seminal schema matching methods that we either implemented from scratch (due to absence of open source code) or imported from open repositories. 
 
-***Valentine*** is an extensible open-source product to execute and organize large-scale automated matching processes on tabular data either for experimentation or deployment in real world data. Valentine includes implementations of seminal schema matching methods that we either implemented from scratch (due to absence of open source code) or imported from open repositories. To enable proper evaluation, Valentine offers a fabricator for creating evaluation dataset pairs that respect specific semantics. It also comes with a GUI that makes it easier than ever to: i) evaluate schema matching methods on dataset pairs that respect specific relatedness semantics (joinable/unionable), and ii) scale SotA methods to holistic matching in big data repositories or data lakes in order to find relationships among disparate tabular data. 
+To enable proper evaluation, Valentine offers a fabricator for creating evaluation dataset pairs that respect specific semantics. 
+
+Finally, Valentine also comes with a GUI that makes it easier than ever to: i) evaluate schema matching methods on dataset pairs that respect specific relatedness semantics (joinable/unionable), and ii) scale SotA methods to holistic matching in big data repositories or data lakes in order to find relationships among disparate tabular data. 
 ## Authors
 
 <figure class="item" style="vertical-align:top; display: inline-block; text-align:center; width:200px">
