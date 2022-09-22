@@ -1,6 +1,6 @@
 theme: jekyll-theme-slate
 
 title: "Valentine: Evaluating Matching Techniques for Dataset Discovery"
-description: "Webpage containing information on Delft-Data's Valentine paper"
+description: "Webpage containing information on the Valentine matching system"
 
 show_downloads: false
