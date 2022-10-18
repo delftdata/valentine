@@ -1,0 +1,1001 @@
+Unnamed: 0,title,book_id,user_id_mapping,book_id_mapping,Predicted Rating,Actual Rating
+177303,Ready Player One,9969571,18478,329,2.4,3
+181834,Evermore The Immortals 1,3975774,82585,837,2.6,1
+183695,The Da Vinci Code Robert Langdon 2,968,57367,267,3.0,3
+147704,A Confederacy of Dunces,310612,49085,164,2.6,4
+94559,Atonement,6867,26364,834,4.5,4
+126751,Quidditch Through the Ages,111450,26236,303,3.6,3
+45475,Darkly Dreaming Dexter Dexter 1,17231,33516,284,4.7,4
+93227,The Silmarillion,7332,18868,861,3.0,4
+89080,Lola and the Boy Next Door Anna and the French Kiss 2,9961796,9517,567,3.5,3
+80962,Four to Score Stephanie Plum 4,6422,41635,431,4.6,4
+86610,Dead and Gone Sookie Stackhouse 9,5161066,50479,417,3.3,3
+10120,A Dance with Dragons A Song of Ice and Fire 5,10664113,4746,680,3.8,3
+139853,A Game of Thrones A Song of Ice and Fire 1,13496,46570,191,4.8,4
+141981,The Adventures of Huckleberry Finn,2956,37737,113,4.8,5
+50995,The Wise Mans Fear The Kingkiller Chronicle 2,1215032,39730,609,3.9,4
+5483,Forever The Wolves of Mercy Falls 3,9409458,52687,497,4.6,5
+110934,Gone with the Wind,18405,60672,160,3.4,3
+190059,The Picture of Dorian Gray,5297,11736,460,4.3,4
+55885,Just Listen,51738,13873,485,4.0,4
+68063,The Pillars of the Earth Kingsbridge 1,5043,34047,206,4.2,3
+30752,The Three Musketeers The DArtagnan Romances 1,7190,26327,408,3.0,2
+46007,The Blood of Olympus The Heroes of Olympus 5,18705209,68515,91,4.9,5
+50695,Blue Bloods Blue Bloods 1,872333,36127,490,3.0,3
+70087,The Throne of Fire Kane Chronicles 2,9067850,16671,827,2.1,3
+107847,Animal Farm,7613,66654,6,3.4,3
+86342,Frankenstein,18490,51155,142,4.1,3
+41698,Scarlet The Lunar Chronicles 2,13206760,492,618,3.4,3
+130891,Girl with a Pearl Earring,2865,48652,561,2.5,3
+70164,Mansfield Park,45032,20239,10,3.1,3
+175474,The Devil in the White City Murder Magic and Madness at the Fair That Changed America,21996,54372,49,4.3,4
+85029,The Girl with All the Gifts,17235026,11339,88,3.6,4
+166373,Hatchet Brians Saga 1,50,14418,319,4.7,5
+188820,The Diary of a Young Girl,48855,21441,469,3.6,4
+39578,Eragon The Inheritance Cycle 1,113436,16785,411,4.7,4
+121233,Murder on the Orient Express Hercule Poirot 10,16304,31997,352,4.8,5
+154155,Dark Lover Black Dagger Brotherhood 1,42899,62507,613,4.3,4
+129210,Harry Potter and the Deathly Hallows Harry Potter 7,136251,61061,157,4.7,5
+156927,Macbeth,8852,78399,346,3.7,3
+57583,Cloud Atlas,49628,34778,695,4.4,4
+128008,The Crucible,17250,44873,794,4.8,5
+187884,The Dead Zone,11573,9749,639,3.9,5
+177610,Dear John,5526,36437,376,3.4,5
+72476,The Lightning Thief Percy Jackson and the Olympians 1,28187,52625,634,4.8,5
+79932,Green Eggs and Ham,23772,27907,389,4.5,3
+61052,And Then There Were None,16299,29631,366,4.5,5
+31603,Reflected in You Crossfire 2,13596809,61733,667,3.9,4
+106710,Fifty Shades Freed Fifty Shades 3,12881778,10048,147,1.2,1
+71413,The Cuckoos Calling Cormoran Strike 1,16160797,24540,703,4.1,4
+161867,The Fault in Our Stars,11870085,3558,306,4.7,4
+195497,The Scorch Trials Maze Runner 2,7631105,927,629,3.2,2
+95066,A Tree Grows in Brooklyn,14891,15291,675,3.0,5
+66336,The Great Gatsby,4671,22068,290,2.4,2
+10430,Robinson Crusoe,2932,13664,412,2.4,4
+52823,Lord of the Flies,7624,39322,228,5.0,5
+143116,Oh The Places Youll Go,191139,31515,677,4.7,5
+40931,Hot Six Stephanie Plum 6,6858,8456,210,4.1,4
+11962,A Monster Calls,8621462,2502,728,4.5,4
+71644,The Magicians Nephew Chronicles of Narnia 6,65605,64242,355,4.3,4
+134443,The One The Selection 3,18635016,52485,673,4.2,4
+94506,Atonement,6867,48870,834,3.7,4
+26776,From the MixedUp Files of Mrs Basil E Frankweiler,3980,41642,547,3.0,3
+164412,Red Dragon Hannibal Lecter 1,28877,33499,63,3.1,2
+161799,The Fault in Our Stars,11870085,31329,306,4.7,5
+37497,The Magicians The Magicians 1,6101718,39768,278,2.8,1
+34507,Thirteen Reasons Why,1217100,36318,612,1.8,3
+130883,Girl with a Pearl Earring,2865,34521,561,3.8,3
+120593,The Sisterhood of the Traveling Pants Sisterhood 1,452306,17347,254,3.6,3
+118715,The Secret Life of Bees,37435,38640,588,3.4,5
+152463,Little Women Little Women 1,1934,69139,50,4.1,4
+110506,The Unbecoming of Mara Dyer Mara Dyer 1,11408650,13622,859,3.9,4
+110112,To Kill a Mockingbird,2657,47301,108,4.3,5
+128912,Harry Potter and the Deathly Hallows Harry Potter 7,136251,79860,157,5.0,5
+83975,A Child Called It Dave Pelzer 1,60748,54364,847,5.0,3
+39707,Waiting for Godot,17716,19666,686,3.0,5
+188604,The Diary of a Young Girl,48855,10206,469,4.3,4
+34085,Bag of Bones,10589,72594,687,4.4,4
+21549,The Voyage of the Dawn Treader Chronicles of Narnia 3,140225,732,146,3.9,5
+33937,Insomnia,10585,4931,433,4.6,5
+24540,Invisible Man,16981,25940,889,3.9,4
+22828,Dead Until Dark Sookie Stackhouse 1,301082,21873,514,5.0,5
+175048,Guns Germs and Steel The Fates of Human Societies,1842,70076,645,4.3,4
+30847,The Three Musketeers The DArtagnan Romances 1,7190,31552,408,3.9,5
+156549,The Princess Bride,21787,13239,77,3.7,5
+27969,The Velveteen Rabbit,144974,45303,805,3.6,1
+144324,The Silence of the Lambs Hannibal Lecter 2,23807,40608,80,3.7,3
+152462,Little Women Little Women 1,1934,41643,50,3.6,4
+5535,Forever The Wolves of Mercy Falls 3,9409458,23269,497,4.2,4
+139425,A Game of Thrones A Song of Ice and Fire 1,13496,35072,191,5.0,5
+24806,Inkheart Inkworld 1,28194,5565,55,3.6,3
+159446,Brave New World,5129,60149,39,5.0,5
+6412,Cry Wolf Alpha Omega 1,2355575,63494,668,3.3,2
+122144,The Color Purple,11486,11525,301,3.9,3
+59963,The Curious Incident of the Dog in the NightTime,1618,30653,173,3.9,5
+185541,MobyDick or The Whale,153747,17560,239,4.5,5
+191199,Divergent Divergent 1,13335037,47793,258,3.9,3
+124144,Harry Potter and the Sorcerers Stone Harry Potter 1,3,33806,488,5.0,5
+7317,Daughter of Smoke Bone Daughter of Smoke Bone 1,8490112,43692,572,4.4,5
+141742,The Adventures of Huckleberry Finn,2956,30862,113,4.0,4
+16121,The 5th Wave The 5th Wave 1,16101128,43095,583,4.4,5
+4489,The Eye of the World Wheel of Time 1,228665,13809,594,3.9,4
+99780,The Golden Compass His Dark Materials 1,119322,52657,54,5.0,5
+15040,Fallen Fallen 1,6487308,17589,781,1.9,1
+11418,Mockingjay The Hunger Games 3,7260188,13827,152,3.6,5
+87910,Where the Red Fern Grows,10365,69781,125,3.7,3
+45027,Their Eyes Were Watching God,37415,3718,222,3.8,5
+64870,The Fiery Cross Outlander 5,10967,28147,592,5.0,5
+157384,Bone Crossed Mercy Thompson 4,3128411,62642,379,4.8,5
+191457,Divergent Divergent 1,13335037,29901,258,5.0,5
+119864,Requiem Delirium 3,9593913,79726,504,4.7,5
+98423,The Clan of the Cave Bear Earths Children 1,1295,6144,193,4.1,4
+139808,A Game of Thrones A Song of Ice and Fire 1,13496,38596,191,4.4,4
+192446,Uglies Uglies 1,24770,26225,330,4.1,4
+18629,Angus Thongs and FullFrontal Snogging Confessions of Georgia Nicolson 1,402013,4886,524,3.2,3
+104847,The Time Machine,2493,3091,401,2.9,3
+57548,Beautiful Disaster Beautiful 1,11505797,77808,705,4.2,5
+35406,Grave Peril The Dresden Files 3,91476,68989,133,3.6,4
+40857,One for the Money Stephanie Plum 1,6853,39738,287,3.5,5
+152774,City of Bones The Mortal Instruments 1,256683,20305,261,3.5,3
+190542,The Sun Also Rises,3876,31827,532,3.9,2
+30535,Obsidian Lux 1,12578077,32310,392,3.9,4
+25282,The Short Second Life of Bree Tanner Twilight 35,7937462,57548,691,2.2,3
+22327,Fifty Shades of Grey Fifty Shades 1,10818853,29771,465,3.7,4
+136323,Eclipse Twilight 3,428263,71851,98,4.2,5
+176926,The Battle of the Labyrinth Percy Jackson and the Olympians 4,2120932,47174,197,4.5,4
+132262,A Little Princess,3008,61066,128,3.6,3
+39281,Eragon The Inheritance Cycle 1,113436,1657,411,2.7,2
+106577,Alexander and the Terrible Horrible No Good Very Bad Day,46677,25105,581,2.5,3
+11335,Mockingjay The Hunger Games 3,7260188,561,152,3.1,4
+172146,The Wide Window A Series of Unfortunate Events 3,438492,36624,454,4.8,5
+163834,Divine Secrets of the YaYa Sisterhood,137791,38629,533,3.4,3
+123238,All the Light We Cannot See,18143977,26247,69,4.3,5
+22336,Fifty Shades of Grey Fifty Shades 1,10818853,34297,465,3.5,5
+193846,The Immortal Life of Henrietta Lacks,6493208,6655,666,3.3,4
+91761,Hamlet,1420,38889,529,3.4,4
+190356,Me Talk Pretty One Day,4137,30063,500,4.9,4
+88791,Burned House of Night 7,6917952,40961,129,4.0,4
+123318,All the Light We Cannot See,18143977,40177,69,4.7,5
+14768,Love in the Time of Cholera,9712,44005,702,3.8,2
+67758,Needful Things,107291,45471,298,4.1,5
+47655,New Moon Twilight 2,49041,52913,78,4.9,5
+4858,Maybe Someday Maybe 1,24445517,24149,493,3.1,4
+96999,The WindUp Bird Chronicle,11275,11349,895,3.9,4
+20585,The Nanny Diaries Nanny 1,228333,70388,697,4.1,4
+77055,The Maze Runner Maze Runner 1,6186357,25249,167,3.2,3
+55349,Breaking Dawn Twilight 4,1162543,32773,199,2.8,3
+94510,Atonement,6867,28289,834,4.0,4
+87407,1984,5470,58290,365,5.0,4
+388,We Should All Be Feminists,22738563,20183,873,3.5,5
+175020,Harry Potter and the Cursed Child Parts One and Two Harry Potter 8,29056083,18606,272,3.2,3
+134494,The One The Selection 3,18635016,25396,673,3.2,3
+110595,Gone with the Wind,18405,18681,160,5.0,5
+148995,Eat Pray Love,19501,49050,62,2.8,5
+11724,Mockingjay The Hunger Games 3,7260188,47801,152,2.8,4
+115144,Catching Fire The Hunger Games 2,6148028,64724,90,4.2,4
+158991,Bloodlines Bloodlines 1,8709527,59617,759,3.9,5
+88094,Hunted House of Night 5,4134071,28620,117,3.6,4
+128626,Harry Potter and the Deathly Hallows Harry Potter 7,136251,22461,157,3.6,3
+36110,The Ocean at the End of the Lane,15783514,40190,296,3.6,3
+73812,Room,7937843,49490,573,4.7,5
+23569,The Miserable Mill A Series of Unfortunate Events 4,65119,2349,169,2.1,2
+109586,To Kill a Mockingbird,2657,5617,108,4.4,5
+59644,The Curious Incident of the Dog in the NightTime,1618,73720,173,2.8,2
+60357,112263,10644930,55328,830,4.3,5
+172362,The Giver The Giver 1,3636,35565,473,4.5,3
+105956,Ella Enchanted,24337,36449,16,4.6,5
+155757,Catch22 Catch22 1,168668,7901,170,1.9,2
+148244,Prodigy Legend 2,13414446,7539,698,3.4,3
+98038,A Clockwork Orange,227463,18343,446,3.9,4
+141801,The Adventures of Huckleberry Finn,2956,28785,113,5.0,3
+40469,Fried Green Tomatoes at the Whistle Stop Cafe,9375,52715,393,3.6,4
+84244,A Great and Terrible Beauty Gemma Doyle 1,3682,12589,22,3.1,3
+35532,The Iron King The Iron Fey 1,6644117,61326,357,4.2,4
+162993,The Return of the King The Lord of the Rings 3,18512,79586,283,5.0,5
+856,Anna and the French Kiss Anna and the French Kiss 1,6936382,3296,271,2.7,3
+46229,Quiet The Power of Introverts in a World That Cant Stop Talking,8520610,70385,690,3.3,4
+162869,Graceling Graceling Realm 1,3236307,9262,130,4.1,5
+195623,The Scorch Trials Maze Runner 2,7631105,43869,629,3.0,3
+6523,Saga Vol 1 Saga 1,15704307,37598,437,3.6,4
+195558,The Scorch Trials Maze Runner 2,7631105,48679,629,3.9,5
+117236,Ignite Me Shatter Me 3,13188676,6607,194,4.6,5
+24859,Inkheart Inkworld 1,28194,2386,55,3.3,2
+9956,The Phantom of the Opera,480204,14645,427,3.1,2
+159764,The Time Travelers Wife,18619684,30507,731,4.2,5
+62881,Attachments,8909152,7119,134,3.5,3
+31325,The Chronicles of Narnia Chronicles of Narnia 17,11127,49300,571,1.9,3
+135581,Eclipse Twilight 3,428263,16065,98,4.9,5
+155321,The Horse and His Boy Chronicles of Narnia 5,84119,17175,495,3.5,4
+158389,Lolita,7604,63691,570,3.0,1
+178158,The House of the Spirits,9328,12978,884,4.0,4
+121621,Allegiant Divergent 3,18710190,20818,277,3.2,4
+109323,To Kill a Mockingbird,2657,15086,108,4.0,5
+142214,The Adventures of Huckleberry Finn,2956,37246,113,2.5,3
+162245,The Fault in Our Stars,11870085,83163,306,4.5,4
+156560,The Princess Bride,21787,12714,77,3.8,3
+18237,James and the Giant Peach,6689,56491,273,3.9,4
+127436,The Merchant of Venice,24128,4727,233,3.9,4
+182551,Cujo,10603,49876,683,3.8,2
+57523,Beautiful Disaster Beautiful 1,11505797,32733,705,2.4,2
+74061,Queen of Shadows Throne of Glass 4,18006496,61479,798,5.0,5
+100306,Glass Houses The Morganville Vampires 1,27266,38318,890,3.7,4
+85923,Frankenstein,18490,49511,142,3.2,2
+101324,The Canterbury Tales,2696,6447,426,3.7,3
+152640,Crime and Punishment,7144,1633,418,3.4,5
+110413,The Pact,10916,3751,472,2.5,3
+41933,The Son of Neptune The Heroes of Olympus 2,9520360,1329,217,4.6,5
+99247,The Subtle Knife His Dark Materials 2,119324,477,541,3.1,3
+109935,To Kill a Mockingbird,2657,8908,108,4.4,4
+117006,How to Win Friends and Influence People,4865,32215,877,4.2,4
+28637,Postmortem Kay Scarpetta 1,6534,31869,552,2.4,3
+160298,The Girl on the Train,22557272,3793,404,3.3,4
+125729,Romeo and Juliet,18135,56835,30,4.0,3
+126981,Lover Awakened Black Dagger Brotherhood 3,42900,69752,349,4.1,4
+136205,Eclipse Twilight 3,428263,24790,98,3.8,3
+171151,Harry Potter and the Order of the Phoenix Harry Potter 5,2,48555,43,3.9,4
+95405,Bloodfever Fever 2,344262,17135,391,3.5,3
+131306,Club Dead Sookie Stackhouse 3,140082,26841,21,5.0,5
+79780,The Host The Host 1,1656001,6552,198,2.1,1
+38269,SlaughterhouseFive,4981,31588,297,3.4,4
+64745,The Memory Keepers Daughter,10441,40257,0,3.5,3
+97477,The Girl with the Dragon Tattoo Millennium 1,2429135,69618,104,2.7,5
+123154,Soulless Parasol Protectorate 1,6381205,40303,597,3.3,4
+116434,For Whom the Bell Tolls,46170,69101,274,3.9,3
+92280,The Witches,6327,2823,696,5.0,5
+175082,Guns Germs and Steel The Fates of Human Societies,1842,37507,645,3.9,5
+36637,The Hunger Games The Hunger Games 1,2767052,45337,58,2.6,3
+145336,Harry Potter and the Chamber of Secrets Harry Potter 2,15881,478,35,2.9,3
+103300,The Client,5359,3886,498,3.5,3
+23628,The Polar Express,420282,456,543,4.5,4
+124073,Harry Potter and the Sorcerers Stone Harry Potter 1,3,61031,488,5.0,5
+62960,Attachments,8909152,80773,134,4.4,5
+110155,To Kill a Mockingbird,2657,11100,108,4.8,5
+119289,Kafka on the Shore,4929,47844,671,4.2,5
+130371,On Dublin Street On Dublin Street 1,15760001,3161,282,4.5,2
+68834,Harry Potter and the HalfBlood Prince Harry Potter 6,1,9649,150,4.1,3
+65346,Outlander Outlander 1,10964,59579,203,3.4,5
+47072,The Absolutely True Diary of a PartTime Indian,693208,33216,334,5.0,4
+93256,The Silmarillion,7332,8568,861,3.2,4
+132485,Candide,19380,40534,736,4.1,4
+173897,Lover Avenged Black Dagger Brotherhood 7,5098079,71364,42,4.8,5
+110580,Gone with the Wind,18405,22030,160,4.7,4
+123687,Harry Potter and the Sorcerers Stone Harry Potter 1,3,30338,488,4.5,5
+105683,Gullivers Travels,7733,22884,264,3.3,3
+146490,The Glass Castle,7445,38928,422,4.3,5
+105957,Ella Enchanted,24337,25299,16,3.3,4
+77684,The Graveyard Book,2213661,17288,240,4.1,4
+11894,A Monster Calls,8621462,33939,728,4.7,5
+120551,The Sisterhood of the Traveling Pants Sisterhood 1,452306,21721,254,4.4,5
+96955,Dark Matter,27833670,54764,910,3.4,2
+135512,The Other Boleyn Girl The Plantagenet and Tudor Novels 9,37470,48645,685,3.6,4
+18584,The Complete Sherlock Holmes,188572,69815,628,4.0,5
+114386,Confessions of a Shopaholic Shopaholic 1,9416,78076,546,5.0,3
+70004,The Throne of Fire Kane Chronicles 2,9067850,3178,827,3.7,4
+180204,Foundation Foundation 1,29579,46347,131,4.3,5
+195388,The Giving Tree,370493,27135,281,3.6,4
+156930,Macbeth,8852,49074,346,4.4,3
+54895,Breaking Dawn Twilight 4,1162543,2138,199,3.7,3
+117400,Of Mice and Men,890,51052,20,4.0,3
+147204,A Christmas Carol,5326,25628,323,2.6,1
+36097,The Ocean at the End of the Lane,15783514,33403,296,4.2,5
+83416,Dracula,17245,55322,390,3.8,5
+19088,The City of Ember Book of Ember 1,307791,15661,186,3.6,3
+180602,The Lord of the Rings The Lord of the Rings 13,33,22131,115,5.0,5
+112045,The Phantom Tollbooth,378,349,227,4.3,4
+40017,The Scarlet Letter,12296,40192,395,2.3,3
+62395,The Hobbit,5907,13764,162,3.0,4
+115980,Catching Fire The Hunger Games 2,6148028,72277,90,4.8,5
+82629,The Gunslinger,43615,5167,241,2.8,5
+133544,The Lion the Witch and the Wardrobe Chronicles of Narnia 1,100915,18692,46,3.4,3
+29107,The Little Prince,157993,25591,425,3.8,5
+141729,The Adventures of Huckleberry Finn,2956,32245,113,3.1,3
+140718,Heidi,93,44051,304,3.3,4
+55377,Breaking Dawn Twilight 4,1162543,48204,199,4.0,5
+70888,If I Stay If I Stay 1,4374400,31158,1,4.3,5
+25922,A Midsummer Nights Dream,1622,20260,252,3.8,3
+93319,The Silmarillion,7332,16002,861,3.9,4
+166881,Interview with the Vampire The Vampire Chronicles 1,43763,12344,370,2.8,4
+183892,The Da Vinci Code Robert Langdon 2,968,25895,267,2.5,3
+140685,Wait for You Wait for You 1,17314430,22442,12,3.3,3
+23932,Hamlet Screenplay Introduction And Film Diary,117251,75614,810,3.0,5
+59611,The Curious Incident of the Dog in the NightTime,1618,1515,173,4.2,5
+89868,Outliers The Story of Success,3228917,32321,378,4.8,5
+110799,Gone with the Wind,18405,23963,160,4.2,3
+113971,I Am Legend and Other Stories,547094,75362,775,3.7,4
+130859,Girl with a Pearl Earring,2865,8991,561,3.3,4
+120640,The Sisterhood of the Traveling Pants Sisterhood 1,452306,42383,254,3.7,4
+140530,The Metamorphosis,485894,29404,60,3.2,4
+169291,Sarahs Key,556602,4180,232,3.6,5
+101652,The Red Pyramid Kane Chronicles 1,7090447,49972,704,3.8,3
+834,Anna and the French Kiss Anna and the French Kiss 1,6936382,14632,271,4.8,4
+79287,Halfway to the Grave Night Huntress 1,1421990,45996,317,4.1,4
+143399,Naked,4138,5795,749,3.7,5
+59767,The Curious Incident of the Dog in the NightTime,1618,48389,173,3.5,3
+24609,Orange Is the New Black,6314763,6016,818,4.2,3
+182056,Charlottes Web,24178,65726,341,5.0,5
+167845,Blood Bound Mercy Thompson 2,285205,51535,183,4.0,4
+178639,All the Bright Places,18460392,64771,336,4.7,5
+81591,Harry Potter and the Prisoner of Azkaban Harry Potter 3,5,58161,82,4.6,5
+186780,Harry Potter and the Goblet of Fire Harry Potter 4,6,21667,75,4.3,3
+171932,Eleanor Park,15745753,12116,785,5.0,4
+8211,Jane Eyre,10210,75791,13,4.7,5
+193306,City of Lost Souls The Mortal Instruments 5,8755776,893,443,2.8,3
+63388,Heir of Fire Throne of Glass 3,20613470,63306,751,3.9,3
+176848,The Battle of the Labyrinth Percy Jackson and the Olympians 4,2120932,45851,197,4.1,5
+99577,The Golden Compass His Dark Materials 1,119322,72525,54,4.6,5
+163135,The Return of the King The Lord of the Rings 3,18512,57584,283,3.8,4
+115835,Catching Fire The Hunger Games 2,6148028,45657,90,5.0,5
+149347,Where the Heart Is,5168,6772,764,3.4,2
+134297,The Death Cure Maze Runner 3,7864437,82745,234,2.7,4
+183868,The Da Vinci Code Robert Langdon 2,968,24233,267,4.0,4
+30326,Blood Rites The Dresden Files 6,99383,72915,793,4.3,4
+181225,The Fellowship of the Ring The Lord of the Rings 1,34,20768,243,3.2,4
+1040,Not That Kind of Girl A Young Woman Tells You What Shes Learned,20588698,15654,693,3.8,3
+74160,Magic Bites Kate Daniels 1,38619,75254,18,4.3,4
+192743,An Abundance of Katherines,49750,66204,715,3.3,4
+25133,Stranger in a Strange Land,350,71487,15,3.5,5
+93543,Why Not Me,22716447,48878,432,4.8,4
+10795,A Clash of Kings A Song of Ice and Fire 2,10572,4015,260,5.0,5
+23205,Dead Until Dark Sookie Stackhouse 1,301082,8790,514,5.0,5
+112809,The Shadow Rising Wheel of Time 4,9539,43145,331,4.2,4
+37351,The Hunger Games The Hunger Games 1,2767052,6076,58,4.1,4
+159135,Brave New World,5129,33229,39,3.8,5
+163988,Alice in Wonderland,13023,14709,9,3.8,5
+40860,One for the Money Stephanie Plum 1,6853,4849,287,3.2,1
+179288,Before I Fall,6482837,37618,255,4.2,5
+463,Betrayed House of Night 2,676924,56338,318,2.2,3
+45293,Veronika Decides to Die,1431,19970,246,3.1,3
+10138,A Dance with Dragons A Song of Ice and Fire 5,10664113,46501,680,4.0,4
+44449,The Iliad,1371,21227,307,4.4,4
+56375,The Count of Monte Cristo,7126,27010,31,4.5,5
+24120,In Her Shoes,14758,19490,599,4.1,4
+171166,Harry Potter and the Order of the Phoenix Harry Potter 5,2,19012,43,5.0,5
+81641,Harry Potter and the Prisoner of Azkaban Harry Potter 3,5,43059,82,4.1,5
+139656,A Game of Thrones A Song of Ice and Fire 1,13496,40349,191,3.4,4
+172789,The Giver The Giver 1,3636,21726,473,4.3,5
+102432,Running with Scissors,242006,337,821,2.2,2
+26234,Twelfth Night,1625,18032,201,3.1,4
+79725,The Host The Host 1,1656001,37052,198,3.1,3
+42587,The Invention of Hugo Cabret,9673436,30149,679,4.0,3
+152433,Little Women Little Women 1,1934,46009,50,5.0,5
+184769,A Heartbreaking Work of Staggering Genius,4953,20595,375,3.6,5
+44378,The Iliad,1371,54286,307,4.5,4
+102709,Dune Dune Chronicles 1,234225,17435,214,3.4,5
+101273,The Canterbury Tales,2696,22275,426,3.6,3
+161235,The Light Between Oceans,13158800,58424,316,4.2,4
+1013,Not That Kind of Girl A Young Woman Tells You What Shes Learned,20588698,34187,693,3.9,4
+165976,Passion Fallen 3,9369720,31589,464,4.4,3
+126959,Lover Awakened Black Dagger Brotherhood 3,42900,32719,349,4.9,5
+37030,The Hunger Games The Hunger Games 1,2767052,24961,58,3.7,4
+63559,Delirium Delirium 1,11614718,3144,507,3.5,4
+26767,From the MixedUp Files of Mrs Basil E Frankweiler,3980,37861,547,4.3,5
+61136,And Then There Were None,16299,53981,366,4.4,5
+178774,Blindness,2526,25734,857,2.9,3
+147045,In the Woods Dublin Murder Squad 1,237209,55052,455,4.4,3
+194543,The Hitchhikers Guide to the Galaxy Hitchhikers Guide to the Galaxy 1,11,18211,362,5.0,5
+131473,Club Dead Sookie Stackhouse 3,140082,46262,21,4.9,5
+79573,The Host The Host 1,1656001,73112,198,4.2,5
+75400,The Thorn Birds,3412,38117,382,4.8,5
+138619,Untamed House of Night 4,2866718,7123,111,4.1,4
+136028,Eclipse Twilight 3,428263,44267,98,5.0,5
+8012,Jane Eyre,10210,56125,13,3.9,5
+153540,Dragonfly in Amber Outlander 2,5364,5399,656,4.6,2
+78496,Prince Caspian Chronicles of Narnia 2,121749,10505,871,4.3,5
+129403,Spirit Bound Vampire Academy 5,6479259,45835,195,5.0,5
+146079,Harry Potter and the Chamber of Secrets Harry Potter 2,15881,25032,35,4.9,5
+194285,The Hitchhikers Guide to the Galaxy Hitchhikers Guide to the Galaxy 1,11,49954,362,4.3,4
+84236,A Great and Terrible Beauty Gemma Doyle 1,3682,29469,22,4.8,5
+192124,Mans Search for Meaning,4069,29342,332,4.2,4
+89582,Looking for Alaska,99561,8798,208,4.1,2
+81832,Harry Potter and the Prisoner of Azkaban Harry Potter 3,5,56243,82,3.3,3
+11099,Mockingjay The Hunger Games 3,7260188,32815,152,4.3,4
+49965,The Book Thief,19063,10295,213,3.8,5
+21425,The Voyage of the Dawn Treader Chronicles of Narnia 3,140225,7466,146,3.9,4
+106046,Ella Enchanted,24337,36730,16,4.3,4
+195979,The Wonderful Wizard of Oz Oz 1,236093,33889,19,3.9,5
+143450,Gone Gone 1,2536134,18475,149,4.0,2
+147772,A Confederacy of Dunces,310612,54593,164,1.8,3
+172757,The Giver The Giver 1,3636,36372,473,3.4,5
+130533,Speaker for the Dead Enders Saga 2,7967,76988,886,4.0,4
+53987,The Catcher in the Rye,5107,69744,244,2.9,2
+87650,1984,5470,33936,365,2.5,1
+112791,The Shadow Rising Wheel of Time 4,9539,704,331,3.9,4
+140488,The Metamorphosis,485894,2827,60,3.8,4
+16477,Wuthering Heights,6185,27382,74,3.3,5
+62030,The Hobbit,5907,5782,162,4.3,4
+168010,The Road,6288,10420,577,3.4,5
+186643,Harry Potter and the Goblet of Fire Harry Potter 4,6,30000,75,5.0,5
+94980,A Tree Grows in Brooklyn,14891,13443,675,2.8,3
+66884,So Long and Thanks for All the Fish Hitchhikers Guide to the Galaxy 4,8698,7420,732,4.9,5
+104306,Fahrenheit 451,4381,28912,640,4.3,5
+87728,1984,5470,45010,365,4.0,4
+55622,Fallen Too Far Rosemary Beach 1 Too Far 1,16070903,78124,562,4.2,3
+2349,Good Omens The Nice and Accurate Prophecies of Agnes Nutter Witch,12067,51706,440,3.0,4
+54082,The Catcher in the Rye,5107,63818,244,3.9,5
+80592,The Nightingale,21853621,47732,665,4.5,5
+130169,Geralds Game,32692,452,380,3.7,1
+184149,Insurgent Divergent 2,11735983,33053,399,4.1,4
+42834,American Psycho,28676,60993,777,4.5,4
+34698,Fantastic Beasts and Where to Find Them,41899,41709,163,3.8,4
+133721,Life of Pi,4214,48064,189,5.0,4
+164213,Gone Girl,21480930,18399,670,3.9,4
+142805,Big Little Lies,19486412,56922,25,4.2,5
+54505,The Catcher in the Rye,5107,5511,244,3.1,1
+120198,The Last Lecture,2318271,25840,808,5.0,4
+123661,Harry Potter and the Sorcerers Stone Harry Potter 1,3,14166,488,5.0,5
+126024,A Wrinkle in Time A Wrinkle in Time Quintet 1,18131,64401,28,3.9,5
+131137,The Ersatz Elevator A Series of Unfortunate Events 6,172327,18656,718,2.8,3
+98796,Watership Down Watership Down 1,76620,54845,601,4.5,4
+165293,Island of the Blue Dolphins Island of the Blue Dolphins 1,233818,47753,280,3.8,2
+168314,The Road,6288,63830,577,3.4,5
+129874,Awakened House of Night 8,8652190,40579,713,3.7,3
+137427,A Storm of Swords A Song of Ice and Fire 3,62291,6104,525,3.4,4
+158498,Bel Canto,5826,48848,879,4.2,3
+94152,The 7 Habits of Highly Effective People Powerful Lessons in Personal Change,36072,21447,153,4.4,4
+41243,Little House in the Big Woods Little House 1,8337,52595,860,1.6,1
+69964,Bossypants,9418327,30863,154,4.3,2
+163019,The Return of the King The Lord of the Rings 3,18512,60464,283,5.0,5
+144643,Middlesex,2187,12845,251,4.4,5
+89180,The Bad Beginning A Series of Unfortunate Events 1,78411,28700,742,3.2,3
+164579,White Oleander,32234,26227,253,4.3,4
+86710,Dead and Gone Sookie Stackhouse 9,5161066,13384,417,3.6,4
+78455,To All the Boys Ive Loved Before To All the Boys Ive Loved Before 1,15749186,35678,11,1.9,4
+112147,The Phantom Tollbooth,378,36539,227,3.6,3
+1256,Under the Dome,6320534,1849,722,4.1,5
+33941,Insomnia,10585,33238,433,2.9,3
+30059,The Summer I Turned Pretty Summer 1,5821978,70831,224,4.2,4
+186162,Me and Earl and the Dying Girl,12700353,49480,139,4.3,3
+151873,Abraham Lincoln Vampire Hunter,7108001,79257,359,3.7,4
+177853,Guards Guards Discworld 8,64216,10507,551,4.2,4
+166507,The Iron Daughter The Iron Fey 2,7747064,10524,238,4.6,4
+115812,Catching Fire The Hunger Games 2,6148028,32014,90,4.8,4
+148101,Heart of Darkness,4900,16032,617,1.5,1
+64233,The Lovely Bones,12232938,44666,159,3.9,5
+127572,The Bell Jar,6514,64738,792,4.1,5
+114132,Extremely Loud and Incredibly Close,4588,28684,361,4.9,4
+37554,The Magicians The Magicians 1,6101718,48826,278,4.2,2
+22184,Id Tell You I Love You But Then Id Have to Kill You Gallagher Girls 1,852470,9491,312,4.3,5
+88461,Shadow Kiss Vampire Academy 3,2802316,25715,515,4.5,5
+119356,Marley and Me Life and Love With the Worlds Worst Dog,12691,51366,707,4.4,5
+131358,Club Dead Sookie Stackhouse 3,140082,17575,21,5.0,5
+44774,Wonder Wonder 1,11387515,47104,569,5.0,4
+142893,Big Little Lies,19486412,11062,25,4.0,4
+84024,A Child Called It Dave Pelzer 1,60748,7592,847,3.7,5
+146792,Lover Unleashed Black Dagger Brotherhood 9,8492319,49577,337,2.6,2
+17600,The Passage The Passage 1,6690798,45163,127,4.0,4
+63776,The Lovely Bones,12232938,15731,159,4.9,4
+40302,The DUFF Designated Ugly Fat Friend,6931356,30747,778,3.4,4
+11916,A Monster Calls,8621462,38293,728,4.4,3
+140559,Wait for You Wait for You 1,17314430,23858,12,4.5,5
+30452,Obsidian Lux 1,12578077,18594,392,2.9,4
+158682,Days of Blood Starlight Daughter of Smoke Bone 2,12812550,63222,166,4.6,3
+50131,The Notebook The Notebook 1,15931,51180,333,5.0,5
+127877,Six of Crows Six of Crows 1,23437156,67729,458,4.4,5
+151443,His Dark Materials His Dark Materials 13,18116,8167,549,4.5,4
+142619,The Tempest,12985,14425,848,4.2,4
+175353,The Devil in the White City Murder Magic and Madness at the Fair That Changed America,21996,47100,49,4.0,3
+161097,Firestarter,233667,14064,733,3.1,4
+16160,The 5th Wave The 5th Wave 1,16101128,44626,583,3.8,5
+25960,A Midsummer Nights Dream,1622,22552,252,3.3,3
+189242,A Walk to Remember,3473,37021,328,4.0,4
+189956,The Picture of Dorian Gray,5297,13745,460,4.6,5
+16429,Wuthering Heights,6185,5805,74,4.6,3
+7946,The Edge of Never The Edge of Never 1,16081272,29104,831,4.2,4
+28949,The Little Prince,157993,41943,425,5.0,5
+55767,Fallen Too Far Rosemary Beach 1 Too Far 1,16070903,35195,562,5.0,5
+158070,Voyager Outlander 3,10987,35970,517,5.0,5
+179048,The Odyssey,1381,28684,459,3.9,4
+5649,Dreamcatcher,11570,33020,840,2.8,1
+187659,Sense and Sensibility,14935,69136,73,4.2,5
+148255,Prodigy Legend 2,13414446,43728,698,3.5,4
+24913,Inkheart Inkworld 1,28194,56454,55,4.6,5
+76331,The Help,4667024,73763,582,4.7,5
+54655,Oliver Twist,18254,61491,448,4.1,4
+96561,American Gods American Gods 1,4407,42181,367,5.0,5
+143795,Hopeless Hopeless 1,15717943,38812,429,4.6,5
+188286,Cress The Lunar Chronicles 3,13206828,15037,270,5.0,5
+39613,Eragon The Inheritance Cycle 1,113436,29440,411,4.2,4
+19400,Norwegian Wood,11297,19792,672,2.7,4
+82837,Enders Game Enders Saga 1,375802,53041,294,3.3,3
+170079,City of Ashes The Mortal Instruments 2,1582996,31466,135,5.0,4
+57705,Crescendo Hush Hush 2,7791997,42811,212,3.3,4
+106816,Unearthly Unearthly 1,7488244,21904,96,4.3,5
+120457,The Storied Life of AJ Fikry,18293427,42827,400,3.8,4
+75556,Cold Mountain,10920,70177,811,4.4,4
+169824,City of Ashes The Mortal Instruments 2,1582996,8259,135,5.0,4
+150446,Wild From Lost to Found on the Pacific Crest Trail,12262741,21111,494,4.7,4
+22041,Mrs Dalloway,14942,8581,905,3.5,3
+20625,The Nanny Diaries Nanny 1,228333,47299,697,3.8,4
+137362,Starship Troopers,17214,52441,735,3.1,4
+145409,Harry Potter and the Chamber of Secrets Harry Potter 2,15881,602,35,4.5,5
+123611,Along for the Ride,5664985,17928,179,3.9,4
+168130,The Road,6288,11665,577,3.1,4
+106506,Alexander and the Terrible Horrible No Good Very Bad Day,46677,495,581,3.7,3
+123600,Along for the Ride,5664985,22687,179,4.3,5
+75464,The Thorn Birds,3412,66751,382,4.4,5
+117625,Of Mice and Men,890,21359,20,2.6,2
+78821,Aristotle and Dante Discover the Secrets of the Universe Aristotle and Dante Discover the Secrets of the Universe 1,12000020,6438,841,4.5,4
+96233,The Infinite Sea The 5th Wave 2,16131484,35453,595,4.7,4
+100994,Angelas Ashes Frank McCourt 1,252577,15336,343,3.4,4
+130572,Deception Point,976,71421,788,2.6,3
+60574,Marked House of Night 1,30183,37452,320,3.5,5
+53353,Lord of the Flies,7624,12501,228,2.6,3
+84427,The Westing Game,902,1490,816,3.7,4
+71587,The Magicians Nephew Chronicles of Narnia 6,65605,41089,355,4.5,5
+30749,The Three Musketeers The DArtagnan Romances 1,7190,67428,408,4.4,4
+84761,The Mists of Avalon Avalon 1,402045,23643,407,3.8,4
+184629,Insurgent Divergent 2,11735983,35993,399,3.9,3
+66013,The Great Gatsby,4671,40113,290,3.9,5
+73368,The Walking Dead Vol 01 Days Gone Bye,138398,30868,790,4.4,4
+99830,The Golden Compass His Dark Materials 1,119322,38416,54,3.2,4
+14680,Love in the Time of Cholera,9712,11486,702,4.4,5
+8310,Jane Eyre,10210,61752,13,3.9,4
+131739,Miss Peregrines Home for Peculiar Children Miss Peregrines Peculiar Children 1,9460487,69480,138,3.2,2
+67599,The White Queen The Plantagenet and Tudor Novels 2,5971165,44931,915,4.0,4
+93432,Everything I Never Told You,18693763,16143,463,3.7,4
+34445,Thirteen Reasons Why,1217100,9232,612,3.4,3
+190102,The Picture of Dorian Gray,5297,18716,460,4.9,5
+125015,A Time to Kill,32542,68599,397,3.1,4
+26247,Twelfth Night,1625,56409,201,3.7,3
+50270,The Notebook The Notebook 1,15931,57328,333,4.0,4
+114539,The Outsiders,231804,63509,245,5.0,5
+164636,Fire Graceling Realm 2,6137154,6051,615,4.0,4
+186153,Me and Earl and the Dying Girl,12700353,1793,139,3.6,4
+67275,Life the Universe and Everything Hitchhikers Guide 3,8694,73477,624,2.6,2
+20939,Howls Moving Castle Howls Moving Castle 1,6294,22340,621,4.2,5
+62431,The Hobbit,5907,40992,162,5.0,5
+61896,The Neverending Story,27712,65817,692,4.1,5
+92757,Fifty Shades Darker Fifty Shades 2,11857408,63521,219,1.8,1
+47481,New Moon Twilight 2,49041,35470,78,4.0,3
+175912,City of Glass The Mortal Instruments 3,3777732,63076,118,4.5,4
+143080,Oh The Places Youll Go,191139,37943,677,4.8,3
+61058,And Then There Were None,16299,25273,366,3.5,3
+107779,Animal Farm,7613,35471,6,4.6,4
+69169,Harry Potter and the HalfBlood Prince Harry Potter 6,1,45581,150,4.1,4
+174594,Dead to the World Sookie Stackhouse 4,140077,23473,761,4.1,3
+116173,Dead Reckoning Sookie Stackhouse 11,7981206,5876,807,3.8,4
+18392,Persepolis The Story of a Childhood Persepolis 1,9516,70218,753,4.0,4
+46053,The Blood of Olympus The Heroes of Olympus 5,18705209,59059,91,5.0,5
+108987,Origin Lux 4,13644052,3144,714,3.8,5
+26057,A Midsummer Nights Dream,1622,41057,252,2.4,4
+54138,The Catcher in the Rye,5107,4147,244,2.8,5
+125961,Romeo and Juliet,18135,20465,30,2.9,5
+115307,Catching Fire The Hunger Games 2,6148028,33076,90,4.5,5
+42019,The Son of Neptune The Heroes of Olympus 2,9520360,52970,217,4.2,4
+160343,The Girl on the Train,22557272,28082,404,4.0,5
+128256,Last Sacrifice Vampire Academy 6,6527740,23565,29,4.6,5
+147355,A Christmas Carol,5326,18704,323,4.2,4
+43181,Don Quixote,3836,15590,2,4.0,4
+20786,Rebecca,12873,44858,107,3.4,4
+173416,Great Expectations,2623,36151,822,3.7,4
+80463,Before I Go to Sleep,9736930,36395,211,3.2,2
+36397,The Hunger Games The Hunger Games 1,2767052,71037,58,3.2,2
+159048,Bloodlines Bloodlines 1,8709527,55946,759,3.3,3
+118470,The Secret Life of Bees,37435,34616,588,4.3,5
+95934,Alices Adventures in Wonderland Through the LookingGlass,24213,52785,66,4.4,4
+41970,The Son of Neptune The Heroes of Olympus 2,9520360,29187,217,3.6,2
+115153,Catching Fire The Hunger Games 2,6148028,45848,90,4.7,5
+106068,Ella Enchanted,24337,70161,16,4.8,5
+60150,Along Came a Spider Alex Cross 1,13145,45850,57,3.3,3
+129714,Dark Places,5886881,37000,881,3.3,4
+34254,The LifeChanging Magic of Tidying Up The Japanese Art of Decluttering and Organizing,22318578,41487,478,3.7,4
+142720,The Tempest,12985,1122,848,4.6,4
+89300,The Bad Beginning A Series of Unfortunate Events 1,78411,20697,742,4.6,4
+67647,Needful Things,107291,28786,298,4.0,3
+55813,Just Listen,51738,6125,485,4.1,5
+186946,Harry Potter and the Goblet of Fire Harry Potter 4,6,69858,75,4.6,5
+151924,Abraham Lincoln Vampire Hunter,7108001,77320,359,3.3,3
+28371,My Sisters Keeper,10917,28317,34,3.7,2
+39667,Waiting for Godot,17716,14737,686,3.5,5
+48279,Lover Eternal Black Dagger Brotherhood 2,35729,68320,653,4.7,5
+16197,The 5th Wave The 5th Wave 1,16101128,6394,583,4.1,5
+153417,Dragonfly in Amber Outlander 2,5364,17502,656,4.4,5
+48486,The Casual Vacancy,13497818,35373,754,2.3,1
+14374,I Am Number Four Lorien Legacies 1,7747374,12438,477,3.3,3
+52220,King Lear,12938,64635,161,4.1,4
+79695,The Host The Host 1,1656001,23414,198,3.5,5
+108700,Snow Flower and the Secret Fan,1103,26298,84,3.2,3
+6674,Saga Vol 1 Saga 1,15704307,55542,437,5.0,5
+10799,A Clash of Kings A Song of Ice and Fire 2,10572,25011,260,4.3,5
+134373,The Death Cure Maze Runner 3,7864437,52046,234,1.6,4
+136454,Saga Vol 2 Saga 2,17131869,52584,674,3.8,4
+136199,Eclipse Twilight 3,428263,7368,98,4.1,4
+194600,The Hitchhikers Guide to the Galaxy Hitchhikers Guide to the Galaxy 1,11,6431,362,3.9,5
+120346,The Tommyknockers,17660,11230,745,2.9,2
+180988,The Fellowship of the Ring The Lord of the Rings 1,34,81776,243,3.2,3
+26648,From the MixedUp Files of Mrs Basil E Frankweiler,3980,18341,547,3.3,5
+10917,Mockingjay The Hunger Games 3,7260188,16687,152,4.6,5
+75499,The Thorn Birds,3412,4283,382,4.9,5
+42423,The Time Travelers Wife,14050,27749,95,3.7,4
+169072,Holes Holes 1,38709,18275,363,4.1,4
+155164,On Writing A Memoir of the Craft,10569,63860,783,5.0,5
+39316,Eragon The Inheritance Cycle 1,113436,52635,411,3.6,3
+56204,The Great Hunt Wheel of Time 2,233649,9465,38,4.4,4
+54202,The Catcher in the Rye,5107,65423,244,3.4,1
+36386,The Hunger Games The Hunger Games 1,2767052,47748,58,4.3,5
+64873,The Fiery Cross Outlander 5,10967,1401,592,4.5,4
+58575,Tuesdays with Morrie,6900,36080,59,3.9,2
+152754,Crime and Punishment,7144,60744,418,3.5,5
+47607,New Moon Twilight 2,49041,82994,78,4.7,4
+156851,Isla and the Happily Ever After Anna and the French Kiss 3,9627755,9930,531,5.0,3
+127197,The Husbands Secret,17802724,54409,310,2.9,3
+149006,Eat Pray Love,19501,4467,62,3.3,4
+11948,A Monster Calls,8621462,37080,728,4.2,5
+139042,Charlie and the Chocolate Factory Charlie Bucket 1,6310,29085,371,4.5,5
+151531,His Dark Materials His Dark Materials 13,18116,18516,549,3.3,4
+129262,Harry Potter and the Deathly Hallows Harry Potter 7,136251,963,157,5.0,5
+34842,The Strange Case of Dr Jekyll and Mr Hyde,51496,31347,141,4.0,4
+31693,Reflected in You Crossfire 2,13596809,41635,667,3.5,5
+111149,One Flew Over the Cuckoos Nest,332613,62532,275,5.0,3
+72832,Les Misrables,24280,63244,314,3.0,5
+155740,Catch22 Catch22 1,168668,64974,170,3.2,4
+148327,Prodigy Legend 2,13414446,60779,698,4.0,4
+112034,The Phantom Tollbooth,378,38382,227,4.2,3
+31102,The Chronicles of Narnia Chronicles of Narnia 17,11127,13525,571,4.7,5
+103612,The Firm Penguin Readers Level 5,5358,57130,3,4.2,4
+3818,The Darkest Minds The Darkest Minds 1,10576365,49025,462,4.7,5
+124406,Harry Potter and the Sorcerers Stone Harry Potter 1,3,19887,488,4.3,5
+22453,Fifty Shades of Grey Fifty Shades 1,10818853,63589,465,3.3,3
+75187,Flowers for Algernon,18373,28722,71,4.5,3
+58428,Guilty Pleasures Anita Blake Vampire Hunter 1,30281,20498,428,4.6,5
+149434,Fahrenheit 451,17470674,27304,470,3.0,3
+88447,Shadow Kiss Vampire Academy 3,2802316,58072,515,5.0,5
+79017,Three Cups of Tea One Mans Mission to Promote Peace One School at a Time,49436,56524,596,3.8,4
+13765,Unravel Me Shatter Me 2,13104080,24507,868,4.4,4
+140373,The Metamorphosis,485894,14823,60,3.9,4
+49886,The Book Thief,19063,37500,213,3.7,5
+7476,The Amber Spyglass His Dark Materials 3,18122,60628,348,3.8,4
+153754,Lover Revealed Black Dagger Brotherhood 4,42898,37928,256,3.0,3
+132961,The Lion the Witch and the Wardrobe Chronicles of Narnia 1,100915,4998,46,5.0,5
+171080,Harry Potter and the Order of the Phoenix Harry Potter 5,2,69499,43,3.5,3
+120454,The Storied Life of AJ Fikry,18293427,39467,400,4.8,5
+119915,Requiem Delirium 3,9593913,973,504,3.6,1
+36754,The Hunger Games The Hunger Games 1,2767052,21634,58,5.0,5
+69347,The Adventures of Tom Sawyer,24583,39790,338,3.4,1
+92407,The Witches,6327,337,696,3.7,3
+160471,The Girl on the Train,22557272,59784,404,4.5,4
+128416,Harry Potter and the Deathly Hallows Harry Potter 7,136251,65551,157,4.4,3
+64086,The Lovely Bones,12232938,49368,159,3.7,4
+85092,Fast Food Nation The Dark Side of the AllAmerican Meal,1097,61920,360,4.0,4
+10425,Robinson Crusoe,2932,2042,412,4.0,5
+49720,The Book Thief,19063,21288,213,4.3,5
+9820,Alanna The First Adventure Song of the Lioness 1,13831,44179,537,4.9,1
+1434,Shiver The Wolves of Mercy Falls 1,6068551,42261,591,1.9,2
+37994,SlaughterhouseFive,4981,16420,297,5.0,5
+98501,The Clan of the Cave Bear Earths Children 1,1295,32193,193,3.2,4
+134889,Shadow and Bone The Grisha 1,10194157,24572,482,3.2,2
+179795,The Lost Hero The Heroes of Olympus 1,7624272,2808,156,3.9,4
+126212,A Wrinkle in Time A Wrinkle in Time Quintet 1,18131,34102,28,3.6,3
+193153,White Fang,43035,49892,7,3.5,4
+14879,The Unbearable Lightness of Being,9717,624,708,3.1,5
+109399,To Kill a Mockingbird,2657,12231,108,4.8,3
+127401,The Merchant of Venice,24128,38471,233,3.8,4
+71411,The Cuckoos Calling Cormoran Strike 1,16160797,5787,703,4.7,5
+103249,The Client,5359,75612,498,3.4,3
+154794,The Martian,18007564,47885,124,4.1,5
+68486,Harry Potter and the HalfBlood Prince Harry Potter 6,1,21197,150,4.8,5
+3634,Pretty Little Liars Pretty Little Liars 1,162085,48076,505,3.2,5
+112727,The Shadow Rising Wheel of Time 4,9539,3893,331,3.8,3
+55007,Breaking Dawn Twilight 4,1162543,74859,199,3.4,2
+27990,The Velveteen Rabbit,144974,34638,805,3.7,4
+49003,Torment Fallen 2,7740152,66805,486,1.9,1
+39831,The Forgotten Garden,3407877,32222,717,4.4,4
+6212,Watchmen,472331,71667,137,4.8,4
+9823,Alanna The First Adventure Song of the Lioness 1,13831,55105,537,5.0,5
+102051,Hex Hall Hex Hall 1,5287473,30257,804,3.6,3
+99118,Timeline,7669,19400,902,4.1,4
+30040,The Summer I Turned Pretty Summer 1,5821978,3593,224,2.2,2
+91129,Gone Girl,8442457,9348,396,4.1,5
+186938,Harry Potter and the Goblet of Fire Harry Potter 4,6,74248,75,4.7,4
+120592,The Sisterhood of the Traveling Pants Sisterhood 1,452306,19734,254,3.6,4
+100689,Fight Club,5759,14001,136,3.4,3
+10542,A Clash of Kings A Song of Ice and Fire 2,10572,53135,260,3.6,3
+160516,The Girl on the Train,22557272,58039,404,3.3,3
+171638,Harry Potter and the Order of the Phoenix Harry Potter 5,2,6353,43,5.0,5
+149540,Fahrenheit 451,17470674,52873,470,4.9,5
+181896,Charlottes Web,24178,14795,341,4.8,4
+177252,Ready Player One,9969571,37610,329,4.5,5
+73429,Perfume The Story of a Murderer,343,5219,608,3.9,5
+42827,Flowers in the Attic Dollanganger 1,43448,56280,168,3.4,3
+106397,Empire of Storms Throne of Glass 5,28260587,57972,734,3.9,4
+22850,Dead Until Dark Sookie Stackhouse 1,301082,47445,514,2.5,3
+95465,Bloodfever Fever 2,344262,73476,391,4.1,5
+113443,Can You Keep a Secret,33724,24701,151,5.0,5
+144976,Emma,6969,44591,103,4.5,2
+61449,The Grapes of Wrath,4395,22028,480,3.2,3
+120629,The Sisterhood of the Traveling Pants Sisterhood 1,452306,34134,254,3.7,2
+120673,The Sisterhood of the Traveling Pants Sisterhood 1,452306,74839,254,3.4,4
+13157,Me Before You Me Before You 1,15507958,12268,313,4.5,5
+138665,Untamed House of Night 4,2866718,67064,111,2.1,2
+37077,The Hunger Games The Hunger Games 1,2767052,23125,58,3.7,4
+169151,Holes Holes 1,38709,20708,363,4.0,4
+177961,Cats Cradle,135479,60770,575,5.0,5
+181387,The Fellowship of the Ring The Lord of the Rings 1,34,56521,243,3.4,4
+104063,The Silkworm Cormoran Strike 2,18214414,15625,689,4.4,5
+153042,City of Bones The Mortal Instruments 1,256683,40962,261,4.3,3
+48846,The Prince,28862,12691,851,3.2,2
+189448,Message in a Bottle,3478,31173,44,3.8,3
+5938,Sharp Objects,66559,45526,268,4.1,5
+98869,Watership Down Watership Down 1,76620,15169,601,4.3,5
+63249,Matched Matched 1,7735333,25962,165,4.4,4
+142219,The Adventures of Huckleberry Finn,2956,21174,113,4.4,4
+39784,The Forgotten Garden,3407877,28158,717,4.3,3
+113928,I Am Legend and Other Stories,547094,12692,775,3.5,3
+107574,Animal Farm,7613,34870,6,2.5,3
+36780,The Hunger Games The Hunger Games 1,2767052,69143,58,4.2,3
+140617,Wait for You Wait for You 1,17314430,14603,12,4.3,5
+103540,The Firm Penguin Readers Level 5,5358,7343,3,3.7,4
+118526,The Secret Life of Bees,37435,70191,588,4.4,5
+68126,The Pillars of the Earth Kingsbridge 1,5043,39956,206,4.2,5
+114475,The Outsiders,231804,66296,245,4.3,3
+149352,Where the Heart Is,5168,43885,764,3.0,3
+66396,The Great Gatsby,4671,17808,290,3.0,4
+38372,Breakfast of Champions,4980,4738,209,4.8,5
+18461,Persepolis The Story of a Childhood Persepolis 1,9516,35620,753,3.9,4
+56855,David Copperfield,58696,12430,326,2.5,5
+55858,Just Listen,51738,48360,485,3.6,5
+23835,The Remains of the Day,28921,34365,292,4.5,4
+157235,Macbeth,8852,3721,346,3.4,3
+112338,Salems Lot,11590,23797,526,1.9,2
+126660,Lover Unbound Black Dagger Brotherhood 5,304027,59354,36,4.3,4
+195051,The Giving Tree,370493,27001,281,3.8,5
+83355,Dracula,17245,80817,390,4.4,4
+50823,Blue Bloods Blue Bloods 1,872333,51890,490,2.9,2
+184628,Insurgent Divergent 2,11735983,3183,399,3.4,4
+79130,Easy Contours of the Heart 1,16056408,56675,545,4.6,5
+72059,The Sea of Monsters Percy Jackson and the Olympians 2,28186,16354,27,3.3,4
+53870,Blood Promise Vampire Academy 4,5996153,26054,322,4.4,2
+154515,The Martian,18007564,52812,124,4.2,4
+191024,Divergent Divergent 1,13335037,55850,258,5.0,4
+157349,Bone Crossed Mercy Thompson 4,3128411,43994,379,2.6,3
+175453,The Devil in the White City Murder Magic and Madness at the Fair That Changed America,21996,57044,49,4.1,1
+38280,SlaughterhouseFive,4981,9792,297,5.0,5
+60840,Marked House of Night 1,30183,8149,320,4.3,4
+132915,The Lion the Witch and the Wardrobe Chronicles of Narnia 1,100915,21413,46,4.8,5
+91666,Hamlet,1420,24693,529,3.4,4
+61235,The Grapes of Wrath,4395,62522,480,4.1,4
+69349,The Adventures of Tom Sawyer,24583,76667,338,4.7,4
+156007,Throne of Glass Throne of Glass 1,7896527,49846,85,4.3,5
+71568,The Magicians Nephew Chronicles of Narnia 6,65605,38405,355,3.3,3
+95439,Bloodfever Fever 2,344262,36006,391,4.0,4
+152501,Little Women Little Women 1,1934,62473,50,5.0,5
+97616,The Girl with the Dragon Tattoo Millennium 1,2429135,59759,104,3.4,4
+153608,A Court of Mist and Fury A Court of Thorns and Roses 2,17927395,28657,358,4.6,5
+3857,The Darkest Minds The Darkest Minds 1,10576365,19091,462,4.3,5
+42923,American Psycho,28676,5532,777,3.5,4
+92737,Fifty Shades Darker Fifty Shades 2,11857408,26592,219,5.0,5
+49814,The Book Thief,19063,29073,213,4.5,3
+53362,Lord of the Flies,7624,8696,228,4.2,5
+99337,The Subtle Knife His Dark Materials 2,119324,1878,541,4.4,5
+160998,Cinder The Lunar Chronicles 1,11235712,40220,269,4.0,3
+30909,Digital Fortress,11125,35503,625,3.9,5
+149560,Fahrenheit 451,17470674,3988,470,3.8,4
+108174,Its Kind of a Funny Story,248704,7601,896,3.5,5
+169549,Ruin and Rising The Grisha 3,14061957,75528,383,3.8,3
+182526,Cujo,10603,65539,683,3.7,5
+146315,Gone Girl,19288043,58160,351,4.1,5
+12270,Snow Crash,830,62933,658,3.0,4
+183848,The Da Vinci Code Robert Langdon 2,968,67657,267,3.6,2
+42355,The Time Travelers Wife,14050,32189,95,3.5,1
+48944,Torment Fallen 2,7740152,51854,486,3.6,3
+102016,Hex Hall Hex Hall 1,5287473,3924,804,3.8,5
+110617,Gone with the Wind,18405,57450,160,4.5,5
+5722,Finale Hush Hush 4,12751687,30128,481,3.6,4
+159033,Bloodlines Bloodlines 1,8709527,46790,759,4.4,5
+186444,Harry Potter and the Goblet of Fire Harry Potter 4,6,9274,75,4.2,4
+113911,I Am Legend and Other Stories,547094,54334,775,4.4,3
+100503,Dress Your Family in Corduroy and Denim,10176,6075,727,4.2,3
+139728,A Game of Thrones A Song of Ice and Fire 1,13496,14963,191,4.2,4
+18844,A Discovery of Witches All Souls Trilogy 1,8667848,28398,568,4.1,4
+41638,Scarlet The Lunar Chronicles 2,13206760,32574,618,5.0,5
+29804,The Hound of the Baskervilles,8921,66336,616,4.5,4
+11059,Mockingjay The Hunger Games 3,7260188,9184,152,3.9,5
+50997,The Wise Mans Fear The Kingkiller Chronicle 2,1215032,36412,609,4.7,5
+180565,The Amazing Adventures of Kavalier Clay,3985,24463,738,4.9,5
+102480,Running with Scissors,242006,36848,821,3.5,3
+149305,Go Ask Alice,46799,52449,647,3.2,5
+134867,Beautiful Creatures Caster Chronicles 1,6304335,28694,223,2.8,3
+196073,Coraline,17061,81369,106,4.9,5
+47765,New Moon Twilight 2,49041,22571,78,4.1,5
+165826,The Stand,149267,17873,388,5.0,4
+134223,The Secret History,29044,1551,534,4.3,5
+173692,Storm Front The Dresden Files 1,47212,34071,87,2.8,3
+21767,Eldest The Inheritance Cycle 2,45978,50873,286,3.0,2
+187718,Sense and Sensibility,14935,58751,73,4.5,3
+72741,Les Misrables,24280,24094,314,3.3,5
+177900,Guards Guards Discworld 8,64216,66975,551,4.0,3
+102617,Dune Dune Chronicles 1,234225,42021,214,4.5,4
+56633,Whered You Go Bernadette,13526165,26974,809,5.0,4
+57389,Beautiful Disaster Beautiful 1,11505797,60725,705,4.4,5
+63107,Matched Matched 1,7735333,35226,165,2.8,4
+158766,The Golden Lily Bloodlines 2,8709523,68436,242,3.5,4
+118533,The Secret Life of Bees,37435,25667,588,3.7,4
+42384,The Time Travelers Wife,14050,55716,95,4.6,4
+6221,Watchmen,472331,23319,137,4.4,4
+4855,Maybe Someday Maybe 1,24445517,50361,493,4.4,5
+170819,Where the Sidewalk Ends,30119,31128,93,3.1,4
+4409,The Eye of the World Wheel of Time 1,228665,15661,594,3.4,3
+75252,Flowers for Algernon,18373,54670,71,3.5,2
+74117,Queen of Shadows Throne of Glass 4,18006496,48215,798,4.3,5
+174168,Definitely Dead Sookie Stackhouse 6,140079,6705,132,4.3,5
+77420,Lover Mine Black Dagger Brotherhood 8,7046495,41408,293,2.9,2
+181158,The Fellowship of the Ring The Lord of the Rings 1,34,7501,243,3.9,4
+18967,A Discovery of Witches All Souls Trilogy 1,8667848,2395,568,3.5,3
+38483,The Red Tent,4989,45149,434,4.8,5
+108778,Beautiful Darkness Caster Chronicles 2,7842288,78844,720,3.8,4
+39773,The Forgotten Garden,3407877,27378,717,3.6,2
+150033,Water for Elephants,43641,66736,574,4.2,4
+126333,A Wrinkle in Time A Wrinkle in Time Quintet 1,18131,45497,28,2.6,4
+71652,The Magicians Nephew Chronicles of Narnia 6,65605,2798,355,3.2,4
+60367,112263,10644930,56468,830,4.8,4
+110950,Gone with the Wind,18405,31438,160,4.6,5
+113643,It,18342,51433,372,4.5,4
+68223,Harry Potter and the HalfBlood Prince Harry Potter 6,1,54722,150,4.6,5
+152245,Little Women Little Women 1,1934,28843,50,2.4,3
+13217,Me Before You Me Before You 1,15507958,21813,313,3.9,4
+48513,The Casual Vacancy,13497818,19453,754,2.1,3
+149132,Eat Pray Love,19501,10358,62,4.4,5
+145401,Harry Potter and the Chamber of Secrets Harry Potter 2,15881,42558,35,3.5,4
+21223,The Virgin Suicides,10956,16905,709,3.9,4
+75282,Flowers for Algernon,18373,2446,71,4.0,4
+166732,Interview with the Vampire The Vampire Chronicles 1,43763,52664,370,2.4,1
+131673,Miss Peregrines Home for Peculiar Children Miss Peregrines Peculiar Children 1,9460487,12637,138,3.5,5
+59750,The Curious Incident of the Dog in the NightTime,1618,75027,173,3.5,5
+109175,Atlas Shrugged,662,62814,723,3.6,4
+151621,The Poisonwood Bible,7244,11097,468,3.7,5
+35585,The Iron King The Iron Fey 1,6644117,36176,357,3.2,4
+21550,The Voyage of the Dawn Treader Chronicles of Narnia 3,140225,42286,146,4.4,4
+32208,The Very Hungry Caterpillar,4948,27754,315,3.4,5
+20290,Pride and Prejudice,1885,2893,291,3.8,5
+124464,Harry Potter and the Sorcerers Stone Harry Potter 1,3,75169,488,5.0,5
+36755,The Hunger Games The Hunger Games 1,2767052,32456,58,4.0,2
+71735,The Magicians Nephew Chronicles of Narnia 6,65605,45759,355,4.0,5
+102506,Running with Scissors,242006,869,821,3.7,3
+2453,The Five People You Meet in Heaven,3431,75049,456,4.0,3
+170251,A Light in the Attic,30118,16536,110,5.0,4
+156294,Jonathan Strange Mr Norrell,14201,36325,662,2.4,3
+34824,The Strange Case of Dr Jekyll and Mr Hyde,51496,7712,141,3.1,5
+6962,The Kite Runner,77203,51126,710,4.4,4
+30428,Obsidian Lux 1,12578077,25339,392,4.1,5
+88876,Midnight in the Garden of Good and Evil,386187,23620,119,3.4,3
+9193,Hush Hush Hush Hush 1,6339664,56202,414,3.9,3
+12085,Perfect Chemistry Perfect Chemistry 1,4268157,66860,449,4.5,4
+146751,Lover Unleashed Black Dagger Brotherhood 9,8492319,28624,337,3.6,3
+132999,The Lion the Witch and the Wardrobe Chronicles of Narnia 1,100915,35829,46,2.9,2
+127093,The Austere Academy A Series of Unfortunate Events 5,131123,32446,803,3.7,3
+172496,The Giver The Giver 1,3636,29605,473,5.0,5
+182175,Charlottes Web,24178,49567,341,4.9,5
+149290,Go Ask Alice,46799,2560,647,3.7,4
+109070,Atlas Shrugged,662,45702,723,3.3,2
+24264,Madame Bovary,2175,5668,646,2.9,2
+73584,Defending Jacob,11367726,15715,503,4.0,4
+183492,The Da Vinci Code Robert Langdon 2,968,45676,267,3.5,4
+119391,Marley and Me Life and Love With the Worlds Worst Dog,12691,16167,707,4.4,3
+108954,Origin Lux 4,13644052,75342,714,4.7,5
+115446,Catching Fire The Hunger Games 2,6148028,9610,90,4.9,4
+114504,The Outsiders,231804,43686,245,3.7,5
+135259,The Lorax,7784,41673,345,4.7,5
+31933,Wizard and Glass,5096,73252,899,3.8,5
+11874,A Monster Calls,8621462,66811,728,4.3,5
+36848,The Hunger Games The Hunger Games 1,2767052,68068,58,4.8,5
+50244,The Notebook The Notebook 1,15931,67895,333,4.3,3
+108864,The God of Small Things,9777,17552,741,3.4,5
+51829,Shes Come Undone,5203,28308,321,3.2,4
+6344,Watchmen,472331,33438,137,3.9,4
+2707,Slammed Slammed 1,13372690,25654,262,4.4,3
+90984,The Night Circus,9361589,72552,17,4.2,4
+87952,Where the Red Fern Grows,10365,24968,125,4.8,3
+141333,Memoirs of a Geisha,930,42027,309,5.0,5
+169423,Sarahs Key,556602,58490,232,4.7,5
+81369,Harry Potter and the Prisoner of Azkaban Harry Potter 3,5,57214,82,5.0,5
+56519,The Count of Monte Cristo,7126,43646,31,3.4,4
+100948,Angelas Ashes Frank McCourt 1,252577,61308,343,3.9,2
+4407,The Eye of the World Wheel of Time 1,228665,7297,594,2.7,2
+141581,Gabriels Inferno Gabriels Inferno 1,10140661,75089,586,3.6,1
+153144,City of Bones The Mortal Instruments 1,256683,52943,261,2.1,2
+144819,Emma,6969,32475,103,4.1,3
+14787,Love in the Time of Cholera,9712,30475,702,4.2,4
+181500,The Fellowship of the Ring The Lord of the Rings 1,34,2294,243,4.4,4
+127248,The Husbands Secret,17802724,25664,310,2.9,3
+130425,Speaker for the Dead Enders Saga 2,7967,3937,886,3.7,5
+131467,Club Dead Sookie Stackhouse 3,140082,59853,21,2.8,3
+24749,Inkheart Inkworld 1,28194,49923,55,4.2,5
+36861,The Hunger Games The Hunger Games 1,2767052,40655,58,4.5,4
+100236,Lamb The Gospel According to Biff Christs Childhood Pal,28881,56739,614,4.3,4
+58783,A Tale of Two Cities,1953,59162,114,4.8,4
+41327,Little House in the Big Woods Little House 1,8337,71104,860,4.7,5
+126348,A Wrinkle in Time A Wrinkle in Time Quintet 1,18131,48689,28,2.9,5
+136083,Eclipse Twilight 3,428263,7957,98,2.5,2
+55087,Breaking Dawn Twilight 4,1162543,50232,199,4.2,4
+50707,Blue Bloods Blue Bloods 1,872333,35242,490,3.8,5
+154349,The Awakening,58345,42850,853,2.6,4
+158285,Lolita,7604,8028,570,3.0,3
+44043,Twilight Twilight 1,41865,6692,8,2.2,2
+168923,Holes Holes 1,38709,70688,363,4.0,4
+187874,The Dead Zone,11573,31320,639,4.3,4
+108736,Beautiful Darkness Caster Chronicles 2,7842288,17316,720,3.4,2
+128093,The Crucible,17250,54186,794,2.6,3
+140304,The Metamorphosis,485894,27917,60,3.2,3
+181811,Evermore The Immortals 1,3975774,27693,837,2.0,3
+66413,The Great Gatsby,4671,32672,290,3.9,5
+130553,Speaker for the Dead Enders Saga 2,7967,13854,886,4.7,4
+103947,The Silkworm Cormoran Strike 2,18214414,23796,689,4.0,5
+13314,The Reader,101299,56887,523,2.3,3
+149836,The Sense of an Ending,10746542,57201,519,3.8,3
+164420,White Oleander,32234,16945,253,5.0,3
+36411,The Hunger Games The Hunger Games 1,2767052,39119,58,5.0,5
+108088,Still Alice,2153405,52180,97,3.6,5
+101036,Angelas Ashes Frank McCourt 1,252577,1091,343,4.4,5
+85482,WinniethePooh WinniethePooh 1,99107,60578,802,3.3,2
+100773,Fight Club,5759,24821,136,4.6,4
+20122,Pride and Prejudice,1885,13846,291,4.1,4
+138964,Charlie and the Chocolate Factory Charlie Bucket 1,6310,69150,371,4.3,5
+115902,Catching Fire The Hunger Games 2,6148028,77109,90,3.6,4
+97687,The Girl with the Dragon Tattoo Millennium 1,2429135,3418,104,3.8,4
+181660,Evermore The Immortals 1,3975774,60778,837,2.2,2
+152383,Little Women Little Women 1,1934,61592,50,1.8,1
+104036,The Silkworm Cormoran Strike 2,18214414,39525,689,4.0,4
+145427,Harry Potter and the Chamber of Secrets Harry Potter 2,15881,13120,35,5.0,5
+119382,Marley and Me Life and Love With the Worlds Worst Dog,12691,31580,707,2.6,4
+6654,Saga Vol 1 Saga 1,15704307,68556,437,4.5,5
+126392,A Wrinkle in Time A Wrinkle in Time Quintet 1,18131,25746,28,4.8,5
+106056,Ella Enchanted,24337,67307,16,4.4,2
+129989,The Mark of Athena The Heroes of Olympus 3,12127750,66894,900,4.9,5
+24070,Ive Got Your Number,12033455,26501,806,5.0,5
+98825,Watership Down Watership Down 1,76620,36266,601,2.8,2
+96037,Alices Adventures in Wonderland Through the LookingGlass,24213,58043,66,3.6,4
+1261,Under the Dome,6320534,13757,722,4.4,3
+51279,Tuck Everlasting,84981,58130,266,2.3,3
+186243,Girl Interrupted,68783,38926,892,3.9,5
+32895,Yes Please,20910157,13694,789,4.0,3
+78071,The World According to Garp,7069,38231,225,4.7,5
+131520,Miss Peregrines Home for Peculiar Children Miss Peregrines Peculiar Children 1,9460487,48772,138,4.9,5
+188217,Cress The Lunar Chronicles 3,13206828,67567,270,3.3,4
+23581,The Miserable Mill A Series of Unfortunate Events 4,65119,33760,169,3.5,4
+164684,Fire Graceling Realm 2,6137154,32185,615,3.8,5
+56610,Whered You Go Bernadette,13526165,9490,809,3.8,4
+146143,Harry Potter and the Chamber of Secrets Harry Potter 2,15881,42656,35,3.6,4
+18460,Persepolis The Story of a Childhood Persepolis 1,9516,13487,753,3.0,3
+159082,Bloodlines Bloodlines 1,8709527,42860,759,3.3,3
+86075,Frankenstein,18490,4287,142,3.7,5
+174887,Harry Potter and the Cursed Child Parts One and Two Harry Potter 8,29056083,8145,272,4.6,4
+35103,Something Borrowed Darcy Rachel 1,42156,44806,205,3.4,3
+58737,A Tale of Two Cities,1953,4941,114,4.3,4
+41192,Misery,10614,75675,610,4.2,5
+31344,The Chronicles of Narnia Chronicles of Narnia 17,11127,19894,571,2.9,3
+126912,Lover Awakened Black Dagger Brotherhood 3,42900,37069,349,5.0,5
+151127,Pippi Longstocking,19302,34008,641,4.2,5
+62039,The Hobbit,5907,8428,162,5.0,5
+173474,Storm Front The Dresden Files 1,47212,59943,87,3.1,4
+86290,Frankenstein,18490,31515,142,3.9,3
+151831,Abraham Lincoln Vampire Hunter,7108001,3033,359,3.9,4
+9839,Alanna The First Adventure Song of the Lioness 1,13831,9880,537,4.5,5
+122989,Silence Hush Hush 3,10637766,58683,94,4.8,5
+2259,Good Omens The Nice and Accurate Prophecies of Agnes Nutter Witch,12067,29433,440,4.1,4
+156965,Macbeth,8852,14737,346,4.6,5
+41757,Scarlet The Lunar Chronicles 2,13206760,59576,618,4.9,5
+174641,Dead to the World Sookie Stackhouse 4,140077,17724,761,3.0,3
+183382,Angels Demons Robert Langdon 1,960,19434,40,2.5,4
+179521,Anna Karenina,152,25371,747,3.9,4
+99212,The Subtle Knife His Dark Materials 2,119324,13095,541,4.2,5
+47636,New Moon Twilight 2,49041,50252,78,4.6,3
+39582,Eragon The Inheritance Cycle 1,113436,39274,411,3.6,4
+60877,1Q84,10357575,64481,832,4.4,4
+85932,Frankenstein,18490,57500,142,3.3,4
+174437,All Together Dead Sookie Stackhouse 7,140075,35795,180,4.3,4
+85309,Treasure Island,295,60083,501,3.3,4
+89006,Midnight in the Garden of Good and Evil,386187,53143,119,3.9,4
+104245,Fahrenheit 451,4381,3297,640,4.3,5
+113982,I Am Legend and Other Stories,547094,25389,775,4.4,5
+131853,Miss Peregrines Home for Peculiar Children Miss Peregrines Peculiar Children 1,9460487,23246,138,3.0,3
+186751,Harry Potter and the Goblet of Fire Harry Potter 4,6,48701,75,4.4,4
+73643,Defending Jacob,11367726,3028,503,4.4,4
+18514,The Complete Sherlock Holmes,188572,18348,628,5.0,5
+152001,Little Women Little Women 1,1934,30255,50,4.7,4
+13612,The Devil Wears Prada The Devil Wears Prada 1,5139,60726,350,3.6,4
+118220,Moon Called Mercy Thompson 1,71811,20646,112,4.2,4
+122012,The Color Purple,11486,27775,301,4.4,5
+164941,The Shining,11588,41818,632,5.0,4
+28577,The Way of Kings The Stormlight Archive 1,7235533,16206,765,3.8,4
+187361,Sense and Sensibility,14935,48358,73,3.2,3
+91803,Hamlet,1420,25329,529,3.9,4
+177956,Cats Cradle,135479,28191,575,4.3,4
+83545,Dracula,17245,22617,390,2.9,3
+117234,Ignite Me Shatter Me 3,13188676,33960,194,3.1,3
+121195,Murder on the Orient Express Hercule Poirot 10,16304,71439,352,2.6,4
+156171,Much Ado About Nothing,12957,25800,295,4.4,3
+131782,Miss Peregrines Home for Peculiar Children Miss Peregrines Peculiar Children 1,9460487,28838,138,3.4,4
+77868,The Graveyard Book,2213661,25159,240,4.1,4
+148778,Eat Pray Love,19501,14942,62,3.2,5
+112499,The Goldfinch,17333223,16301,86,2.7,3
+77701,The Graveyard Book,2213661,68181,240,3.6,5
+188930,The Diary of a Young Girl,48855,53550,469,3.7,5
+29161,The Little Prince,157993,38043,425,4.5,5
+105008,The Handmaids Tale,38447,55723,394,5.0,5
+1976,From Dead to Worse Sookie Stackhouse 8,2233407,65005,221,3.7,4
+12282,Snow Crash,830,10913,658,4.5,5
+28299,My Sisters Keeper,10917,19347,34,1.8,2
+40408,The DUFF Designated Ugly Fat Friend,6931356,74549,778,2.9,3
+32463,The Historian,10692,21389,41,2.3,2
+187971,Paper Towns,6442769,53160,756,3.8,4
+115375,Catching Fire The Hunger Games 2,6148028,6226,90,4.1,5

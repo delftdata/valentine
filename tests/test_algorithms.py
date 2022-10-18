@@ -4,8 +4,8 @@ from tests import df1, df2
 from valentine.algorithms import Coma, JaccardLevenMatcher, DistributionBased, SimilarityFlooding, Cupid
 from valentine.data_sources import DataframeTable
 
-d1 = DataframeTable(df1, name='authors1')
-d2 = DataframeTable(df2, name='authors2')
+d1 = DataframeTable(df1, name='table_1')
+d2 = DataframeTable(df2, name='table_2')
 
 
 class TestAlgorithms(unittest.TestCase):
