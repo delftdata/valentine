@@ -235,7 +235,7 @@ def cuttoff_column_generator(matrix_a: dict,
     for column_name in columns:
         tn_i, _, cn_i, _ = column_name
         f_name = f'{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}'
-        column = get_column_from_store(f_name, tmp_folder_path)
+        column = read_from_cache(f_name, tmp_folder_path)
         yield matrix_a, column, threshold
 
 
