@@ -188,7 +188,15 @@ def get_synonyms(word) -> set:
 # the higher, the better
 def compute_similarity_wordnet(word1,
                                word2):
-    wn_lemmas = set(wn.all_lemma_names())
+    try:
+        wn_lemmas = set(wn.all_lemma_names())
+    except LookupError:
+        nltk.download('punkt')
+        nltk.download('omw-1.4')
+        nltk.download('stopwords')
+        nltk.download('wordnet')
+        wn_lemmas = set(wn.all_lemma_names())
+
     if word1 not in wn_lemmas or word2 not in wn_lemmas:
         return math.nan
     allsyns1 = get_synonyms(word1)
