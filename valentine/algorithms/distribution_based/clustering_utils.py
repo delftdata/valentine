@@ -277,7 +277,7 @@ def unix_sort_ranks(corpus: set,
     unsorted_file_path = os.path.join(tmp_folder_path, 'unsorted_file.txt')
     sorted_file_path = os.path.join(tmp_folder_path, 'sorted_file.txt')
 
-    with open(unsorted_file_path, 'w') as out:
+    with open(unsorted_file_path, 'w', encoding='utf-8') as out:
         for var in corpus:
             print(str(var), file=out)
 
@@ -296,7 +296,7 @@ def unix_sort_ranks(corpus: set,
     rank = 1
     ranks = []
 
-    with open(sorted_file_path, 'r') as f:
+    with open(sorted_file_path, 'r', encoding='utf-8') as f:
         txt = f.read()
         for var in txt.splitlines():
             ranks.append((convert_data_type(var.replace('\n', '')), rank))
