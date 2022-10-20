@@ -73,7 +73,8 @@ class Coma(BaseMatcher):
             return {}
         formatted_output = {}
         for match in matches:
-            m, similarity = match.split(":")
+            split_idx = len(match) - match[::-1].find(":") - 1
+            m, similarity = match[:split_idx], match[split_idx + 2:]
             m1, m2 = m.split(" <-> ")
             column1 = self.__get_column(m2)
             column2 = self.__get_column(m1)
