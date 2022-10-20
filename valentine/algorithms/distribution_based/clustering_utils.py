@@ -222,7 +222,8 @@ def ingestion_column_generator(columns: List[BaseColumn],
     Generator of incoming pandas dataframe columns
     """
     for column in columns:
-        yield column.name, column.unique_identifier, column.data, table_name, table_guid, quantiles, tmp_folder_path
+        if not column.is_empty:
+            yield column.name, column.unique_identifier, column.data, table_name, table_guid, quantiles, tmp_folder_path
 
 
 def cuttoff_column_generator(matrix_a: dict,
@@ -306,9 +307,8 @@ def unix_sort_ranks(corpus: set,
 
 def get_column_from_store(file_name: str, tmp_folder_path: str):
     file_path = os.path.join(tmp_folder_path, f'{file_name}.pkl')
-    if os.path.getsize(file_path) > 0:
-        with open(file_path, 'rb') as pkl_file:
-            data = pickle.load(pkl_file)
+    with open(file_path, 'rb') as pkl_file:
+        data = pickle.load(pkl_file)
     return data
 
 

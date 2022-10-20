@@ -89,7 +89,8 @@ class DistributionBased(BaseMatcher):
                 for table in all_tables:
 
                     self.__column_names.extend([(table.name, table.unique_identifier,
-                                                 x.name, x.unique_identifier) for x in table.get_columns()])
+                                                 x.name, x.unique_identifier) for x in table.get_columns()
+                                                if not x.is_empty])
 
                     columns: List[BaseColumn] = table.get_columns()
                     for tup in ingestion_column_generator(columns,
@@ -103,7 +104,8 @@ class DistributionBased(BaseMatcher):
                 with get_context("spawn").Pool(self.__process_num) as process_pool:
                     for table in all_tables:
                         self.__column_names.extend([(table.name, table.unique_identifier,
-                                                     x.name, x.unique_identifier) for x in table.get_columns()])
+                                                     x.name, x.unique_identifier) for x in table.get_columns()
+                                                    if not x.is_empty])
                         columns: List[BaseColumn] = table.get_columns()
                         process_pool.map(process_columns, ingestion_column_generator(columns,
                                                                                      table.name,

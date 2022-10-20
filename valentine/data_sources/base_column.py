@@ -32,3 +32,7 @@ class BaseColumn(ABC):
     @property
     def size(self) -> int:
         return len(self.data)
+
+    @property
+    def is_empty(self) -> bool:
+        return self.size == 0

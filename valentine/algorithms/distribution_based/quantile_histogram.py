@@ -72,8 +72,9 @@ class QuantileHistogram:
         self.quantiles = n_quantiles
         self.dist_matrix = self.calc_dist_matrix()
         if reference_hist is None:
-            self.add_buckets(ranks.min(initial=math.inf),
-                             [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method='inclusive')])
+            bucket = [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method='inclusive')] \
+                if len(ranks) > 1 else ranks
+            self.add_buckets(ranks.min(initial=math.inf), list(set(bucket)))
             self.add_values(ranks)
         else:
             self.bucket_boundaries = reference_hist.bucket_boundaries
@@ -164,7 +165,7 @@ class QuantileHistogram:
             The bucket index that the value falls into or -1 if it does not fit in anyone
         """
         left = 0
-        right = self.quantiles - 1
+        right = len(self.bucket_boundaries) - 1
         while left <= right:
             mid = left + (right - left) // 2
             if self.bucket_boundaries[mid][0] <= x <= self.bucket_boundaries[mid][1]:
