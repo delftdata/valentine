@@ -2,7 +2,7 @@ from itertools import product
 from multiprocessing import get_context
 from typing import Dict, Tuple
 
-import Levenshtein as Lv
+from Levenshtein import ratio
 
 from ..base_matcher import BaseMatcher
 from ..match import Match
@@ -145,6 +145,6 @@ class JaccardLevenMatcher(BaseMatcher):
         """
         s1, set2, threshold = tup
         for s2 in set2:
-            if Lv.ratio(s1, str(s2)) >= threshold:
+            if ratio(s1, str(s2)) >= threshold:
                 return 1
         return 0

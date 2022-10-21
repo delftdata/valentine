@@ -8,7 +8,7 @@ import snakecase as snakecase
 from anytree import LevelOrderIter
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
-import Levenshtein as Lv
+from Levenshtein import ratio
 from strsimpy.ngram import NGram
 
 from . import DATATYPE_COMPATIBILITY_TABLE
@@ -219,7 +219,7 @@ def compute_similarity_ngram(word1,
 # Higher the better
 def compute_similarity_leven(word1,
                              word2):
-    return Lv.ratio(word1, word2)
+    return ratio(word1, word2)
 
 
 # max is 0.5

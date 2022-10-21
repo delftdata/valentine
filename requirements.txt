@@ -1,14 +1,14 @@
 # algorithms
-numpy==1.23.3
-pandas==1.5.0
+numpy==1.23.4
+pandas==1.5.1
 nltk==3.7
 snakecase==1.0.1
 anytree==2.8.0
 six==1.16.0
 strsimpy==0.2.1
-networkx==2.8.6
+networkx==2.8.7
 chardet==5.0.0
-python-Levenshtein==0.12.2
+levenshtein==0.20.7
 PuLP==2.6.0
 pyemd==0.5.1
 # data loading

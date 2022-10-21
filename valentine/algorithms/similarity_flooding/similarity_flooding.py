@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-import Levenshtein as Lv
+from Levenshtein import ratio
 import math
 
 from .graph import Graph
@@ -42,7 +42,7 @@ class SimilarityFlooding(BaseMatcher):
                 if n1.name[0:6] == "NodeID" or n2.name[0:6] == "NodeID":
                     self.__initial_map[NodePair(n1, n2)] = 0.0
                 else:
-                    similarity = Lv.ratio(n1.name, n2.name)
+                    similarity = ratio(n1.name, n2.name)
                     self.__initial_map[NodePair(n1, n2)] = similarity
 
     @staticmethod
