@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setuptools.setup(
     name='valentine',
-    version='0.1.4',
+    version='0.1.5',
     description='Valentine Matcher',
     license_files=('LICENSE',),
     author='Delft Data',
@@ -14,7 +14,7 @@ setuptools.setup(
     maintainer='Delft Data',
     maintainer_email='delftdatasystems@gmail.com',
     url='https://delftdata.github.io/valentine/',
-    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.4.tar.gz',
+    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.5.tar.gz',
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'numpy>=1.22,<2.0',
