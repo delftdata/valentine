@@ -10,6 +10,6 @@ networkx==2.8.7
 chardet==5.0.0
 levenshtein==0.20.7
 PuLP==2.6.0
-pyemd==0.5.1
+pot==0.8.2
 # data loading
 python-dateutil==2.8.2

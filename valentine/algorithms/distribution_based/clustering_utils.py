@@ -187,7 +187,7 @@ def process_columns(tup: tuple):
         tuple containing the information of the column to be processed
     """
     column_name, column_uid, data, source_name, source_guid, quantiles, tmp_folder_path = tup
-    column = CorrelationClusteringColumn(column_name, column_uid, data, source_name, source_guid, quantiles, tmp_folder_path)
+    column = CorrelationClusteringColumn(column_name, column_uid, data, source_name, source_guid, tmp_folder_path)
     if column.size > 0:
         column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
     with open(os.path.join(tmp_folder_path,

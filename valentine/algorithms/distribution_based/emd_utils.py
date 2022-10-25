@@ -1,5 +1,5 @@
 import math
-from pyemd import emd
+from ot import emd2
 
 from .column_model import CorrelationClusteringColumn
 from .quantile_histogram import QuantileHistogram
@@ -36,7 +36,9 @@ def quantile_emd(column1: CorrelationClusteringColumn,
                                    reference_hist=histogram1)
     if histogram2.is_empty:
         return math.inf
-    return emd(histogram1.get_values, histogram2.get_values, histogram1.dist_matrix)
+    h1 = histogram1.get_values/histogram1.get_values.sum()
+    h2 = histogram2.get_values/histogram2.get_values.sum()
+    return emd2(h1, h2, histogram1.dist_matrix)
 
 
 def intersection_emd(column1: CorrelationClusteringColumn,
@@ -79,7 +81,7 @@ def intersection_emd(column1: CorrelationClusteringColumn,
 
     intersection_column = CorrelationClusteringColumn(
         "", "Intersection of " + str(column1.long_name) + " " + str(column2.long_name),
-        intersection, "", "", quantiles, tmp_folder_path)
+        intersection, "", "", tmp_folder_path)
 
     e1 = quantile_emd(column1, intersection_column, quantiles)
     e2 = quantile_emd(column2, intersection_column, quantiles)

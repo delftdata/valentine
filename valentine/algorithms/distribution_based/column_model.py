@@ -13,10 +13,8 @@ class CorrelationClusteringColumn(BaseColumn):
 
     Attributes
     ----------
-    data : list
+    __data : list
         The data contained in the column
-    quantiles : int
-        The number of quantiles used in the histogram creation
     __ranks : list
         A list containing the ranks of the column
     quantile_histogram : QuantileHistogram
@@ -36,7 +34,6 @@ class CorrelationClusteringColumn(BaseColumn):
                  data: list,
                  table_name: str,
                  table_guid: str,
-                 quantiles: int,
                  tmp_folder_path: str):
         """
         Parameters
@@ -47,15 +44,12 @@ class CorrelationClusteringColumn(BaseColumn):
             The data instances of the column
         table_name : str
             The name of the table
-        quantiles: int
-            The number of quantiles of the column's quantile histogram
         """
         self.__name = name
         self.__uid = column_uid
         self.__data = data
         self.__table_name = table_name
         self.__table_guid = table_guid
-        self.__quantiles = quantiles
         self.__tmp_dir = tmp_folder_path
         self.__ranks = self.get_global_ranks(self.__data, self.__tmp_dir)
         self.quantile_histogram = None

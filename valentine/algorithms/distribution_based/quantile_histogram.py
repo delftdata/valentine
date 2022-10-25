@@ -1,7 +1,6 @@
 from statistics import quantiles
 from numpy import ndarray
 import numpy as np
-import math
 
 
 class QuantileHistogram:
@@ -12,14 +11,6 @@ class QuantileHistogram:
     ----------
     name : str
         The column name
-    ranks : ndarray
-        The column's ranked data
-    normalization : int
-        The number that normalizes the histogram values
-    quantiles : int
-        The number of quantiles
-    reference_hist : QuantileHistogram, optional
-        The reference histogram that provides the bucket boundaries
 
     Methods
     -------
@@ -70,15 +61,17 @@ class QuantileHistogram:
         self.name = name
         self.normalization_factor = normalization
         self.quantiles = n_quantiles
-        self.dist_matrix = self.calc_dist_matrix()
         if reference_hist is None:
             bucket = [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method='inclusive')] \
                 if len(ranks) > 1 else ranks
-            self.add_buckets(ranks.min(initial=math.inf), list(set(bucket)))
+
+            self.add_buckets(min(ranks), list(set(bucket)))
             self.add_values(ranks)
         else:
             self.bucket_boundaries = reference_hist.bucket_boundaries
             self.add_values(ranks)
+        self.n_buckets = len(self.bucket_boundaries)
+        self.dist_matrix = self.calc_dist_matrix()
 
     @property
     def get_values(self):
@@ -186,7 +179,7 @@ class QuantileHistogram:
         ndarray
             The distances between the buckets
         """
-        q = np.array(list(range(1, self.quantiles + 1))) / self.quantiles
+        q = np.array(list(range(1, self.n_buckets + 1))) / self.n_buckets
         dist = []
         for i in q:
             temp = []

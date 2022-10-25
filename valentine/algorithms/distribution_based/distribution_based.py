@@ -18,13 +18,13 @@ class DistributionBased(BaseMatcher):
 
     Attributes
     ----------
-    threshold1: float
+    __threshold1: float
         The threshold for phase 1
-    threshold2: float
+    __threshold2: float
         The threshold for phase 2
-    quantiles: int
+    __quantiles: int
         the number of quantiles of the histograms
-    process_num: int
+    __process_num: int
         The number of processes to spawn
 
     Methods
@@ -202,26 +202,27 @@ class DistributionBased(BaseMatcher):
         """
         matches = {}
         for cluster in attribute_clusters:
-            if len(cluster) > 1:
-                for combination in combinations(cluster, 2):
-                    table1 = combination[0][0]
-                    table2 = combination[1][0]
-                    if table1 != table2:
-                        k, emd = process_emd(((combination[0], combination[1]),
-                                              self.__quantiles,
-                                              False,
-                                              tmp_folder_path))
-                        sim = 1 / (1 + emd)
-                        tn_i, tguid_i, cn_i, cguid_i = k[0]
-                        tn_j, tguid_j, cn_j, cguid_j = k[1]
-                        if self.__target_name == tn_i:
-                            matches.update(Match(tn_i, cn_i,
-                                                 tn_j, cn_j,
-                                                 sim)
-                                           .to_dict)
-                        else:
-                            matches.update(Match(tn_j, cn_j,
-                                                 tn_i, cn_i,
-                                                 sim)
-                                           .to_dict)
+            if len(cluster) < 2:
+                continue
+            for combination in combinations(cluster, 2):
+                table1 = combination[0][0]
+                table2 = combination[1][0]
+                if table1 != table2:
+                    k, emd = process_emd(((combination[0], combination[1]),
+                                          self.__quantiles,
+                                          False,
+                                          tmp_folder_path))
+                    sim = 1 / (1 + emd)
+                    tn_i, tguid_i, cn_i, cguid_i = k[0]
+                    tn_j, tguid_j, cn_j, cguid_j = k[1]
+                    if self.__target_name == tn_i:
+                        matches.update(Match(tn_i, cn_i,
+                                             tn_j, cn_j,
+                                             sim)
+                                       .to_dict)
+                    else:
+                        matches.update(Match(tn_j, cn_j,
+                                             tn_i, cn_i,
+                                             sim)
+                                       .to_dict)
         return matches
