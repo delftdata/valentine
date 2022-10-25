@@ -4,3 +4,4 @@
 __pycache__/
 dist
 valentine.egg-info
+build
