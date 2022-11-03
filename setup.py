@@ -4,10 +4,21 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+]
+
 setuptools.setup(
     name='valentine',
     version='0.1.5',
     description='Valentine Matcher',
+    classifiers=classifiers,
     license_files=('LICENSE',),
     author='Delft Data',
     author_email='delftdatasystems@gmail.com',
