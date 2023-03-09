@@ -83,7 +83,7 @@ in order to get all effectiveness metrics, such as Precision, Recall, F1-score a
 
 
 ### Example
-The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about authors and their publications, and then 2) how to assess its effectiveness based on a given ground truth (as found in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/package/examples/valentine_example.py)):
+The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about authors and their publications, and then 2) how to assess its effectiveness based on a given ground truth (as found in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py)):
 
 ```python
 # Load data using pandas
