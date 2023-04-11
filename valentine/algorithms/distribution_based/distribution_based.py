@@ -74,6 +74,7 @@ class DistributionBased(BaseMatcher):
         dict
             A dictionary with matches and their similarity
         """
+        self.__column_names: list = []
         self.__target_name = target_input.name
 
         all_tables: List[BaseTable] = [source_input, target_input]
