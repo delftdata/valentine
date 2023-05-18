@@ -35,7 +35,7 @@ class DataframeTable(BaseTable):
         return self.__df.empty
 
     def __get_columns_from_df(self):
-        for (column_name, column_data) in self.__df.items():
+        for column_name, column_data in self.__df.items():
             data = list(column_data.dropna().values)
             d_type = self.get_data_type(data, str(column_data.dtype))
             self.__columns[column_name] = DataframeColumn(column_name, data, d_type, self.unique_identifier)

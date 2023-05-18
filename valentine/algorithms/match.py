@@ -1,4 +1,4 @@
-class Match:
+class Match(object):
     """
     Class representing a match of two columns target is the one we want to find the matches of, source an other
     that exists in the database and the similarity between the two.

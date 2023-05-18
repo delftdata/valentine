@@ -49,7 +49,6 @@ def normalization(element,
                 schema_element.add_token(token_obj)
             except ValueError:
                 token_snake = snakecase_convert(token)
-                print(f'{token} -> {token_snake}')
 
                 if '_' in token_snake:
                     token_snake = token_snake.replace('_', ' ')

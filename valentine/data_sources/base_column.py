@@ -7,7 +7,7 @@ class BaseColumn(ABC):
     """
 
     def __str__(self):
-        return "\t\tColumn: " + self.name + " <" + self.data_type + ">  |  " + str(self.unique_identifier) + "\n"
+        return f"\t\tColumn: {self.name} <{self.data_type}>  |  {self.unique_identifier}\n"
 
     @property
     @abstractmethod

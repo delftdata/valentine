@@ -2,7 +2,7 @@ from collections import namedtuple
 from enum import Enum
 
 
-class SchemaElement:
+class SchemaElement(object):
     def __init__(self,
                  name):
         super(SchemaElement, self).__init__()

@@ -3,7 +3,7 @@ from numpy import ndarray
 import numpy as np
 
 
-class QuantileHistogram:
+class QuantileHistogram(object):
     """
     A class used to represent an equi-depth quantile histogram
 

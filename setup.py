@@ -29,17 +29,17 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'numpy>=1.22,<2.0',
-        'pandas>=1.3,<2.0',
+        'pandas>=1.3,<2.1',
         'nltk>=3.6,<4.0',
         'anytree>=2.8,<2.9',
         'six>=1.16,<1.17',
         'strsimpy==0.2.1',
-        'networkx>=2.8,<3.0',
+        'networkx>=2.8,<4.0',
         'chardet>=5.0.0,<6.0.0',
-        'python-Levenshtein>=0.20.7,<1.0',
+        'levenshtein>=0.20.7,<1.0',
         'PuLP>=2.5.1,<3.0',
         'pot>=0.8.2,<1.0',
-        'python-dateutil>=2.8,<2.9'
+        'python-dateutil>=2.8,<3.0'
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
     include_package_data=True,

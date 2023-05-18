@@ -4,7 +4,7 @@ from .linguistic_matching import normalization
 from .schema_element_node import SchemaElementNode
 
 
-class SchemaTree:
+class SchemaTree(object):
     def __init__(self, root):
         self.nodes = dict()  # k: node name v: SchemaElementNode object
         self.add_node(root)

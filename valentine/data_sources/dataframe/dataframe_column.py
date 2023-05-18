@@ -11,7 +11,7 @@ class DataframeColumn(BaseColumn):
 
     @property
     def unique_identifier(self) -> str:
-        return self.__table_guid[0] + "_" + self.__table_guid[1] + ":" + self.__column_name
+        return f"{self.__table_guid[0]}_{self.__table_guid[1]}:{self.__column_name}"
 
     @property
     def name(self):

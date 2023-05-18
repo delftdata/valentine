@@ -13,7 +13,7 @@ class BaseTable(ABC):
     """
 
     def __str__(self):
-        __str: str = "\tTable: " + self.name + "  |  " + str(self.unique_identifier) + "\n"
+        __str: str = f"\tTable: {self.name}  |  {self.unique_identifier}\n"
         for column in self.get_columns():
             __str = __str + str(column.__str__())
         return __str
