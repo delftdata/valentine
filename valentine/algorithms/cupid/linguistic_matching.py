@@ -9,7 +9,6 @@ from anytree import LevelOrderIter
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
 from Levenshtein import ratio
-from strsimpy.ngram import NGram
 
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
@@ -210,15 +209,6 @@ def compute_similarity_wordnet(word1,
         return math.nan
     best = max(wn.wup_similarity(s1, s2) or math.nan for s1, s2 in product(allsyns1, allsyns2))
     return best
-
-
-# the lower, the better
-def compute_similarity_ngram(word1,
-                             word2,
-                             n):
-    ngram = NGram(n)
-    sim = ngram.distance(word1, word2)
-    return sim
 
 
 # Higher the better
