@@ -2,7 +2,6 @@
 numpy==1.23.4
 pandas==1.5.1
 nltk==3.7
-snakecase==1.0.1
 anytree==2.8.0
 six==1.16.0
 strsimpy==0.2.1

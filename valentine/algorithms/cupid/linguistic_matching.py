@@ -1,10 +1,10 @@
 import math
+import re
 import operator
 import string
 from itertools import product, repeat, combinations_with_replacement
 from multiprocessing import get_context
 import nltk
-import snakecase as snakecase
 from anytree import LevelOrderIter
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
@@ -13,6 +13,11 @@ from strsimpy.ngram import NGram
 
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
+
+
+def snakecase_convert(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
 def normalization(element,
@@ -43,7 +48,8 @@ def normalization(element,
                 token_obj.token_type = TokenTypes.NUMBER
                 schema_element.add_token(token_obj)
             except ValueError:
-                token_snake = snakecase.convert(token)
+                token_snake = snakecase_convert(token)
+                print(f'{token} -> {token_snake}')
 
                 if '_' in token_snake:
                     token_snake = token_snake.replace('_', ' ')

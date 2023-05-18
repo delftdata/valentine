@@ -31,7 +31,6 @@ setuptools.setup(
         'numpy>=1.22,<2.0',
         'pandas>=1.3,<2.0',
         'nltk>=3.6,<4.0',
-        'snakecase>=1.0,<2.0',
         'anytree>=2.8,<2.9',
         'six>=1.16,<1.17',
         'strsimpy==0.2.1',
