@@ -3,7 +3,6 @@ numpy==1.24.3
 pandas==2.0.1
 nltk==3.8.1
 anytree==2.8.0
-six==1.16.0
 strsimpy==0.2.1
 networkx==3.1
 chardet==5.1.0

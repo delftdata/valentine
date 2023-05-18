@@ -32,7 +32,6 @@ setuptools.setup(
         'pandas>=1.3,<2.1',
         'nltk>=3.6,<4.0',
         'anytree>=2.8,<2.9',
-        'six>=1.16,<1.17',
         'strsimpy==0.2.1',
         'networkx>=2.8,<4.0',
         'chardet>=5.0.0,<6.0.0',
