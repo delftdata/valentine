@@ -41,7 +41,7 @@ setuptools.setup(
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
     include_package_data=True,
-    python_requires='>=3.8,<3.12',
+    python_requires='>=3.8,<3.13',
     long_description=long_description,
     long_description_content_type='text/markdown'
 )
