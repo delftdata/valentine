@@ -1,5 +1,5 @@
 import math
-from ot import emd2
+from pyemd import emd
 
 from .column_model import CorrelationClusteringColumn
 from .quantile_histogram import QuantileHistogram
@@ -38,7 +38,7 @@ def quantile_emd(column1: CorrelationClusteringColumn,
         return math.inf
     h1 = histogram1.get_values/histogram1.get_values.sum()
     h2 = histogram2.get_values/histogram2.get_values.sum()
-    return emd2(h1, h2, histogram1.dist_matrix)
+    return emd(h1, h2, histogram1.dist_matrix)
 
 
 def intersection_emd(column1: CorrelationClusteringColumn,
@@ -76,9 +76,9 @@ def intersection_emd(column1: CorrelationClusteringColumn,
     if len(common_elements) == 0:
         return math.inf
 
+    # The intersection of the two columns
     intersection = [x for x in list(column1.data) + list(column2.data)
-                    if x in common_elements]  # The intersection of the two columns
-
+                    if x in common_elements]
     intersection_column = CorrelationClusteringColumn(
         "", f"Intersection of {column1.long_name} {column2.long_name}",
         intersection, "", "", tmp_folder_path)

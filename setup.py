@@ -36,7 +36,7 @@ setuptools.setup(
         'chardet>=5.0.0,<6.0.0',
         'levenshtein>=0.20.7,<1.0',
         'PuLP>=2.5.1,<3.0',
-        'pot>=0.8.2,<1.0',
+        'pyemd>=1.0.0,<2.0',
         'python-dateutil>=2.8,<3.0'
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
