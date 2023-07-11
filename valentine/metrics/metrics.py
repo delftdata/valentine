@@ -1,4 +1,5 @@
 import math
+from itertools import chain
 from typing import Dict, Tuple, List
 
 
@@ -28,7 +29,7 @@ def one_to_one_matches(matches: dict):
         matched[key[0]] = False
         matched[key[1]] = False
 
-    median = list(set_match_values)[math.ceil(len(set_match_values)/2)]
+    median = list(set_match_values)[math.ceil(len(set_match_values) / 2)]
 
     matches1to1 = dict()
 
@@ -232,7 +233,7 @@ def precision_at_n_percent(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]]
 
 
 def recall_at_sizeof_ground_truth(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-                                  golden_standard: List[Tuple[str, str]],):
+                                  golden_standard: List[Tuple[str, str]], ):
     """
     Function that calculates the recall at the size of the ground truth.
     e.g. if the size of ground truth size is 10 then only the first 10 matches will be considered for
@@ -254,3 +255,78 @@ def recall_at_sizeof_ground_truth(matches: Dict[Tuple[Tuple[str, str], Tuple[str
     if tp + fn == 0:
         return 0
     return tp / (tp + fn)
+
+
+def get_top_n_columns(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float], n: int):
+    """
+    Returns the top n columns (regarding similarity) for each column (applies to both tables)
+    Example output (n=2): {
+        ('table_1', 'Authors'): ['Access Type', 'Authors'],
+        ('table_2', 'Authors'): ['Authors', 'Cited by']
+        ...
+    }
+
+    Parameters
+    ----------
+    matches : dict
+        Ranked list of matches from the match with higher similarity to lower
+    n : int
+        The maximum number of columns to return
+
+    Returns
+    -------
+    dict
+        A dictionary with its keys to be equal to the column names of the first dataframe and its values to be
+        a list of the top n columns
+    """
+
+    # Create an empty dictionary where each column holds a list of the top similar
+    unique_keys = list(set(chain.from_iterable(sub for sub in matches.keys())))
+    top_columns = {}
+    for key in unique_keys:
+        top_columns[key] = list()
+
+    # Iterate sort matches and add the columns to the dictionary
+    for column_a, column_b in sorted(matches):
+        if len(top_columns[column_a]) < n:
+            top_columns[column_a].append(column_b[1])
+
+        if len(top_columns[column_b]) < n:
+            top_columns[column_b].append(column_a[1])
+
+    return top_columns
+
+
+def get_top_n_columns_for_column(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
+                                 n: int,
+                                 column_name: str):
+    """
+    Given the columns of a dataframe1, returns the top n columns (regarding similarity) in dataframe2
+
+    Parameters
+    ----------
+    matches : dict
+        Ranked list of matches from the match with higher similarity to lower
+    n : int
+        The maximum number of columns to return
+    column_name : str
+        The column name in the first dataframe
+
+    Returns
+    -------
+    list
+        A list of the top n column names in dataframe2
+    """
+
+    top_columns = list()
+
+    # Iterate sort matches and add the columns to the dictionary
+    for column_a, column_b in sorted(matches):
+        if column_a[1] == column_name:
+            top_columns.append(column_b[1])
+
+        # End condition: The n columns names have been found
+        if len(top_columns) >= n:
+            break
+
+    return top_columns
