@@ -20,6 +20,8 @@ def main():
 
     # Find the top-n columns for all columns in dataframe1 (authors1.csv)
     all_top_2_columns = get_top_n_columns(matches, 2)
+
+    # Find the top-n columns for the column 'Authors' in dataframe1
     authors_top_2_columns = get_top_n_columns_for_column(matches, 2, 'Authors')
 
     pp = pprint.PrettyPrinter(indent=4)
