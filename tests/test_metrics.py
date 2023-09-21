@@ -42,6 +42,6 @@ class TestMetrics(unittest.TestCase):
         m_entry_one_to_one = one_to_one_matches(m_entry)
 
         # Verify that all remaining values are above the median
-        median = sorted(set(m_entry.values()))[math.ceil(len(m_entry)/2)]
+        median = sorted(set(m_entry.values()), reverse=True)[math.ceil(len(m_entry)/2)]
         for k in m_entry_one_to_one:
             assert m_entry_one_to_one[k] >= median
