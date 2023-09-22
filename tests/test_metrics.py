@@ -1,8 +1,8 @@
 import unittest
 
 import math
-from valentine.metrics.metrics import get_tp_fn, get_fp, recall, one_to_one_matches, precision
-from copy import deepcopy 
+from valentine.metrics.metrics import one_to_one_matches
+from copy import deepcopy
 
 matches = {
     (('table_1', 'Cited by'), ('table_2', 'Cited by')): 0.8374313,
