@@ -138,7 +138,7 @@ Original Valentine paper:
 Demo Paper:
 @article{koutras2021demo,
   title={Valentine in Action: Matching Tabular Data at Scale},
-  author={Koutras, Christos and Psarakis, Kyriakos and Ionescu, Andra and Fragkoulis, Marios and Bonifati, Angela and Katsifodimos, Asterios},
+  author={Koutras, Christos and Psarakis, Kyriakos and Siachamis, George and Ionescu, Andra and Fragkoulis, Marios and Bonifati, Angela and Katsifodimos, Asterios},
   journal={VLDB},
   volume={14},
   number={12},
