@@ -15,7 +15,7 @@ def main():
     # Instantiate matcher and run
     # Coma requires java to be installed on your machine
     # If java is not an option, all the other algorithms are in Python (e.g., Cupid)
-    matcher = Coma()
+    matcher = Coma(use_instances=False)
     matches = valentine_match(df1, df2, matcher)
 
     # If ground truth available valentine could calculate the metrics
