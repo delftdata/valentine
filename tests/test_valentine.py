@@ -12,7 +12,7 @@ class TestValentine(unittest.TestCase):
     def test_match(self):
         assert not DataframeTable(df1, name='df1_name').is_empty
         assert not DataframeTable(df2, name='df2_name').is_empty
-        matches = valentine_match(df1, df2, Coma(strategy="COMA_OPT_INST"))
+        matches = valentine_match(df1, df2, Coma(use_instances=True))
         assert len(matches) > 0
         try:
             valentine_match(df1, df2, None)
@@ -22,7 +22,7 @@ class TestValentine(unittest.TestCase):
             assert False
 
     def test_metrics(self):
-        matches = valentine_match(df1, df2, Coma(strategy="COMA_OPT_INST"))
+        matches = valentine_match(df1, df2, Coma(use_instances=True))
         golden_standard = [('Cited by', 'Cited by'),
                            ('Authors', 'Authors'),
                            ('EID', 'EID')]
