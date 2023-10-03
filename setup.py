@@ -28,6 +28,7 @@ setuptools.setup(
     download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.7.tar.gz',
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
+        'setuptools',
         'numpy>=1.22,<2.0',
         'pandas>=1.3,<2.2',
         'nltk>=3.6,<4.0',
@@ -37,7 +38,7 @@ setuptools.setup(
         'levenshtein>=0.22,<1.0',
         'PuLP>=2.5,<3.0',
         'pyemd>=1.0.0,<2.0',
-        'python-dateutil>=2.8,<3.0'
+        'python-dateutil>=2.8,<3.0',
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
     include_package_data=True,
