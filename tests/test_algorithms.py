@@ -12,11 +12,11 @@ class TestAlgorithms(unittest.TestCase):
 
     def test_coma(self):
         # Test the schema variant of coma
-        coma_matcher_schema = Coma(strategy="COMA_OPT")
+        coma_matcher_schema = Coma(use_instances=False)
         matches_coma_matcher_schema = coma_matcher_schema.get_matches(d1, d2)
         assert len(matches_coma_matcher_schema) > 0  # Check that it actually produced output
         # Test the instance variant of coma
-        coma_matcher_instances = Coma(strategy="COMA_OPT_INST")
+        coma_matcher_instances = Coma(use_instances=True)
         matches_coma_matcher_instances = coma_matcher_instances.get_matches(d1, d2)
         assert len(matches_coma_matcher_instances) > 0  # Check that it actually produced output
         # Assume the Schema and instance should provide different results

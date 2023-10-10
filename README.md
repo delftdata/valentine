@@ -93,7 +93,7 @@ df1 = pd.read_csv(d1_path)
 df2 = pd.read_csv(d2_path)
 
 # Instantiate matcher and run
-matcher = Coma(strategy="COMA_OPT")
+matcher = Coma(use_instances=True)
 matches = valentine_match(df1, df2, matcher)
 
 print(matches)

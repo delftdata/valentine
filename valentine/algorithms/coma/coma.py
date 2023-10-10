@@ -14,10 +14,10 @@ class Coma(BaseMatcher):
 
     def __init__(self,
                  max_n: int = 0,
-                 strategy: str = "COMA_OPT",
+                 use_instances: bool = False,
                  java_xmx: str = "1024m"):
         self.__max_n = int(max_n)
-        self.__strategy = strategy
+        self.__strategy = "COMA_OPT_INST" if use_instances else "COMA_OPT"
         self.__java_XmX = java_xmx
 
     def get_matches(self,
