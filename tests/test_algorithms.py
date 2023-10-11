@@ -1,8 +1,9 @@
 import unittest
 
 from tests import df1, df2
-from valentine.algorithms import Coma, JaccardLevenMatcher, DistributionBased, SimilarityFlooding, Cupid
+from valentine.algorithms import Coma, JaccardDistanceMatcher, DistributionBased, SimilarityFlooding, Cupid
 from valentine.data_sources import DataframeTable
+from valentine.algorithms.jaccard_distance.jaccard_distance import StringDistanceFunction
 
 d1 = DataframeTable(df1, name='authors1')
 d2 = DataframeTable(df2, name='authors2')
@@ -40,14 +41,50 @@ class TestAlgorithms(unittest.TestCase):
         matches_db_matcher = distribution_based_matcher.get_matches(d1, d2)
         assert len(matches_db_matcher) > 0  # Check that it actually produced output
 
+    def test_jaccard_hamming(self):
+        # Test the Jaccard matcher with Hamming distance
+        jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.Hamming)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+        jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=StringDistanceFunction.Hamming)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+    
     def test_jaccard_levenshtein(self):
-        # Test the Jaccard Levenshtein matcher
-        jl_matcher = JaccardLevenMatcher()
-        matches_jl_matcher = jl_matcher.get_matches(d1, d2)
-        assert len(matches_jl_matcher) > 0  # Check that it actually produced output
-        jl_matcher = JaccardLevenMatcher(threshold_leven=0.5, process_num=2)
-        matches_jl_matcher = jl_matcher.get_matches(d1, d2)
-        assert len(matches_jl_matcher) > 0  # Check that it actually produced output
+        # Test the Jaccard matcher with Levenshtein distance
+        jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.Levenshtein)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+        jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=StringDistanceFunction.Levenshtein)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+    
+    def test_jaccard_damerau_levenshtein(self):
+        # Test the Jaccard matcher with Damerau-Levenshtein distance
+        jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.DamerauLevenshtein)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+        jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=StringDistanceFunction.DamerauLevenshtein)
+        matches_jl_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+
+    def test_jaccard_jaro_winkler(self):
+        # Test the Jaccard matcher with Jaro-Winkler distance
+        jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.JaroWinkler)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+        jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=StringDistanceFunction.JaroWinkler)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+
+    def test_jaccard_jaro(self):
+        # Test the Jaccard matcher with Jaro distance
+        jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.Jaro)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+        jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=StringDistanceFunction.Jaro)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
 
     def test_similarity_flooding(self):
         # Test the Similarity flooding matcher
