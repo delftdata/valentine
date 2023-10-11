@@ -18,6 +18,7 @@ class StringDistanceFunction(Enum):
     Jaro = auto()
     JaroWinkler = auto()
     Hamming = auto()
+    Exact = auto()
 
 
 class JaccardDistanceMatcher(BaseMatcher):
@@ -88,11 +89,13 @@ class JaccardDistanceMatcher(BaseMatcher):
             set1 = set(target_data)
             set2 = set(source_data)
 
+        if distance_function == StringDistanceFunction.Exact:
+            threshold = 1.0
         combinations = self.__get_set_combinations(set1, set2, threshold)
 
         intersection_cnt = 0
         for cmb in combinations:
-            if distance_function == StringDistanceFunction.Levenshtein:
+            if distance_function in [StringDistanceFunction.Levenshtein, StringDistanceFunction.Exact]:
                 intersection_cnt = intersection_cnt + self.__process_distance(cmb + (levenshtein_distance, True))
             elif distance_function == StringDistanceFunction.DamerauLevenshtein:
                 intersection_cnt = intersection_cnt + self.__process_distance(cmb + (damerau_levenshtein_distance, True))
@@ -100,7 +103,7 @@ class JaccardDistanceMatcher(BaseMatcher):
                 intersection_cnt = intersection_cnt + self.__process_distance(cmb + (hamming_distance, True))
             elif distance_function == StringDistanceFunction.Jaro:
                 intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_similarity, False))
-            else:
+            elif distance_function == StringDistanceFunction.JaroWinkler:
                 intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_winkler_similarity, False))
 
         union_cnt = len(set1) + len(set2) - intersection_cnt

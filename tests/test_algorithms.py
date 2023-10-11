@@ -41,6 +41,12 @@ class TestAlgorithms(unittest.TestCase):
         matches_db_matcher = distribution_based_matcher.get_matches(d1, d2)
         assert len(matches_db_matcher) > 0  # Check that it actually produced output
 
+    def test_jaccard(self):
+        # Test the Jaccard matcher with exact string similarity
+        jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.Exact)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
+        assert len(matches_jd_matcher) > 0  # Check that it actually produced output
+
     def test_jaccard_hamming(self):
         # Test the Jaccard matcher with Hamming distance
         jd_matcher = JaccardDistanceMatcher(distance_fun=StringDistanceFunction.Hamming)
