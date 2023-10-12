@@ -56,6 +56,7 @@ In order to do so, the user can choose one of the following 5 matching methods:
    * **Parameters**: 
      * **threshold_dist**(*float*) - Acceptance threshold for assessing two strings as equal, default is 0.8.
      * **distance_fun**(*StringDistanceFunction*) - String similarity function used to assess whether two strings are equal. The enumeration class type `StringDistanceFunction` can be imported from `valentine.algorithms.jaccard_distance`. Functions currently supported are:
+     
    			* `StringDistanceFunction.Levenshtein`: [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
    			* `StringDistanceFunction.DamerauLevenshtein`: [Damerau-Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
    			* `StringDistanceFunction.Hamming`: [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
