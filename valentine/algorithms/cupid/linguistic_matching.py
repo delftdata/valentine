@@ -12,7 +12,7 @@ from jellyfish import levenshtein_distance
 
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
-from ....valentine.utils.utils import normalize_distance
+from ...utils.utils import normalize_distance
 
 def snakecase_convert(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
