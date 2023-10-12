@@ -71,7 +71,7 @@ class TestAlgorithms(unittest.TestCase):
         matches_jd_matcher = jd_matcher.get_matches(d1, d2)
         assert len(matches_jd_matcher) > 0  # Check that it actually produced output
         jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=StringDistanceFunction.DamerauLevenshtein)
-        matches_jl_matcher = jd_matcher.get_matches(d1, d2)
+        matches_jd_matcher = jd_matcher.get_matches(d1, d2)
         assert len(matches_jd_matcher) > 0  # Check that it actually produced output
 
     def test_jaccard_jaro_winkler(self):
