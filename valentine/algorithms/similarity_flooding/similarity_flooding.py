@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from Levenshtein import ratio
+from jellyfish import levenshtein_distance
 import math
 
 from .graph import Graph
@@ -9,6 +9,7 @@ from .propagation_graph import PropagationGraph
 from ..match import Match
 from ..base_matcher import BaseMatcher
 from ...data_sources.base_table import BaseTable
+from ...utils.utils import normalize_distance
 
 
 class SimilarityFlooding(BaseMatcher):
@@ -42,7 +43,7 @@ class SimilarityFlooding(BaseMatcher):
                 if n1.name[0:6] == "NodeID" or n2.name[0:6] == "NodeID":
                     self.__initial_map[NodePair(n1, n2)] = 0.0
                 else:
-                    similarity = ratio(n1.name, n2.name)
+                    similarity = normalize_distance(levenshtein_distance(n1.name, n2.name), n1.name, n2.name)
                     self.__initial_map[NodePair(n1, n2)] = similarity
 
     @staticmethod

@@ -35,7 +35,7 @@ setuptools.setup(
         'anytree>=2.9,<3.0',
         'networkx>=2.8,<4.0',
         'chardet>=5.2.0,<6.0.0',
-        'levenshtein>=0.22,<1.0',
+        'jellyfish>=0.9,<1.1',
         'PuLP>=2.5,<3.0',
         'pyemd>=1.0.0,<2.0',
         'python-dateutil>=2.8,<3.0',
