@@ -5,21 +5,12 @@ from typing import Dict, Tuple
 from jellyfish import levenshtein_distance, damerau_levenshtein_distance, \
                       jaro_similarity, jaro_winkler_similarity, hamming_distance
 
-from enum import Enum, auto
+from ..jaccard_distance import StringDistanceFunction
 
 from ..base_matcher import BaseMatcher
 from ..match import Match
 from ...data_sources.base_table import BaseTable
 from ...utils.utils import normalize_distance
-
-class StringDistanceFunction(Enum):
-    Levenshtein = auto()
-    DamerauLevenshtein = auto()
-    Jaro = auto()
-    JaroWinkler = auto()
-    Hamming = auto()
-    Exact = auto()
-
 
 class JaccardDistanceMatcher(BaseMatcher):
     """

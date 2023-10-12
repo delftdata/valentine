@@ -3,7 +3,7 @@ import unittest
 from tests import df1, df2
 from valentine.algorithms import Coma, JaccardDistanceMatcher, DistributionBased, SimilarityFlooding, Cupid
 from valentine.data_sources import DataframeTable
-from valentine.algorithms.jaccard_distance.jaccard_distance import StringDistanceFunction
+from valentine.algorithms.jaccard_distance import StringDistanceFunction
 
 d1 = DataframeTable(df1, name='authors1')
 d2 = DataframeTable(df2, name='authors2')
