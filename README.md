@@ -52,9 +52,9 @@ In order to do so, the user can choose one of the following 5 matching methods:
      * **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
      * **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
 
- 4.  `JaccardLevenMatcher(float: threshold_leven)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, enhanced by Levenshtein Distance
+ 4.  `JaccardDistanceMatcher(float: threshold_dist)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, optionally enhanced by a string similarity measure of choice.
    * **Parameters**: 
-     * **threshold_leven**(*float*) - Levenshtein ratio threshold for deciding whether two instances are same or not, default is 0.8.
+     * **threshold_dist**(*float*) - Acceptance threshold for assessing two strings as equal, default is 0.8.
 
  5. `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](http://p8090-ilpubs.stanford.edu.tudelft.idm.oclc.org/730/1/2002-1.pdf)
    * **Parameters**: 
