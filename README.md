@@ -55,14 +55,13 @@ In order to do so, the user can choose one of the following 5 matching methods:
  4.  `JaccardDistanceMatcher(float: threshold_dist)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, optionally enhanced by a string similarity measure of choice.
    * **Parameters**: 
      * **threshold_dist**(*float*) - Acceptance threshold for assessing two strings as equal, default is 0.8.
-     * **distance_fun**(*StringDistanceFunction*) - String similarity function used to assess whether two strings are equal. The enumeration class type `StringDistanceFunction` can be imported from `valentine.algorithms.jaccard_distance`. Functions currently supported are:
-     
-   			* `StringDistanceFunction.Levenshtein`: [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
-   			* `StringDistanceFunction.DamerauLevenshtein`: [Damerau-Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
-   			* `StringDistanceFunction.Hamming`: [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
-   			* `StringDistanceFunction.Jaro`: [Jaro distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
-   			* `StringDistanceFunction.JaroWinkler`: [Jaro-Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
-   			* `StringDistanceFunction.Exact`: String equality `==`
+     * **distance_fun**(*StringDistanceFunction*) - String similarity function used to assess whether two strings are equal. The enumeration class type `StringDistanceFunction` can be imported from `valentine.algorithms.jaccard_distance`. Functions currently supported are:  
+   		  * `StringDistanceFunction.Levenshtein`: [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
+       * `StringDistanceFunction.DamerauLevenshtein`: [Damerau-Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
+       * `StringDistanceFunction.Hamming`: [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
+       * `StringDistanceFunction.Jaro`: [Jaro distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
+       * `StringDistanceFunction.JaroWinkler`: [Jaro-Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
+       * `StringDistanceFunction.Exact`: String equality `==`
   
 
  5. `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](http://p8090-ilpubs.stanford.edu.tudelft.idm.oclc.org/730/1/2002-1.pdf)
