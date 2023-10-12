@@ -8,11 +8,11 @@ import nltk
 from anytree import LevelOrderIter
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
-from Levenshtein import ratio
+from jellyfish import levenshtein_distance
 
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
-
+from ....valentine.utils.utils import normalize_distance
 
 def snakecase_convert(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
@@ -214,7 +214,7 @@ def compute_similarity_wordnet(word1,
 # Higher the better
 def compute_similarity_leven(word1,
                              word2):
-    return ratio(word1, word2)
+    return normalize_distance(levenshtein_distance(word1, word2), word1, word2)
 
 
 # max is 0.5
