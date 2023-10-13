@@ -122,8 +122,8 @@ def mapping_generation_leaves(source_tree,
 
 def create_output_dict(match: tuple, similarity) -> dict:
     s, t = match
-    s_t_name, s_t_guid, s_c_name, s_c_guid = s
-    t_t_name, t_t_guid, t_c_name, t_c_guid = t
+    s_t_name, _, s_c_name, _ = s
+    t_t_name, _, t_c_name, _ = t
     return Match(t_t_name, t_c_name, s_t_name, s_c_name,
                  float(similarity)).to_dict
 

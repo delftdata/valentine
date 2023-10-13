@@ -214,8 +214,8 @@ class DistributionBased(BaseMatcher):
                                           False,
                                           tmp_folder_path))
                     sim = 1 / (1 + emd)
-                    tn_i, tguid_i, cn_i, cguid_i = k[0]
-                    tn_j, tguid_j, cn_j, cguid_j = k[1]
+                    tn_i, _, cn_i, _ = k[0]
+                    tn_j, _, cn_j, _ = k[1]
                     if self.__target_name == tn_i:
                         matches.update(Match(tn_i, cn_i,
                                              tn_j, cn_j,

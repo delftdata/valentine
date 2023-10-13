@@ -12,6 +12,7 @@ from ..match import Match
 from ...data_sources.base_table import BaseTable
 from ...utils.utils import normalize_distance
 
+
 class JaccardDistanceMatcher(BaseMatcher):
     """
     Class containing the methods for implementing a simple baseline matcher that uses Jaccard Similarity between
@@ -63,8 +64,10 @@ class JaccardDistanceMatcher(BaseMatcher):
                                                                                   target_id,
                                                                                   source_id,
                                                                                   self.__distance_function))
-                [matches.update(match) for match in list_of_matches]
-        matches = {k: v for k, v in matches.items() if v > 0.0}  # Remove the pairs with zero similarity
+                for match in list_of_matches:
+                    matches.update(match)
+        # Remove the pairs with zero similarity
+        matches = {k: v for k, v in matches.items() if v > 0.0}
         return matches
 
     def process_jaccard_distance(self, tup: tuple):
@@ -87,15 +90,25 @@ class JaccardDistanceMatcher(BaseMatcher):
         intersection_cnt = 0
         for cmb in combinations:
             if distance_function in [StringDistanceFunction.Levenshtein, StringDistanceFunction.Exact]:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (levenshtein_distance, True))
+                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (levenshtein_distance,
+                                                                                     True)
+                                                                              )
             elif distance_function == StringDistanceFunction.DamerauLevenshtein:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (damerau_levenshtein_distance, True))
+                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (damerau_levenshtein_distance,
+                                                                                     True)
+                                                                              )
             elif distance_function == StringDistanceFunction.Hamming:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (hamming_distance, True))
+                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (hamming_distance,
+                                                                                     True)
+                                                                              )
             elif distance_function == StringDistanceFunction.Jaro:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_similarity, False))
+                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_similarity,
+                                                                                     False)
+                                                                              )
             elif distance_function == StringDistanceFunction.JaroWinkler:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_winkler_similarity, False))
+                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_winkler_similarity,
+                                                                                     False)
+                                                                              )
 
         union_cnt = len(set1) + len(set2) - intersection_cnt
 
@@ -107,7 +120,7 @@ class JaccardDistanceMatcher(BaseMatcher):
         return Match(target_table_name, target_column_name,
                      source_table_name, source_column_name,
                      sim).to_dict
-    
+
     @staticmethod
     def __get_column_combinations(source_table: BaseTable,
                                   target_table: BaseTable,
@@ -145,7 +158,7 @@ class JaccardDistanceMatcher(BaseMatcher):
         """
         for s1 in set1:
             yield str(s1), set2, threshold
-    
+
     @staticmethod
     def __process_distance(tup: tuple):
         """

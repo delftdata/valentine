@@ -68,10 +68,10 @@ def column_combinations(columns: List[Tuple],
     c = len(columns)
     c_i = 0
     while c_i < c:
-        _, table_guid_i, _, column_guid_i = columns[c_i]
+        _, table_guid_i, _, _ = columns[c_i]
         c_j = c_i + 1
         while c_j < c:
-            _, table_guid_j, _, column_guid_j = columns[c_j]
+            _, table_guid_j, _, _ = columns[c_j]
             if table_guid_i != table_guid_j:
                 yield (columns[c_i], columns[c_j]), quantiles, intersection, tmp_folder_path
             c_j = c_j + 1

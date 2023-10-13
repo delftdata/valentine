@@ -20,7 +20,7 @@ def convert_data_type(string: str):
         return f
     except ValueError:
         return string
-    
+
 
 def normalize_distance(dist: int,
                        str1: str,
@@ -32,10 +32,12 @@ def normalize_distance(dist: int,
     ----------
     dist : int
         The distance between the two strings (hamming, levenshtein or damerau levenshtein)
-    str1: str, str2: str
-        The strings that are compared
+    str1: str
+        The first string
+    str2: str
+        The second string
     """
-        
+
     return 1 - dist/max(max(len(str1), len(str2)), 1)
 
 

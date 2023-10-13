@@ -6,7 +6,8 @@ from .schema_element_node import SchemaElementNode
 
 class SchemaTree(object):
     def __init__(self, root):
-        self.nodes = dict()  # k: node name v: SchemaElementNode object
+        # k: node name v: SchemaElementNode object
+        self.nodes = dict()
         self.add_node(root)
         self.schema_name = root
         self.schema_tree = None
