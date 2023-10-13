@@ -24,7 +24,7 @@ class TestMetrics(unittest.TestCase):
 
         # Add multiple matches per column
         pairs = list(m.keys())
-        for ((ta, ca), (tb, cb)) in pairs:
+        for (ta, ca), (tb, cb) in pairs:
             m[((ta, ca), (tb, cb + 'foo'))] = m[((ta, ca), (tb, cb))] / 2
 
         # Verify that len gets corrected to 3
@@ -32,7 +32,7 @@ class TestMetrics(unittest.TestCase):
         assert len(m_one_to_one) == 3 and len(m) == 6
 
         # Verify that none of the lower similarity "foo" entries made it
-        for ((ta, ca), (tb, cb)) in pairs:
+        for (ta, ca), (tb, cb) in pairs:
             assert ((ta, ca), (tb, cb + 'foo')) not in m_one_to_one
 
         # Add one new entry with lower similarity
