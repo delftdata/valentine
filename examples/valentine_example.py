@@ -20,8 +20,8 @@ def main():
 
     # If ground truth available valentine could calculate the metrics
     ground_truth = [('Cited by', 'Cited by'),
-                       ('Authors', 'Authors'),
-                       ('EID', 'EID')]
+                    ('Authors', 'Authors'),
+                    ('EID', 'EID')]
 
     metrics = valentine_metrics.all_metrics(matches, ground_truth)
 
@@ -31,10 +31,9 @@ def main():
 
     print("\nAccording to the ground truth:")
     pp.pprint(ground_truth)
-    
+
     print("\nThese are the scores of the matcher:")
     pp.pprint(metrics)
-
 
 
 if __name__ == '__main__':

@@ -167,7 +167,7 @@ def precision(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
     """
     if one_to_one:
         matches = one_to_one_matches(matches)
-    tp, fn = get_tp_fn(matches, golden_standard)
+    tp, _ = get_tp_fn(matches, golden_standard)
     fp = get_fp(matches, golden_standard)
     if tp + fp == 0:
         return 0
@@ -224,7 +224,7 @@ def precision_at_n_percent(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]]
         The precision at n %
     """
     number_to_keep = int(math.ceil((n / 100) * len(matches.keys())))
-    tp, fn = get_tp_fn(matches, golden_standard, number_to_keep)
+    tp, _ = get_tp_fn(matches, golden_standard, number_to_keep)
     fp = get_fp(matches, golden_standard, number_to_keep)
     if tp + fp == 0:
         return 0

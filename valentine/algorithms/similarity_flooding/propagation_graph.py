@@ -3,7 +3,7 @@ import networkx as nx
 from .node_pair import NodePair
 
 
-class PropagationGraph:
+class PropagationGraph(object):
     """
         Class for constructing a Propagation Graph from two input graphs.
     """
@@ -11,7 +11,8 @@ class PropagationGraph:
     def __init__(self, graph1, graph2, policy):
         self.graph1 = graph1
         self.graph2 = graph2
-        self.policy = policy  # policy corresponds to the policy used to compute propagation coefficients
+        # policy corresponds to the policy used to compute propagation coefficients
+        self.policy = policy
 
     @staticmethod
     def __inverse_label_values(labels, m=1.0):
@@ -31,7 +32,7 @@ class PropagationGraph:
 
             label = edge_data.get('label')
 
-            if label in labels.keys():
+            if label in labels:
                 labels[label] += 1.0
             else:
                 labels[label] = 1.0
@@ -51,7 +52,8 @@ class PropagationGraph:
         return p_graph
 
     def __construct_connectivity_graph(self):
-        c_g = nx.DiGraph()  # initialize the connectivity graph
+        # initialize the connectivity graph
+        c_g = nx.DiGraph()
 
         for e1 in self.graph1.edges():
             for e2 in self.graph2.edges():
@@ -80,7 +82,7 @@ class PropagationGraph:
 
             label = edge_data.get('label')
 
-            if label in in_labels1.keys():
+            if label in in_labels1:
                 in_labels1[label] += 1.0
             else:
                 in_labels1[label] = 1.0
@@ -90,7 +92,7 @@ class PropagationGraph:
 
             label = edge_data.get('label')
 
-            if label in in_labels2.keys():
+            if label in in_labels2:
                 in_labels2[label] += 1.0
             else:
                 in_labels2[label] = 1.0
@@ -100,7 +102,7 @@ class PropagationGraph:
 
             label = edge_data.get('label')
 
-            if label in out_labels1.keys():
+            if label in out_labels1:
                 out_labels1[label] += 1.0
             else:
                 out_labels1[label] = 1.0
@@ -110,7 +112,7 @@ class PropagationGraph:
 
             label = edge_data.get('label')
 
-            if label in out_labels2.keys():
+            if label in out_labels2:
                 out_labels2[label] += 1.0
             else:
                 out_labels2[label] = 1.0
@@ -120,8 +122,8 @@ class PropagationGraph:
     def construct_graph(self):
 
         c_g = self.__construct_connectivity_graph()
-
-        p_g = nx.DiGraph()  # initialize the similarity propagation graph
+        # initialize the similarity propagation graph
+        p_g = nx.DiGraph()
 
         for n in c_g.nodes():
             p_g.add_node(n)
@@ -145,13 +147,13 @@ class PropagationGraph:
                 out_labels = out_labels1.copy()
 
                 for key in in_labels2:
-                    if key in in_labels.keys():
+                    if key in in_labels:
                         in_labels[key] += in_labels2[key]
                     else:
                         in_labels[key] = in_labels2[key]
 
                 for key in out_labels2:
-                    if key in out_labels.keys():
+                    if key in out_labels:
                         out_labels[key] += out_labels2[key]
                     else:
                         out_labels[key] = out_labels2[key]

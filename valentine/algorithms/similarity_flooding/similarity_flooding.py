@@ -16,10 +16,10 @@ class SimilarityFlooding(BaseMatcher):
 
     def __init__(self, coeff_policy='inverse_average', formula='formula_c'):
         self.__coeff_policy = coeff_policy
-        self.__formula = formula  # formula used to update similarities of map-pairs as shown in page 10 of the paper
+        # formula used to update similarities of map-pairs as shown in page 10 of the paper
+        self.__formula = formula
         self.__graph1 = None
         self.__graph2 = None
-        self.__propagation_graph = None
         self.__initial_map = None
 
     def get_matches(self,
@@ -51,7 +51,8 @@ class SimilarityFlooding(BaseMatcher):
         # residual vector
         residual_vector = {key: math.pow(previous_map.get(key, 0) - next_map.get(key, 0), 2)
                            for key in set(previous_map) | set(next_map)}
-        return math.sqrt(sum(residual_vector.values())) # compute euclidean length of residual vector
+        # compute Euclidean length of residual vector
+        return math.sqrt(sum(residual_vector.values()))
 
     def __get_next_map(self, previous_map, p_graph, formula):
         next_map = dict()
@@ -81,7 +82,7 @@ class SimilarityFlooding(BaseMatcher):
                 max_map = map_sim
 
             next_map[n] = map_sim
-        for key in next_map.keys():
+        for key in next_map:
             next_map[key] = next_map[key] / max_map
 
         return next_map
@@ -92,8 +93,24 @@ class SimilarityFlooding(BaseMatcher):
 
         p_g = p_g_builder.construct_graph()
 
-        if self.__formula == 'basic':  # using the basing formula
+        if self.__formula == 'basic':
+            # using the basing formula
 
+            previous_map = self.__initial_map.copy()
+
+            for _ in range(0, num_iter):
+                next_map = self.__get_next_map(previous_map, p_g, self.__formula)
+
+                euc_len = self.__get_euc_residual_vector(previous_map, next_map)
+
+                if euc_len <= residual_diff:
+                    # check whether the algo has converged
+                    break
+
+                previous_map = next_map.copy()
+
+        elif self.__formula == 'formula_a':
+            # using formula A
             previous_map = self.__initial_map.copy()
 
             for _ in range(0, num_iter):
@@ -106,20 +123,8 @@ class SimilarityFlooding(BaseMatcher):
 
                 previous_map = next_map.copy()
 
-        elif self.__formula == 'formula_a':  # using formula A
-            previous_map = self.__initial_map.copy()
-
-            for _ in range(0, num_iter):
-                next_map = self.__get_next_map(previous_map, p_g, self.__formula)
-
-                euc_len = self.__get_euc_residual_vector(previous_map, next_map)
-
-                if euc_len <= residual_diff:  # check whether the algo has converged
-                    break
-
-                previous_map = next_map.copy()
-
-        elif self.__formula == 'formula_b':  # using formula B
+        elif self.__formula == 'formula_b':
+            # using formula B
             next_map = self.__get_next_map(None, p_g, self.__formula)
             previous_map = next_map.copy()
 
@@ -128,12 +133,14 @@ class SimilarityFlooding(BaseMatcher):
 
                 euc_len = self.__get_euc_residual_vector(previous_map, next_map)
 
-                if euc_len <= residual_diff:  # check whether the algo has converged
+                if euc_len <= residual_diff:
+                    # check whether the algo has converged
                     break
 
                 previous_map = next_map.copy()
 
-        elif self.__formula == 'formula_c':  # using formula C which is claimed to be the best one
+        elif self.__formula == 'formula_c':
+            # using formula C which is claimed to be the best one
             previous_map = self.__initial_map.copy()
             next_map = self.__get_next_map(previous_map, p_g, 'formula_b')
             previous_map = next_map.copy()
@@ -142,8 +149,9 @@ class SimilarityFlooding(BaseMatcher):
                 next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
                 euc_len = self.__get_euc_residual_vector(previous_map, next_map)
-                 
-                if euc_len <= residual_diff:  # check whether the algo has converged
+
+                if euc_len <= residual_diff:
+                    # check whether the algo has converged
                     break
 
                 previous_map = next_map.copy()
@@ -151,8 +159,8 @@ class SimilarityFlooding(BaseMatcher):
         else:
             print("Wrong formula option!")
             return {}
-
-        return previous_map  # the dictionary storing the final similarities of map pairs
+        # the dictionary storing the final similarities of map pairs
+        return previous_map
 
     def __filter_map(self, prev_map):
 
@@ -164,7 +172,7 @@ class SimilarityFlooding(BaseMatcher):
 
         filtered_map = prev_map.copy()
 
-        for key in prev_map.keys():
+        for key in prev_map:
 
             flag = False
             if key.node1.name[0:6] == 'NodeID':
@@ -222,43 +230,14 @@ class SimilarityFlooding(BaseMatcher):
 
         return filtered_map
 
-
-    @staticmethod
-    def __filter_n_to_1_matches(matches):
-
-        matches_n_to_1 = dict()
-        nodes_left = set()
-
-        for np in matches.keys():
-
-            nodes_left.add(np.node1)
-
-        for nd in nodes_left:
-
-            max_sim = 0
-            max_node = 0
-
-            for np in matches.keys():
-
-                if nd == np.node1:
-
-                    if matches[np] > max_sim:
-
-                        max_sim = matches[np]
-                        max_node = np
-
-            matches_n_to_1[max_node] = max_sim
-
-        return matches_n_to_1
-
     def __format_output(self, matches) -> Dict[Tuple[Tuple[str, str], Tuple[str, str]], float]:
         output = {}
         sorted_maps = {k: v for k, v in sorted(matches.items(), key=lambda item: -item[1])}
         for key in sorted_maps.keys():
             s_long_name, t_long_name = self.__get_node_name(key)
             similarity = sorted_maps[key]
-            s_t_name, s_t_guid, s_c_name, s_c_guid = s_long_name
-            t_t_name, t_t_guid, t_c_name, t_c_guid = t_long_name
+            s_t_name, _, s_c_name, _ = s_long_name
+            t_t_name, _, t_c_name, _ = t_long_name
             match = Match(t_t_name, t_c_name,
                           s_t_name, s_c_name,
                           float(similarity))

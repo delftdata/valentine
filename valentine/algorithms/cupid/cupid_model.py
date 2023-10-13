@@ -28,7 +28,8 @@ class Cupid(BaseMatcher):
         self.__th_ns = float(th_ns)
         self.__parallelism = int(parallelism)
         self.__categories = set()
-        self.__schemata = dict()  # schema name:str, schema_tree
+        # schema name:str, schema_tree
+        self.__schemata = dict()
 
     def get_matches(self,
                     source_input: BaseTable,
@@ -47,7 +48,7 @@ class Cupid(BaseMatcher):
     def __add_data(self,
                    schema_name: str,
                    table: BaseTable):
-        if schema_name not in self.__schemata.keys():
+        if schema_name not in self.__schemata:
             self.__schemata[schema_name] = SchemaTree(schema_name)
 
         schema_level_node = self.__schemata[schema_name].get_node(schema_name)
