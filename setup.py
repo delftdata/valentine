@@ -9,6 +9,7 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: POSIX",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
@@ -16,7 +17,7 @@ classifiers = [
 
 setuptools.setup(
     name='valentine',
-    version='0.1.7',
+    version='0.1.8',
     description='Valentine Matcher',
     classifiers=classifiers,
     license_files=('LICENSE',),
@@ -25,7 +26,7 @@ setuptools.setup(
     maintainer='Delft Data',
     maintainer_email='delftdatasystems@gmail.com',
     url='https://delftdata.github.io/valentine/',
-    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.7.tar.gz',
+    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.1.8.tar.gz',
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'setuptools',

@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/delftdata/valentine/branch/master/graph/badge.svg?token=4QR0X315CL)](https://codecov.io/gh/delftdata/valentine)
 [![PyPI version](https://badge.fury.io/py/valentine.svg)](https://badge.fury.io/py/valentine)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/valentine)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8|3.9|3.10|3.11-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8|3.9|3.10|3.11|3.12-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/85cfebfc9c6a43359c5b2e56a5fdf3a3)](https://app.codacy.com/gh/delftdata/valentine/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
@@ -18,7 +18,7 @@ The original experimental suite version of Valentine, as first published for the
 ## Installation instructions
 ### Requirements
 
-*   *Python* >=3.8,<3.12
+*   *Python* >=3.8,<3.13
 *   *Java*: For the Coma matcher it is required to have java (jre) installed
 
 To install Valentine simply run:
