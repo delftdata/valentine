@@ -2,9 +2,9 @@ import unittest
 
 from valentine.data_sources import DataframeTable
 
-from valentine import valentine_match, valentine_metrics, NotAValentineMatcher
+from valentine import valentine_match, valentine_match_batch, valentine_metrics, NotAValentineMatcher
 from tests import df1, df2
-from valentine.algorithms import Coma
+from valentine.algorithms import Coma, DistributionBased
 
 
 class TestValentine(unittest.TestCase):
@@ -28,3 +28,21 @@ class TestValentine(unittest.TestCase):
                            ('EID', 'EID')]
         metrics = valentine_metrics.all_metrics(matches, golden_standard)
         assert metrics['recall_at_sizeof_ground_truth'] == 1.0
+
+    def test_batch_generator(self):
+        n = 3
+
+        def generate_df1():
+            for _ in range(n):
+                yield df1
+
+        def generate_df2():
+            for _ in range(n):
+                yield df2
+
+        matches = valentine_match_batch(generate_df1(), generate_df2(), DistributionBased())
+        assert len(matches) > 0
+
+    def test_batch_list(self):
+        matches = valentine_match_batch([df1, df1, df1], [df2, df2, df2], DistributionBased())
+        assert len(matches) > 0
