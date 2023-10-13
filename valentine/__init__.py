@@ -1,3 +1,5 @@
+from typing import Iterable, List, Union
+
 import pandas as pd
 
 import valentine.metrics as valentine_metrics
@@ -9,17 +11,45 @@ class NotAValentineMatcher(Exception):
     pass
 
 
+def validate_matcher(matcher):
+    if not isinstance(matcher, valentine.algorithms.BaseMatcher):
+        raise NotAValentineMatcher('The method that you selected is not supported by Valentine')
+
+
 def valentine_match(df1: pd.DataFrame,
                     df2: pd.DataFrame,
                     matcher: valentine.algorithms.BaseMatcher,
                     df1_name: str = 'table_1',
                     df2_name: str = 'table_2'):
-    if isinstance(matcher, valentine.algorithms.BaseMatcher):
-        table_1 = valentine.data_sources.DataframeTable(df1, name=df1_name)
-        table_2 = valentine.data_sources.DataframeTable(df2, name=df2_name)
-        matches = dict(sorted(matcher.get_matches(table_1, table_2).items(),
-                              key=lambda item: item[1], reverse=True))
-    else:
-        raise NotAValentineMatcher('The method that you selected is not supported by Valentine')
+
+    validate_matcher(matcher)
+
+    table_1 = valentine.data_sources.DataframeTable(df1, name=df1_name)
+    table_2 = valentine.data_sources.DataframeTable(df2, name=df2_name)
+    matches = dict(sorted(matcher.get_matches(table_1, table_2).items(),
+                          key=lambda item: item[1], reverse=True))
+
+    return matches
+
+
+def valentine_match_batch(df_iter_1: Iterable[pd.DataFrame],
+                          df_iter_2: Iterable[pd.DataFrame],
+                          matcher: valentine.algorithms.BaseMatcher,
+                          df_iter_1_names: Union[List[str], None] = None,
+                          df_iter_2_names: Union[List[str], None] = None):
+
+    validate_matcher(matcher)
+
+    matches = {}
+
+    for df1_idx, df1 in enumerate(df_iter_1):
+        for df2_idx, df2 in enumerate(df_iter_2):
+            table_1_name = df_iter_1_names[df1_idx] if df_iter_1_names is not None else f'table_1_{df1_idx}'
+            table_2_name = df_iter_2_names[df2_idx] if df_iter_2_names is not None else f'table_2_{df2_idx}'
+            table_1 = valentine.data_sources.DataframeTable(df1, name=table_1_name)
+            table_2 = valentine.data_sources.DataframeTable(df2, name=table_2_name)
+            matches.update(matcher.get_matches(table_1, table_2))
+
+    matches = dict(sorted(matches.items(), key=lambda item: item[1], reverse=True))
 
     return matches

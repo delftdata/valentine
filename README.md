@@ -5,6 +5,7 @@
 [![PyPI version](https://badge.fury.io/py/valentine.svg)](https://badge.fury.io/py/valentine)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/valentine)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8|3.9|3.10|3.11-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/85cfebfc9c6a43359c5b2e56a5fdf3a3)](https://app.codacy.com/gh/delftdata/valentine/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 A python package for capturing potential relationships among columns of different tabular datasets, which are given in the form of pandas DataFrames. Valentine is based on [Valentine: Evaluating Matching Techniques for Dataset Discovery](https://ieeexplore.ieee.org/abstract/document/9458921)
 
@@ -70,15 +71,25 @@ In order to do so, the user can choose one of the following 5 matching methods:
      * **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
      * **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
 
-### Matching DataFrames
+### Matching DataFrame Pair
 
-After selecting one of the 5 matching methods, the user can initiate the matching process in the following way:
+After selecting one of the 5 matching methods, the user can initiate the pairwise matching process in the following way:
 
 ```python
 matches = valentine_match(df1, df2, matcher, df1_name, df2_name)
 ```
 
-where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a dictionary storing as keys column pairs from the two DataFrames and as keys the corresponding similarity scores.
+where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a dictionary storing as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
+
+### Matching DataFrame Batch
+
+After selecting one of the 5 matching methods, the user can initiate the batch matching process in the following way:
+
+```python
+matches = valentine_match_batch(df_iter_1, df_iter_2, matcher, df_iter_1_names, df_iter_2_names)
+```
+
+where df_iter_1 and df_iter_2 are the two iterable structures containing pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input an iterable with names for each DataFrame. Function ```valentine_match_batch``` returns a dictionary storing as keys column pairs from the DataFrames and as values the corresponding similarity scores.
 
 ### Measuring effectiveness
 
