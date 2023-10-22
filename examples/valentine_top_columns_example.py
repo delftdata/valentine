@@ -4,7 +4,7 @@ from valentine import valentine_match
 from valentine.algorithms import SimilarityFlooding
 import pprint
 
-from valentine.metrics.metrics import get_top_n_columns, get_top_n_columns_for_column
+from valentine.metrics.metrics import get_top_n_columns
 
 
 def main():
@@ -22,7 +22,9 @@ def main():
     all_top_2_columns = get_top_n_columns(matches, 2)
 
     # Find the top-n columns for the column 'Authors' in dataframe1
-    authors_top_2_columns = get_top_n_columns_for_column(matches, 2, 'Authors')
+    authors_top_2_columns = get_top_n_columns(matches, 2, [('table_1', 'Authors')])
+
+    authors_year_top_2_columns = get_top_n_columns(matches, 2, [('table_1', 'Authors'), ('table_1', 'Year')])
 
     pp = pprint.PrettyPrinter(indent=4)
     print("Found the following matches:")
@@ -33,6 +35,9 @@ def main():
 
     print("Top 2 columns for 'Authors' column in table 1:")
     pp.pprint(authors_top_2_columns)
+
+    print("Top 2 columns for multiple keys. Namely, 'Authors' and 'Year' columns in table 1:")
+    pp.pprint(authors_year_top_2_columns)
 
 
 if __name__ == '__main__':
