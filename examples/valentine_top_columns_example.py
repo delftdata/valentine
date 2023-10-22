@@ -28,7 +28,7 @@ def main():
     print("Found the following matches:")
     pp.pprint(matches)
 
-    print("Top 2 columns for each column:")
+    print("Top 2 columns for each column (with their corresponding score):")
     pp.pprint(all_top_2_columns)
 
     print("Top 2 columns for 'Authors' column in table 1:")

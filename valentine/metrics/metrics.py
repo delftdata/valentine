@@ -277,7 +277,11 @@ def get_top_n_columns(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], flo
     -------
     dict
         A dictionary with its keys to be equal to the column names of the first dataframe and its values to be
-        a list of the top n columns
+        a list of dictionaries with the top n columns
+
+        output example:
+            key: ('table_1', 'Authors')
+            value: [{'Access Type': 0.1515703989838858}, {'Authors': 0.2816471572126128}]
     """
 
     # Create an empty dictionary where each column holds a list of the top similar
@@ -288,11 +292,13 @@ def get_top_n_columns(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], flo
 
     # Iterate sort matches and add the columns to the dictionary
     for column_a, column_b in sorted(matches):
+        score = matches[(column_a, column_b)]
+
         if len(top_columns[column_a]) < n:
-            top_columns[column_a].append(column_b[1])
+            top_columns[column_a].append({column_b[1]: score})
 
         if len(top_columns[column_b]) < n:
-            top_columns[column_b].append(column_a[1])
+            top_columns[column_b].append({column_a[1]: score})
 
     return top_columns
 
