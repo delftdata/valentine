@@ -34,10 +34,11 @@ Valentine can be used to find matches among columns of a given pair of pandas Da
 ### Matching methods
 In order to do so, the user can choose one of the following 5 matching methods:
 
-1.   `Coma(int: max_n str: strategy)` is a python wrapper around [COMA 3.0 Comunity edition](https://sourceforge.net/projects/coma-ce/)
+1.   `Coma(int: max_n, bool: use_instances, str: java_xmx)` is a python wrapper around [COMA 3.0 Comunity edition](https://sourceforge.net/projects/coma-ce/)
      *    **Parameters**: 
-           *    **max_n**(*int*) - Accept similarity threshold, default is 0.
-           *    **strategy**(*str*) - Choice of "COMA\_OPT" (schema based matching - default) or "COMA\_OPT\_INST" (schema and instance based matching)
+           *    **max_n**(*int*) - Accept similarity threshold, (default: 0).
+           *    **use_instances**(*bool*) - Wheather Coma will make use of the data instances or just the schema information, (default: False).
+           *    **java_xmx**(*str*) - The amount of RAM that Coma is allowed to use, (default: "1024m") .
 
 2.   `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.79.4079&rep=rep1&type=pdf)
      *    **Parameters**:
