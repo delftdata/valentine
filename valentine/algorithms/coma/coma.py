@@ -10,6 +10,10 @@ from ...data_sources.base_table import BaseTable
 from ...utils.utils import get_project_root
 
 
+class JavaException(Exception):
+    pass
+
+
 class Coma(BaseMatcher):
 
     def __init__(self,
@@ -45,15 +49,18 @@ class Coma(BaseMatcher):
         source_data = os.path.join(tmp_folder_path, source_table_f_name)
         target_data = os.path.join(tmp_folder_path, target_table_f_name)
         coma_output_path = os.path.join(tmp_folder_path, coma_output_path)
-        with open(os.path.join(tmp_folder_path, "NUL"), "w") as fh:
-            subprocess.call(['java', f'-Xmx{self.__java_XmX}',
-                             '-cp', jar_path,
-                             '-DinputFile1=' + source_data,
-                             '-DinputFile2=' + target_data,
-                             '-DoutputFile=' + coma_output_path,
-                             '-DmaxN=' + str(self.__max_n),
-                             '-Dstrategy=' + self.__strategy,
-                             'Main'], stdout=fh, stderr=fh)
+        try:
+            subprocess.check_output(['java', f'-Xmx{self.__java_XmX}',
+                                     '-cp', jar_path,
+                                     '-DinputFile1=' + source_data,
+                                     '-DinputFile2=' + target_data,
+                                     '-DoutputFile=' + coma_output_path,
+                                     '-DmaxN=' + str(self.__max_n),
+                                     '-Dstrategy=' + self.__strategy,
+                                     'Main'], stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            raise JavaException("Either Java (JRE) is not installed or Java does not have enough memory to operate. "
+                                "Try raising the java_xmx parameter of the Coma class")
 
     def __write_schema_csv_files(self,
                                  table1: BaseTable,
