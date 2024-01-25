@@ -59,3 +59,6 @@ class TestMetrics(unittest.TestCase):
     def test_recall_at_size_of_ground_truth(self):
         recall = self.matches.get_metrics(self.ground_truth, metrics={RecallAtSizeofGroundTruth()})
         assert 'RecallAtSizeofGroundTruth' in recall and recall['RecallAtSizeofGroundTruth'] == 0.6
+
+    def test_base_metric(self):
+        bla = Metric({})

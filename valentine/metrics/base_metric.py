@@ -3,23 +3,20 @@ metrics.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
+from pandas.io.pytables import DataCol
 if TYPE_CHECKING:
     from ..algorithms.matcher_results import MatcherResults
 from abc import ABC, abstractmethod
 from typing import Dict, Tuple, List, Any, final
+from dataclasses import dataclass
 
 
+@dataclass(eq=True, frozen=True)
 class Metric(ABC):
     """Base class for a metric. Metrics can be prepared with parameters by
     instantiating them, their application is deferred to a later moment this
     way, which can be implemented by overriding the `apply` method.
-
-    Metrics are tested for equivalence and hash based on their name. Hence, one
-    can override the `name` method to change under which key the metric appears
-    in the aggregated metrics obtained from a `MatcherResults`.
-
-    All initialization arguments are expected to have default values, and thus
-    be keyword arguments.
     """
 
     @abstractmethod
@@ -41,7 +38,7 @@ class Metric(ABC):
         NotImplementedError
         Override this method in concrete implementations.
         """
-        raise NotImplementedError
+        pass
 
     def name(self: Metric) -> str:
         """The name of the metric, as it appears in the metric results.
@@ -68,11 +65,3 @@ class Metric(ABC):
             The formatted metric value or score.
         """
         return {self.name(): value}
-
-    def __hash__(self: Metric) -> int:
-        return str.__hash__(self.name())
-
-    def __eq__(self: Metric, other: object) -> bool:
-        if isinstance(other, Metric):
-            return self.name() == other.name()
-        return False

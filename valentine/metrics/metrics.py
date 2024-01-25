@@ -1,10 +1,13 @@
 """Here one can find some common metric implementations. Custom metrics can be
-made by subclassing the `Metric` ABC.
+made by subclassing the `Metric` ABC. Marking them with the dataclass decorator
+allows for proper hashing/equals without the boilerplate.
 """
 from .base_metric import Metric
 from .metric_helpers import *
+from dataclasses import dataclass
 
 
+@dataclass(eq=True, frozen=True)
 class Precision(Metric):
     """Metric for calculating precision.
 
@@ -13,9 +16,7 @@ class Precision(Metric):
     one_to_one : bool
     Whether to apply the one-to-one filter to the MatcherResults first.
     """
-
-    def __init__(self, one_to_one: bool = True):
-        self.one_to_one = one_to_one
+    one_to_one: bool = True
 
     def apply(self, matches, ground_truth):
         if self.one_to_one:
@@ -30,6 +31,7 @@ class Precision(Metric):
         return self.return_format(precision)
 
 
+@dataclass(eq=True, frozen=True)
 class Recall(Metric):
     """Metric for calculating recall.
 
@@ -38,9 +40,7 @@ class Recall(Metric):
     one_to_one : bool
     Whether to apply the one-to-one filter to the MatcherResults first.
     """
-
-    def __init__(self, one_to_one: bool = True):
-        self.one_to_one = one_to_one
+    one_to_one: bool = True
 
     def apply(self, matches, ground_truth):
         if self.one_to_one:
@@ -54,6 +54,7 @@ class Recall(Metric):
         return self.return_format(recall)
 
 
+@dataclass(eq=True, frozen=True)
 class F1Score(Metric):
     """Metric for calculating f1 score.
 
@@ -62,9 +63,7 @@ class F1Score(Metric):
     one_to_one : bool
     Whether to apply the one-to-one filter to the MatcherResults first.
     """
-
-    def __init__(self, one_to_one: bool = True):
-        self.one_to_one = one_to_one
+    one_to_one: bool = True
 
     def apply(self, matches, ground_truth):
         if self.one_to_one:
@@ -81,20 +80,19 @@ class F1Score(Metric):
         return self.return_format(f1)
 
 
+@dataclass(eq=True, frozen=True)
 class PrecisionTopNPercent(Metric):
     """Metric for calculating precision of the top N percent of matches.
 
     Attributes
     ----------
-    n : int
-    The percent of matches to consider.
     one_to_one : bool
     Whether to apply the one-to-one filter to the MatcherResults first.
+    n : int
+    The percent of matches to consider.
     """
-
-    def __init__(self, one_to_one: bool = True, n: int = 10):
-        self.one_to_one = one_to_one
-        self.n = n
+    one_to_one: bool = True
+    n: int = 10
 
     def name(self):
         return super().name().replace('N', str(self.n))
@@ -114,6 +112,7 @@ class PrecisionTopNPercent(Metric):
         return self.return_format(precision_top_n_percent)
 
 
+@dataclass(eq=True, frozen=True)
 class RecallAtSizeofGroundTruth(Metric):
     """Metric for calculating recall at the size of the ground truth.
     """
