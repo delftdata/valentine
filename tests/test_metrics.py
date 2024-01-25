@@ -1,7 +1,7 @@
 import unittest
 from valentine.metrics import *
 from valentine.algorithms.matcher_results import MatcherResults
-
+from valentine.metrics.metric_helpers import get_fp, get_tp_fn
 
 class TestMetrics(unittest.TestCase):
     def setUp(self):
@@ -60,5 +60,18 @@ class TestMetrics(unittest.TestCase):
         recall = self.matches.get_metrics(self.ground_truth, metrics={RecallAtSizeofGroundTruth()})
         assert 'RecallAtSizeofGroundTruth' in recall and recall['RecallAtSizeofGroundTruth'] == 0.6
 
-    def test_base_metric(self):
-        bla = Metric({})
+    def test_metric_helpers(self):
+        limit = 2
+        tp, fn = get_tp_fn(self.matches, self.ground_truth, n=limit)
+        assert tp <= len(self.ground_truth) and fn <= len(self.ground_truth)
+
+        fp = get_fp(self.matches, self.ground_truth, n=limit)
+        assert fp <= limit
+        print(tp, fn, fp)
+        assert tp == 2 and fn == 3  # Since we limit to 2 of the matches
+        assert fp == 0
+
+    def test_metric_equals(self):
+        assert PrecisionTopNPercent(n=10, one_to_one=False) == PrecisionTopNPercent(n=10, one_to_one=False)
+        assert PrecisionTopNPercent(n=10, one_to_one=False) != PrecisionTopNPercent(n=10, one_to_one=True)
+        assert PrecisionTopNPercent(n=10, one_to_one=False) != Precision()

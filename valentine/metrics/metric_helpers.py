@@ -38,9 +38,10 @@ def get_tp_fn(matches: MatcherResults,
 
     for expected_match in ground_truth:
         if expected_match in all_matches:
-            tp = tp + 1
+            tp += 1
         else:
-            fn = fn + 1
+            fn += 1
+
     return tp, fn
 
 
@@ -75,5 +76,6 @@ def get_fp(matches: MatcherResults,
 
     for possible_match in all_matches:
         if possible_match not in ground_truth:
-            fp = fp + 1
+            fp += 1
+
     return fp
