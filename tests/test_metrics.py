@@ -67,7 +67,6 @@ class TestMetrics(unittest.TestCase):
 
         fp = get_fp(self.matches, self.ground_truth, n=limit)
         assert fp <= limit
-        print(tp, fn, fp)
         assert tp == 2 and fn == 3  # Since we limit to 2 of the matches
         assert fp == 0
 
