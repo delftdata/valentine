@@ -1,5 +1,6 @@
+from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, Tuple, Self
+from typing import Dict, Tuple
 
 
 @dataclass
@@ -19,6 +20,6 @@ class Match:
     similarity: float
 
     @property
-    def to_dict(self: Self) -> Dict[Tuple[Tuple[str, str], Tuple[str, str]], float]:
+    def to_dict(self: Match) -> Dict[Tuple[Tuple[str, str], Tuple[str, str]], float]:
         return {((self.source_table_name, self.source_column_name),
                  (self.target_table_name, self.target_column_name)): self.similarity}

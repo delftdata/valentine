@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..algorithms.matcher_results import MatcherResults
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple, List, Any, Self, final
+from typing import Dict, Tuple, List, Any, final
 
 
 class Metric(ABC):
@@ -23,7 +23,7 @@ class Metric(ABC):
     """
 
     @abstractmethod
-    def apply(self: Self, matches: MatcherResults, ground_truth: List[Tuple[str, str]]) -> Dict[str, Any]:
+    def apply(self: Metric, matches: MatcherResults, ground_truth: List[Tuple[str, str]]) -> Dict[str, Any]:
         """Applies the metric to a `MatcherResults` instance, given ground
         truth.
 
@@ -43,7 +43,7 @@ class Metric(ABC):
         """
         raise NotImplementedError
 
-    def name(self: Self) -> str:
+    def name(self: Metric) -> str:
         """The name of the metric, as it appears in the metric results.
 
         Returns
@@ -54,7 +54,7 @@ class Metric(ABC):
         return self.__class__.__name__
 
     @final
-    def return_format(self: Self, value: Any) -> Dict[str, Any]:
+    def return_format(self: Metric, value: Any) -> Dict[str, Any]:
         """The return format of the `apply` method.
 
         Parameters
@@ -69,10 +69,10 @@ class Metric(ABC):
         """
         return {self.name(): value}
 
-    def __hash__(self: Self) -> int:
+    def __hash__(self: Metric) -> int:
         return str.__hash__(self.name())
 
-    def __eq__(self: Self, other: object) -> bool:
+    def __eq__(self: Metric, other: object) -> bool:
         if isinstance(other, Metric):
             return self.name() == other.name()
         return False
