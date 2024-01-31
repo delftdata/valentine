@@ -76,7 +76,7 @@ After selecting one of the 5 matching methods, the user can initiate the pairwis
 matches = valentine_match(df1, df2, matcher, df1_name, df2_name)
 ```
 
-where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a dictionary storing as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
+where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
 
 ### Matching DataFrame Batch
 
@@ -86,23 +86,48 @@ After selecting one of the 5 matching methods, the user can initiate the batch m
 matches = valentine_match_batch(df_iter_1, df_iter_2, matcher, df_iter_1_names, df_iter_2_names)
 ```
 
-where df_iter_1 and df_iter_2 are the two iterable structures containing pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input an iterable with names for each DataFrame. Function ```valentine_match_batch``` returns a dictionary storing as keys column pairs from the DataFrames and as values the corresponding similarity scores.
+where df_iter_1 and df_iter_2 are the two iterable structures containing pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input an iterable with names for each DataFrame. Function ```valentine_match_batch``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
+
+
+### MatcherResults instance
+The `MatcherResults` instance has some convenience methods that the user can use to either obtain a subset of the data or to transform the data. This instance is a dictionary and is sorted upon instantiation, from high similarity to low similarity.
+```python
+top_n_matches = matches.take_top_n(5)
+
+top_n_percent_matches = matches.take_top_percent(25)
+
+one_to_one_matches = matches.one_to_one()
+```
+
 
 ### Measuring effectiveness
-
-Based on the matches retrieved by calling `valentine_match` the user can use 
+The MatcherResults instance that is returned by `valentine_match` or `valentine_match_batch` also has a `get_metrics` method that the user can use 
 
 ```python 
-metrics = valentine_metrics.all_metrics(matches, ground_truth)
+metrics = matches.get_metrics(ground_truth)
 ``` 
 
-in order to get all effectiveness metrics, such as Precision, Recall, F1-score and others as described in the original Valentine paper. In order to do so, the user needs to also input the ground truth of matches based on which the metrics will be calculated. The ground truth can be given as a list of tuples representing column matches that should hold.
+in order to get all effectiveness metrics, such as Precision, Recall, F1-score and others as described in the original Valentine paper. In order to do so, the user needs to also input the ground truth of matches based on which the metrics will be calculated. The ground truth can be given as a list of tuples representing column matches that should hold (see example below).
+
+By default, all the core metrics will be used for this with default parameters, but the user can also customize which metrics to run with what parameters, and implement own custom metrics by extending from the `Metric` base class. Some sets of metrics are available as well.
+
+```python
+from valentine.metrics import F1Score, PrecisionTopNPercent, METRICS_PRECISION_INCREASING_N
+metrics_custom = matches.get_metrics(ground_truth, metrics={F1Score(one_to_one=False), PrecisionTopNPercent(n=70)})
+metrics_prefefined_set = matches.get_metrics(ground_truth, metrics=METRICS_PRECISION_INCREASING_N)
+
+```
 
 
 ### Example
-The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about authors and their publications, and then 2) how to assess its effectiveness based on a given ground truth (as found in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py)):
+The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about authors and their publications, and then 2) how to assess its effectiveness based on a given ground truth (a more extensive example is shown in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py)):
 
 ```python
+import os
+import pandas as pd
+from valentine import valentine_match
+from valentine.algorithms import Coma
+
 # Load data using pandas
 d1_path = os.path.join('data', 'authors1.csv')
 d2_path = os.path.join('data', 'authors2.csv')
@@ -120,7 +145,7 @@ ground_truth = [('Cited by', 'Cited by'),
                 ('Authors', 'Authors'),
                 ('EID', 'EID')]
 
-metrics = valentine_metrics.all_metrics(matches, ground_truth)
+metrics = matches.get_metrics(ground_truth)
     
 print(metrics)
 ```
@@ -128,17 +153,18 @@ print(metrics)
 The output of the above code block is:
 
 ```
-{(('table_1', 'Cited by'), ('table_2', 'Cited by')): 0.8374313, 
-(('table_1', 'Authors'), ('table_2', 'Authors')): 0.83498037, 
-(('table_1', 'EID'), ('table_2', 'EID')): 0.8214057}
-{'precision': 1.0, 'recall': 1.0, 'f1_score': 1.0, 
-'precision_at_10_percent': 1.0, 
-'precision_at_30_percent': 1.0,
-'precision_at_50_percent': 1.0, 
-'precision_at_70_percent': 1.0, 
-'precision_at_90_percent': 1.0, 
-'recall_at_sizeof_ground_truth': 1.0}
-
+{
+     (('table_1', 'Cited by'), ('table_2', 'Cited by')): 0.86994505, 
+     (('table_1', 'Authors'), ('table_2', 'Authors')): 0.8679843, 
+     (('table_1', 'EID'), ('table_2', 'EID')): 0.8571245
+}
+{
+     'Recall': 1.0, 
+     'F1Score': 1.0, 
+     'RecallAtSizeofGroundTruth': 1.0, 
+     'Precision': 1.0, 
+     'PrecisionTop10Percent': 1.0
+}
 ```
 
 ## Cite Valentine

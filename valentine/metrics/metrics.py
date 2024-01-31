@@ -1,256 +1,128 @@
-import math
-from typing import Dict, Tuple, List
+"""Here one can find some common metric implementations. Custom metrics can be
+made by subclassing the `Metric` ABC. Marking them with the dataclass decorator
+allows for proper hashing/equals without the boilerplate.
+"""
+from .base_metric import Metric
+from .metric_helpers import *
+from dataclasses import dataclass
 
 
-def one_to_one_matches(matches: dict):
-    """
-    A filter that takes a dict of column matches and returns a dict of 1 to 1 matches. The filter works in the following
-    way: At first it gets the median similarity of the set of the values and removes all matches
-    that have a similarity lower than that. Then from what remained it matches columns for me highest similarity
-    to the lowest till the columns have at most one match.
-    Parameters
+@dataclass(eq=True, frozen=True)
+class Precision(Metric):
+    """Metric for calculating precision.
+
+    Attributes
     ----------
-    matches : dict
-        The ranked list of matches
-    Returns
-    -------
-    dict
-        The ranked list of matches after the 1 to 1 filter
+    one_to_one : bool
+    Whether to apply the one-to-one filter to the MatcherResults first.
     """
-    set_match_values = set(matches.values())
+    one_to_one: bool = True
 
-    if len(set_match_values) < 2:
-        return matches
+    def apply(self, matches, ground_truth):
+        if self.one_to_one:
+            matches = matches.one_to_one()
 
-    matched = dict()
+        tp, _ = get_tp_fn(matches, ground_truth)
+        fp = get_fp(matches, ground_truth)
+        precision = 0
+        if tp + fp > 0:
+            precision = tp / (tp + fp)
 
-    for key in matches.keys():
-        matched[key[0]] = False
-        matched[key[1]] = False
-
-    median = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values)/2)]
-
-    matches1to1 = dict()
-
-    for key in matches.keys():
-        if (not matched[key[0]]) and (not matched[key[1]]):
-            similarity = matches.get(key)
-            if similarity >= median:
-                matches1to1[key] = similarity
-                matched[key[0]] = True
-                matched[key[1]] = True
-            else:
-                break
-    return matches1to1
+        return self.return_format(precision)
 
 
-def get_tp_fn(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-              golden_standard: List[Tuple[str, str]],
-              n: int = None):
-    """
-    Calculate the true positive  and false negative numbers of the given matches
+@dataclass(eq=True, frozen=True)
+class Recall(Metric):
+    """Metric for calculating recall.
 
-    Parameters
+    Attributes
     ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
-    n : int, optional
-        The percentage number that we want to consider from the ranked list (matches)
-        e.g. (90) for 90% of the matches
-
-    Returns
-    -------
-    (int, int)
-        True positive and false negative counts
+    one_to_one : bool
+    Whether to apply the one-to-one filter to the MatcherResults first.
     """
-    tp = 0
-    fn = 0
+    one_to_one: bool = True
 
-    all_matches = [(m[0][1], m[1][1]) for m in matches.keys()]
+    def apply(self, matches, ground_truth):
+        if self.one_to_one:
+            matches = matches.one_to_one()
 
-    if n is not None:
-        all_matches = all_matches[:n]
+        tp, fn = get_tp_fn(matches, ground_truth)
+        recall = 0
+        if tp + fn > 0:
+            recall = tp / (tp + fn)
 
-    for expected_match in golden_standard:
-        if expected_match in all_matches:
-            tp = tp + 1
-        else:
-            fn = fn + 1
-    return tp, fn
+        return self.return_format(recall)
 
 
-def get_fp(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-           golden_standard: List[Tuple[str, str]],
-           n: int = None):
-    """
-    Calculate the false positive number of the given matches
+@dataclass(eq=True, frozen=True)
+class F1Score(Metric):
+    """Metric for calculating f1 score.
 
-    Parameters
+    Attributes
     ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
-    n : int, optional
-        The percentage number that we want to consider from the ranked list (matches)
-        e.g. (90) for 90% of the matches
-
-    Returns
-    -------
-    int
-        False positive
+    one_to_one : bool
+    Whether to apply the one-to-one filter to the MatcherResults first.
     """
-    fp = 0
+    one_to_one: bool = True
 
-    all_matches = [(m[0][1], m[1][1]) for m in matches.keys()]
+    def apply(self, matches, ground_truth):
+        if self.one_to_one:
+            matches = matches.one_to_one()
 
-    if n is not None:
-        all_matches = all_matches[:n]
+        tp, fn = get_tp_fn(matches, ground_truth)
+        fp = get_fp(matches, ground_truth)
+        f1 = 0
+        if tp > 0:
+            pr = tp / (tp + fp)
+            re = tp / (tp + fn)
+            f1 = 2 * ((pr * re) / (pr + re))
 
-    for possible_match in all_matches:
-        if possible_match not in golden_standard:
-            fp = fp + 1
-    return fp
+        return self.return_format(f1)
 
 
-def recall(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-           golden_standard: List[Tuple[str, str]],
-           one_to_one=True):
-    """
-    Function that calculates the recall of the matches against the golden standard. If one_to_one is set to true, it
-    also performs an 1-1 match filer. Meaning that each column will match only with another one.
+@dataclass(eq=True, frozen=True)
+class PrecisionTopNPercent(Metric):
+    """Metric for calculating precision of the top N percent of matches.
 
-    Parameters
+    Attributes
     ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
-    one_to_one : bool, optional
-        If to perform the 1-1 match filter
-
-    Returns
-    -------
-    float
-        The recall
-    """
-    if one_to_one:
-        matches = one_to_one_matches(matches)
-    tp, fn = get_tp_fn(matches, golden_standard)
-    if tp + fn == 0:
-        return 0
-    return tp / (tp + fn)
-
-
-def precision(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-              golden_standard: List[Tuple[str, str]],
-              one_to_one=True):
-    """
-    Function that calculates the precision of the matches against the golden standard. If one_to_one is set to true, it
-    also performs an 1-1 match filer. Meaning that each column will match only with another one.
-
-    Parameters
-    ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
-    one_to_one : bool, optional
-        If to perform the 1-1 match filter
-
-    Returns
-    -------
-    float
-        The precision
-    """
-    if one_to_one:
-        matches = one_to_one_matches(matches)
-    tp, _ = get_tp_fn(matches, golden_standard)
-    fp = get_fp(matches, golden_standard)
-    if tp + fp == 0:
-        return 0
-    return tp / (tp + fp)
-
-
-def f1_score(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-             golden_standard: List[Tuple[str, str]],
-             one_to_one=True):
-    """
-    Function that calculates the F1 score of the matches against the golden standard. If one_to_one is set to true, it
-    also performs an 1-1 match filer. Meaning that each column will match only with another one.
-
-    Parameters
-    ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
-    one_to_one : bool, optional
-        If to perform the 1-1 match filter
-
-    Returns
-    -------
-    float
-        The f1_score
-    """
-    pr = precision(matches, golden_standard, one_to_one)
-    re = recall(matches, golden_standard, one_to_one)
-    if pr + re == 0:
-        return 0
-    return 2 * ((pr * re) / (pr + re))
-
-
-def precision_at_n_percent(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-                           golden_standard: List[Tuple[str, str]],
-                           n: int):
-    """
-    Function that calculates the precision at n %
-    e.g. if n is 10 then only the first 10% of the matches will be considered for the precision calculation
-
-    Parameters
-    ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
+    one_to_one : bool
+    Whether to apply the one-to-one filter to the MatcherResults first.
     n : int
-        The integer percentage number
-
-    Returns
-    -------
-    float
-        The precision at n %
+    The percent of matches to consider.
     """
-    number_to_keep = int(math.ceil((n / 100) * len(matches.keys())))
-    tp, _ = get_tp_fn(matches, golden_standard, number_to_keep)
-    fp = get_fp(matches, golden_standard, number_to_keep)
-    if tp + fp == 0:
-        return 0
-    return tp / (tp + fp)
+    one_to_one: bool = True
+    n: int = 10
+
+    def name(self):
+        return super().name().replace('N', str(self.n))
+
+    def apply(self, matches, ground_truth):
+        if self.one_to_one:
+            matches = matches.one_to_one()
+
+        n_matches = matches.take_top_percent(self.n)
+
+        tp, _ = get_tp_fn(n_matches, ground_truth)
+        fp = get_fp(n_matches, ground_truth)
+        precision_top_n_percent = 0
+        if tp + fp > 0:
+            precision_top_n_percent = tp / (tp + fp)
+
+        return self.return_format(precision_top_n_percent)
 
 
-def recall_at_sizeof_ground_truth(matches: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float],
-                                  golden_standard: List[Tuple[str, str]],):
+@dataclass(eq=True, frozen=True)
+class RecallAtSizeofGroundTruth(Metric):
+    """Metric for calculating recall at the size of the ground truth.
     """
-    Function that calculates the recall at the size of the ground truth.
-    e.g. if the size of ground truth size is 10 then only the first 10 matches will be considered for
-    the recall calculation
 
-    Parameters
-    ----------
-    matches : dict
-        Ranked list of matches from the match with higher similarity to lower
-    golden_standard : list
-        A list that contains the golden standard
+    def apply(self, matches, ground_truth):
+        n_matches = matches.take_top_n(len(ground_truth))
 
-    Returns
-    -------
-    float
-        The recall at the size of ground truth
-    """
-    tp, fn = get_tp_fn(matches, golden_standard, len(golden_standard))
-    if tp + fn == 0:
-        return 0
-    return tp / (tp + fn)
+        tp, fn = get_tp_fn(n_matches, ground_truth)
+        recall = 0
+        if tp + fn > 0:
+            recall = tp / (tp + fn)
+
+        return self.return_format(recall)
