@@ -6,3 +6,5 @@ dist
 valentine.egg-info
 build
 .vscode/
+valentine.sublime-workspace
+valentine.sublime-project

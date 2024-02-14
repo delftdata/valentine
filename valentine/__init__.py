@@ -1,10 +1,10 @@
-from typing import Iterable, List, Union
-
 import pandas as pd
 
-import valentine.metrics as valentine_metrics
 import valentine.algorithms
 import valentine.data_sources
+
+from typing import Iterable, List, Union
+from valentine.algorithms.matcher_results import MatcherResults
 
 
 class NotAValentineMatcher(Exception):
@@ -13,7 +13,7 @@ class NotAValentineMatcher(Exception):
 
 def validate_matcher(matcher):
     if not isinstance(matcher, valentine.algorithms.BaseMatcher):
-        raise NotAValentineMatcher('The method that you selected is not supported by Valentine')
+        raise NotAValentineMatcher('Please provide a valid matcher')
 
 
 def valentine_match(df1: pd.DataFrame,
@@ -26,10 +26,9 @@ def valentine_match(df1: pd.DataFrame,
 
     table_1 = valentine.data_sources.DataframeTable(df1, name=df1_name)
     table_2 = valentine.data_sources.DataframeTable(df2, name=df2_name)
-    matches = dict(sorted(matcher.get_matches(table_1, table_2).items(),
-                          key=lambda item: item[1], reverse=True))
+    matches = matcher.get_matches(table_1, table_2)
 
-    return matches
+    return MatcherResults(matches)
 
 
 def valentine_match_batch(df_iter_1: Iterable[pd.DataFrame],
@@ -50,6 +49,4 @@ def valentine_match_batch(df_iter_1: Iterable[pd.DataFrame],
             table_2 = valentine.data_sources.DataframeTable(df2, name=table_2_name)
             matches.update(matcher.get_matches(table_1, table_2))
 
-    matches = dict(sorted(matches.items(), key=lambda item: item[1], reverse=True))
-
-    return matches
+    return MatcherResults(matches)
