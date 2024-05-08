@@ -10,3 +10,7 @@ PuLP==2.7.0
 pyemd==1.0.0
 # data loading
 python-dateutil==2.8.2
+# testing
+valentine~=0.2.0
+pytest~=8.2.0
+setuptools~=65.5.1
