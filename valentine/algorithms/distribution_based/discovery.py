@@ -1,11 +1,10 @@
 from ast import literal_eval
+from multiprocessing import Pool
 from typing import List, Tuple
 
-import numpy as np
 import networkx as nx
+import numpy as np
 import pulp as plp
-from multiprocessing import Pool
-
 from pulp import PULP_CBC_CMD
 
 from .clustering_utils import column_combinations, transform_dict, process_emd, parallel_cutoff_threshold, \

@@ -1,6 +1,7 @@
 from statistics import quantiles
-from numpy import ndarray
+
 import numpy as np
+from numpy import ndarray
 
 
 class QuantileHistogram(object):
@@ -113,7 +114,7 @@ class QuantileHistogram(object):
         self.bucket_boundaries[0] = (min_val, bb[0])
         i = 0
         while i < len(bb) - 1:
-            self.bucket_boundaries[i+1] = (bb[i], bb[i+1])
+            self.bucket_boundaries[i + 1] = (bb[i], bb[i + 1])
             i = i + 1
 
     def add_values(self,

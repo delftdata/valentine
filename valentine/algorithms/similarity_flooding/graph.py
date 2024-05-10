@@ -1,8 +1,8 @@
 import networkx as nx
 
+from . import TABLE, COLUMN, COLUMN_TYPE
 from .node import Node
 from ...data_sources.base_table import BaseTable
-from . import TABLE, COLUMN, COLUMN_TYPE
 
 
 class Graph:
@@ -72,6 +72,3 @@ class Graph:
     def create_graph(self):
         for column in self.schema.get_columns():
             self.add_and_connect(column)
-
-
-

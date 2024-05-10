@@ -1,9 +1,12 @@
 import os
+import pprint
+
 import pandas as pd
-from valentine.metrics import F1Score, PrecisionTopNPercent
+
 from valentine import valentine_match
 from valentine.algorithms import JaccardDistanceMatcher
-import pprint
+from valentine.metrics import F1Score, PrecisionTopNPercent
+
 pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
 

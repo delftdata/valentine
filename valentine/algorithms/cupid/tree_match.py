@@ -1,6 +1,7 @@
 import math
 from itertools import product
 from typing import Dict, Tuple
+
 from anytree import PostOrderIter, LevelOrderIter
 
 from .linguistic_matching import compute_compatibility, comparison, compute_lsim

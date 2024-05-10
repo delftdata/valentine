@@ -1,5 +1,6 @@
-import chardet
 import csv
+
+import chardet
 from dateutil.parser import parse
 
 

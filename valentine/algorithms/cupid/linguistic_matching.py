@@ -1,18 +1,20 @@
 import math
-import re
 import operator
+import re
 import string
 from itertools import product, repeat, combinations_with_replacement
 from multiprocessing import get_context
+
 import nltk
 from anytree import LevelOrderIter
+from jellyfish import levenshtein_distance
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet as wn
-from jellyfish import levenshtein_distance
 
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
 from ...utils.utils import normalize_distance
+
 
 def snakecase_convert(name):
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
@@ -122,7 +124,7 @@ def generate_parallel_l_sim_input(source_tree,
     all_nodes = product(all_nodes_s, all_nodes_t)
     for pair in all_nodes:
         if pair[0].categories[0] in compatibility_table and \
-            pair[1].categories[0] in compatibility_table[pair[0].categories[0]] and \
+                pair[1].categories[0] in compatibility_table[pair[0].categories[0]] and \
                 compatibility_table[pair[0].categories[0]][pair[1].categories[0]] > th_ns:
             yield pair
 

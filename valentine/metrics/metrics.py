@@ -2,9 +2,10 @@
 made by subclassing the `Metric` ABC. Marking them with the dataclass decorator
 allows for proper hashing/equals without the boilerplate.
 """
+from dataclasses import dataclass
+
 from .base_metric import Metric
 from .metric_helpers import *
-from dataclasses import dataclass
 
 
 @dataclass(eq=True, frozen=True)

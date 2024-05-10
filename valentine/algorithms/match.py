@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Dict, Tuple
 
@@ -7,7 +8,7 @@ from typing import Dict, Tuple
 class Match:
     """
     Class representing a match of two columns. target is the one we want to
-    find the matches of, source an other that exists in the database and the
+    find the matches of, source another that exists in the database and the
     similarity between the two.
 
     NOTE: Use the to_dict method when you want to append a match to a list of

@@ -1,6 +1,6 @@
 import tempfile
-from multiprocessing import Pool, get_context
 from itertools import combinations
+from multiprocessing import Pool, get_context
 from typing import List
 
 from . import discovery

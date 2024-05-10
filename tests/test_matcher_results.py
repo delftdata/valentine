@@ -1,11 +1,11 @@
-import unittest
 import math
+import unittest
 
 from tests import df1, df2
-from valentine.algorithms.matcher_results import MatcherResults
-from valentine.algorithms import JaccardDistanceMatcher
-from valentine.metrics import Precision
 from valentine import valentine_match
+from valentine.algorithms import JaccardDistanceMatcher
+from valentine.algorithms.matcher_results import MatcherResults
+from valentine.metrics import Precision
 
 
 class TestMatcherResults(unittest.TestCase):
@@ -55,7 +55,7 @@ class TestMatcherResults(unittest.TestCase):
         assert m_one_to_one != m_entry_one_to_one
 
         # Verify that all remaining values are above the median
-        median = sorted(list(m_entry.values()), reverse=True)[math.ceil(len(m_entry)/2)]
+        median = sorted(list(m_entry.values()), reverse=True)[math.ceil(len(m_entry) / 2)]
         for k in m_entry_one_to_one:
             assert m_entry_one_to_one[k] >= median
 
@@ -79,7 +79,7 @@ class TestMatcherResults(unittest.TestCase):
         take_all = self.matches.take_top_n(len(self.matches))
         assert len(take_all) == len(self.matches)
 
-        take_more_than_all = self.matches.take_top_n(len(self.matches)+1)
+        take_more_than_all = self.matches.take_top_n(len(self.matches) + 1)
         assert len(take_more_than_all) == len(self.matches)
 
     def test_copy(self):

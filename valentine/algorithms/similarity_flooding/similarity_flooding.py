@@ -1,13 +1,13 @@
+import math
 from typing import Dict, Tuple
 
 from jellyfish import levenshtein_distance
-import math
 
 from .graph import Graph
 from .node_pair import NodePair
 from .propagation_graph import PropagationGraph
-from ..match import Match
 from ..base_matcher import BaseMatcher
+from ..match import Match
 from ...data_sources.base_table import BaseTable
 from ...utils.utils import normalize_distance
 
@@ -128,7 +128,7 @@ class SimilarityFlooding(BaseMatcher):
             next_map = self.__get_next_map(None, p_g, self.__formula)
             previous_map = next_map.copy()
 
-            for _ in range(0, num_iter-1):
+            for _ in range(0, num_iter - 1):
                 next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
                 euc_len = self.__get_euc_residual_vector(previous_map, next_map)
@@ -145,7 +145,7 @@ class SimilarityFlooding(BaseMatcher):
             next_map = self.__get_next_map(previous_map, p_g, 'formula_b')
             previous_map = next_map.copy()
 
-            for _ in range(0, num_iter-1):
+            for _ in range(0, num_iter - 1):
                 next_map = self.__get_next_map(previous_map, p_g, self.__formula)
 
                 euc_len = self.__get_euc_residual_vector(previous_map, next_map)
@@ -225,7 +225,6 @@ class SimilarityFlooding(BaseMatcher):
                 continue
 
             if not flag:
-
                 del filtered_map[key]
 
         return filtered_map

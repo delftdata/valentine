@@ -1,4 +1,5 @@
 import math
+
 from pyemd import emd
 
 from .column_model import CorrelationClusteringColumn
@@ -36,8 +37,8 @@ def quantile_emd(column1: CorrelationClusteringColumn,
                                    reference_hist=histogram1)
     if histogram2.is_empty:
         return math.inf
-    h1 = histogram1.get_values/histogram1.get_values.sum()
-    h2 = histogram2.get_values/histogram2.get_values.sum()
+    h1 = histogram1.get_values / histogram1.get_values.sum()
+    h2 = histogram2.get_values / histogram2.get_values.sum()
     return emd(h1, h2, histogram1.dist_matrix)
 
 

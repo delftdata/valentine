@@ -1,9 +1,9 @@
+from typing import Iterable, List, Union
+
 import pandas as pd
 
 import valentine.algorithms
 import valentine.data_sources
-
-from typing import Iterable, List, Union
 from valentine.algorithms.matcher_results import MatcherResults
 
 
@@ -21,7 +21,6 @@ def valentine_match(df1: pd.DataFrame,
                     matcher: valentine.algorithms.BaseMatcher,
                     df1_name: str = 'table_1',
                     df2_name: str = 'table_2'):
-
     validate_matcher(matcher)
 
     table_1 = valentine.data_sources.DataframeTable(df1, name=df1_name)
@@ -36,7 +35,6 @@ def valentine_match_batch(df_iter_1: Iterable[pd.DataFrame],
                           matcher: valentine.algorithms.BaseMatcher,
                           df_iter_1_names: Union[List[str], None] = None,
                           df_iter_2_names: Union[List[str], None] = None):
-
     validate_matcher(matcher)
 
     matches = {}

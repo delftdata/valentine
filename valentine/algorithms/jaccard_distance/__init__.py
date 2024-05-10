@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+
 class StringDistanceFunction(Enum):
     Levenshtein = auto()
     DamerauLevenshtein = auto()

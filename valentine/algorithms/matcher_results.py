@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 import math
+from typing import Dict, Tuple, List, Any, Set
+
 from ..metrics import METRICS_CORE
 from ..metrics.base_metric import Metric
-
-from typing import Dict, Tuple, List, Any, Set
 
 
 class MatcherResults(dict):
@@ -24,7 +25,7 @@ class MatcherResults(dict):
 
     def __init__(self: MatcherResults, res: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float], *args, **kwargs):
         self._cached_one_to_one = None
-        sorted_res = {k:res[k] for k in sorted(res, key=res.get, reverse=True)}
+        sorted_res = {k: res[k] for k in sorted(res, key=res.get, reverse=True)}
         dict.__init__(self, sorted_res, *args, **kwargs)
 
     def one_to_one(self: MatcherResults) -> MatcherResults:
@@ -32,7 +33,7 @@ class MatcherResults(dict):
         to 1 matches. The filter works in the following way: At first it
         gets the median similarity of the set of the values and removes all
         matches that have a similarity lower than that. Then from what
-        remained it matches columns for me highest similarity to the lowest
+        remained it matches columns from the highest similarity to the lowest
         till the columns have at most one match.
 
         Once calculated, the one-to-one matches are cached, to avoid redundant
@@ -61,7 +62,7 @@ class MatcherResults(dict):
             matched[key[1]] = False
 
         median = sorted(set_match_values, reverse=True)[
-            math.ceil(len(set_match_values)/2)]
+            math.ceil(len(set_match_values) / 2)]
 
         matches1to1_dict = dict()
 
@@ -120,10 +121,11 @@ class MatcherResults(dict):
         """
         matches = self.get_copy()
         matches = dict(sorted(matches.items(),
-                            key=lambda x: x[1], reverse=True)[:n])
+                              key=lambda x: x[1], reverse=True)[:n])
         return MatcherResults(matches)
 
-    def get_metrics(self: MatcherResults, ground_truth: List[Tuple[str, str]], metrics: Set[Metric] = METRICS_CORE) -> Dict[str, Any]:
+    def get_metrics(self: MatcherResults, ground_truth: List[Tuple[str, str]], metrics: Set[Metric] = METRICS_CORE) -> \
+            Dict[str, Any]:
         """Summary
         Given ground truth column matches and a set of metric instances, this
         method will calculate scores for these metrics. Metrics can be imported

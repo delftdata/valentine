@@ -13,26 +13,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install Valentine
-      run: pip install .
+      - name: Install Valentine
+        run: pip install .
 
-    - name: Install Coverage
-      run: pip install coverage
+      - name: Install Coverage
+        run: pip install coverage
 
-    - name: Install Pytest
-      run: pip install pytest==8.2.0
+      - name: Install Pytest
+        run: pip install pytest==8.2.0
 
-    - name: Run Tests
-      run: coverage run --source=valentine -m pytest tests/
+      - name: Run Tests
+        run: coverage run --source=valentine -m pytest tests/
 
-    - name: Generate Coverage Report
-      run: coverage xml
+      - name: Generate Coverage Report
+        run: coverage xml
 
-    - name: "Upload coverage to Codecov"
-      uses: codecov/codecov-action@v4
-      with:
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
-        verbose: true
+      - name: "Upload coverage to Codecov"
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
