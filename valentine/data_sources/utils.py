@@ -66,6 +66,3 @@ def add_noise_to_df_column(df, column_name, noise_level):
             if np.random.rand() < noise_level:
                 df[column_name] = df[column_name].apply(lambda x: ''.join(np.random.permutation(list(str(x)))))
     return df
-
-# if __name__ == "__main__":
-#     add_noise_to_df_column(pd.DataFrame({'a': [1, 2, 3], 'b': ['abcdefg', 'hijklmn', 'opqrst']}), 'b', 0.99)
