@@ -1,5 +1,7 @@
-import chardet
 import csv
+
+import chardet
+import numpy as np
 from dateutil.parser import parse
 
 
@@ -40,3 +42,30 @@ def is_date(string, fuzzy=False):
         return True
     except Exception:
         return False
+
+
+def add_noise_to_df_column(df, column_name, noise_level):
+    """
+    Adds noise to a specified column in a DataFrame.
+
+    Parameters:
+    - df (pd.DataFrame): The DataFrame containing the column to which noise will be added.
+    - column_name (str): The name of the column to which noise will be added.
+    - noise_level (float): The level of noise to be added. For numerical columns, this indicates the standard deviation
+                           of the Gaussian noise. For string columns, it represents the probability of permuting the characters
+                           of each string.
+
+    Returns:
+    - pd.DataFrame: The DataFrame with noise added to the specified column.
+    """
+    if df[column_name].dtype in ["int64", "float64"]:
+        noise = np.random.normal(0, noise_level, df[column_name].shape[0])
+        df[column_name] = df[column_name] + noise
+    elif df[column_name].dtype == "object":
+        for i in range(df[column_name].shape[0]):
+            if np.random.rand() < noise_level:
+                df[column_name] = df[column_name].apply(lambda x: ''.join(np.random.permutation(list(str(x)))))
+    return df
+
+# if __name__ == "__main__":
+#     add_noise_to_df_column(pd.DataFrame({'a': [1, 2, 3], 'b': ['abcdefg', 'hijklmn', 'opqrst']}), 'b', 0.99)
