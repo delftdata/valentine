@@ -1,7 +1,9 @@
 import unittest
-from valentine.metrics import *
+
 from valentine.algorithms.matcher_results import MatcherResults
+from valentine.metrics import *
 from valentine.metrics.metric_helpers import get_fp, get_tp_fn
+
 
 class TestMetrics(unittest.TestCase):
     def setUp(self):
@@ -37,7 +39,7 @@ class TestMetrics(unittest.TestCase):
 
     def test_f1(self):
         f1 = self.matches.get_metrics(self.ground_truth, metrics={F1Score()})
-        assert 'F1Score' in f1 and round(100*f1['F1Score']) == 67
+        assert 'F1Score' in f1 and round(100 * f1['F1Score']) == 67
 
         f1_not_one_to_one = self.matches.get_metrics(self.ground_truth, metrics={F1Score(one_to_one=False)})
         assert 'F1Score' in f1_not_one_to_one and f1_not_one_to_one['F1Score'] == 0.6
@@ -51,10 +53,13 @@ class TestMetrics(unittest.TestCase):
 
         precision = self.matches.get_metrics(self.ground_truth, metrics={Precision()})
         precision_100 = self.matches.get_metrics(self.ground_truth, metrics={PrecisionTopNPercent(n=100)})
-        assert 'PrecisionTop100Percent' in precision_100 and precision_100['PrecisionTop100Percent'] == precision['Precision']
+        assert 'PrecisionTop100Percent' in precision_100 and precision_100['PrecisionTop100Percent'] == precision[
+            'Precision']
 
-        precision_70_not_one_to_one = self.matches.get_metrics(self.ground_truth, metrics={PrecisionTopNPercent(n=70, one_to_one=False)})
-        assert 'PrecisionTop70Percent' in precision_70_not_one_to_one and precision_70_not_one_to_one['PrecisionTop70Percent'] == 0.75
+        precision_70_not_one_to_one = self.matches.get_metrics(self.ground_truth,
+                                                               metrics={PrecisionTopNPercent(n=70, one_to_one=False)})
+        assert 'PrecisionTop70Percent' in precision_70_not_one_to_one and precision_70_not_one_to_one[
+            'PrecisionTop70Percent'] == 0.75
 
     def test_recall_at_size_of_ground_truth(self):
         recall = self.matches.get_metrics(self.ground_truth, metrics={RecallAtSizeofGroundTruth()})

@@ -3,11 +3,10 @@ from multiprocessing import get_context
 from typing import Dict, Tuple
 
 from jellyfish import levenshtein_distance, damerau_levenshtein_distance, \
-                      jaro_similarity, jaro_winkler_similarity, hamming_distance
-
-from ..jaccard_distance import StringDistanceFunction
+    jaro_similarity, jaro_winkler_similarity, hamming_distance
 
 from ..base_matcher import BaseMatcher
+from ..jaccard_distance import StringDistanceFunction
 from ..match import Match
 from ...data_sources.base_table import BaseTable
 from ...utils.utils import normalize_distance
@@ -76,10 +75,9 @@ class JaccardDistanceMatcher(BaseMatcher):
             target_column_name, _, source_table_name, _, \
             _, source_column_name, _, distance_function = tup
 
-        if len(set(source_data)) < len(set(target_data)):
-            set1 = set(source_data)
-            set2 = set(target_data)
-        else:
+        set1 = set(source_data)
+        set2 = set(target_data)
+        if len(set(source_data)) > len(set(target_data)):
             set1 = set(target_data)
             set2 = set(source_data)
 
@@ -130,10 +128,10 @@ class JaccardDistanceMatcher(BaseMatcher):
                                   distance_function: StringDistanceFunction):
         for source_column, target_column in product(source_table.get_columns(), target_table.get_columns()):
             yield source_column.data, target_column.data, threshold, target_id, \
-                  target_table.name, target_table.unique_identifier, \
-                  target_column.name, target_column.unique_identifier, \
-                  source_table.name, source_table.unique_identifier, source_id, \
-                  source_column.name, source_column.unique_identifier, distance_function
+                target_table.name, target_table.unique_identifier, \
+                target_column.name, target_column.unique_identifier, \
+                source_table.name, source_table.unique_identifier, source_id, \
+                source_column.name, source_column.unique_identifier, distance_function
 
     @staticmethod
     def __get_set_combinations(set1: set,

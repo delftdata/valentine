@@ -1,10 +1,9 @@
 import unittest
 
-from valentine.data_sources import DataframeTable
-
-from valentine import valentine_match, valentine_match_batch, NotAValentineMatcher
 from tests import df1, df2
+from valentine import valentine_match, valentine_match_batch, NotAValentineMatcher
 from valentine.algorithms import JaccardDistanceMatcher
+from valentine.data_sources import DataframeTable
 
 
 class TestValentine(unittest.TestCase):
@@ -40,5 +39,6 @@ class TestValentine(unittest.TestCase):
         assert len(matches) > 0
 
     def test_batch_names(self):
-        matches = valentine_match_batch([df1, df1], [df2, df2], JaccardDistanceMatcher(), ['ta1', 'tb1'], ['ta2', 'tb2'])
+        matches = valentine_match_batch([df1, df1], [df2, df2], JaccardDistanceMatcher(), ['ta1', 'tb1'],
+                                        ['ta2', 'tb2'])
         assert len(matches) > 0

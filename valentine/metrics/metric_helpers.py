@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ..algorithms.matcher_results import MatcherResults
 from typing import Tuple, List

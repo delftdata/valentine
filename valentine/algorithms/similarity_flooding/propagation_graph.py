@@ -17,7 +17,7 @@ class PropagationGraph(object):
     @staticmethod
     def __inverse_label_values(labels, m=1.0):
         for key, value in labels.items():
-            labels[key] = m/value
+            labels[key] = m / value
 
     def __add_propagation_edges(self, c_graph, p_graph, node, case_in):
 

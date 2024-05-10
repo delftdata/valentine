@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 import tempfile
 import time
 from typing import AnyStr, Dict, Tuple

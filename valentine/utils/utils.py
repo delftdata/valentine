@@ -38,7 +38,7 @@ def normalize_distance(dist: int,
         The second string
     """
 
-    return 1 - dist/max(max(len(str1), len(str2)), 1)
+    return 1 - dist / max(max(len(str1), len(str2)), 1)
 
 
 def get_project_root():

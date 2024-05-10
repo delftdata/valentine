@@ -1,7 +1,7 @@
 import os
+import pickle
 
 import numpy as np
-import pickle
 
 from ...data_sources.base_column import BaseColumn
 from ...utils.utils import convert_data_type
@@ -28,6 +28,7 @@ class CorrelationClusteringColumn(BaseColumn):
     get_original_data()
         Returns the original data instances
     """
+
     def __init__(self,
                  name: str,
                  column_uid: str,

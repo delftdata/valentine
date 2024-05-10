@@ -34,10 +34,10 @@ class Cupid(BaseMatcher):
     def get_matches(self,
                     source_input: BaseTable,
                     target_input: BaseTable) -> Dict[Tuple[Tuple[str, str], Tuple[str, str]], float]:
-        self.__add_data("DB__"+source_input.name, source_input)
-        self.__add_data("DB__"+target_input.name, target_input)
-        source_tree = self.__get_schema_by_name("DB__"+source_input.name)
-        target_tree = self.__get_schema_by_name("DB__"+target_input.name)
+        self.__add_data("DB__" + source_input.name, source_input)
+        self.__add_data("DB__" + target_input.name, target_input)
+        source_tree = self.__get_schema_by_name("DB__" + source_input.name)
+        target_tree = self.__get_schema_by_name("DB__" + target_input.name)
         sims = tree_match(source_tree, target_tree, self.__categories, self.__leaf_w_struct, self.__w_struct,
                           self.__th_accept, self.__th_high, self.__th_low, self.__c_inc, self.__c_dec,
                           self.__th_ns, self.__parallelism)

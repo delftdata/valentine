@@ -42,7 +42,7 @@ class BaseTable(ABC):
         raise NotImplementedError
 
     def get_guid_column_lookup(self) -> Dict[str, object]:
-        return {column.name:  column.unique_identifier for column in self.get_columns()}
+        return {column.name: column.unique_identifier for column in self.get_columns()}
 
     @staticmethod
     def get_data_type(data: list, d_type: str) -> str:

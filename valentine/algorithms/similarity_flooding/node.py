@@ -12,7 +12,6 @@ class Node:
         self.long_name = (table_name, table_guid, column_name, column_guid)
 
     def __eq__(self, other):
-
         if isinstance(other, Node):
             return self.name == other.name and self.db == other.db
 
