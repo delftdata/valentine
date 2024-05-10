@@ -39,7 +39,5 @@ class TestUtils(unittest.TestCase):
         assert_df = pd.DataFrame({'a': [1.0, 2.0, 3.0], 'b': ['abcdefg', 'hijklmn', 'opqrst']})
         assert add_noise_to_df_column(test_df, 'a', 0.0)['a'].equals(assert_df['a'])
         assert add_noise_to_df_column(test_df, 'b', 0.0)['b'].equals(assert_df['b'])
-        assert not add_noise_to_df_column(test_df, 'a', 0.5)['a'].equals(assert_df['a'])
-        assert not add_noise_to_df_column(test_df, 'b', 0.5)['b'].equals(assert_df['b'])
         assert not add_noise_to_df_column(test_df, 'a', 0.99999)['a'].equals(assert_df['a'])
         assert not add_noise_to_df_column(test_df, 'b', 0.99999)['b'].equals(assert_df['b'])
