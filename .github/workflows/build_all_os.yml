@@ -25,5 +25,7 @@ jobs:
           java-version: '11'
       - name: Install valentine
         run: pip install .
-      - name: run tests
+      - name: Install test dependencies
+        run: pip install pytest==8.2.0
+      - name: Run tests
         run: python -m unittest discover tests

@@ -21,6 +21,9 @@ jobs:
     - name: install coverage
       run: pip install coverage
 
+    - name: install pytest
+      run: pip install pytest==8.2.0
+
     - name: run tests
       run: coverage run --source=valentine -m unittest discover tests
 

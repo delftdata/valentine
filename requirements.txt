@@ -10,3 +10,5 @@ PuLP==2.7.0
 pyemd==1.0.0
 # data loading
 python-dateutil==2.8.2
+# testing
+pytest~=8.2.0
