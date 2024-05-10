@@ -15,19 +15,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: install valentine
+    - name: Install Valentine
       run: pip install .
 
-    - name: install coverage
+    - name: Install Coverage
       run: pip install coverage
 
-    - name: install pytest
+    - name: Install Pytest
       run: pip install pytest==8.2.0
 
-    - name: run tests
-      run: coverage run --source=valentine -m pytest discover tests
+    - name: Run Tests
+      run: coverage run --source=valentine -m pytest tests/
 
-    - name: Generate coverage report
+    - name: Generate Coverage Report
       run: coverage xml
 
     - name: "Upload coverage to Codecov"
