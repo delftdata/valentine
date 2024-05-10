@@ -52,8 +52,8 @@ def add_noise_to_df_column(df, column_name, noise_level):
     - df (pd.DataFrame): The DataFrame containing the column to which noise will be added.
     - column_name (str): The name of the column to which noise will be added.
     - noise_level (float): The level of noise to be added. For numerical columns, this indicates the standard deviation
-                           of the Gaussian noise. For string columns, it represents the probability of permuting the characters
-                           of each string.
+                            of the Gaussian noise. For string columns, it represents the probability of permuting the
+                            characters of each string.
 
     Returns:
     - pd.DataFrame: The DataFrame with noise added to the specified column.
@@ -62,7 +62,7 @@ def add_noise_to_df_column(df, column_name, noise_level):
         noise = np.random.normal(0, noise_level, df[column_name].shape[0])
         df[column_name] = df[column_name] + noise
     elif df[column_name].dtype == "object":
-        for i in range(df[column_name].shape[0]):
+        for _ in range(df[column_name].shape[0]):
             if np.random.rand() < noise_level:
                 df[column_name] = df[column_name].apply(lambda x: ''.join(np.random.permutation(list(str(x)))))
     return df
