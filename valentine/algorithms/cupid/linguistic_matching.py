@@ -26,7 +26,7 @@ def normalization(element,
     try:
         tokens = nltk.word_tokenize(element)
     except LookupError:
-        nltk.download('punkt')
+        nltk.download('punkt_tab')
         nltk.download('omw-1.4')
         nltk.download('stopwords')
         nltk.download('wordnet')
@@ -195,7 +195,7 @@ def compute_similarity_wordnet(word1,
     try:
         wn_lemmas = set(wn.all_lemma_names())
     except LookupError:
-        nltk.download('punkt')
+        nltk.download('punkt_tab')
         nltk.download('omw-1.4')
         nltk.download('stopwords')
         nltk.download('wordnet')
