@@ -17,7 +17,7 @@ classifiers = [
 
 setuptools.setup(
     name='valentine',
-    version='0.2.0',
+    version='0.2.1',
     description='Valentine Matcher',
     classifiers=classifiers,
     license_files=('LICENSE',),
@@ -26,13 +26,13 @@ setuptools.setup(
     maintainer='Delft Data',
     maintainer_email='delftdatasystems@gmail.com',
     url='https://delftdata.github.io/valentine/',
-    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.2.0.tar.gz',
+    download_url='https://github.com/delftdata/valentine/archive/refs/tags/v0.2.1.tar.gz',
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'setuptools',
         'numpy>=1.22,<2.0',
         'pandas>=1.3,<2.2',
-        'nltk>=3.6,<4.0',
+        'nltk>=3.9.1,<4.0',
         'anytree>=2.9,<3.0',
         'networkx>=2.8,<4.0',
         'chardet>=5.2.0,<6.0.0',
