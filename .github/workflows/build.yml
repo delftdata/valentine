@@ -22,7 +22,7 @@ jobs:
       run: pip install coverage
 
     - name: Install Pytest
-      run: pip install pytest==8.2.0
+      run: pip install pytest==8.3.3
 
     - name: Run Tests
       run: coverage run --source=valentine -m pytest tests/

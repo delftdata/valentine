@@ -1,14 +1,14 @@
 # algorithms
-numpy==1.26.0
-pandas==2.1.1
+numpy==2.1.2
+pandas==2.2.3
 nltk==3.9.1
-anytree==2.10.0
-networkx==3.1
+anytree==2.12.1
+networkx==3.4.2
 chardet==5.2.0
-jellyfish==1.0.1
-PuLP==2.7.0
+jellyfish==1.1.0
+PuLP==2.9.0
 pyemd==1.0.0
 # data loading
-python-dateutil==2.8.2
+python-dateutil==2.9.0
 # testing
-pytest~=8.2.0
+pytest~=8.3.3
