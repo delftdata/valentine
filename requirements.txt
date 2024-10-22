@@ -1,5 +1,5 @@
 # algorithms
-numpy==2.1.2
+numpy==1.26.4
 pandas==2.2.3
 nltk==3.9.1
 anytree==2.12.1
