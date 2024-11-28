@@ -1,5 +1,5 @@
 import math
-from pyemd import emd
+from ot import emd2
 
 from .column_model import CorrelationClusteringColumn
 from .quantile_histogram import QuantileHistogram
@@ -38,7 +38,7 @@ def quantile_emd(column1: CorrelationClusteringColumn,
         return math.inf
     h1 = histogram1.get_values/histogram1.get_values.sum()
     h2 = histogram2.get_values/histogram2.get_values.sum()
-    return emd(h1, h2, histogram1.dist_matrix)
+    return emd2(h1, h2, histogram1.dist_matrix)
 
 
 def intersection_emd(column1: CorrelationClusteringColumn,

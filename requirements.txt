@@ -7,7 +7,7 @@ networkx==3.4.2
 chardet==5.2.0
 jellyfish==1.1.0
 PuLP==2.9.0
-pyemd==1.0.0
+POT==0.9.5
 # data loading
 python-dateutil==2.9.0
 # testing

@@ -30,7 +30,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'setuptools',
-        'numpy>=1.22,<2.0',
+        'numpy>=1.22,<3.0',
         'pandas>=1.3,<2.3',
         'nltk>=3.9.1,<4.0',
         'anytree>=2.9,<3.0',
@@ -38,7 +38,7 @@ setuptools.setup(
         'chardet>=5.2.0,<6.0.0',
         'jellyfish>=0.9,<1.2',
         'PuLP>=2.5,<3.0',
-        'pyemd>=1.0.0,<2.0',
+        'POT>=0.9.5,<1.0',
         'python-dateutil>=2.8,<3.0',
     ],
     keywords=['matching', 'valentine', 'schema matching', 'dataset discovery', 'coma', 'cupid', 'similarity flooding'],
