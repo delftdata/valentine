@@ -30,7 +30,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=('tests*', 'examples*')),
     install_requires=[
         'setuptools',
-        'numpy>=2.1.3,<3.0',
+        'numpy>=2.0,<3.0',
         'pandas>=1.3,<2.3',
         'nltk>=3.9.1,<4.0',
         'anytree>=2.9,<3.0',
