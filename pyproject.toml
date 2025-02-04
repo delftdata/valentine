@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "valentine"
+version = "0.3.0"
+description = "Valentine Matcher"
+readme = "README.md"
+authors = [
+    { name = "Delft Data", email = "delftdatasystems@gmail.com" }
+]
+maintainers = [
+    { name = "Delft Data", email = "delftdatasystems@gmail.com" }
+]
+license = { file = "LICENSE" }
+
+classifiers = [
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+]
+
+requires-python = ">=3.9,<3.14"
+dependencies = [
+    "numpy>=2.0,<3.0",
+    "pandas>=1.3,<2.3",
+    "nltk>=3.9.1,<4.0",
+    "anytree>=2.9,<3.0",
+    "networkx>=2.8,<4.0",
+    "chardet>=5.2.0,<6.0.0",
+    "jellyfish>=0.9,<1.2",
+    "PuLP>=2.5,<3.0",
+    "POT>=0.9.5,<1.0",
+    "python-dateutil>=2.8,<3.0"
+]
+
+[project.urls]
+Homepage = "https://delftdata.github.io/valentine/"
+Download = "https://github.com/delftdata/valentine/archive/refs/tags/v0.3.0.tar.gz"
+
+[tool.setuptools]
+packages = ["valentine"]
+
+[tool.setuptools.package-data]
+"valentine" = ["coma.jar"]
