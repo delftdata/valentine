@@ -40,13 +40,13 @@ In order to do so, the user can choose one of the following 5 matching methods:
            *    **use_instances**(*bool*) - Wheather Coma will make use of the data instances or just the schema information, (default: False).
            *    **java_xmx**(*str*) - The amount of RAM that Coma is allowed to use, (default: "1024m") .
 
-2.   `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.79.4079&rep=rep1&type=pdf)
+2.   `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](https://www.vldb.org/conf/2001/P049.pdf)
      *    **Parameters**:
           *    **w_struct**(*float*) - Structural similarity threshold, default is 0.2.
           *    **leaf_w_struct**(*float*) - Structural similarity threshold, leaf level, default is 0.2.
           *    **th_accept**(*float*) - Accept similarity threshold, default is 0.7.
 
-3.   `DistributionBased(float: threshold1, float: threshold2)` is the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl-acm-org.tudelft.idm.oclc.org/doi/pdf/10.1145/1989323.1989336)
+3.   `DistributionBased(float: threshold1, float: threshold2)` is the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl.acm.org/doi/10.1145/1989323.1989336)
      *    **Parameters**: 
           *    **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
           *    **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
@@ -63,7 +63,7 @@ In order to do so, the user can choose one of the following 5 matching methods:
                * `StringDistanceFunction.JaroWinkler`: [Jaro-Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
               * `StringDistanceFunction.Exact`: String equality `==`
 
-5.   `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](http://p8090-ilpubs.stanford.edu.tudelft.idm.oclc.org/730/1/2002-1.pdf)
+5.   `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](https://ieeexplore.ieee.org/document/994702)
      * **Parameters**: 
         *    **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
         *    **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
