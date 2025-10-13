@@ -1,5 +1,5 @@
-from valentine.metrics.base_metric import Metric
-from .metrics import *
+from .base_metric import Metric
+from .metrics import Precision, Recall, F1Score, PrecisionTopNPercent, RecallAtSizeofGroundTruth
 
 # Some predefined sets of metrics
 METRICS_ALL = {metric() for metric in Metric.__subclasses__()}  # Note: will also catch newly defined metrics
