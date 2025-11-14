@@ -1,0 +1,18 @@
+#!/bin/sh
+echo "🔍 Running tests before commit..."
+
+# activate venv if needed
+if [ -f ".venv/bin/activate" ]; then
+    . .venv/bin/activate
+fi
+
+pytest tests
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+    echo "❌ Tests failed. Commit aborted."
+    exit 1
+fi
+
+echo "✔️ Tests passed. Proceeding with commit."
+exit 0

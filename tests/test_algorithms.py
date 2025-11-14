@@ -1,3 +1,4 @@
+import nltk
 import pytest
 
 from tests import df1, df2
@@ -23,7 +24,23 @@ def test_coma():
     # Assume the Schema and instance should provide different results
     assert matches_coma_matcher_schema != matches_coma_matcher_instances
 
+def _has_nltk_data():
+    # Check only what this test actually needs
+    needed = [
+        "tokenizers/punkt_tab/english/",  # tokenizer
+        "corpora/wordnet",                # wordnet
+        "corpora/omw-1.4",                # multilingual wordnet
+        "corpora/stopwords",              # stopwords
+    ]
+    for res in needed:
+        try:
+            nltk.data.find(res)
+        except LookupError:
+            return False
+    return True
 
+
+@pytest.mark.skipif(not _has_nltk_data(), reason="Required NLTK data not installed")
 def test_cupid():
     # Test the CUPID matcher
     cu_matcher = Cupid()
