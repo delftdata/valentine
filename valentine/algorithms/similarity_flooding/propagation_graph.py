@@ -128,7 +128,8 @@ class PropagationGraph:
         if self.policy == "inverse_average":
             return self.__construct_inverse_average(c_g, p_g)
 
-        raise ValueError(f"Unknown policy: {self.policy}")
+        print("Wrong policy!")
+        return {}
 
     @staticmethod
     def __initialize_graph(c_g):
