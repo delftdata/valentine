@@ -186,8 +186,6 @@ class QuantileHistogram:
         q = np.array(list(range(1, self.n_buckets + 1))) / self.n_buckets
         dist = []
         for i in q:
-            temp = []
-            for j in q:
-                temp.append(abs(i - j))
+            temp = [abs(i - j) for j in q]
             dist.append(temp)
         return np.array(dist)

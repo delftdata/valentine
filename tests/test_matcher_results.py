@@ -22,7 +22,7 @@ class TestMatcherResults(unittest.TestCase):
 
     def test_get_metrics(self):
         metrics = self.matches.get_metrics(self.ground_truth)
-        assert all(x in metrics for x in {"Precision", "Recall", "F1Score"})
+        assert all(x in metrics for x in ("Precision", "Recall", "F1Score"))
 
         metrics_specific = self.matches.get_metrics(self.ground_truth, metrics={Precision()})
         assert "Precision" in metrics_specific

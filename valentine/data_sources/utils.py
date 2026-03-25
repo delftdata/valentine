@@ -38,6 +38,7 @@ def is_date(string, fuzzy=False):
     """
     try:
         parse(str(string), fuzzy=fuzzy)
-        return True
     except Exception:
         return False
+    else:
+        return True

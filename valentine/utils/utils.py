@@ -6,9 +6,8 @@ def is_sorted(matches: dict):
     for value in matches.values():
         if prev is None:
             prev = value
-        else:
-            if prev > value:
-                return False
+        elif prev > value:
+            return False
     return True
 
 
@@ -17,9 +16,10 @@ def convert_data_type(string: str):
         f = float(string)
         if f.is_integer():
             return int(f)
-        return f
     except ValueError:
         return string
+    else:
+        return f
 
 
 def normalize_distance(dist: int, str1: str, str2: str):
@@ -36,7 +36,7 @@ def normalize_distance(dist: int, str1: str, str2: str):
         The second string
     """
 
-    return 1 - dist / max(max(len(str1), len(str2)), 1)
+    return 1 - dist / max(len(str1), len(str2), 1)
 
 
 def get_project_root():

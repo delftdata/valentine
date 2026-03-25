@@ -227,7 +227,6 @@ class JaccardDistanceMatcher(BaseMatcher):
             if normalize:
                 if normalize_distance(dist, s1, str_s2) >= threshold:
                     return 1
-            else:
-                if dist >= threshold:
-                    return 1
+            elif dist >= threshold:
+                return 1
         return 0

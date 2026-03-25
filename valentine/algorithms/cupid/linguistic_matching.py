@@ -68,9 +68,10 @@ def normalization(element, schema_element=None):
 def add_token_type(token: Token):
     try:
         float(token.data)
-        return TokenTypes.NUMBER
     except ValueError:
         return TokenTypes.CONTENT
+    else:
+        return TokenTypes.NUMBER
 
 
 def compute_compatibility(categories):
@@ -180,8 +181,7 @@ def get_partial_similarity(token_set1, token_set2):
                 if math.isnan(sim):
                     sim = compute_similarity_leven(t1.data, t2.data)
 
-            if sim > max_sim:
-                max_sim = sim
+            max_sim = max(max_sim, sim)
 
         total_sum = total_sum + max_sim
 
@@ -256,7 +256,6 @@ def get_max_ns_category(categories_e1, categories_e2):
             c2_tokens = [Token().add_data(t) for t in nltk.word_tokenize(c2)]
             name_similarity_categories = name_similarity_tokens(c1_tokens, c2_tokens)
 
-            if name_similarity_categories > max_category:
-                max_category = name_similarity_categories
+            max_category = max(max_category, name_similarity_categories)
 
     return max_category

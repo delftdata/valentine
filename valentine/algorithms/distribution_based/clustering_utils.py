@@ -1,8 +1,10 @@
 import os
 import pickle
 import subprocess
+from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
+from itertools import product
 from pathlib import Path
 from typing import Any
 
@@ -69,9 +71,6 @@ def column_combinations(
     tuple
         A tuple with ((column_name1, column_name1), quantiles, intersection)
     """
-    from collections import defaultdict
-    from itertools import product
-
     groups: dict[Any, list[tuple[Any, Any, Any, Any]]] = defaultdict(list)
     for item in columns:
         _, table_guid, _, _ = item

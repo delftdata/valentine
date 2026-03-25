@@ -120,63 +120,68 @@ class PropagationGraph:
         return in_labels1, in_labels2, out_labels1, out_labels2
 
     def construct_graph(self):
-
         c_g = self.__construct_connectivity_graph()
-        # initialize the similarity propagation graph
-        p_g = nx.DiGraph()
+        p_g = self.__initialize_graph(c_g)
 
-        for n in c_g.nodes():
-            p_g.add_node(n)
-        # inverse product strategy for computing propagation coefficients as described in the paper
         if self.policy == "inverse_product":
-            for node in p_g.nodes():
-                p_g = self.__add_propagation_edges(c_g, p_g, node, case_in=True)
-                p_g = self.__add_propagation_edges(c_g, p_g, node, case_in=False)
-        # inverse average strategy for computing propagation coefficients as described in the paper
-        elif self.policy == "inverse_average":
-            for n in p_g.nodes():
-                if n.node1 in self.graph1.nodes():
-                    in_labels1, in_labels2, out_labels1, out_labels2 = self.__create_label_dicts(
-                        self.graph1, self.graph2, n
-                    )
-                else:
-                    in_labels1, in_labels2, out_labels1, out_labels2 = self.__create_label_dicts(
-                        self.graph2, self.graph1, n
-                    )
+            return self.__construct_inverse_product(c_g, p_g)
+        if self.policy == "inverse_average":
+            return self.__construct_inverse_average(c_g, p_g)
 
-                in_labels = in_labels1.copy()
-                out_labels = out_labels1.copy()
+        raise ValueError(f"Unknown policy: {self.policy}")
 
-                for key in in_labels2:
-                    if key in in_labels:
-                        in_labels[key] += in_labels2[key]
-                    else:
-                        in_labels[key] = in_labels2[key]
+    @staticmethod
+    def __initialize_graph(c_g):
+        p_g = nx.DiGraph()
+        p_g.add_nodes_from(c_g.nodes())
+        return p_g
 
-                for key in out_labels2:
-                    if key in out_labels:
-                        out_labels[key] += out_labels2[key]
-                    else:
-                        out_labels[key] = out_labels2[key]
+    def __construct_inverse_product(self, c_g, p_g):
+        for node in p_g.nodes():
+            p_g = self.__add_propagation_edges(c_g, p_g, node, case_in=True)
+            p_g = self.__add_propagation_edges(c_g, p_g, node, case_in=False)
+        return p_g
 
-                self.__inverse_label_values(in_labels, m=2.0)
-                self.__inverse_label_values(out_labels, m=2.0)
+    def __construct_inverse_average(self, c_g, p_g):
+        for n in p_g.nodes():
+            in_labels, out_labels = self.__compute_labels(n)
 
-                for e in c_g.in_edges(n):
-                    edge_data = c_g.get_edge_data(e[0], e[1])
+            self.__inverse_label_values(in_labels, m=2.0)
+            self.__inverse_label_values(out_labels, m=2.0)
 
-                    label = edge_data.get("label")
-
-                    p_g.add_edge(e[1], e[0], weight=in_labels[label])
-
-                for e in c_g.out_edges(n):
-                    edge_data = c_g.get_edge_data(e[0], e[1])
-
-                    label = edge_data.get("label")
-
-                    p_g.add_edge(e[0], e[1], weight=out_labels[label])
-        else:
-            print("Wrong policy!")
-            return {}
+            self.__add_in_edges(c_g, p_g, n, in_labels)
+            self.__add_out_edges(c_g, p_g, n, out_labels)
 
         return p_g
+
+    def __compute_labels(self, n):
+        if n.node1 in self.graph1.nodes():
+            g1, g2 = self.graph1, self.graph2
+        else:
+            g1, g2 = self.graph2, self.graph1
+
+        in1, in2, out1, out2 = self.__create_label_dicts(g1, g2, n)
+
+        in_labels = self.__merge_dicts(in1, in2)
+        out_labels = self.__merge_dicts(out1, out2)
+
+        return in_labels, out_labels
+
+    @staticmethod
+    def __merge_dicts(d1, d2):
+        result = d1.copy()
+        for k, v in d2.items():
+            result[k] = result.get(k, 0) + v
+        return result
+
+    @staticmethod
+    def __add_in_edges(c_g, p_g, node, in_labels):
+        for u, v in c_g.in_edges(node):
+            label = c_g.get_edge_data(u, v).get("label")
+            p_g.add_edge(v, u, weight=in_labels[label])
+
+    @staticmethod
+    def __add_out_edges(c_g, p_g, node, out_labels):
+        for u, v in c_g.out_edges(node):
+            label = c_g.get_edge_data(u, v).get("label")
+            p_g.add_edge(u, v, weight=out_labels[label])

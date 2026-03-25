@@ -61,11 +61,10 @@ license-files = ["LICENSE"]
 ]
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py314"
 line-length = 100
 indent-width = 4
 
-# Exclude common non-source dirs
 exclude = [
     ".git",
     ".venv",
@@ -76,44 +75,76 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-# Enable a strong but practical ruleset
 select = [
-    "E",    # pycodestyle (errors)
-    "W",    # pycodestyle (warnings)
-    "F",    # pyflakes (unused imports, etc.)
-    "I",    # isort (import sorting)
-    "B",    # flake8-bugbear (common bugs)
-    "C4",   # flake8-comprehensions
-    "UP",   # pyupgrade (modern Python)
-    "SIM",  # simplify
-    "RET",  # return-related improvements
-    "ARG",  # unused arguments
-    "PTH",  # pathlib usage
-    "RUF",  # Ruff-specific rules
+    # Core
+    "E", "W", "F",
+
+    # Imports
+    "I",
+
+    # Bug detection
+    "B",        # bugbear
+    "RUF",      # Ruff-native
+
+    # Code quality
+    "C4",       # comprehensions
+    "SIM",      # simplifications
+    "RET",      # returns
+    "ARG",      # unused args
+
+    # Modern Python
+    "UP",
+
+    # Pathlib over os
+    "PTH",
+
+    # Pylint-like (strictness boost)
+    "PL",
+
+    # Exception handling
+    "TRY",
+
+    # Performance
+    "PERF",
+
+    #Numpy
+    "NPY",
+
+    # dateutil
+    "DTZ",
 ]
 
-# Ignore rules that are annoying or not useful for this project
+
 ignore = [
-    "E501",   # line too long (handled by formatter)
-    "B008",   # function calls in defaults (often fine in scientific code)
-    "RET504", # unnecessary assignment before return (can hurt readability)
-    "SIM108", # ternary suggestions (can reduce clarity)
+    # Style tradeoffs
+    "E501",    # line length handled by formatter
+    "SIM108",  # ternary suggestions can hurt readability
+
+    # Practicality for algorithms / research code
+    "PLR0913", # too many arguments (common in matching algorithms)
+    "PLR2004", # magic values (similarity thresholds, etc.)
+    "PLR0915", # too many statements (complex pipelines)
+
+    # Readability tradeoffs
+    "RET504",  # unnecessary assignment before return
+    "RET505",  # else-after-return (sometimes clearer)
+
+    # Allow flexible exception patterns
+    "TRY003",  # long exception messages
 ]
 
-# Allow unused variables that start with underscore
 dummy-variable-rgx = "^_.*"
 
 [tool.ruff.lint.per-file-ignores]
-# Tests can be more relaxed
 "tests/*" = [
-    "ARG",   # unused arguments (fixtures)
-    "S101",  # assert usage
-    "PLR2004", # magic values
+    "ARG",      # unused fixtures
+    "S101",     # asserts
+    "PLR2004",  # magic values
+    "PLR0913",  # many args
 ]
 
-# __init__.py often re-exports
 "__init__.py" = [
-    "F401",  # unused imports
+    "F401",     # re-exports
 ]
 
 [tool.ruff.lint.isort]

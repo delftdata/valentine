@@ -68,8 +68,7 @@ class SimilarityFlooding(BaseMatcher):
                     map_sim += w * init_map[e[0]]
                 else:
                     map_sim += init_map[e[0]] + w * (previous_map[e[0]] + init_map[e[0]])
-            if map_sim > max_val:
-                max_val = map_sim
+            max_val = max(max_val, map_sim)
             next_map[n] = map_sim
         inv_max = 1.0 / max_val if max_val > 0 else 1.0
         for k in next_map:

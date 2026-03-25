@@ -56,9 +56,8 @@ class BaseTable(ABC):
                 new_d_type = "int"
             elif d_type.startswith("float"):
                 new_d_type = "float"
+        elif d_type == "object":
+            new_d_type = "varchar"
         else:
-            if d_type == "object":
-                new_d_type = "varchar"
-            else:
-                new_d_type = d_type
+            new_d_type = d_type
         return new_d_type
