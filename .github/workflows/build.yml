@@ -33,8 +33,14 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install .        # or: pip install -e . if you prefer editable
-          pip install pytest==8.3.3 coverage==7.*
+          pip install .
+          pip install pytest==9.0.2 coverage==7.13.5 ruff==0.15.7
+
+      - name: Ruff lint (must pass)
+        run: ruff check .
+
+      - name: Ruff format check (must be already formatted)
+        run: ruff format --check .
 
       - name: Run tests with coverage
         run: |
@@ -44,7 +50,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5.5.3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}   # required for v4
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.xml
           verbose: true
           fail_ci_if_error: true

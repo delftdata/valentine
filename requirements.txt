@@ -13,3 +13,5 @@ sentence-transformers==5.3.0
 python-dateutil==2.9.0.post0
 # testing
 pytest==9.0.2
+# lint
+ruff==0.15.7
