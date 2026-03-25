@@ -1,6 +1,6 @@
-import os
 import tempfile
 import unittest
+from pathlib import Path
 
 import pandas as pd
 
@@ -110,26 +110,26 @@ class TestBaseColumnTableAndUtils(unittest.TestCase):
     def test_get_delimiter_and_encoding(self):
         with tempfile.TemporaryDirectory() as d:
             # delimiter: comma
-            p_comma = os.path.join(d, "comma.csv")
-            with open(p_comma, "w", encoding="utf-8") as f:
+            p_comma = Path(d) / "comma.csv"
+            with Path(p_comma).open("w", encoding="utf-8") as f:
                 f.write("a,b,c\n1,2,3\n")
             self.assertEqual(get_delimiter(p_comma), ",")
 
             # delimiter: semicolon
-            p_sc = os.path.join(d, "semi.csv")
-            with open(p_sc, "w", encoding="utf-8") as f:
+            p_sc = Path(d) / "semi.csv"
+            with Path(p_sc).open("w", encoding="utf-8") as f:
                 f.write("a;b;c\n1;2;3\n")
             self.assertEqual(get_delimiter(p_sc), ";")
 
             # encoding: ASCII -> returns utf-8
-            p_ascii = os.path.join(d, "ascii.txt")
-            with open(p_ascii, "wb") as f:
+            p_ascii = Path(d) / "ascii.txt"
+            with Path(p_ascii).open("wb") as f:
                 f.write(b"just ascii lines\nsecond line\n")
             self.assertEqual(get_encoding(p_ascii), "utf-8")
 
             # encoding: non-ascii (latin-1 with 'é')
-            p_latin1 = os.path.join(d, "latin1.txt")
-            with open(p_latin1, "wb") as f:
+            p_latin1 = Path(d) / "latin1.txt"
+            with Path(p_latin1).open("wb") as f:
                 f.write("caf\u00e9\n".encode("latin-1"))
             enc = get_encoding(p_latin1)
             self.assertIsInstance(enc, str)

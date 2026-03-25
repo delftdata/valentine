@@ -3,6 +3,7 @@ import pickle
 import subprocess
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from ...data_sources.base_column import BaseColumn
@@ -206,7 +207,7 @@ def process_columns(tup: tuple) -> None:
         quantiles,
         tmp_folder_path,
     ) = tup
-    os.makedirs(tmp_folder_path, exist_ok=True)
+    Path(tmp_folder_path).mkdir(parents=True, exist_ok=True)
     column = CorrelationClusteringColumn(
         column_name, column_uid, data, source_name, source_guid, tmp_folder_path
     )
@@ -214,11 +215,10 @@ def process_columns(tup: tuple) -> None:
         column.quantile_histogram = QuantileHistogram(
             column.long_name, column.ranks, column.size, quantiles
         )
-    with open(
-        os.path.join(
-            tmp_folder_path,
-            f"{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}.pkl",
-        ),
+    with Path(
+        Path(tmp_folder_path)
+        / f"{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}.pkl"
+    ).open(
         "wb",
     ) as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
@@ -293,9 +293,9 @@ def generate_global_ranks(data: list, tmp_folder_path: str) -> None:
     tmp_folder_path: str
         The path of the temporary folder that will serve as a cache for the run
     """
-    os.makedirs(tmp_folder_path, exist_ok=True)
+    Path(tmp_folder_path).mkdir(parents=True, exist_ok=True)
     ranks = unix_sort_ranks(set(data), tmp_folder_path)
-    with open(os.path.join(tmp_folder_path, "ranks.pkl"), "wb") as output:
+    with Path(Path(tmp_folder_path) / "ranks.pkl").open("wb") as output:
         pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
 
@@ -316,14 +316,14 @@ def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> dict[Any, int]:
     dict
         The ranks in the form of k: value, v: the rank of the value
     """
-    unsorted_file_path = os.path.join(tmp_folder_path, "unsorted_file.txt")
-    sorted_file_path = os.path.join(tmp_folder_path, "sorted_file.txt")
+    unsorted_file_path = Path(tmp_folder_path) / "unsorted_file.txt"
+    sorted_file_path = Path(tmp_folder_path) / "sorted_file.txt"
 
-    with open(unsorted_file_path, "w", encoding="utf-8") as out:
+    with Path(unsorted_file_path).open("w", encoding="utf-8") as out:
         for var in corpus:
             print(str(var), file=out)
 
-    with open(sorted_file_path, "w", encoding="utf-8") as f:
+    with Path(sorted_file_path).open("w", encoding="utf-8") as f:
         if os.name == "nt":
             subprocess.run(["sort", unsorted_file_path], stdout=f, check=True)
         else:
@@ -332,7 +332,7 @@ def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> dict[Any, int]:
             subprocess.run(["sort", "-n", unsorted_file_path], stdout=f, env=sort_env, check=True)
 
     ranks: list[tuple[Any, int]] = []
-    with open(sorted_file_path, encoding="utf-8") as f:
+    with Path(sorted_file_path).open(encoding="utf-8") as f:
         for rank, line in enumerate(f, start=1):
             ranks.append((convert_data_type(line.rstrip("\n")), rank))
 
@@ -340,8 +340,8 @@ def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> dict[Any, int]:
 
 
 def get_column_from_store(file_name: str, tmp_folder_path: str) -> CorrelationClusteringColumn:
-    file_path = os.path.join(tmp_folder_path, f"{file_name}.pkl")
-    with open(file_path, "rb") as pkl_file:
+    file_path = Path(tmp_folder_path) / f"{file_name}.pkl"
+    with Path(file_path).open("rb") as pkl_file:
         data = pickle.load(pkl_file)
     return data
 

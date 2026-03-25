@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 
 import chardet
 from dateutil.parser import parse
@@ -9,7 +10,7 @@ def get_encoding(ds_path: str) -> str:
     test_str = b""
     number_of_lines_to_read = 500
     count = 0
-    with open(ds_path, "rb") as f:
+    with Path(ds_path).open("rb") as f:
         line = f.readline()
         while line and count < number_of_lines_to_read:
             test_str = test_str + line
@@ -21,9 +22,9 @@ def get_encoding(ds_path: str) -> str:
     return result["encoding"]
 
 
-def get_delimiter(ds_path: str) -> str:
+def get_delimiter(ds_path: Path) -> str:
     """Returns the delimiter of the csv file"""
-    with open(ds_path) as f:
+    with Path(ds_path).open() as f:
         first_line = f.readline()
         s = csv.Sniffer()
         return str(s.sniff(first_line).delimiter)

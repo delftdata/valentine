@@ -1,5 +1,5 @@
-import os
 import pprint
+from pathlib import Path
 
 import pandas as pd
 
@@ -12,8 +12,8 @@ pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
 def main():
     # Load data using pandas
-    d1_path = os.path.join("data", "authors1.csv")
-    d2_path = os.path.join("data", "authors2.csv")
+    d1_path = Path("data") / "authors1.csv"
+    d2_path = Path("data") / "authors2.csv"
     df1 = pd.read_csv(d1_path)
     df2 = pd.read_csv(d2_path)
 

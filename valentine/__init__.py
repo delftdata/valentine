@@ -1,5 +1,4 @@
 from collections.abc import Iterable
-from typing import List, Union
 
 import pandas as pd
 

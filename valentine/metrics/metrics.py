@@ -108,7 +108,7 @@ class PrecisionTopNPercent(Metric):
     one_to_one : bool
         Whether to apply the one-to-one filter to the MatcherResults first.
     n : int
-        Percentage of matches to consider (0–100).
+        Percentage of matches to consider (0-100).
     """
 
     one_to_one: bool = True

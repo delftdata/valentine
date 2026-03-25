@@ -1,5 +1,5 @@
-import os
 import pickle
+from pathlib import Path
 
 import numpy as np
 
@@ -103,7 +103,7 @@ class CorrelationClusteringColumn(BaseColumn):
         ndarray
             The ndarray that contains the ranks of the data
         """
-        with open(os.path.join(tmp_folder_path, "ranks.pkl"), "rb") as pkl_file:
+        with Path(Path(tmp_folder_path) / "ranks.pkl").open("rb") as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
             ranks = np.array(
                 sorted(
