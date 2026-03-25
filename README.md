@@ -11,6 +11,9 @@
   <a href="https://app.codacy.com/gh/delftdata/valentine/dashboard">
     <img src="https://app.codacy.com/project/badge/Grade/85cfebfc9c6a43359c5b2e56a5fdf3a3" alt="Codacy Badge">
   </a>
+  <a href="https://github.com/astral-sh/ruff">
+    <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff">
+  </a>
   <a href="https://pypi.org/project/valentine/">
     <img src="https://img.shields.io/pypi/v/valentine.svg" alt="PyPI version">
   </a>
