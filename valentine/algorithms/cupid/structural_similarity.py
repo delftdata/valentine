@@ -18,7 +18,7 @@ def compute_ssim(node_s, node_t, sims, th_accept=0.5):
 
     for s in s_leaves:
         for t in t_leaves:
-            if sims[(s, t)]['wsim'] > th_accept:
+            if sims[(s, t)]["wsim"] > th_accept:
                 s_strong_link.add(s)
                 t_strong_link.add(t)
 
@@ -30,5 +30,5 @@ def change_structural_similarity(leaves_s, leaves_t, sims, factor):
 
     for pair in all_leaves:
         if pair in sims:
-            partial = sims[pair]['ssim'] * factor
-            sims[pair]['ssim'] = partial if partial < 1 else 1
+            partial = sims[pair]["ssim"] * factor
+            sims[pair]["ssim"] = partial if partial < 1 else 1

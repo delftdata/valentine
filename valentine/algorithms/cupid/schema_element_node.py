@@ -5,7 +5,7 @@ from .schema_element import SchemaElement
 
 class SchemaElementNode(SchemaElement, NodeMixin):
     def __init__(self, name, parent=None, children=None):
-        super(SchemaElementNode, self).__init__(name=name)
+        super().__init__(name=name)
         self.name = name
         self.parent = parent
         if children:

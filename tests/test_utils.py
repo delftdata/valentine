@@ -1,12 +1,11 @@
 import unittest
 
 from tests import d1_path
-from valentine.data_sources.utils import get_encoding, get_delimiter, is_date
-from valentine.utils.utils import is_sorted, convert_data_type
+from valentine.data_sources.utils import get_delimiter, get_encoding, is_date
+from valentine.utils.utils import convert_data_type, is_sorted
 
 
 class TestUtils(unittest.TestCase):
-
     def test_is_sorted(self):
         sorted_dict = {"k1": 1, "k2": 2, "k3": 3}
         assert is_sorted(sorted_dict)

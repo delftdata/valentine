@@ -1,16 +1,19 @@
 from itertools import product
 from multiprocessing import get_context
-from typing import Dict, Tuple
 
-from jellyfish import levenshtein_distance, damerau_levenshtein_distance, \
-                      jaro_similarity, jaro_winkler_similarity, hamming_distance
+from jellyfish import (
+    damerau_levenshtein_distance,
+    hamming_distance,
+    jaro_similarity,
+    jaro_winkler_similarity,
+    levenshtein_distance,
+)
 
-from ..jaccard_distance import StringDistanceFunction
-
-from ..base_matcher import BaseMatcher
-from ..match import Match
 from ...data_sources.base_table import BaseTable
 from ...utils.utils import normalize_distance
+from ..base_matcher import BaseMatcher
+from ..jaccard_distance import StringDistanceFunction
+from ..match import Match
 
 
 class JaccardDistanceMatcher(BaseMatcher):
@@ -24,10 +27,12 @@ class JaccardDistanceMatcher(BaseMatcher):
 
     """
 
-    def __init__(self,
-                 threshold_dist: float = 0.8,
-                 distance_fun: StringDistanceFunction = StringDistanceFunction.Levenshtein,
-                 process_num: int = 1):
+    def __init__(
+        self,
+        threshold_dist: float = 0.8,
+        distance_fun: StringDistanceFunction = StringDistanceFunction.Levenshtein,
+        process_num: int = 1,
+    ):
         """
         Parameters
         ----------
@@ -40,30 +45,36 @@ class JaccardDistanceMatcher(BaseMatcher):
         self.__process_num = int(process_num)
         self.__distance_function = distance_fun
 
-    def get_matches(self,
-                    source_input: BaseTable,
-                    target_input: BaseTable) -> Dict[Tuple[Tuple[str, str], Tuple[str, str]], float]:
+    def get_matches(
+        self, source_input: BaseTable, target_input: BaseTable
+    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
         source_id = source_input.unique_identifier
         target_id = target_input.unique_identifier
         matches = {}
         if self.__process_num == 1:
-            for combination in self.__get_column_combinations(source_input,
-                                                              target_input,
-                                                              self.__threshold_dist,
-                                                              target_id,
-                                                              source_id,
-                                                              self.__distance_function):
+            for combination in self.__get_column_combinations(
+                source_input,
+                target_input,
+                self.__threshold_dist,
+                target_id,
+                source_id,
+                self.__distance_function,
+            ):
                 matches.update(self.process_jaccard_distance(combination))
         else:
             with get_context("spawn").Pool(self.__process_num) as process_pool:
                 matches = {}
-                list_of_matches = process_pool.map(self.process_jaccard_distance,
-                                                   self.__get_column_combinations(source_input,
-                                                                                  target_input,
-                                                                                  self.__threshold_dist,
-                                                                                  target_id,
-                                                                                  source_id,
-                                                                                  self.__distance_function))
+                list_of_matches = process_pool.map(
+                    self.process_jaccard_distance,
+                    self.__get_column_combinations(
+                        source_input,
+                        target_input,
+                        self.__threshold_dist,
+                        target_id,
+                        source_id,
+                        self.__distance_function,
+                    ),
+                )
                 for match in list_of_matches:
                     matches.update(match)
         # Remove the pairs with zero similarity
@@ -72,9 +83,22 @@ class JaccardDistanceMatcher(BaseMatcher):
 
     def process_jaccard_distance(self, tup: tuple):
 
-        source_data, target_data, threshold, _, target_table_name, _, \
-            target_column_name, _, source_table_name, _, \
-            _, source_column_name, _, distance_function = tup
+        (
+            source_data,
+            target_data,
+            threshold,
+            _,
+            target_table_name,
+            _,
+            target_column_name,
+            _,
+            source_table_name,
+            _,
+            _,
+            source_column_name,
+            _,
+            distance_function,
+        ) = tup
 
         if len(set(source_data)) < len(set(target_data)):
             set1 = set(source_data)
@@ -89,26 +113,29 @@ class JaccardDistanceMatcher(BaseMatcher):
 
         intersection_cnt = 0
         for cmb in combinations:
-            if distance_function in [StringDistanceFunction.Levenshtein, StringDistanceFunction.Exact]:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (levenshtein_distance,
-                                                                                     True)
-                                                                              )
+            if distance_function in [
+                StringDistanceFunction.Levenshtein,
+                StringDistanceFunction.Exact,
+            ]:
+                intersection_cnt = intersection_cnt + self.__process_distance(
+                    cmb + (levenshtein_distance, True)
+                )
             elif distance_function == StringDistanceFunction.DamerauLevenshtein:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (damerau_levenshtein_distance,
-                                                                                     True)
-                                                                              )
+                intersection_cnt = intersection_cnt + self.__process_distance(
+                    cmb + (damerau_levenshtein_distance, True)
+                )
             elif distance_function == StringDistanceFunction.Hamming:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (hamming_distance,
-                                                                                     True)
-                                                                              )
+                intersection_cnt = intersection_cnt + self.__process_distance(
+                    cmb + (hamming_distance, True)
+                )
             elif distance_function == StringDistanceFunction.Jaro:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_similarity,
-                                                                                     False)
-                                                                              )
+                intersection_cnt = intersection_cnt + self.__process_distance(
+                    cmb + (jaro_similarity, False)
+                )
             elif distance_function == StringDistanceFunction.JaroWinkler:
-                intersection_cnt = intersection_cnt + self.__process_distance(cmb + (jaro_winkler_similarity,
-                                                                                     False)
-                                                                              )
+                intersection_cnt = intersection_cnt + self.__process_distance(
+                    cmb + (jaro_winkler_similarity, False)
+                )
 
         union_cnt = len(set1) + len(set2) - intersection_cnt
 
@@ -117,28 +144,45 @@ class JaccardDistanceMatcher(BaseMatcher):
         else:
             sim = float(intersection_cnt) / union_cnt
 
-        return Match(target_table_name, target_column_name,
-                     source_table_name, source_column_name,
-                     sim).to_dict
+        return Match(
+            target_table_name,
+            target_column_name,
+            source_table_name,
+            source_column_name,
+            sim,
+        ).to_dict
 
     @staticmethod
-    def __get_column_combinations(source_table: BaseTable,
-                                  target_table: BaseTable,
-                                  threshold,
-                                  target_id,
-                                  source_id,
-                                  distance_function: StringDistanceFunction):
-        for source_column, target_column in product(source_table.get_columns(), target_table.get_columns()):
-            yield source_column.data, target_column.data, threshold, target_id, \
-                  target_table.name, target_table.unique_identifier, \
-                  target_column.name, target_column.unique_identifier, \
-                  source_table.name, source_table.unique_identifier, source_id, \
-                  source_column.name, source_column.unique_identifier, distance_function
+    def __get_column_combinations(
+        source_table: BaseTable,
+        target_table: BaseTable,
+        threshold,
+        target_id,
+        source_id,
+        distance_function: StringDistanceFunction,
+    ):
+        for source_column, target_column in product(
+            source_table.get_columns(), target_table.get_columns()
+        ):
+            yield (
+                source_column.data,
+                target_column.data,
+                threshold,
+                target_id,
+                target_table.name,
+                target_table.unique_identifier,
+                target_column.name,
+                target_column.unique_identifier,
+                source_table.name,
+                source_table.unique_identifier,
+                source_id,
+                source_column.name,
+                source_column.unique_identifier,
+                distance_function,
+            )
 
     @staticmethod
-    def __get_set_combinations(set1: set,
-                               set2: set,
-                               threshold: float):
+    def __get_set_combinations(set1: set, set2: set, threshold: float):
         """
         Function that creates combination between elements of set1 and set2
 

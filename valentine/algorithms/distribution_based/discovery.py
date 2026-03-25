@@ -1,21 +1,27 @@
 from ast import literal_eval
-from typing import List, Tuple
-
-import numpy as np
-import networkx as nx
-import pulp as plp
 from multiprocessing import Pool
 
+import networkx as nx
+import numpy as np
+import pulp as plp
 from pulp import PULP_CBC_CMD
 
-from .clustering_utils import column_combinations, transform_dict, process_emd, parallel_cutoff_threshold, \
-    cuttoff_column_generator, compute_cutoff_threshold
+from .clustering_utils import (
+    column_combinations,
+    compute_cutoff_threshold,
+    cuttoff_column_generator,
+    parallel_cutoff_threshold,
+    process_emd,
+    transform_dict,
+)
 
 
-def compute_distribution_clusters(columns: List[Tuple[str, str, str, str]],
-                                  threshold: float,
-                                  tmp_folder_path: str,
-                                  quantiles: int = 256):
+def compute_distribution_clusters(
+    columns: list[tuple[str, str, str, str]],
+    threshold: float,
+    tmp_folder_path: str,
+    quantiles: int = 256,
+):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
     algorithm captures which columns contain data with similar distributions based on the EMD distance metric.
@@ -51,11 +57,13 @@ def compute_distribution_clusters(columns: List[Tuple[str, str, str, str]],
     return connected_components
 
 
-def compute_distribution_clusters_parallel(columns: list,
-                                           threshold: float,
-                                           pool: Pool,
-                                           tmp_folder_path: str,
-                                           quantiles: int = 256):
+def compute_distribution_clusters_parallel(
+    columns: list,
+    threshold: float,
+    pool: Pool,
+    tmp_folder_path: str,
+    quantiles: int = 256,
+):
     """
     Algorithm 2 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]. This
     algorithm captures which columns contain data with similar distributions based on the EMD distance metric.
@@ -81,10 +89,13 @@ def compute_distribution_clusters_parallel(columns: list,
     combinations = column_combinations(columns, quantiles, tmp_folder_path, intersection=False)
     matrix_a: dict = transform_dict(dict(pool.map(process_emd, combinations, chunksize=1)))
 
-    edges_per_column = list(pool.map(parallel_cutoff_threshold, cuttoff_column_generator(matrix_a,
-                                                                                         columns,
-                                                                                         threshold,
-                                                                                         tmp_folder_path), chunksize=1))
+    edges_per_column = list(
+        pool.map(
+            parallel_cutoff_threshold,
+            cuttoff_column_generator(matrix_a, columns, threshold, tmp_folder_path),
+            chunksize=1,
+        )
+    )
 
     graph = create_graph(columns, edges_per_column)
 
@@ -93,10 +104,12 @@ def compute_distribution_clusters_parallel(columns: list,
     return connected_components
 
 
-def compute_attributes(distribution_clusters: list,
-                       threshold: float,
-                       tmp_folder_path: str,
-                       quantiles: int = 256):
+def compute_attributes(
+    distribution_clusters: list,
+    threshold: float,
+    tmp_folder_path: str,
+    quantiles: int = 256,
+):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
     This algorithm creates the attribute graph of the distribution clusters computed in algorithm 2.
@@ -118,18 +131,22 @@ def compute_attributes(distribution_clusters: list,
         A dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = column_combinations(distribution_clusters, quantiles, tmp_folder_path, intersection=True)
+    combinations = column_combinations(
+        distribution_clusters, quantiles, tmp_folder_path, intersection=True
+    )
 
     matrix_i: dict = transform_dict({k: v for k, v in [process_emd(cmb) for cmb in combinations]})
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
 
-def compute_attributes_parallel(distribution_clusters: list,
-                                threshold: float,
-                                pool: Pool,
-                                tmp_folder_path: str,
-                                quantiles: int = 256):
+def compute_attributes_parallel(
+    distribution_clusters: list,
+    threshold: float,
+    pool: Pool,
+    tmp_folder_path: str,
+    quantiles: int = 256,
+):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
     This algorithm creates the attribute graph of the distribution clusters computed in algorithm 2.
@@ -153,16 +170,16 @@ def compute_attributes_parallel(distribution_clusters: list,
         A dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = column_combinations(distribution_clusters, quantiles, tmp_folder_path, intersection=True)
+    combinations = column_combinations(
+        distribution_clusters, quantiles, tmp_folder_path, intersection=True
+    )
 
     matrix_i = transform_dict(dict(pool.map(process_emd, combinations, chunksize=1)))
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
 
-def get_attribute_graph(distribution_clusters: list,
-                        matrix_i: dict,
-                        threshold: float):
+def get_attribute_graph(distribution_clusters: list, matrix_i: dict, threshold: float):
     g_a = dict()
     matrix_e = np.zeros((len(distribution_clusters), len(distribution_clusters)))
 
@@ -171,7 +188,7 @@ def get_attribute_graph(distribution_clusters: list,
 
         cutoff_i = compute_cutoff_threshold(matrix_i[name_i], threshold)
 
-        n_c = [i['c'] for i in matrix_i[name_i] if i['e'] <= cutoff_i]
+        n_c = [i["c"] for i in matrix_i[name_i] if i["e"] <= cutoff_i]
 
         for c_j in n_c:
             matrix_e[i][distribution_clusters.index(c_j)] = 1
@@ -187,8 +204,7 @@ def get_attribute_graph(distribution_clusters: list,
     return g_a
 
 
-def correlation_clustering_pulp(vertexes: list,
-                                edges: dict):
+def correlation_clustering_pulp(vertexes: list, edges: dict):
     """
     The LP solver used to perform the correlation clustering
 
@@ -209,18 +225,27 @@ def correlation_clustering_pulp(vertexes: list,
     set_u = vertexes
     set_v = vertexes
 
-    x_vars = {(i, j): plp.LpVariable(cat=plp.LpInteger, lowBound=0, upBound=1, name="({0},{1})"
-                                     .format(str(i)
-                                             .replace(" ", "__WHITESPACE__")
-                                             .replace("-", "__DASH__")
-                                             .replace(">", "__GREATER__")
-                                             .replace("/", "__BACKSLASH__"),
-                                             str(j)
-                                             .replace(" ", "__WHITESPACE__")
-                                             .replace("-", "__DASH__")
-                                             .replace(">", "__GREATER__")
-                                             .replace("/", "__BACKSLASH__")))
-              for i in set_u for j in set_v}
+    x_vars = {
+        (i, j): plp.LpVariable(
+            cat=plp.LpInteger,
+            lowBound=0,
+            upBound=1,
+            name="({0},{1})".format(
+                str(i)
+                .replace(" ", "__WHITESPACE__")
+                .replace("-", "__DASH__")
+                .replace(">", "__GREATER__")
+                .replace("/", "__BACKSLASH__"),
+                str(j)
+                .replace(" ", "__WHITESPACE__")
+                .replace("-", "__DASH__")
+                .replace(">", "__GREATER__")
+                .replace("/", "__BACKSLASH__"),
+            ),
+        )
+        for i in set_u
+        for j in set_v
+    }
 
     sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
     sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
@@ -232,17 +257,19 @@ def correlation_clustering_pulp(vertexes: list,
     result = dict()
 
     for v in opt_model.variables():
-        result[literal_eval(v.name
-                            .replace("__WHITESPACE__", " ")
-                            .replace("__DASH__", "-")
-                            .replace("__GREATER__", ">")
-                            .replace("__BACKSLASH__", "/"))] = v.varValue
+        result[
+            literal_eval(
+                v.name.replace("__WHITESPACE__", " ")
+                .replace("__DASH__", "-")
+                .replace("__GREATER__", ">")
+                .replace("__BACKSLASH__", "/")
+            )
+        ] = v.varValue
 
     return result
 
 
-def process_correlation_clustering_result(results: list,
-                                          columns: list):
+def process_correlation_clustering_result(results: list, columns: list):
     """
     Function that takes the output of the correlation clustering and returns the connected components
 
@@ -270,8 +297,7 @@ def process_correlation_clustering_result(results: list,
     return connected_components
 
 
-def create_graph(nodes: list,
-                 edges_per_column: list):
+def create_graph(nodes: list, edges_per_column: list):
     """
     Simple function that creates a graph give the vertices and their corresponding edges
 

@@ -2,7 +2,6 @@ from ..base_column import BaseColumn
 
 
 class DataframeColumn(BaseColumn):
-
     def __init__(self, column_name: str, data: list, d_type: str, table_guid: str):
         self.__column_name = column_name
         self.__data = data

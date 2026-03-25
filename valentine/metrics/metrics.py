@@ -6,23 +6,24 @@ with ``frozen=True`` so instances are hashable and comparable without boilerplat
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Sequence, Tuple
+from typing import Any
 
 from .base_metric import Metric
 from .metric_helpers import get_fp, get_tp_fn
 
 # Public exports
 __all__ = [
-    "Precision",
-    "Recall",
     "F1Score",
+    "Precision",
     "PrecisionTopNPercent",
+    "Recall",
     "RecallAtSizeofGroundTruth",
 ]
 
 # Ground-truth is expressed as pairs of (left_col_name, right_col_name)
-GroundTruth = Sequence[Tuple[str, str]]
+GroundTruth = Sequence[tuple[str, str]]
 
 
 def _safe_div(numerator: float, denominator: float) -> float:
@@ -39,6 +40,7 @@ class Precision(Metric):
     one_to_one : bool
         Whether to apply the one-to-one filter to the MatcherResults first.
     """
+
     one_to_one: bool = True
 
     def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
@@ -60,6 +62,7 @@ class Recall(Metric):
     one_to_one : bool
         Whether to apply the one-to-one filter to the MatcherResults first.
     """
+
     one_to_one: bool = True
 
     def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
@@ -80,6 +83,7 @@ class F1Score(Metric):
     one_to_one : bool
         Whether to apply the one-to-one filter to the MatcherResults first.
     """
+
     one_to_one: bool = True
 
     def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
@@ -106,6 +110,7 @@ class PrecisionTopNPercent(Metric):
     n : int
         Percentage of matches to consider (0–100).
     """
+
     one_to_one: bool = True
     n: int = 10
 

@@ -1,7 +1,7 @@
 import unittest
-from typing import List
-import pandas as pd
+
 import networkx as nx
+import pandas as pd
 
 from valentine.algorithms.similarity_flooding import (
     graph as sf_graph_mod,
@@ -10,7 +10,6 @@ from valentine.algorithms.similarity_flooding import (
     propagation_graph as sf_prop_mod,
     similarity_flooding as sf_sf_mod,
 )
-
 from valentine.data_sources.base_column import BaseColumn
 from valentine.data_sources.base_table import BaseTable
 
@@ -26,33 +25,48 @@ class DummyColumn(BaseColumn):
         self._data = data
 
     @property
-    def unique_identifier(self): return self._uid
+    def unique_identifier(self):
+        return self._uid
+
     @property
-    def name(self): return self._name
+    def name(self):
+        return self._name
+
     @property
-    def data_type(self): return self._dtype
+    def data_type(self):
+        return self._dtype
+
     @property
-    def data(self): return self._data
+    def data(self):
+        return self._data
 
 
 class DummyTable(BaseTable):
-    def __init__(self, uid, name, cols: List[BaseColumn]):
+    def __init__(self, uid, name, cols: list[BaseColumn]):
         self._uid = uid
         self._name = name
         self._cols = cols
 
     @property
-    def unique_identifier(self): return self._uid
+    def unique_identifier(self):
+        return self._uid
+
     @property
-    def name(self): return self._name
-    def get_columns(self) -> List[BaseColumn]: return self._cols
-    def get_df(self) -> pd.DataFrame: return pd.DataFrame({c.name: c.data for c in self._cols})
+    def name(self):
+        return self._name
+
+    def get_columns(self) -> list[BaseColumn]:
+        return self._cols
+
+    def get_df(self) -> pd.DataFrame:
+        return pd.DataFrame({c.name: c.data for c in self._cols})
+
     @property
-    def is_empty(self) -> bool: return False
+    def is_empty(self) -> bool:
+        return False
 
 
 class TestGraphNodePropagationAndSF(unittest.TestCase):
-
     def test_node_equality_and_hash(self):
         Node = sf_node_mod.Node
         a1 = Node("A", "DB")
@@ -93,7 +107,7 @@ class TestGraphNodePropagationAndSF(unittest.TestCase):
         )
         g = sf_graph_mod.Graph(t).graph
         self.assertIsInstance(g, nx.DiGraph)
-        labels = [d.get("label") for *_ , d in g.edges(data=True)]
+        labels = [d.get("label") for *_, d in g.edges(data=True)]
         self.assertIn("name", labels)
         self.assertIn("type", labels)
         self.assertIn("SQLtype", labels)
@@ -119,8 +133,16 @@ class TestGraphNodePropagationAndSF(unittest.TestCase):
 
     def test_similarity_flooding_end_to_end(self):
         # Two tiny tables; full pipeline executes and returns a dict
-        t_src = DummyTable("SUID", "S", [DummyColumn(1, "A", "int", [1]), DummyColumn(3, "C", "float", [1.1])])
-        t_tgt = DummyTable("TUID", "T", [DummyColumn(2, "B", "int", [2]), DummyColumn(4, "D", "float", [2.2])])
+        t_src = DummyTable(
+            "SUID",
+            "S",
+            [DummyColumn(1, "A", "int", [1]), DummyColumn(3, "C", "float", [1.1])],
+        )
+        t_tgt = DummyTable(
+            "TUID",
+            "T",
+            [DummyColumn(2, "B", "int", [2]), DummyColumn(4, "D", "float", [2.2])],
+        )
 
         sf = sf_sf_mod.SimilarityFlooding(coeff_policy="inverse_average", formula="formula_c")
         res = sf.get_matches(t_src, t_tgt)

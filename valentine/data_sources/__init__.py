@@ -1,7 +1,3 @@
-from .dataframe.dataframe_table import DataframeTable
+from .dataframe.dataframe_table import DataframeColumn, DataframeTable
 
-__all__ = [
-    "dataframe",
-    "utils",
-    "DataframeTable"
-]
+__all__ = ["DataframeColumn", "DataframeTable", "dataframe", "utils"]

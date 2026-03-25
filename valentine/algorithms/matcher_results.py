@@ -1,9 +1,10 @@
 from __future__ import annotations
+
 import math
+from typing import Any
+
 from ..metrics import METRICS_CORE
 from ..metrics.base_metric import Metric
-
-from typing import Dict, Tuple, List, Any, Set
 
 
 class MatcherResults(dict):
@@ -22,9 +23,14 @@ class MatcherResults(dict):
     handy predefined sets as well, e.g. METRICS_CORE, which is the default.
     """
 
-    def __init__(self: MatcherResults, res: Dict[Tuple[Tuple[str, str], Tuple[str, str]], float], *args, **kwargs):
+    def __init__(
+        self: MatcherResults,
+        res: dict[tuple[tuple[str, str], tuple[str, str]], float],
+        *args,
+        **kwargs,
+    ):
         self._cached_one_to_one = None
-        sorted_res = {k:res[k] for k in sorted(res, key=res.get, reverse=True)}
+        sorted_res = {k: res[k] for k in sorted(res, key=res.get, reverse=True)}
         dict.__init__(self, sorted_res, *args, **kwargs)
 
     def one_to_one(self: MatcherResults) -> MatcherResults:
@@ -60,8 +66,7 @@ class MatcherResults(dict):
             matched[key[0]] = False
             matched[key[1]] = False
 
-        median = sorted(set_match_values, reverse=True)[
-            math.ceil(len(set_match_values)/2)]
+        median = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
 
         matches1to1_dict = dict()
 
@@ -95,11 +100,8 @@ class MatcherResults(dict):
             top 'percent' of matches.
         """
         matches = self.get_copy()
-        number_to_keep = int(
-            math.ceil((percent / 100) * len(matches.keys())))
-        matches = dict(sorted(matches.items(),
-                              key=lambda x: x[1],
-                              reverse=True)[:number_to_keep])
+        number_to_keep = int(math.ceil((percent / 100) * len(matches.keys())))
+        matches = dict(sorted(matches.items(), key=lambda x: x[1], reverse=True)[:number_to_keep])
         return MatcherResults(matches)
 
     def take_top_n(self: MatcherResults, n: int) -> MatcherResults:
@@ -119,11 +121,14 @@ class MatcherResults(dict):
             top 'n' matches.
         """
         matches = self.get_copy()
-        matches = dict(sorted(matches.items(),
-                            key=lambda x: x[1], reverse=True)[:n])
+        matches = dict(sorted(matches.items(), key=lambda x: x[1], reverse=True)[:n])
         return MatcherResults(matches)
 
-    def get_metrics(self: MatcherResults, ground_truth: List[Tuple[str, str]], metrics: Set[Metric] = METRICS_CORE) -> Dict[str, Any]:
+    def get_metrics(
+        self: MatcherResults,
+        ground_truth: list[tuple[str, str]],
+        metrics: set[Metric] = METRICS_CORE,
+    ) -> dict[str, Any]:
         """Summary
         Given ground truth column matches and a set of metric instances, this
         method will calculate scores for these metrics. Metrics can be imported

@@ -1,14 +1,16 @@
 """Provides the base metric class, that can be inherited from to implement
 metrics.
 """
+
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..algorithms.matcher_results import MatcherResults
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple, List, Any, final
 from dataclasses import dataclass
+from typing import Any, final
 
 
 @dataclass(eq=True, frozen=True)
@@ -19,7 +21,9 @@ class Metric(ABC):
     """
 
     @abstractmethod
-    def apply(self: Metric, matches: MatcherResults, ground_truth: List[Tuple[str, str]]) -> Dict[str, Any]:
+    def apply(
+        self: Metric, matches: MatcherResults, ground_truth: list[tuple[str, str]]
+    ) -> dict[str, Any]:
         """Applies the metric to a `MatcherResults` instance, given ground
         truth.
 
@@ -50,7 +54,7 @@ class Metric(ABC):
         return self.__class__.__name__
 
     @final
-    def return_format(self: Metric, value: Any) -> Dict[str, Any]:
+    def return_format(self: Metric, value: Any) -> dict[str, Any]:
         """The return format of the `apply` method.
 
         Parameters

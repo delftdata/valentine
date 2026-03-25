@@ -1,14 +1,15 @@
-import pickle
 import os
+import pickle
 import subprocess
+from collections.abc import Iterable, Sequence
 from functools import lru_cache
-from typing import Any, Dict, Iterable, List, Sequence, Tuple
+from typing import Any
 
+from ...data_sources.base_column import BaseColumn
+from ...utils.utils import convert_data_type
 from .column_model import CorrelationClusteringColumn
 from .emd_utils import intersection_emd, quantile_emd
 from .quantile_histogram import QuantileHistogram
-from ...data_sources.base_column import BaseColumn
-from ...utils.utils import convert_data_type
 
 
 def compute_cutoff_threshold(matrix_c: list, threshold: float) -> float:
@@ -29,25 +30,25 @@ def compute_cutoff_threshold(matrix_c: list, threshold: float) -> float:
     float
         The cutoff threshold of the input column
     """
-    matrix_c.append({'e': threshold, 'c': 0})
-    matrix_c.sort(key=lambda k: k['e'])
+    matrix_c.append({"e": threshold, "c": 0})
+    matrix_c.sort(key=lambda k: k["e"])
     cutoff = 0.0
     gap = 0.0
     i = 0
-    while i < len(matrix_c) - 1 and matrix_c[i + 1]['e'] <= threshold:
-        if gap < (matrix_c[i + 1]['e'] - matrix_c[i]['e']):
-            gap = matrix_c[i + 1]['e'] - matrix_c[i]['e']
-            cutoff = matrix_c[i]['e']
+    while i < len(matrix_c) - 1 and matrix_c[i + 1]["e"] <= threshold:
+        if gap < (matrix_c[i + 1]["e"] - matrix_c[i]["e"]):
+            gap = matrix_c[i + 1]["e"] - matrix_c[i]["e"]
+            cutoff = matrix_c[i]["e"]
         i += 1
     return cutoff
 
 
 def column_combinations(
-    columns: List[Tuple[Any, Any, Any, Any]],
+    columns: list[tuple[Any, Any, Any, Any]],
     quantiles: int,
     tmp_folder_path: str,
     intersection: bool = False,
-) -> Iterable[Tuple[Tuple[Tuple[Any, Any, Any, Any], Tuple[Any, Any, Any, Any]], int, bool, str]]:
+) -> Iterable[tuple[tuple[tuple[Any, Any, Any, Any], tuple[Any, Any, Any, Any]], int, bool, str]]:
     """
     All the unique combinations between all the columns
 
@@ -70,19 +71,19 @@ def column_combinations(
     from collections import defaultdict
     from itertools import product
 
-    groups: Dict[Any, List[Tuple[Any, Any, Any, Any]]] = defaultdict(list)
+    groups: dict[Any, list[tuple[Any, Any, Any, Any]]] = defaultdict(list)
     for item in columns:
         _, table_guid, _, _ = item
         groups[table_guid].append(item)
 
     table_guids = list(groups.keys())
     for i, gi in enumerate(table_guids):
-        for gj in table_guids[i + 1:]:
+        for gj in table_guids[i + 1 :]:
             for ci, cj in product(groups[gi], groups[gj]):
                 yield (ci, cj), quantiles, intersection, tmp_folder_path
 
 
-def process_emd(tup: tuple) -> Tuple[Tuple[Any, Any], float]:
+def process_emd(tup: tuple) -> tuple[tuple[Any, Any], float]:
     """
     Function defining a single quantile_emd process between two columns.
 
@@ -99,12 +100,11 @@ def process_emd(tup: tuple) -> Tuple[Tuple[Any, Any], float]:
     name_i, name_j, k, quantile, intersection, tmp_folder_path = unwrap_process_input_tuple(tup)
     tn_i, _, cn_i, _ = name_i
     tn_j, _, cn_j, _ = name_j
-    c1 = read_from_cache(f'{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}', tmp_folder_path)
-    c2 = read_from_cache(f'{make_filename_safe(tn_j)}_{make_filename_safe(cn_j)}', tmp_folder_path)
+    c1 = read_from_cache(f"{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}", tmp_folder_path)
+    c2 = read_from_cache(f"{make_filename_safe(tn_j)}_{make_filename_safe(cn_j)}", tmp_folder_path)
     if intersection:
         return k, intersection_emd(c1, c2, tmp_folder_path, quantile)
-    else:
-        return k, quantile_emd(c1, c2, quantile)
+    return k, quantile_emd(c1, c2, quantile)
 
 
 @lru_cache(maxsize=512)
@@ -127,7 +127,16 @@ def read_from_cache(file_name: str, tmp_folder_path: str) -> CorrelationClusteri
     return get_column_from_store(file_name, tmp_folder_path)
 
 
-def unwrap_process_input_tuple(tup: tuple) -> Tuple[Tuple[Any, Any, Any, Any], Tuple[Any, Any, Any, Any], Tuple[Any, Any], int, bool, str]:
+def unwrap_process_input_tuple(
+    tup: tuple,
+) -> tuple[
+    tuple[Any, Any, Any, Any],
+    tuple[Any, Any, Any, Any],
+    tuple[Any, Any],
+    int,
+    bool,
+    str,
+]:
     """
     Helper function that unwraps a tuple to its components and creates a unique key for the column combination
 
@@ -142,7 +151,7 @@ def unwrap_process_input_tuple(tup: tuple) -> Tuple[Tuple[Any, Any, Any, Any], T
     return name_i, name_j, k, quantile, intersection, tmp_folder_path
 
 
-def insert_to_dict(dc: Dict[Any, List[Dict[str, Any]]], k: Any, v: Dict[str, Any]) -> None:
+def insert_to_dict(dc: dict[Any, list[dict[str, Any]]], k: Any, v: dict[str, Any]) -> None:
     """
     Helper function that instantiates a list to a dictionary key if it is not present and then appends an
     EMD/ColumnName pair to it
@@ -161,7 +170,7 @@ def insert_to_dict(dc: Dict[Any, List[Dict[str, Any]]], k: Any, v: Dict[str, Any
     dc[k].append(v)
 
 
-def transform_dict(dc: Dict[Tuple[Any, Any], float]) -> Dict[Any, List[Dict[str, Any]]]:
+def transform_dict(dc: dict[tuple[Any, Any], float]) -> dict[Any, list[dict[str, Any]]]:
     """
     Helper function that transforms a dict with composite column combination keys to a dict with column keys and
     values EMD/ColumnName pairs in a sorted list (ascending based on the EMD value)
@@ -171,11 +180,11 @@ def transform_dict(dc: Dict[Tuple[Any, Any], float]) -> Dict[Any, List[Dict[str,
     dc : dict
         the dictionary
     """
-    tmp_dict: Dict[Any, List[Dict[str, Any]]] = dict()
+    tmp_dict: dict[Any, list[dict[str, Any]]] = dict()
     append = insert_to_dict
     for (k1, k2), v in dc.items():
-        append(tmp_dict, k1, {'e': v, 'c': k2})
-        append(tmp_dict, k2, {'e': v, 'c': k1})
+        append(tmp_dict, k1, {"e": v, "c": k2})
+        append(tmp_dict, k2, {"e": v, "c": k1})
     return tmp_dict
 
 
@@ -188,19 +197,37 @@ def process_columns(tup: tuple) -> None:
     tup : tuple
         tuple containing the information of the column to be processed
     """
-    column_name, column_uid, data, source_name, source_guid, quantiles, tmp_folder_path = tup
+    (
+        column_name,
+        column_uid,
+        data,
+        source_name,
+        source_guid,
+        quantiles,
+        tmp_folder_path,
+    ) = tup
     os.makedirs(tmp_folder_path, exist_ok=True)
-    column = CorrelationClusteringColumn(column_name, column_uid, data, source_name, source_guid, tmp_folder_path)
+    column = CorrelationClusteringColumn(
+        column_name, column_uid, data, source_name, source_guid, tmp_folder_path
+    )
     if column.size > 0:
-        column.quantile_histogram = QuantileHistogram(column.long_name, column.ranks, column.size, quantiles)
-    with open(os.path.join(tmp_folder_path,
-                           f'{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}.pkl'),
-              'wb') as output:
+        column.quantile_histogram = QuantileHistogram(
+            column.long_name, column.ranks, column.size, quantiles
+        )
+    with open(
+        os.path.join(
+            tmp_folder_path,
+            f"{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}.pkl",
+        ),
+        "wb",
+    ) as output:
         pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
     del column
 
 
-def parallel_cutoff_threshold(tup: tuple) -> List[Tuple[Tuple[Any, Any, Any, Any], Tuple[Any, Any, Any, Any]]]:
+def parallel_cutoff_threshold(
+    tup: tuple,
+) -> list[tuple[tuple[Any, Any, Any, Any], tuple[Any, Any, Any, Any]]]:
     """
     Process the cutoff threshold in parallel for each column
 
@@ -212,7 +239,7 @@ def parallel_cutoff_threshold(tup: tuple) -> List[Tuple[Tuple[Any, Any, Any, Any
     matrix_a, column, threshold = tup
     name_i = column.long_name
     theta = compute_cutoff_threshold(matrix_a[name_i], threshold)
-    n_c = [(name_i, i['c']) for i in matrix_a[name_i] if i['e'] <= theta]
+    n_c = [(name_i, i["c"]) for i in matrix_a[name_i] if i["e"] <= theta]
     return n_c
 
 
@@ -222,27 +249,35 @@ def ingestion_column_generator(
     table_guid: object,
     quantiles: int,
     tmp_folder_path: str,
-) -> Iterable[Tuple[str, object, Sequence[Any], str, object, int, str]]:
+) -> Iterable[tuple[str, object, Sequence[Any], str, object, int, str]]:
     """
     Generator of incoming pandas dataframe columns
     """
     for column in columns:
         if not column.is_empty:
-            yield column.name, column.unique_identifier, column.data, table_name, table_guid, quantiles, tmp_folder_path
+            yield (
+                column.name,
+                column.unique_identifier,
+                column.data,
+                table_name,
+                table_guid,
+                quantiles,
+                tmp_folder_path,
+            )
 
 
 def cuttoff_column_generator(
     matrix_a: dict,
-    columns: List[Tuple[str, str, str, str]],
+    columns: list[tuple[str, str, str, str]],
     threshold: float,
     tmp_folder_path: str,
-) -> Iterable[Tuple[dict, CorrelationClusteringColumn, float]]:
+) -> Iterable[tuple[dict, CorrelationClusteringColumn, float]]:
     """
     Generator of columns for the cutoff threshold computation
     """
     for column_name in columns:
         tn_i, _, cn_i, _ = column_name
-        f_name = f'{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}'
+        f_name = f"{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}"
         column = read_from_cache(f_name, tmp_folder_path)
         yield matrix_a, column, threshold
 
@@ -260,11 +295,11 @@ def generate_global_ranks(data: list, tmp_folder_path: str) -> None:
     """
     os.makedirs(tmp_folder_path, exist_ok=True)
     ranks = unix_sort_ranks(set(data), tmp_folder_path)
-    with open(os.path.join(tmp_folder_path, 'ranks.pkl'), 'wb') as output:
+    with open(os.path.join(tmp_folder_path, "ranks.pkl"), "wb") as output:
         pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
 
-def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> Dict[Any, int]:
+def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> dict[Any, int]:
     """
     Function that takes a corpus sorts it with the unix sort -n command and generates the global ranks
     for each value in the corpus.
@@ -281,36 +316,36 @@ def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> Dict[Any, int]:
     dict
         The ranks in the form of k: value, v: the rank of the value
     """
-    unsorted_file_path = os.path.join(tmp_folder_path, 'unsorted_file.txt')
-    sorted_file_path = os.path.join(tmp_folder_path, 'sorted_file.txt')
+    unsorted_file_path = os.path.join(tmp_folder_path, "unsorted_file.txt")
+    sorted_file_path = os.path.join(tmp_folder_path, "sorted_file.txt")
 
-    with open(unsorted_file_path, 'w', encoding='utf-8') as out:
+    with open(unsorted_file_path, "w", encoding="utf-8") as out:
         for var in corpus:
             print(str(var), file=out)
 
-    with open(sorted_file_path, 'w', encoding='utf-8') as f:
-        if os.name == 'nt':
-            subprocess.run(['sort', unsorted_file_path], stdout=f, check=True)
+    with open(sorted_file_path, "w", encoding="utf-8") as f:
+        if os.name == "nt":
+            subprocess.run(["sort", unsorted_file_path], stdout=f, check=True)
         else:
             sort_env = os.environ.copy()
-            sort_env['LC_ALL'] = 'C'
-            subprocess.run(['sort', '-n', unsorted_file_path], stdout=f, env=sort_env, check=True)
+            sort_env["LC_ALL"] = "C"
+            subprocess.run(["sort", "-n", unsorted_file_path], stdout=f, env=sort_env, check=True)
 
-    ranks: List[Tuple[Any, int]] = []
-    with open(sorted_file_path, 'r', encoding='utf-8') as f:
+    ranks: list[tuple[Any, int]] = []
+    with open(sorted_file_path, encoding="utf-8") as f:
         for rank, line in enumerate(f, start=1):
-            ranks.append((convert_data_type(line.rstrip('\n')), rank))
+            ranks.append((convert_data_type(line.rstrip("\n")), rank))
 
     return dict(ranks)
 
 
 def get_column_from_store(file_name: str, tmp_folder_path: str) -> CorrelationClusteringColumn:
-    file_path = os.path.join(tmp_folder_path, f'{file_name}.pkl')
-    with open(file_path, 'rb') as pkl_file:
+    file_path = os.path.join(tmp_folder_path, f"{file_name}.pkl")
+    with open(file_path, "rb") as pkl_file:
         data = pickle.load(pkl_file)
     return data
 
 
 @lru_cache(maxsize=4096)
 def make_filename_safe(file_name: str) -> str:
-    return "".join(c for c in file_name if c.isalpha() or c.isdigit() or c == ' ').rstrip()
+    return "".join(c for c in file_name if c.isalpha() or c.isdigit() or c == " ").rstrip()

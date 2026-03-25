@@ -1,20 +1,20 @@
-import unittest
 import math
+import unittest
 
 from tests import df1, df2
-from valentine.algorithms.matcher_results import MatcherResults
-from valentine.algorithms import JaccardDistanceMatcher
-from valentine.metrics import Precision
 from valentine import valentine_match
+from valentine.algorithms import JaccardDistanceMatcher
+from valentine.algorithms.matcher_results import MatcherResults
+from valentine.metrics import Precision
 
 
 class TestMatcherResults(unittest.TestCase):
     def setUp(self):
         self.matches = valentine_match(df1, df2, JaccardDistanceMatcher())
         self.ground_truth = [
-            ('Cited by', 'Cited by'),
-            ('Authors', 'Authors'),
-            ('EID', 'EID')
+            ("Cited by", "Cited by"),
+            ("Authors", "Authors"),
+            ("EID", "EID"),
         ]
 
     def test_dict(self):
@@ -33,7 +33,7 @@ class TestMatcherResults(unittest.TestCase):
         # Add multiple matches per column
         pairs = list(m.keys())
         for (ta, ca), (tb, cb) in pairs:
-            m[((ta, ca), (tb, cb + 'foo'))] = m[((ta, ca), (tb, cb))] / 2
+            m[((ta, ca), (tb, cb + "foo"))] = m[((ta, ca), (tb, cb))] / 2
 
         # Verify that len gets corrected from 6 to 3
         m_one_to_one = m.one_to_one()
@@ -41,21 +41,21 @@ class TestMatcherResults(unittest.TestCase):
 
         # Verify that none of the lower similarity "foo" entries made it
         for (ta, ca), (tb, cb) in pairs:
-            assert ((ta, ca), (tb, cb + 'foo')) not in m_one_to_one
+            assert ((ta, ca), (tb, cb + "foo")) not in m_one_to_one
 
         # Verify that the cache resets on a new MatcherResults instance
         m_entry = MatcherResults(m)
         assert m_entry._cached_one_to_one is None
 
         # Add one new entry with lower similarity
-        m_entry[(('table_1', 'BLA'), ('table_2', 'BLA'))] = 0.7214057
+        m_entry[(("table_1", "BLA"), ("table_2", "BLA"))] = 0.7214057
 
         # Verify that the new one_to_one is different from the old one
         m_entry_one_to_one = m_entry.one_to_one()
         assert m_one_to_one != m_entry_one_to_one
 
         # Verify that all remaining values are above the median
-        median = sorted(list(m_entry.values()), reverse=True)[math.ceil(len(m_entry)/2)]
+        median = sorted(list(m_entry.values()), reverse=True)[math.ceil(len(m_entry) / 2)]
         for k in m_entry_one_to_one:
             assert m_entry_one_to_one[k] >= median
 
@@ -79,7 +79,7 @@ class TestMatcherResults(unittest.TestCase):
         take_all = self.matches.take_top_n(len(self.matches))
         assert len(take_all) == len(self.matches)
 
-        take_more_than_all = self.matches.take_top_n(len(self.matches)+1)
+        take_more_than_all = self.matches.take_top_n(len(self.matches) + 1)
         assert len(take_more_than_all) == len(self.matches)
 
     def test_copy(self):

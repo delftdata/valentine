@@ -1,13 +1,16 @@
 import math
+
 from ot import emd2
 
 from .column_model import CorrelationClusteringColumn
 from .quantile_histogram import QuantileHistogram
 
 
-def quantile_emd(column1: CorrelationClusteringColumn,
-                 column2: CorrelationClusteringColumn,
-                 quantiles: int = 256):
+def quantile_emd(
+    column1: CorrelationClusteringColumn,
+    column2: CorrelationClusteringColumn,
+    quantiles: int = 256,
+):
     """
     Computes the Earth Mover's Distance (EMD) over two column quantile histograms
 
@@ -32,19 +35,26 @@ def quantile_emd(column1: CorrelationClusteringColumn,
         return math.inf
 
     histogram1 = column1.quantile_histogram
-    histogram2 = QuantileHistogram(column2.long_name, column2.ranks, column2.size, quantiles,
-                                   reference_hist=histogram1)
+    histogram2 = QuantileHistogram(
+        column2.long_name,
+        column2.ranks,
+        column2.size,
+        quantiles,
+        reference_hist=histogram1,
+    )
     if histogram2.is_empty:
         return math.inf
-    h1 = histogram1.get_values/histogram1.get_values.sum()
-    h2 = histogram2.get_values/histogram2.get_values.sum()
+    h1 = histogram1.get_values / histogram1.get_values.sum()
+    h2 = histogram2.get_values / histogram2.get_values.sum()
     return emd2(h1, h2, histogram1.dist_matrix)
 
 
-def intersection_emd(column1: CorrelationClusteringColumn,
-                     column2: CorrelationClusteringColumn,
-                     tmp_folder_path: str,
-                     quantiles: int = 256):
+def intersection_emd(
+    column1: CorrelationClusteringColumn,
+    column2: CorrelationClusteringColumn,
+    tmp_folder_path: str,
+    quantiles: int = 256,
+):
     """
     Computes the intersection Earth Mover's Distance (EMD) over two column quantile histograms as described in
     "Automatic Discovery of Attributes in Relational Databases"
@@ -77,11 +87,15 @@ def intersection_emd(column1: CorrelationClusteringColumn,
         return math.inf
 
     # The intersection of the two columns
-    intersection = [x for x in list(column1.data) + list(column2.data)
-                    if x in common_elements]
+    intersection = [x for x in list(column1.data) + list(column2.data) if x in common_elements]
     intersection_column = CorrelationClusteringColumn(
-        "", f"Intersection of {column1.long_name} {column2.long_name}",
-        intersection, "", "", tmp_folder_path)
+        "",
+        f"Intersection of {column1.long_name} {column2.long_name}",
+        intersection,
+        "",
+        "",
+        tmp_folder_path,
+    )
 
     e1 = quantile_emd(column1, intersection_column, quantiles)
     e2 = quantile_emd(column2, intersection_column, quantiles)

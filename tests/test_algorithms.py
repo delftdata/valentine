@@ -1,12 +1,18 @@
 import pytest
 
 from tests import df1, df2
-from valentine.algorithms import Coma, JaccardDistanceMatcher, DistributionBased, SimilarityFlooding, Cupid
+from valentine.algorithms import (
+    Coma,
+    Cupid,
+    DistributionBased,
+    JaccardDistanceMatcher,
+    SimilarityFlooding,
+)
 from valentine.algorithms.jaccard_distance import StringDistanceFunction
 from valentine.data_sources import DataframeTable
 
-d1 = DataframeTable(df1, name='authors1')
-d2 = DataframeTable(df2, name='authors2')
+d1 = DataframeTable(df1, name="authors1")
+d2 = DataframeTable(df2, name="authors2")
 
 
 def test_coma():
@@ -56,16 +62,25 @@ def test_jaccard():
     assert len(matches_jd_matcher) > 0
 
 
-@pytest.mark.parametrize("distance_function", [StringDistanceFunction.Hamming, StringDistanceFunction.Levenshtein,
-                                               StringDistanceFunction.DamerauLevenshtein,
-                                               StringDistanceFunction.JaroWinkler, StringDistanceFunction.Jaro])
+@pytest.mark.parametrize(
+    "distance_function",
+    [
+        StringDistanceFunction.Hamming,
+        StringDistanceFunction.Levenshtein,
+        StringDistanceFunction.DamerauLevenshtein,
+        StringDistanceFunction.JaroWinkler,
+        StringDistanceFunction.Jaro,
+    ],
+)
 def test_jaccard_distance_function(distance_function):
     # Test the Jaccard matcher with different distance functions
     jd_matcher = JaccardDistanceMatcher(distance_fun=distance_function)
     matches_jd_matcher = jd_matcher.get_matches(d1, d2)
     # Check that it actually produced output
     assert len(matches_jd_matcher) > 0
-    jd_matcher = JaccardDistanceMatcher(threshold_dist=0.5, process_num=2, distance_fun=distance_function)
+    jd_matcher = JaccardDistanceMatcher(
+        threshold_dist=0.5, process_num=2, distance_fun=distance_function
+    )
     matches_jd_matcher = jd_matcher.get_matches(d1, d2)
     # Check that it actually produced output
     assert len(matches_jd_matcher) > 0

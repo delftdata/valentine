@@ -1,28 +1,28 @@
-import chardet
 import csv
+
+import chardet
 from dateutil.parser import parse
 
 
 def get_encoding(ds_path: str) -> str:
-    """ Returns the encoding of the file """
-    test_str = b''
+    """Returns the encoding of the file"""
+    test_str = b""
     number_of_lines_to_read = 500
     count = 0
-    with open(ds_path, 'rb') as f:
+    with open(ds_path, "rb") as f:
         line = f.readline()
         while line and count < number_of_lines_to_read:
             test_str = test_str + line
             count += 1
             line = f.readline()
         result = chardet.detect(test_str)
-    if result['encoding'] == 'ascii':
-        return 'utf-8'
-    else:
-        return result['encoding']
+    if result["encoding"] == "ascii":
+        return "utf-8"
+    return result["encoding"]
 
 
 def get_delimiter(ds_path: str) -> str:
-    """ Returns the delimiter of the csv file """
+    """Returns the delimiter of the csv file"""
     with open(ds_path) as f:
         first_line = f.readline()
         s = csv.Sniffer()

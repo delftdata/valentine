@@ -1,7 +1,7 @@
 import os
+import pickle
 
 import numpy as np
-import pickle
 
 from ...data_sources.base_column import BaseColumn
 from ...utils.utils import convert_data_type
@@ -28,13 +28,16 @@ class CorrelationClusteringColumn(BaseColumn):
     get_original_data()
         Returns the original data instances
     """
-    def __init__(self,
-                 name: str,
-                 column_uid: str,
-                 data: list,
-                 table_name: str,
-                 table_guid: str,
-                 tmp_folder_path: str):
+
+    def __init__(
+        self,
+        name: str,
+        column_uid: str,
+        data: list,
+        table_name: str,
+        table_guid: str,
+        tmp_folder_path: str,
+    ):
         """
         Parameters
         ----------
@@ -100,8 +103,15 @@ class CorrelationClusteringColumn(BaseColumn):
         ndarray
             The ndarray that contains the ranks of the data
         """
-        with open(os.path.join(tmp_folder_path, 'ranks.pkl'), 'rb') as pkl_file:
+        with open(os.path.join(tmp_folder_path, "ranks.pkl"), "rb") as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
-            ranks = np.array(sorted([global_ranks[convert_data_type(x)] for x in column
-                                     if convert_data_type(x) in global_ranks]))
+            ranks = np.array(
+                sorted(
+                    [
+                        global_ranks[convert_data_type(x)]
+                        for x in column
+                        if convert_data_type(x) in global_ranks
+                    ]
+                )
+            )
             return ranks

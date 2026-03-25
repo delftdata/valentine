@@ -2,17 +2,16 @@ import unittest
 
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.metrics import (
-    Precision,
-    Recall,
     F1Score,
+    Precision,
     PrecisionTopNPercent,
+    Recall,
     RecallAtSizeofGroundTruth,
 )
 from valentine.metrics.metric_helpers import get_fp, get_tp_fn
 
 
 class TestMetrics(unittest.TestCase):
-
     def setUp(self) -> None:
         # Scores chosen so that the highest-confidence pairs are the true matches,
         # and "Title" has two competing candidates (DUMMY1, DUMMY2) to exercise 1-1 logic.
@@ -37,7 +36,7 @@ class TestMetrics(unittest.TestCase):
 
         # Handy expected values
         self.expected_precision_1to1 = 0.75  # 3/4 due to Title conflict
-        self.expected_recall_1to1 = 0.6      # 3/5
+        self.expected_recall_1to1 = 0.6  # 3/5
         # Harmonic mean of P=0.75 and R=0.6  ->  0.666666...
         self.expected_f1_1to1 = (2 * self.expected_precision_1to1 * self.expected_recall_1to1) / (
             self.expected_precision_1to1 + self.expected_recall_1to1
@@ -63,7 +62,9 @@ class TestMetrics(unittest.TestCase):
             self.assertAlmostEqual(recall["Recall"], self.expected_recall_1to1, places=6)
 
         with self.subTest(one_to_one=False):
-            recall_n11 = self.matches.get_metrics(self.ground_truth, metrics={Recall(one_to_one=False)})
+            recall_n11 = self.matches.get_metrics(
+                self.ground_truth, metrics={Recall(one_to_one=False)}
+            )
             self.assertIn("Recall", recall_n11)
             self.assertAlmostEqual(recall_n11["Recall"], 0.6, places=6)
 
@@ -74,7 +75,9 @@ class TestMetrics(unittest.TestCase):
             self.assertAlmostEqual(f1["F1Score"], self.expected_f1_1to1, places=6)
 
         with self.subTest(one_to_one=False):
-            f1_n11 = self.matches.get_metrics(self.ground_truth, metrics={F1Score(one_to_one=False)})
+            f1_n11 = self.matches.get_metrics(
+                self.ground_truth, metrics={F1Score(one_to_one=False)}
+            )
             self.assertIn("F1Score", f1_n11)
             self.assertAlmostEqual(f1_n11["F1Score"], 0.6, places=6)
 

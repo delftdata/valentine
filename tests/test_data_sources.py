@@ -1,19 +1,18 @@
 import os
 import tempfile
 import unittest
-from typing import List
 
 import pandas as pd
 
 from valentine.data_sources.base_column import BaseColumn
 from valentine.data_sources.base_table import BaseTable
-from valentine.data_sources.utils import get_encoding, get_delimiter, is_date
-
+from valentine.data_sources.utils import get_delimiter, get_encoding, is_date
 
 # ---- Minimal concrete implementations for the ABCs ----
 
+
 class DummyColumn(BaseColumn):
-    def __init__(self, uid: object, name: str, dtype: str, data: List[object]):
+    def __init__(self, uid: object, name: str, dtype: str, data: list[object]):
         self._uid = uid
         self._name = name
         self._dtype = dtype
@@ -37,7 +36,7 @@ class DummyColumn(BaseColumn):
 
 
 class DummyTable(BaseTable):
-    def __init__(self, uid: object, name: str, columns: List[BaseColumn], df: pd.DataFrame):
+    def __init__(self, uid: object, name: str, columns: list[BaseColumn], df: pd.DataFrame):
         self._uid = uid
         self._name = name
         self._columns = columns
@@ -51,7 +50,7 @@ class DummyTable(BaseTable):
     def name(self) -> str:
         return self._name
 
-    def get_columns(self) -> List[BaseColumn]:
+    def get_columns(self) -> list[BaseColumn]:
         return self._columns
 
     def get_df(self) -> pd.DataFrame:
@@ -63,6 +62,7 @@ class DummyTable(BaseTable):
 
 
 # ---- Tests ----
+
 
 class TestBaseColumnTableAndUtils(unittest.TestCase):
     def setUp(self):

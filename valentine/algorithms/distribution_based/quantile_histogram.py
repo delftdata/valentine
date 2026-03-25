@@ -1,9 +1,10 @@
 from statistics import quantiles
-from numpy import ndarray
+
 import numpy as np
+from numpy import ndarray
 
 
-class QuantileHistogram(object):
+class QuantileHistogram:
     """
     A class used to represent an equi-depth quantile histogram
 
@@ -36,12 +37,14 @@ class QuantileHistogram(object):
          Compute the distance matrix between all buckets.
     """
 
-    def __init__(self,
-                 name: tuple,
-                 ranks: ndarray,
-                 normalization: int,
-                 n_quantiles: int,
-                 reference_hist=None):
+    def __init__(
+        self,
+        name: tuple,
+        ranks: ndarray,
+        normalization: int,
+        n_quantiles: int,
+        reference_hist=None,
+    ):
         """
         Parameters
         ----------
@@ -62,8 +65,11 @@ class QuantileHistogram(object):
         self.normalization_factor = normalization
         self.quantiles = n_quantiles
         if reference_hist is None:
-            bucket = [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method='inclusive')] \
-                if len(ranks) > 1 else ranks
+            bucket = (
+                [round(q, 3) for q in quantiles(ranks, n=self.quantiles + 1, method="inclusive")]
+                if len(ranks) > 1
+                else ranks
+            )
 
             self.add_buckets(min(ranks), list(set(bucket)))
             self.add_values(ranks)
@@ -97,9 +103,7 @@ class QuantileHistogram(object):
         """
         return np.sum(self.get_values) == 0
 
-    def add_buckets(self,
-                    min_val: int,
-                    bb: list):
+    def add_buckets(self, min_val: int, bb: list):
         """
         Create the buckets with the given bucket boundaries
 
@@ -113,12 +117,10 @@ class QuantileHistogram(object):
         self.bucket_boundaries[0] = (min_val, bb[0])
         i = 0
         while i < len(bb) - 1:
-            self.bucket_boundaries[i+1] = (bb[i], bb[i+1])
+            self.bucket_boundaries[i + 1] = (bb[i], bb[i + 1])
             i = i + 1
 
-    def add_values(self,
-                   values,
-                   norm=True):
+    def add_values(self, values, norm=True):
         """
         Add all values to buckets
 
@@ -142,7 +144,9 @@ class QuantileHistogram(object):
         """
         Normalize the bucket values based on the normalization factor
         """
-        self.bucket_values = {k: v / self.normalization_factor for k, v in self.bucket_values.items()}
+        self.bucket_values = {
+            k: v / self.normalization_factor for k, v in self.bucket_values.items()
+        }
 
     def bucket_binary_search(self, x):
         """
@@ -163,7 +167,7 @@ class QuantileHistogram(object):
             mid = left + (right - left) // 2
             if self.bucket_boundaries[mid][0] <= x <= self.bucket_boundaries[mid][1]:
                 return mid
-            elif self.bucket_boundaries[mid][1] < x:
+            if self.bucket_boundaries[mid][1] < x:
                 left = mid + 1
             else:
                 right = mid - 1

@@ -1,20 +1,19 @@
+import math
 import unittest
 from types import SimpleNamespace
-from typing import List
-import math
+
 import pandas as pd
 from anytree import LevelOrderIter
 
 from valentine.algorithms.cupid import (
     cupid_model,
     linguistic_matching as cupid_ling,
-    structural_similarity as cupid_struct,
-    tree_match as cupid_tree,
     schema_element as cupid_elem,
     schema_element_node as cupid_node,  # noqa: F401
     schema_tree as cupid_tree_mod,
+    structural_similarity as cupid_struct,
+    tree_match as cupid_tree,
 )
-
 from valentine.data_sources.base_column import BaseColumn
 from valentine.data_sources.base_table import BaseTable
 
@@ -24,33 +23,50 @@ class DummyColumn(BaseColumn):
         self._uid, self._name, self._dtype, self._data = uid, name, dtype, data
 
     @property
-    def unique_identifier(self): return self._uid
+    def unique_identifier(self):
+        return self._uid
+
     @property
-    def name(self): return self._name
+    def name(self):
+        return self._name
+
     @property
-    def data_type(self): return self._dtype
+    def data_type(self):
+        return self._dtype
+
     @property
-    def data(self): return self._data
+    def data(self):
+        return self._data
 
 
 class DummyTable(BaseTable):
-    def __init__(self, uid, name, cols: List[BaseColumn]):
+    def __init__(self, uid, name, cols: list[BaseColumn]):
         self._uid, self._name, self._cols = uid, name, cols
 
     @property
-    def unique_identifier(self): return self._uid
+    def unique_identifier(self):
+        return self._uid
+
     @property
-    def name(self): return self._name
-    def get_columns(self) -> List[BaseColumn]: return self._cols
-    def get_df(self) -> pd.DataFrame: return pd.DataFrame({c.name: c.data for c in self._cols})
+    def name(self):
+        return self._name
+
+    def get_columns(self) -> list[BaseColumn]:
+        return self._cols
+
+    def get_df(self) -> pd.DataFrame:
+        return pd.DataFrame({c.name: c.data for c in self._cols})
+
     @property
-    def is_empty(self) -> bool: return False
+    def is_empty(self) -> bool:
+        return False
 
 
 # ---- Patch nltk + wordnet so tests run offline ----
 def _mock_word_tokenize(s: str):
     s = s.replace(",", " , ").replace("_", " ")
     return s.split()
+
 
 def _install_nltk_mocks():
     mock_stopwords = SimpleNamespace(words=lambda lang: ["the", "and"])
@@ -90,8 +106,12 @@ class TestCupidLinguisticStructural(unittest.TestCase):
         self.assertEqual(cupid_ling.add_token_type(t_num), cupid_elem.TokenTypes.NUMBER)
         self.assertEqual(cupid_ling.add_token_type(t_txt), cupid_elem.TokenTypes.CONTENT)
 
-        a1 = cupid_elem.Token(); a1.data = "alpha"; a1.token_type = cupid_elem.TokenTypes.CONTENT
-        b1 = cupid_elem.Token(); b1.data = "beta";  b1.token_type = cupid_elem.TokenTypes.CONTENT
+        a1 = cupid_elem.Token()
+        a1.data = "alpha"
+        a1.token_type = cupid_elem.TokenTypes.CONTENT
+        b1 = cupid_elem.Token()
+        b1.data = "beta"
+        b1.token_type = cupid_elem.TokenTypes.CONTENT
 
         sim_ab = cupid_ling.name_similarity_tokens([a1], [b1])
         self.assertGreaterEqual(sim_ab, 0.0)
@@ -108,7 +128,11 @@ class TestCupidLinguisticStructural(unittest.TestCase):
 
     def test_data_type_and_compatibility(self):
         def mk(content: str):
-            t = cupid_elem.Token(); t.data = content; t.token_type = cupid_elem.TokenTypes.CONTENT; return t
+            t = cupid_elem.Token()
+            t.data = content
+            t.token_type = cupid_elem.TokenTypes.CONTENT
+            return t
+
         sim = cupid_ling.data_type_similarity([mk("alpha")], [mk("beta")])
         self.assertGreaterEqual(sim, 0.0)
 
@@ -120,10 +144,17 @@ class TestCupidLinguisticStructural(unittest.TestCase):
         e1 = cupid_elem.SchemaElement("A")
         e2 = cupid_elem.SchemaElement("B")
         for w in ["hello", "world"]:
-            t = cupid_elem.Token(); t.data = w; t.token_type = cupid_elem.TokenTypes.CONTENT; e1.add_token(t)
+            t = cupid_elem.Token()
+            t.data = w
+            t.token_type = cupid_elem.TokenTypes.CONTENT
+            e1.add_token(t)
         for w in ["hello", "beta"]:
-            t = cupid_elem.Token(); t.data = w; t.token_type = cupid_elem.TokenTypes.CONTENT; e2.add_token(t)
-        e1.add_category("alpha"); e2.add_category("beta")
+            t = cupid_elem.Token()
+            t.data = w
+            t.token_type = cupid_elem.TokenTypes.CONTENT
+            e2.add_token(t)
+        e1.add_category("alpha")
+        e2.add_category("beta")
 
         nse = cupid_ling.name_similarity_elements(e1, e2)
         self.assertGreaterEqual(nse, 0.0)
@@ -137,27 +168,51 @@ class TestCupidLinguisticStructural(unittest.TestCase):
         root = st.get_node("DB__X")
         st.add_node(table_name="T", table_guid="tg", data_type="Table", parent=root)
         tbl = st.get_node("T")
-        st.add_node(table_name="T", table_guid="tg", column_name="C1", column_guid="c1", data_type="int", parent=tbl)
-        st.add_node(table_name="T", table_guid="tg", column_name="C2", column_guid="c2", data_type="int", parent=tbl)
+        st.add_node(
+            table_name="T",
+            table_guid="tg",
+            column_name="C1",
+            column_guid="c1",
+            data_type="int",
+            parent=tbl,
+        )
+        st.add_node(
+            table_name="T",
+            table_guid="tg",
+            column_name="C2",
+            column_guid="c2",
+            data_type="int",
+            parent=tbl,
+        )
 
         st2 = cupid_tree_mod.SchemaTree("DB__Y")
         root2 = st2.get_node("DB__Y")
         st2.add_node(table_name="U", table_guid="ug", data_type="Table", parent=root2)
         tbl2 = st2.get_node("U")
-        st2.add_node(table_name="U", table_guid="ug", column_name="D1", column_guid="d1", data_type="int", parent=tbl2)
-        st2.add_node(table_name="U", table_guid="ug", column_name="D2", column_guid="d2", data_type="int", parent=tbl2)
+        st2.add_node(
+            table_name="U",
+            table_guid="ug",
+            column_name="D1",
+            column_guid="d1",
+            data_type="int",
+            parent=tbl2,
+        )
+        st2.add_node(
+            table_name="U",
+            table_guid="ug",
+            column_name="D2",
+            column_guid="d2",
+            data_type="int",
+            parent=tbl2,
+        )
 
         leaves_s = [n.long_name for n in st.get_leaves()]
         leaves_t = [n.long_name for n in st2.get_leaves()]
 
         # Provide sims for ALL leaf pairs to avoid KeyError inside compute_ssim
-        sims = {
-            (s, t): {'wsim': 0.0, 'ssim': 0.0, 'lsim': 0.0}
-            for s in leaves_s
-            for t in leaves_t
-        }
-        sims[(leaves_s[0], leaves_t[0])]['wsim'] = 1.0
-        sims[(leaves_s[0], leaves_t[0])]['ssim'] = 1.0
+        sims = {(s, t): {"wsim": 0.0, "ssim": 0.0, "lsim": 0.0} for s in leaves_s for t in leaves_t}
+        sims[(leaves_s[0], leaves_t[0])]["wsim"] = 1.0
+        sims[(leaves_s[0], leaves_t[0])]["ssim"] = 1.0
 
         ssim = cupid_struct.compute_ssim(tbl, tbl2, sims, th_accept=0.5)
         self.assertFalse(math.isnan(ssim))
@@ -165,22 +220,40 @@ class TestCupidLinguisticStructural(unittest.TestCase):
         self.assertLessEqual(ssim, 1.0)
 
         cupid_struct.change_structural_similarity(leaves_s, leaves_t, sims, factor=2.0)
-        self.assertEqual(sims[(leaves_s[0], leaves_t[0])]['ssim'], 1.0)
+        self.assertEqual(sims[(leaves_s[0], leaves_t[0])]["ssim"], 1.0)
 
     def test_tree_match_helpers_and_mapping(self):
-        st = cupid_tree_mod.SchemaTree("DB__A"); root = st.get_node("DB__A")
+        st = cupid_tree_mod.SchemaTree("DB__A")
+        root = st.get_node("DB__A")
         st.add_node(table_name="T", table_guid="tg", data_type="Table", parent=root)
         tbl = st.get_node("T")
-        st.add_node(table_name="T", table_guid="tg", column_name="C", column_guid="c", data_type="int", parent=tbl)
+        st.add_node(
+            table_name="T",
+            table_guid="tg",
+            column_name="C",
+            column_guid="c",
+            data_type="int",
+            parent=tbl,
+        )
 
-        st2 = cupid_tree_mod.SchemaTree("DB__B"); root2 = st2.get_node("DB__B")
+        st2 = cupid_tree_mod.SchemaTree("DB__B")
+        root2 = st2.get_node("DB__B")
         st2.add_node(table_name="U", table_guid="ug", data_type="Table", parent=root2)
         tbl2 = st2.get_node("U")
-        st2.add_node(table_name="U", table_guid="ug", column_name="D", column_guid="d", data_type="int", parent=tbl2)
+        st2.add_node(
+            table_name="U",
+            table_guid="ug",
+            column_name="D",
+            column_guid="d",
+            data_type="int",
+            parent=tbl2,
+        )
 
         comp = {"int": {"int": 1.0}}
-        l_sims = { (st.get_leaves()[0].long_name, st2.get_leaves()[0].long_name): 0.5 }
-        sims = cupid_tree.get_sims(st.get_leaves(), st2.get_leaves(), comp, l_sims, leaf_w_struct=0.2)
+        l_sims = {(st.get_leaves()[0].long_name, st2.get_leaves()[0].long_name): 0.5}
+        sims = cupid_tree.get_sims(
+            st.get_leaves(), st2.get_leaves(), comp, l_sims, leaf_w_struct=0.2
+        )
         self.assertIn((st.get_leaves()[0].long_name, st2.get_leaves()[0].long_name), sims)
 
         new = cupid_tree.recompute_wsim(st, st2, sims, w_struct=0.6, th_accept=0.14)
@@ -202,11 +275,13 @@ class TestCupidLinguisticStructural(unittest.TestCase):
 
         for s_ln in non_leaves_s:
             for t_ln in non_leaves_t:
-                new.setdefault((s_ln, t_ln), {'wsim': 0.0, 'ssim': 0.0, 'lsim': 0.0})
+                new.setdefault((s_ln, t_ln), {"wsim": 0.0, "ssim": 0.0, "lsim": 0.0})
 
         # Explicitly ensure the table-table pair exists, then bump wsim
-        entry = new.setdefault((tbl.long_name, tbl2.long_name), {'wsim': 0.0, 'ssim': 0.0, 'lsim': 0.0})
-        entry['wsim'] = 1.0
+        entry = new.setdefault(
+            (tbl.long_name, tbl2.long_name), {"wsim": 0.0, "ssim": 0.0, "lsim": 0.0}
+        )
+        entry["wsim"] = 1.0
 
         # The function should run and return a list (may be empty depending on structure/thresholds)
         non_leaves = cupid_tree.mapping_generation_non_leaves(st, st2, new, th_accept=0.0)
@@ -219,7 +294,7 @@ class TestCupidLinguisticStructural(unittest.TestCase):
         def fake_tree_match(st, tt, cats, *args, **kwargs):
             s_leaf = st.get_leaves()[0].long_name
             t_leaf = tt.get_leaves()[0].long_name
-            return {(s_leaf, t_leaf): {'wsim': 1.0, 'ssim': 1.0, 'lsim': 0.0}}
+            return {(s_leaf, t_leaf): {"wsim": 1.0, "ssim": 1.0, "lsim": 0.0}}
 
         def fake_recompute_wsim(st, tt, sims, *args, **kwargs):
             return sims
@@ -253,9 +328,13 @@ class TestCupidLinguisticStructural(unittest.TestCase):
             self.assertIsInstance(res, dict)
             self.assertTrue(res)
         finally:
-            cupid_model.tree_match, cupid_model.recompute_wsim, cupid_model.mapping_generation_leaves = (
-                orig_tm_m, orig_rc_m, orig_map_m
-            )
-            cupid_tree.tree_match, cupid_tree.recompute_wsim, cupid_tree.mapping_generation_leaves = (
-                orig_tm, orig_rc, orig_map
-            )
+            (
+                cupid_model.tree_match,
+                cupid_model.recompute_wsim,
+                cupid_model.mapping_generation_leaves,
+            ) = (orig_tm_m, orig_rc_m, orig_map_m)
+            (
+                cupid_tree.tree_match,
+                cupid_tree.recompute_wsim,
+                cupid_tree.mapping_generation_leaves,
+            ) = (orig_tm, orig_rc, orig_map)
