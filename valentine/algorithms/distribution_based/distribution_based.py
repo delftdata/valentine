@@ -151,7 +151,7 @@ class DistributionBased(BaseMatcher):
             self.__column_names, self.__threshold1, tmp_folder_path, self.__quantiles
         )
 
-        all_attributes = list()
+        all_attributes = []
         i = 1
         for components in connected_components:
             if len(components) > 1:
@@ -164,7 +164,7 @@ class DistributionBased(BaseMatcher):
                 )
                 all_attributes.append((list(components), edges))
 
-        results = list()
+        results = []
         for components, edges in all_attributes:
             results.append(discovery.correlation_clustering_pulp(components, edges))
 
@@ -193,7 +193,7 @@ class DistributionBased(BaseMatcher):
             self.__quantiles,
         )
 
-        all_attributes = list()
+        all_attributes = []
         i = 1
         for components in connected_components:
             if len(components) > 1:
@@ -207,7 +207,7 @@ class DistributionBased(BaseMatcher):
                 )
                 all_attributes.append((list(components), edges))
 
-        results = list()
+        results = []
         for components, edges in all_attributes:
             results.append(discovery.correlation_clustering_pulp(components, edges))
 

@@ -14,7 +14,7 @@ def compute_weighted_similarity(s_sim, l_sim, w_struct=0.5):
 
 
 def get_sims(s_leaves, t_leaves, compatibility_table, l_sims, leaf_w_struct):
-    sims = dict()
+    sims = {}
     for s, t in product(s_leaves, t_leaves):
         if s.data_type in compatibility_table and t.data_type in compatibility_table:
             s_sim = compatibility_table[s.data_type][t.data_type]
@@ -48,8 +48,8 @@ def tree_match(
     s_leaves = source_tree.get_leaves()
     t_leaves = target_tree.get_leaves()
     sims = get_sims(s_leaves, t_leaves, compatibility_table, l_sims, leaf_w_struct)
-    s_post_order = [node for node in PostOrderIter(source_tree.root)]
-    t_post_order = [node for node in PostOrderIter(target_tree.root)]
+    s_post_order = list(PostOrderIter(source_tree.root))
+    t_post_order = list(PostOrderIter(target_tree.root))
     for s in s_post_order:
         s_name = s.long_name
 
@@ -101,8 +101,8 @@ def tree_match(
 
 
 def recompute_wsim(source_tree, target_tree, sims, w_struct=0.6, th_accept=0.14):
-    s_post_order = [node for node in PostOrderIter(source_tree.root)]
-    t_post_order = [node for node in PostOrderIter(target_tree.root)]
+    s_post_order = list(PostOrderIter(source_tree.root))
+    t_post_order = list(PostOrderIter(target_tree.root))
 
     for s in s_post_order:
         s_name = s.long_name

@@ -74,12 +74,12 @@ def add_token_type(token: Token):
 
 
 def compute_compatibility(categories):
-    compatibility_table = dict()
+    compatibility_table = {}
     for cat1, cat2 in combinations_with_replacement(categories, 2):
         if cat1 not in compatibility_table:
-            compatibility_table[cat1] = dict()
+            compatibility_table[cat1] = {}
         if cat2 not in compatibility_table:
-            compatibility_table[cat2] = dict()
+            compatibility_table[cat2] = {}
         if cat1 == cat2:
             compatibility_table[cat1][cat2] = 1.0
             compatibility_table[cat2][cat1] = 1.0
@@ -104,9 +104,7 @@ def comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism
         source_tree, target_tree, compatibility_table, th_ns
     )
     if parallelism == 1:
-        l_sim = {
-            k: v for k, v in [l_sim_proc(pair, compatibility_table) for pair in elements_to_compare]
-        }
+        l_sim = dict([l_sim_proc(pair, compatibility_table) for pair in elements_to_compare])
     else:
         with get_context("spawn").Pool(parallelism) as process_pool:
             l_sim = dict(
@@ -119,8 +117,8 @@ def comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism
 
 
 def generate_parallel_l_sim_input(source_tree, target_tree, compatibility_table, th_ns):
-    all_nodes_s = [node for node in LevelOrderIter(source_tree.root)]
-    all_nodes_t = [node for node in LevelOrderIter(target_tree.root)]
+    all_nodes_s = list(LevelOrderIter(source_tree.root))
+    all_nodes_t = list(LevelOrderIter(target_tree.root))
     all_nodes = product(all_nodes_s, all_nodes_t)
     for pair in all_nodes:
         if (
@@ -191,7 +189,7 @@ def get_partial_similarity(token_set1, token_set2):
 
 
 def get_synonyms(word) -> set:
-    return set(ss for ss in wn.synsets(word))
+    return set(wn.synsets(word))
 
 
 # the higher, the better

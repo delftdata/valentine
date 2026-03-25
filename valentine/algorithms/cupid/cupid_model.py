@@ -29,7 +29,7 @@ class Cupid(BaseMatcher):
         self.__parallelism = int(parallelism)
         self.__categories = set()
         # schema name:str, schema_tree
-        self.__schemata = dict()
+        self.__schemata = {}
 
     def get_matches(
         self, source_input: BaseTable, target_input: BaseTable

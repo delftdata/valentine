@@ -12,4 +12,4 @@ class SchemaElementNode(SchemaElement, NodeMixin):
             self.children = children
 
     def get_leaf_names(self):
-        return tuple(map(lambda x: x.long_name, self.leaves))
+        return tuple(x.long_name for x in self.leaves)

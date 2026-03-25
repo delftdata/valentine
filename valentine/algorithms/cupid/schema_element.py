@@ -6,9 +6,9 @@ class SchemaElement:
     def __init__(self, name):
         super().__init__()
         # an element can belong to multiple categories
-        self.categories = list()
+        self.categories = []
         self.data_type = None
-        self.tokens = list()
+        self.tokens = []
         self.initial_name = name
         self.long_name = None
 

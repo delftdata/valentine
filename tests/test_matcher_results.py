@@ -22,7 +22,7 @@ class TestMatcherResults(unittest.TestCase):
 
     def test_get_metrics(self):
         metrics = self.matches.get_metrics(self.ground_truth)
-        assert all([x in metrics for x in {"Precision", "Recall", "F1Score"}])
+        assert all(x in metrics for x in {"Precision", "Recall", "F1Score"})
 
         metrics_specific = self.matches.get_metrics(self.ground_truth, metrics={Precision()})
         assert "Precision" in metrics_specific
@@ -55,7 +55,7 @@ class TestMatcherResults(unittest.TestCase):
         assert m_one_to_one != m_entry_one_to_one
 
         # Verify that all remaining values are above the median
-        median = sorted(list(m_entry.values()), reverse=True)[math.ceil(len(m_entry) / 2)]
+        median = sorted(m_entry.values(), reverse=True)[math.ceil(len(m_entry) / 2)]
         for k in m_entry_one_to_one:
             assert m_entry_one_to_one[k] >= median
 

@@ -110,7 +110,7 @@ class SimilarityFlooding(BaseMatcher):
         g1_out_edges = self.__graph1.out_edges
         g2_out_edges = self.__graph2.out_edges
 
-        for key in prev_map.keys():
+        for key in prev_map:
             n1 = key.node1
             n2 = key.node2
             if not n1.name.startswith("NodeID"):

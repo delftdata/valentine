@@ -60,17 +60,17 @@ class MatcherResults(dict):
             self._cached_one_to_one = matches_dict
             return MatcherResults(matches_dict)
 
-        matched = dict()
+        matched = {}
 
-        for key in matches_dict.keys():
+        for key in matches_dict:
             matched[key[0]] = False
             matched[key[1]] = False
 
         median = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
 
-        matches1to1_dict = dict()
+        matches1to1_dict = {}
 
-        for key in matches_dict.keys():
+        for key in matches_dict:
             if (not matched[key[0]]) and (not matched[key[1]]):
                 similarity = matches_dict.get(key)
                 if similarity is not None and similarity >= median:
@@ -100,7 +100,7 @@ class MatcherResults(dict):
             top 'percent' of matches.
         """
         matches = self.get_copy()
-        number_to_keep = int(math.ceil((percent / 100) * len(matches.keys())))
+        number_to_keep = math.ceil((percent / 100) * len(matches.keys()))
         matches = dict(sorted(matches.items(), key=lambda x: x[1], reverse=True)[:number_to_keep])
         return MatcherResults(matches)
 

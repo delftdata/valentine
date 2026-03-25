@@ -61,7 +61,7 @@ class Graph:
         if self.graph.has_node(Node(column.data_type, table.name)):
             self.graph.add_edge(
                 clm_node,
-                [n for n in self.graph.predecessors(Node(column.data_type, table.name))][0],
+                next(iter(self.graph.predecessors(Node(column.data_type, table.name)))),
                 label="SQLtype",
             )
         else:

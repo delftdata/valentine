@@ -30,7 +30,7 @@ def get_tp_fn(matches: MatcherResults, ground_truth: list[tuple[str, str]], n: i
     fn = 0
 
     matches_dict = matches.get_copy()
-    all_matches = [(m[0][1], m[1][1]) for m in matches_dict.keys()]
+    all_matches = [(m[0][1], m[1][1]) for m in matches_dict]
 
     if n is not None:
         all_matches = all_matches[:n]
@@ -66,7 +66,7 @@ def get_fp(matches: MatcherResults, ground_truth: list[tuple[str, str]], n: int 
     """
     fp = 0
     matches_dict = matches.get_copy()
-    all_matches = [(m[0][1], m[1][1]) for m in matches_dict.keys()]
+    all_matches = [(m[0][1], m[1][1]) for m in matches_dict]
 
     if n is not None:
         all_matches = all_matches[:n]

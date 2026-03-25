@@ -166,7 +166,7 @@ def insert_to_dict(dc: dict[Any, list[dict[str, Any]]], k: Any, v: dict[str, Any
          EMD/ColumnName pair
     """
     if k not in dc:
-        dc[k] = list()
+        dc[k] = []
     dc[k].append(v)
 
 
@@ -180,7 +180,7 @@ def transform_dict(dc: dict[tuple[Any, Any], float]) -> dict[Any, list[dict[str,
     dc : dict
         the dictionary
     """
-    tmp_dict: dict[Any, list[dict[str, Any]]] = dict()
+    tmp_dict: dict[Any, list[dict[str, Any]]] = {}
     append = insert_to_dict
     for (k1, k2), v in dc.items():
         append(tmp_dict, k1, {"e": v, "c": k2})

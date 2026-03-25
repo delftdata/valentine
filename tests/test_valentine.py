@@ -17,7 +17,7 @@ class TestValentine(unittest.TestCase):
         except NotAValentineMatcher:
             pass
         else:
-            assert False
+            raise AssertionError()
 
     def test_batch_generator(self):
         n = 3

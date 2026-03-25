@@ -26,7 +26,7 @@ class PropagationGraph:
         else:
             edges = c_graph.out_edges(node)
 
-        labels = dict()
+        labels = {}
         for e in edges:
             edge_data = c_graph.get_edge_data(e[0], e[1])
 

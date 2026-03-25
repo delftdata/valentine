@@ -44,7 +44,7 @@ def compute_distribution_clusters(
     """
     combinations = column_combinations(columns, quantiles, tmp_folder_path, intersection=False)
 
-    matrix_a: dict = transform_dict({k: v for k, v in [process_emd(cmb) for cmb in combinations]})
+    matrix_a: dict = transform_dict(dict([process_emd(cmb) for cmb in combinations]))
 
     ctf_clm_gnr = cuttoff_column_generator(matrix_a, columns, threshold, tmp_folder_path)
 
@@ -135,7 +135,7 @@ def compute_attributes(
         distribution_clusters, quantiles, tmp_folder_path, intersection=True
     )
 
-    matrix_i: dict = transform_dict({k: v for k, v in [process_emd(cmb) for cmb in combinations]})
+    matrix_i: dict = transform_dict(dict([process_emd(cmb) for cmb in combinations]))
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
@@ -180,7 +180,7 @@ def compute_attributes_parallel(
 
 
 def get_attribute_graph(distribution_clusters: list, matrix_i: dict, threshold: float):
-    g_a = dict()
+    g_a = {}
     matrix_e = np.zeros((len(distribution_clusters), len(distribution_clusters)))
 
     for i, cluster in enumerate(distribution_clusters):
@@ -192,7 +192,7 @@ def get_attribute_graph(distribution_clusters: list, matrix_i: dict, threshold: 
 
         for c_j in n_c:
             matrix_e[i][distribution_clusters.index(c_j)] = 1
-        g_a[cluster] = dict()
+        g_a[cluster] = {}
 
     matrix_m = matrix_e + np.dot(matrix_e, matrix_e)
     for i, cluster_i in enumerate(distribution_clusters):
@@ -230,7 +230,7 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
             cat=plp.LpInteger,
             lowBound=0,
             upBound=1,
-            name="({0},{1})".format(
+            name="({},{})".format(
                 str(i)
                 .replace(" ", "__WHITESPACE__")
                 .replace("-", "__DASH__")
@@ -254,7 +254,7 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
 
     opt_model.solve(PULP_CBC_CMD(msg=False))
 
-    result = dict()
+    result = {}
 
     for v in opt_model.variables():
         result[

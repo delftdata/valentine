@@ -7,7 +7,7 @@ from .schema_element_node import SchemaElementNode
 class SchemaTree:
     def __init__(self, root):
         # k: node name v: SchemaElementNode object
-        self.nodes = dict()
+        self.nodes = {}
         self.add_node(root)
         self.schema_name = root
         self.schema_tree = None
@@ -48,14 +48,14 @@ class SchemaTree:
 
     def print_schema_tree(self):
         for pre, _, node in self.get_schema_tree():
-            tree_str = "%s%s" % (pre, node.name + str(node.categories))
+            tree_str = f"{pre}{node.name + str(node.categories)}"
             print(tree_str.ljust(8))
 
     def get_leaves(self):
         return self.get_node(self.schema_name).leaves
 
     def get_leaf_names(self):
-        return tuple(map(lambda x: x.long_name, self.get_leaves()))
+        return tuple(x.long_name for x in self.get_leaves())
 
     @property
     def height(self):

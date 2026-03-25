@@ -80,7 +80,7 @@ def intersection_emd(
     float
         the intersection EMD value between column1 and column2
     """
-    common_elements = set(list(column1.data)).intersection(set(list(column2.data)))
+    common_elements = set(column1.data).intersection(set(column2.data))
 
     # If the two columns do not share any common elements return inf
     if len(common_elements) == 0:

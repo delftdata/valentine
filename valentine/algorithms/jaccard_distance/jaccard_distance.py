@@ -118,23 +118,23 @@ class JaccardDistanceMatcher(BaseMatcher):
                 StringDistanceFunction.Exact,
             ]:
                 intersection_cnt = intersection_cnt + self.__process_distance(
-                    cmb + (levenshtein_distance, True)
+                    (*cmb, levenshtein_distance, True)
                 )
             elif distance_function == StringDistanceFunction.DamerauLevenshtein:
                 intersection_cnt = intersection_cnt + self.__process_distance(
-                    cmb + (damerau_levenshtein_distance, True)
+                    (*cmb, damerau_levenshtein_distance, True)
                 )
             elif distance_function == StringDistanceFunction.Hamming:
                 intersection_cnt = intersection_cnt + self.__process_distance(
-                    cmb + (hamming_distance, True)
+                    (*cmb, hamming_distance, True)
                 )
             elif distance_function == StringDistanceFunction.Jaro:
                 intersection_cnt = intersection_cnt + self.__process_distance(
-                    cmb + (jaro_similarity, False)
+                    (*cmb, jaro_similarity, False)
                 )
             elif distance_function == StringDistanceFunction.JaroWinkler:
                 intersection_cnt = intersection_cnt + self.__process_distance(
-                    cmb + (jaro_winkler_similarity, False)
+                    (*cmb, jaro_winkler_similarity, False)
                 )
 
         union_cnt = len(set1) + len(set2) - intersection_cnt
