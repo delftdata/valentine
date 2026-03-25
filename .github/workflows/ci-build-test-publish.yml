@@ -15,12 +15,12 @@ jobs:
     name: Build distributions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
-          python-version: "3.12"
+          python-version: "3.14"
           cache: "pip"
 
       - name: Install build tooling
@@ -32,7 +32,7 @@ jobs:
         run: python -m build --sdist --wheel --outdir dist
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: dist
           path: dist/*
@@ -47,16 +47,16 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
           cache: "pip"
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5.2.0
         with:
           distribution: 'zulu'
           java-version: '11'
@@ -67,7 +67,7 @@ jobs:
           pip install .
 
       - name: Install test deps
-        run: pip install pytest==8.3.3
+        run: pip install pytest==9.0.2
 
       - name: Run tests (unittest)
         run: python -m unittest discover tests
@@ -83,22 +83,22 @@ jobs:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
         python-version: [ '3.10', '3.11', '3.12', '3.13', '3.14' ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
           cache: "pip"
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5.2.0
         with:
           distribution: 'zulu'
           java-version: '11'
 
       - name: Download built dists
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.1
         with:
           name: dist
           path: dist
@@ -116,7 +116,7 @@ jobs:
           fi
 
       - name: Install test deps
-        run: pip install pytest==8.3.3
+        run: pip install pytest==9.0.2
 
       - name: Run tests (against installed wheel)
         run: python -m unittest discover tests
@@ -132,25 +132,15 @@ jobs:
       contents: read
     steps:
       - name: Download built artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8.0.1
         with:
           name: dist
           path: dist
 
-      # A) Trusted Publisher / OIDC (recommended)
+      # A) Trusted Publisher / OIDC
       - name: Publish (PyPI via OIDC)
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@v1.13.0
         with:
           packages-dir: dist/
           verify-metadata: true
           skip-existing: false
-
-      # If you prefer token auth (not recomended) instead of OIDC, replace the step above with:
-      # - name: Publish (PyPI via API token)
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     user: __token__
-      #     password: ${{ secrets.PYPI_API_TOKEN }}
-      #     packages-dir: dist/
-      #     verify-metadata: true
-      #     skip-existing: false
