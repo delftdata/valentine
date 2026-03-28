@@ -145,8 +145,8 @@ def l_sim_proc(pair: tuple, compatibility_table: dict):
 
 
 def data_type_similarity(token_set1, token_set2):
-    sum1 = 0
-    sum2 = 0
+    numerator = 0
+    denominator = 0
     for tt in TokenTypes:
         if tt == TokenTypes.SYMBOLS:
             continue
@@ -154,12 +154,12 @@ def data_type_similarity(token_set1, token_set2):
         t2 = [t for t in token_set2 if t.token_type == tt]
         if len(t1) == 0 or len(t2) == 0:
             continue
-        sim = name_similarity_tokens(t1, t2)
-        sum1 = sum1 + tt.weight * sim
-        sum2 = sum2 + tt.weight
-    if sum1 == 0 or sum2 == 0:
+        raw_sum = get_partial_similarity(t1, t2) + get_partial_similarity(t2, t1)
+        numerator += tt.weight * raw_sum
+        denominator += tt.weight * (len(t1) + len(t2))
+    if denominator == 0:
         return 0
-    return sum1 / sum2
+    return numerator / denominator
 
 
 # max is 1
@@ -220,8 +220,8 @@ def compute_similarity_leven(word1, word2):
 
 # max is 0.5
 def name_similarity_elements(element1, element2):
-    sum1 = 0
-    sum2 = 0
+    numerator = 0
+    denominator = 0
 
     for tt in TokenTypes:
         if tt == TokenTypes.SYMBOLS:
@@ -230,14 +230,14 @@ def name_similarity_elements(element1, element2):
         t2 = element2.get_tokens_by_token_type(tt)
         if len(t1) == 0 or len(t2) == 0:
             continue
-        sim = name_similarity_tokens(t1, t2)
-        sum1 = sum1 + tt.weight * sim
-        sum2 = sum2 + tt.weight
+        raw_sum = get_partial_similarity(t1, t2) + get_partial_similarity(t2, t1)
+        numerator += tt.weight * raw_sum
+        denominator += tt.weight * (len(t1) + len(t2))
 
-    if sum1 == 0 or sum2 == 0:
+    if denominator == 0:
         return 0
 
-    return sum1 / sum2
+    return numerator / denominator
 
 
 def compute_lsim(element1, element2):

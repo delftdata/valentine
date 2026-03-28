@@ -219,7 +219,9 @@ class TestCupidLinguisticStructural(unittest.TestCase):
         self.assertGreaterEqual(ssim, 0.0)
         self.assertLessEqual(ssim, 1.0)
 
-        cupid_struct.change_structural_similarity(leaves_s, leaves_t, sims, factor=2.0)
+        cupid_struct.change_structural_similarity(
+            leaves_s, leaves_t, sims, factor=2.0, leaf_w_struct=0.5
+        )
         self.assertEqual(sims[(leaves_s[0], leaves_t[0])]["ssim"], 1.0)
 
     def test_tree_match_helpers_and_mapping(self):
