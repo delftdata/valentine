@@ -1,10 +1,7 @@
-import os
 import pickle
-import subprocess
-from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
-from itertools import product
+from itertools import combinations
 from pathlib import Path
 from typing import Any
 
@@ -51,9 +48,14 @@ def column_combinations(
     quantiles: int,
     tmp_folder_path: str,
     intersection: bool = False,
-) -> Iterable[tuple[tuple[tuple[Any, Any, Any, Any], tuple[Any, Any, Any, Any]], int, bool, str]]:
+    use_bloom_filters: bool = False,
+) -> Iterable[tuple]:
     """
-    All the unique combinations between all the columns
+    All the unique pairwise combinations between columns (Algorithm 2, lines 3-8 of the paper).
+
+    Generates ALL unique column pairs, including same-table pairs, so that distribution
+    clusters and attribute graphs are built with full pairwise information. Cross-table
+    filtering is applied later in the output ranking stage.
 
     Parameters
     ---------
@@ -65,22 +67,16 @@ def column_combinations(
         The path of the temporary folder that will serve as a cache for the run
     intersection : bool, optional
         If true do the intersection EMD else the normal EMD
+    use_bloom_filters : bool, optional
+        If true use Bloom filters for approximate intersection (default is False)
 
     Returns
     -------
     tuple
-        A tuple with ((column_name1, column_name1), quantiles, intersection)
+        A tuple with ((column_name1, column_name2), quantiles, intersection, tmp_folder_path, use_bloom_filters)
     """
-    groups: dict[Any, list[tuple[Any, Any, Any, Any]]] = defaultdict(list)
-    for item in columns:
-        _, table_guid, _, _ = item
-        groups[table_guid].append(item)
-
-    table_guids = list(groups.keys())
-    for i, gi in enumerate(table_guids):
-        for gj in table_guids[i + 1 :]:
-            for ci, cj in product(groups[gi], groups[gj]):
-                yield (ci, cj), quantiles, intersection, tmp_folder_path
+    for ci, cj in combinations(columns, 2):
+        yield (ci, cj), quantiles, intersection, tmp_folder_path, use_bloom_filters
 
 
 def process_emd(tup: tuple) -> tuple[tuple[Any, Any], float]:
@@ -90,20 +86,22 @@ def process_emd(tup: tuple) -> tuple[tuple[Any, Any], float]:
     Parameters
     ---------
     tup : tuple
-        A tuple with ((column_name1, column_name1), quantiles, intersection)
+        A tuple with ((column_name1, column_name2), quantiles, intersection, tmp_folder_path, use_bloom_filters)
 
     Returns
     -------
     tuple
         a dictionary entry {k: joint key of the column combination, v: quantile_emd calculation}
     """
-    name_i, name_j, k, quantile, intersection, tmp_folder_path = unwrap_process_input_tuple(tup)
+    name_i, name_j, k, quantile, intersection, tmp_folder_path, use_bloom_filters = (
+        unwrap_process_input_tuple(tup)
+    )
     tn_i, _, cn_i, _ = name_i
     tn_j, _, cn_j, _ = name_j
     c1 = read_from_cache(f"{make_filename_safe(tn_i)}_{make_filename_safe(cn_i)}", tmp_folder_path)
     c2 = read_from_cache(f"{make_filename_safe(tn_j)}_{make_filename_safe(cn_j)}", tmp_folder_path)
     if intersection:
-        return k, intersection_emd(c1, c2, tmp_folder_path, quantile)
+        return k, intersection_emd(c1, c2, tmp_folder_path, quantile, use_bloom_filters)
     return k, quantile_emd(c1, c2, quantile)
 
 
@@ -136,6 +134,7 @@ def unwrap_process_input_tuple(
     int,
     bool,
     str,
+    bool,
 ]:
     """
     Helper function that unwraps a tuple to its components and creates a unique key for the column combination
@@ -145,10 +144,10 @@ def unwrap_process_input_tuple(
     tup : tuple
         the tuple to unwrap
     """
-    names, quantile, intersection, tmp_folder_path = tup
+    names, quantile, intersection, tmp_folder_path, use_bloom_filters = tup
     name_i, name_j = names
     k = (name_i, name_j)
-    return name_i, name_j, k, quantile, intersection, tmp_folder_path
+    return name_i, name_j, k, quantile, intersection, tmp_folder_path, use_bloom_filters
 
 
 def insert_to_dict(dc: dict[Any, list[dict[str, Any]]], k: Any, v: dict[str, Any]) -> None:
@@ -293,49 +292,53 @@ def generate_global_ranks(data: list, tmp_folder_path: str) -> None:
         The path of the temporary folder that will serve as a cache for the run
     """
     Path(tmp_folder_path).mkdir(parents=True, exist_ok=True)
-    ranks = unix_sort_ranks(set(data), tmp_folder_path)
+    ranks = _compute_ranks(set(data))
     with Path(Path(tmp_folder_path) / "ranks.pkl").open("wb") as output:
         pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
 
-def unix_sort_ranks(corpus: set, tmp_folder_path: str) -> dict[Any, int]:
+def _compute_ranks(corpus: set) -> dict[Any, int]:
     """
-    Function that takes a corpus sorts it with the unix sort -n command and generates the global ranks
-    for each value in the corpus.
+    Compute global ranks for all unique values using type-aware sorting.
+
+    Per Section 2.3 of the paper: numeric values are sorted numerically,
+    string values are sorted lexicographically. Numbers are ranked first,
+    followed by strings, so that different data types naturally separate
+    into different distribution clusters in Phase 1.
 
     Parameters
     ----------
     corpus: set
         The corpus (all the unique values from every column)
-    tmp_folder_path: str
-        The path of the temporary folder that will serve as a cache for the run
 
     Returns
     -------
     dict
         The ranks in the form of k: value, v: the rank of the value
     """
-    unsorted_file_path = Path(tmp_folder_path) / "unsorted_file.txt"
-    sorted_file_path = Path(tmp_folder_path) / "sorted_file.txt"
+    numeric_values: list[int | float] = []
+    string_values: list[str] = []
 
-    with Path(unsorted_file_path).open("w", encoding="utf-8") as out:
-        for var in corpus:
-            print(str(var), file=out)
-
-    with Path(sorted_file_path).open("w", encoding="utf-8") as f:
-        if os.name == "nt":
-            subprocess.run(["sort", unsorted_file_path], stdout=f, check=True)
+    for val in corpus:
+        converted = convert_data_type(str(val))
+        if isinstance(converted, (int, float)):
+            numeric_values.append(converted)
         else:
-            sort_env = os.environ.copy()
-            sort_env["LC_ALL"] = "C"
-            subprocess.run(["sort", "-n", unsorted_file_path], stdout=f, env=sort_env, check=True)
+            string_values.append(converted)
 
-    ranks: list[tuple[Any, int]] = []
-    with Path(sorted_file_path).open(encoding="utf-8") as f:
-        for rank, line in enumerate(f, start=1):
-            ranks.append((convert_data_type(line.rstrip("\n")), rank))
+    numeric_values.sort()
+    string_values.sort()
 
-    return dict(ranks)
+    ranks: dict[Any, int] = {}
+    rank = 1
+    for val in numeric_values:
+        ranks[val] = rank
+        rank += 1
+    for val in string_values:
+        ranks[val] = rank
+        rank += 1
+
+    return ranks
 
 
 def get_column_from_store(file_name: str, tmp_folder_path: str) -> CorrelationClusteringColumn:

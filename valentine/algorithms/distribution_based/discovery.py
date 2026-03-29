@@ -109,6 +109,7 @@ def compute_attributes(
     threshold: float,
     tmp_folder_path: str,
     quantiles: int = 256,
+    use_bloom_filters: bool = False,
 ):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
@@ -124,6 +125,8 @@ def compute_attributes(
         The path of the temporary folder that will serve as a cache for the run
     quantiles : int, optional
         The number of quantiles that the histograms are split on (default is 256)
+    use_bloom_filters : bool, optional
+        If true use Bloom filters for approximate intersection (default is False)
 
     Returns
     -------
@@ -131,11 +134,15 @@ def compute_attributes(
         A dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = column_combinations(
-        distribution_clusters, quantiles, tmp_folder_path, intersection=True
+    cmbs = column_combinations(
+        distribution_clusters,
+        quantiles,
+        tmp_folder_path,
+        intersection=True,
+        use_bloom_filters=use_bloom_filters,
     )
 
-    matrix_i: dict = transform_dict(dict([process_emd(cmb) for cmb in combinations]))
+    matrix_i: dict = transform_dict(dict([process_emd(cmb) for cmb in cmbs]))
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
@@ -146,6 +153,7 @@ def compute_attributes_parallel(
     pool: Pool,
     tmp_folder_path: str,
     quantiles: int = 256,
+    use_bloom_filters: bool = False,
 ):
     """
     Algorithm 3 of the paper "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al.[1]
@@ -163,6 +171,8 @@ def compute_attributes_parallel(
         The path of the temporary folder that will serve as a cache for the run
     quantiles : int, optional
         The number of quantiles that the histograms are split on (default is 256)
+    use_bloom_filters : bool, optional
+        If true use Bloom filters for approximate intersection (default is False)
 
     Returns
     -------
@@ -170,11 +180,15 @@ def compute_attributes_parallel(
         A dictionary that contains the attribute graph of the distribution clusters
     """
 
-    combinations = column_combinations(
-        distribution_clusters, quantiles, tmp_folder_path, intersection=True
+    cmbs = column_combinations(
+        distribution_clusters,
+        quantiles,
+        tmp_folder_path,
+        intersection=True,
+        use_bloom_filters=use_bloom_filters,
     )
 
-    matrix_i = transform_dict(dict(pool.map(process_emd, combinations, chunksize=1)))
+    matrix_i = transform_dict(dict(pool.map(process_emd, cmbs, chunksize=1)))
 
     return get_attribute_graph(distribution_clusters, matrix_i, threshold)
 
@@ -197,6 +211,8 @@ def get_attribute_graph(distribution_clusters: list, matrix_i: dict, threshold: 
     matrix_m = matrix_e + np.dot(matrix_e, matrix_e)
     for i, cluster_i in enumerate(distribution_clusters):
         for j, cluster_j in enumerate(distribution_clusters):
+            if i == j:
+                continue
             if matrix_m[i][j] == 0:
                 g_a[cluster_i][cluster_j] = -1
             else:
@@ -245,12 +261,22 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
         )
         for i in set_u
         for j in set_v
+        if i != j
     }
 
-    sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == 1)
-    sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if edges[i][j] == -1)
+    sum1 = plp.lpSum(x_vars[i, j] for i in set_u for j in set_v if i != j and edges[i][j] == 1)
+    sum2 = plp.lpSum(1 - x_vars[i, j] for i in set_u for j in set_v if i != j and edges[i][j] == -1)
 
     opt_model.setObjective(sum1 + sum2)
+
+    # Triangle inequality constraints: X_uw <= X_uv + X_vw for all triples (u, v, w)
+    # This ensures transitivity: if u,v are in the same cluster and v,w are in the same
+    # cluster, then u,w must also be in the same cluster (Section 3.2.2 of the paper).
+    for u in vertexes:
+        for v in vertexes:
+            for w in vertexes:
+                if len({u, v, w}) == 3:
+                    opt_model += x_vars[u, w] <= x_vars[u, v] + x_vars[v, w]
 
     opt_model.solve(PULP_CBC_CMD(msg=False))
 

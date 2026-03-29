@@ -30,6 +30,8 @@ class DistributionBased(BaseMatcher):
         the number of quantiles of the histograms
     __process_num: int
         The number of processes to spawn
+    __use_bloom_filters: bool
+        Whether to use Bloom filters for approximate intersection in phase 2
 
     Methods
     -------
@@ -48,6 +50,7 @@ class DistributionBased(BaseMatcher):
         threshold2: float = 0.15,
         quantiles: int = 256,
         process_num: int = 1,
+        use_bloom_filters: bool = False,
     ):
         """
         Parameters
@@ -60,11 +63,17 @@ class DistributionBased(BaseMatcher):
             the number of quantiles of the histograms
         process_num: int
             The number of processes to spawn
+        use_bloom_filters: bool
+            Whether to use Bloom filters for approximate intersection in phase 2.
+            When True, uses Bloom filters as described in Section 4 of the paper to
+            approximate set intersection, trading a small false positive rate for
+            reduced computation on large columns. Default is False (exact intersection).
         """
         self.__quantiles: int = int(quantiles)
         self.__threshold1: float = float(threshold1)
         self.__threshold2: float = float(threshold2)
         self.__process_num: int = int(process_num)
+        self.__use_bloom_filters: bool = bool(use_bloom_filters)
         self.__column_names: list = []
         self.__target_name: str = ""
 
@@ -161,6 +170,7 @@ class DistributionBased(BaseMatcher):
                     self.__threshold2,
                     tmp_folder_path,
                     self.__quantiles,
+                    self.__use_bloom_filters,
                 )
                 all_attributes.append((list(components), edges))
 
@@ -204,6 +214,7 @@ class DistributionBased(BaseMatcher):
                     pool,
                     tmp_folder_path,
                     self.__quantiles,
+                    self.__use_bloom_filters,
                 )
                 all_attributes.append((list(components), edges))
 
@@ -249,6 +260,7 @@ class DistributionBased(BaseMatcher):
                             self.__quantiles,
                             False,
                             tmp_folder_path,
+                            False,
                         )
                     )
                     sim = 1 / (1 + emd)

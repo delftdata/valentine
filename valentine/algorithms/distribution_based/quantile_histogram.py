@@ -71,7 +71,7 @@ class QuantileHistogram:
                 else ranks
             )
 
-            self.add_buckets(min(ranks), list(set(bucket)))
+            self.add_buckets(min(ranks), sorted(set(bucket)))
             self.add_values(ranks)
         else:
             self.bucket_boundaries = reference_hist.bucket_boundaries
