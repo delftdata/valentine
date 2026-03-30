@@ -5,6 +5,7 @@ import pytest
 from tests import df1, df2
 from valentine.algorithms import (
     Coma,
+    ComaPy,
     Cupid,
     DistributionBased,
     JaccardDistanceMatcher,
@@ -30,6 +31,19 @@ def test_coma():
     assert len(matches_coma_matcher_instances) > 0
     # Assume the Schema and instance should provide different results
     assert matches_coma_matcher_schema != matches_coma_matcher_instances
+
+
+def test_coma_py():
+    # Test the schema variant of ComaPy
+    coma_py_schema = ComaPy(use_instances=False)
+    matches_schema = coma_py_schema.get_matches(d1, d2)
+    assert len(matches_schema) > 0
+    # Test the instance variant of ComaPy
+    coma_py_instances = ComaPy(use_instances=True)
+    matches_instances = coma_py_instances.get_matches(d1, d2)
+    assert len(matches_instances) > 0
+    # Schema and instance should provide different results
+    assert matches_schema != matches_instances
 
 
 def test_cupid():
