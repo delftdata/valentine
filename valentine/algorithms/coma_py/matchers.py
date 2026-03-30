@@ -44,10 +44,10 @@ def ctx_selfnode(elem: SchemaElement, _graph: SchemaGraph) -> list[SchemaElement
     return [elem]
 
 
-def ctx_selfpath(elem: SchemaElement, graph: SchemaGraph) -> list[SchemaElement]:
-    if elem is graph.root:
-        return [elem]
-    return [graph.root, elem]
+def ctx_selfpath(elem: SchemaElement, _graph: SchemaGraph) -> list[SchemaElement]:
+    # The element's accession already IS the full path string (e.g. "table.column"),
+    # so returning [elem] is equivalent to returning [path] for RES3_PATH extraction.
+    return [elem]
 
 
 def ctx_leaves(elem: SchemaElement, graph: SchemaGraph) -> list[SchemaElement]:
@@ -115,7 +115,7 @@ class ComplexMatcher:
     context_selector: Callable[[SchemaElement, SchemaGraph], list[SchemaElement]]
     inner: list[Matcher | ComplexMatcher]
     sim_combination: Callable[[list[float]], float]
-    set_combination: Callable[[list[float]], float]
+    set_combination: Callable[[list[list[float]]], float]
 
     def compute(
         self,
@@ -131,9 +131,10 @@ class ComplexMatcher:
         if not ctx1 or not ctx2:
             return 0.0
 
-        # For each pair of context elements, compute combined inner matcher score
-        pair_scores = []
+        # Build similarity matrix [len(ctx1) x len(ctx2)]
+        sim_matrix: list[list[float]] = []
         for c1 in ctx1:
+            row = []
             for c2 in ctx2:
                 inner_scores = []
                 for m in self.inner:
@@ -142,9 +143,10 @@ class ComplexMatcher:
                     else:
                         score = m.compute(c1, c2)
                     inner_scores.append(score)
-                pair_scores.append(self.sim_combination(inner_scores))
+                row.append(self.sim_combination(inner_scores))
+            sim_matrix.append(row)
 
-        return self.set_combination(pair_scores)
+        return self.set_combination(sim_matrix)
 
 
 # Predefined complex matchers

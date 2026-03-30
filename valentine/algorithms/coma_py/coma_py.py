@@ -41,14 +41,14 @@ class ComaPy(BaseMatcher):
                 scores = [cm.compute(e1, e2, source_graph, target_graph) for cm in complex_matchers]
                 sim_matrix[(e1, e2)] = average(scores)
 
-        # Apply selection
+        # Apply selection (COMA_OPT uses delta=0.01, threshold=0.0)
         selected = select_both_multiple(
             sim_matrix,
             source_graph.columns,
             target_graph.columns,
             max_n=self.__max_n,
-            threshold=0.01,
-            delta=0.0,
+            delta=0.01,
+            threshold=0.0,
         )
 
         # Format output

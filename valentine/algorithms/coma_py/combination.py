@@ -25,7 +25,33 @@ def weighted(values: list[float], weights: list[float]) -> float:
     return sum(v * w for v, w in zip(values, weights, strict=True)) / total_weight
 
 
-# Set combination functions operate the same way but are named distinctly
-# for clarity in the matching pipeline (they combine across resolved element sets).
-set_average = average
-set_highest = maximum
+def set_average(sim_matrix: list[list[float]]) -> float:
+    """
+    COMA's computeSetSimilarity: max-matching Dice formula.
+
+    For each row: find the max similarity to any column.
+    For each column: find the max similarity to any row.
+    Result = (sum_row_maxes + sum_col_maxes) / (m + n)
+
+    This matches Java's SET_AVERAGE behavior for context element sets.
+    """
+    if not sim_matrix:
+        return 0.0
+    m = len(sim_matrix)
+    if m == 0:
+        return 0.0
+    n = len(sim_matrix[0]) if sim_matrix[0] else 0
+    if n == 0:
+        return 0.0
+
+    sum_row_max = sum(max(row) for row in sim_matrix)
+    sum_col_max = sum(max(sim_matrix[i][j] for i in range(m)) for j in range(n))
+
+    return (sum_row_max + sum_col_max) / (m + n)
+
+
+def set_highest(sim_matrix: list[list[float]]) -> float:
+    """Max over all values in the similarity matrix."""
+    if not sim_matrix:
+        return 0.0
+    return max(max(row) for row in sim_matrix if row)
