@@ -40,7 +40,7 @@ def main():
     coma_schema = Coma(use_instances=False)
     matches_schema = coma_schema.get_matches(d1, d2)
     golden_schema = serialize_matches(matches_schema)
-    with open(output_dir / "coma_golden_schema_only.json", "w") as f:
+    with Path(output_dir / "coma_golden_schema_only.json").open("w") as f:
         json.dump(golden_schema, f, indent=2, sort_keys=True)
     print(f"  Wrote {len(golden_schema)} matches to coma_golden_schema_only.json")
 
@@ -49,7 +49,7 @@ def main():
     coma_inst = Coma(use_instances=True)
     matches_inst = coma_inst.get_matches(d1, d2)
     golden_inst = serialize_matches(matches_inst)
-    with open(output_dir / "coma_golden_schema_instance.json", "w") as f:
+    with Path(output_dir / "coma_golden_schema_instance.json").open("w") as f:
         json.dump(golden_inst, f, indent=2, sort_keys=True)
     print(f"  Wrote {len(golden_inst)} matches to coma_golden_schema_instance.json")
 
