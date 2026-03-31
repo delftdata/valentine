@@ -41,7 +41,7 @@ class BloomFilter:
     @classmethod
     def from_iterable(
         cls, data: Iterable, expected_elements: int, false_positive_rate: float = 0.01
-    ) -> "BloomFilter":  # noqa
+    ) -> "BloomFilter":
         """Build a BloomFilter from an iterable of items."""
         bf = cls(expected_elements, false_positive_rate)
         for item in data:

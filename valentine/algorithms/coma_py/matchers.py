@@ -181,9 +181,7 @@ def make_instance_matchers(corpus: TfidfCorpus) -> ComplexMatcher:
     inst_direct = Matcher(
         "InstancesDirect", extract_instances_direct, corpus.similarity, set_average
     )
-    inst_all = Matcher(
-        "InstancesAll", extract_instances_all, corpus.similarity, set_average
-    )
+    inst_all = Matcher("InstancesAll", extract_instances_all, corpus.similarity, set_average)
     return ComplexMatcher(
         "InstancesCM", ctx_selfnode, [inst_direct, inst_all], maximum, set_average
     )

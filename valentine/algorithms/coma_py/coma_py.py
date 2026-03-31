@@ -68,9 +68,7 @@ class ComaPy(BaseMatcher):
         threshold: float = 0.0,
     ):
         if not use_schema and not use_instances:
-            raise ValueError(
-                "At least one of use_schema or use_instances must be True"
-            )
+            raise ValueError("At least one of use_schema or use_instances must be True")
         self.__max_n = int(max_n)
         self.__use_instances = use_instances
         self.__use_schema = use_schema
@@ -88,8 +86,7 @@ class ComaPy(BaseMatcher):
         corpus = None
         if self.__use_instances:
             all_column_instances = [
-                col.instances
-                for col in source_graph.columns + target_graph.columns
+                col.instances for col in source_graph.columns + target_graph.columns
             ]
             corpus = TfidfCorpus(all_column_instances)
 

@@ -61,7 +61,7 @@ license-files = ["LICENSE"]
 ]
 
 [tool.ruff]
-target-version = "py314"
+target-version = "py310" # Add the minimum supported version here
 line-length = 100
 indent-width = 4
 
