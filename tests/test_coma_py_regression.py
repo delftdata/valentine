@@ -85,8 +85,8 @@ def test_coma_py_schema_instance_scores(golden_schema_instance):
 
     for key, golden_score in golden_schema_instance.items():
         assert key in py_results, f"Missing match: {key}"
-        # Instance matching has larger score divergence due to TF-IDF differences
-        assert py_results[key] == pytest.approx(golden_score, abs=0.25), (
+        # Instance matching has minor score divergence due to TF-IDF tokenization differences
+        assert py_results[key] == pytest.approx(golden_score, abs=0.05), (
             f"Score mismatch for {key}: Python={py_results[key]:.4f}, Java={golden_score:.4f}"
         )
 

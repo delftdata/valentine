@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import pandas as pd
+
 from ...data_sources.base_table import BaseTable
 
 INSTANCES_MAX = 1000
@@ -35,15 +37,36 @@ class SchemaGraph:
             accession=table.name,
             data_type="element",
         )
+
+        # Java's InstanceCSVParser reads rows until 1000 rows have at least one
+        # non-null value. All columns share the same row window. We replicate
+        # this by selecting up to INSTANCES_MAX rows from the DataFrame where
+        # at least one column is non-null, then extracting per-column values.
+        all_cols = table.get_columns()
+        col_instances: dict[str, list[str]] = {col.name: [] for col in all_cols}
+
+        df = table.get_df()
+        # Keep only rows where at least one value is non-null and non-empty
+        row_count = 0
+        for _, row in df.iterrows():
+            if row_count >= INSTANCES_MAX:
+                break
+            has_value = False
+            for col in all_cols:
+                val = row[col.name]
+                if pd.notna(val) and str(val) != "":
+                    has_value = True
+                    col_instances[col.name].append(str(val))
+            if has_value:
+                row_count += 1
+
         columns = []
-        for col in table.get_columns():
-            raw = col.data if col.data else []
-            instances = [str(v) for v in raw[:INSTANCES_MAX] if v is not None and str(v) != ""]
+        for col in all_cols:
             elem = SchemaElement(
                 name=col.name,
                 accession=f"{table.name}.{col.name}",
                 data_type=col.data_type,
-                instances=instances,
+                instances=col_instances[col.name],
             )
             columns.append(elem)
         return cls(root=root, columns=columns)

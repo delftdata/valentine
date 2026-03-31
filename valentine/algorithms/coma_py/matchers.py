@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from .combination import average, maximum, set_average
 from .schema import SchemaElement, SchemaGraph
 from .similarity.datatype import datatype_similarity
-from .similarity.tfidf import tfidf_similarity
+from .similarity.tfidf import TfidfCorpus, tfidf_similarity
 from .similarity.trigram import trigram_similarity
 
 # ---------------------------------------------------------------------------
@@ -23,7 +23,9 @@ def extract_datatype(elem: SchemaElement) -> str:
 
 
 def extract_path(elem: SchemaElement) -> str:
-    return elem.accession
+    # Java's RES3_PATH calls path.toNameString().replace(".", " ")
+    # converting "root.column" into "root column" before trigram matching
+    return elem.accession.replace(".", " ")
 
 
 def extract_instances_direct(elem: SchemaElement) -> list[str]:
@@ -170,5 +172,35 @@ INSTANCES_CM = ComplexMatcher(
 # COMA_OPT: schema-only matching
 COMA_OPT_MATCHERS = [NAME_CM, PATH_CM, LEAVES_CM, PARENTS_CM]
 
-# COMA_OPT_INST: schema + instance matching
+# COMA_OPT_INST: schema + instance matching (local per-pair IDF fallback)
 COMA_OPT_INST_MATCHERS = [NAME_CM, PATH_CM, INSTANCES_CM, LEAVES_CM, PARENTS_CM]
+
+
+def make_instance_matchers(corpus: TfidfCorpus) -> ComplexMatcher:
+    """Create an InstancesCM using a pre-built global TF-IDF corpus."""
+    inst_direct = Matcher(
+        "InstancesDirect", extract_instances_direct, corpus.similarity, set_average
+    )
+    inst_all = Matcher(
+        "InstancesAll", extract_instances_all, corpus.similarity, set_average
+    )
+    return ComplexMatcher(
+        "InstancesCM", ctx_selfnode, [inst_direct, inst_all], maximum, set_average
+    )
+
+
+def build_matchers(
+    corpus: TfidfCorpus | None = None,
+    *,
+    use_schema: bool = True,
+    use_instances: bool = False,
+) -> list[ComplexMatcher]:
+    """Build the list of complex matchers based on the requested configuration."""
+    matchers: list[ComplexMatcher] = []
+    if use_schema:
+        matchers.extend([NAME_CM, PATH_CM])
+    if use_instances and corpus is not None:
+        matchers.append(make_instance_matchers(corpus))
+    if use_schema:
+        matchers.extend([LEAVES_CM, PARENTS_CM])
+    return matchers

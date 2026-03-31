@@ -1,6 +1,7 @@
 import subprocess
 import tempfile
 import time
+import warnings
 from pathlib import Path
 
 from ...data_sources.base_table import BaseTable
@@ -14,7 +15,25 @@ class JavaException(Exception):
 
 
 class Coma(BaseMatcher):
+    """
+    Java-based COMA 3.0 schema matcher.
+
+    .. deprecated::
+        ``Coma`` is deprecated and will be removed in valentine v1.0.0.
+        Use :class:`valentine.algorithms.ComaPy` instead, which is a pure Python
+        implementation that does not require Java. ``ComaPy`` will be renamed
+        to ``Coma`` in v1.0.0.
+    """
+
     def __init__(self, max_n: int = 0, use_instances: bool = False, java_xmx: str = "1024m"):
+        warnings.warn(
+            "Coma is deprecated and will be removed in valentine v1.0.0. "
+            "Use ComaPy instead, which is a pure Python implementation "
+            "that does not require Java. ComaPy will be renamed to Coma "
+            "in v1.0.0.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.__max_n = int(max_n)
         self.__strategy = "COMA_OPT_INST" if use_instances else "COMA_OPT"
         self.__java_XmX = java_xmx
