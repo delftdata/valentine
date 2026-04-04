@@ -12,13 +12,12 @@ from valentine.algorithms.coma_py.combination import (
     set_highest,
     weighted,
 )
-from valentine.algorithms.coma_py.schema import SchemaElement, SchemaGraph
+from valentine.algorithms.coma_py.schema import SchemaGraph
 from valentine.algorithms.coma_py.selection import select_both_multiple
 from valentine.algorithms.coma_py.similarity.datatype import datatype_similarity
 from valentine.algorithms.coma_py.similarity.tfidf import TfidfCorpus, tfidf_similarity
 from valentine.algorithms.coma_py.similarity.trigram import trigram_similarity
 from valentine.data_sources import DataframeTable
-
 
 # ---------------------------------------------------------------------------
 # combination.py
