@@ -3,7 +3,7 @@ import unittest
 import pytest
 
 from tests import df1, df2
-from valentine import NotAValentineMatcher, valentine_match
+from valentine import InvalidMatcherError, NotAValentineMatcher, valentine_match
 from valentine.algorithms import JaccardDistanceMatcher
 
 
@@ -13,6 +13,11 @@ class TestValentine(unittest.TestCase):
         assert len(matches) > 0
 
     def test_match_invalid_matcher(self):
+        with pytest.raises(InvalidMatcherError):
+            valentine_match([df1, df2], None)
+
+    def test_match_invalid_matcher_old_alias(self):
+        # Backward compat: old exception name still works
         with pytest.raises(NotAValentineMatcher):
             valentine_match([df1, df2], None)
 
@@ -27,9 +32,9 @@ class TestValentine(unittest.TestCase):
             df_names=["source", "target"],
         )
         assert len(matches) > 0
-        for (t1, _), (t2, _) in matches:
-            assert t1 in ("source", "target")
-            assert t2 in ("source", "target")
+        for pair in matches:
+            assert pair.source_table in ("source", "target")
+            assert pair.target_table in ("source", "target")
 
     def test_match_multiple_tables(self):
         matches = valentine_match(

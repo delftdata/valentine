@@ -92,10 +92,11 @@ In order to do so, the user can choose one of the following matching methods:
                * `StringDistanceFunction.JaroWinkler`: [Jaro-Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
               * `StringDistanceFunction.Exact`: String equality `==`
 
-5.   `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](https://ieeexplore.ieee.org/document/994702)
-     * **Parameters**: 
-        *    **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
-        *    **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
+5.   `SimilarityFlooding(Policy: coeff_policy, Formula: formula, StringMatcher: string_matcher)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](https://ieeexplore.ieee.org/document/994702)
+     * **Parameters**:
+        *    **coeff_policy**(*Policy*) - Policy for deciding the weight coefficients of the propagation graph. `Policy.INVERSE_PRODUCT` or `Policy.INVERSE_AVERAGE` (default).
+        *    **formula**(*Formula*) - Formula on which iterative fixpoint computation is based. `Formula.BASIC`, `Formula.FORMULA_A`, `Formula.FORMULA_B`, or `Formula.FORMULA_C` (default).
+        *    **string_matcher**(*StringMatcher*) - String matching function for the initial similarity mapping. `StringMatcher.PREFIX_SUFFIX` (default), `StringMatcher.PREFIX_SUFFIX_TFIDF`, or `StringMatcher.LEVENSHTEIN`.
 
 ### Matching DataFrames
 
@@ -109,42 +110,60 @@ matches = valentine_match([df1, df2], matcher)
 matches = valentine_match([df1, df2, df3], matcher, df_names=["sales", "orders", "products"])
 ```
 
-Optionally provide `df_names` to label each DataFrame (defaults to "aaa", "bbb", etc. — designed to have zero similarity so they don't influence schema-based matchers). Function `valentine_match` returns a `MatcherResults` object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `filter`, `get_metrics` and more. It stores as keys column pairs from the DataFrames and as values the corresponding similarity scores.
+Optionally provide `df_names` to label each DataFrame (defaults to "aaa", "bbb", etc. — designed to have zero similarity so they don't influence schema-based matchers). Function `valentine_match` returns a `MatcherResults` object, an immutable mapping from `ColumnPair` to similarity scores with convenience methods for filtering, subsetting, and evaluation.
 
 
-### MatcherResults instance
-The `MatcherResults` instance has convenience methods for filtering and subsetting. It is a dictionary sorted from high similarity to low similarity.
+### MatcherResults and ColumnPair
+
+Results are keyed by `ColumnPair` namedtuples with named fields for easy access:
+
+```python
+for pair, score in matches.items():
+    print(f"{pair.source_column} <-> {pair.target_column}: {score:.3f}")
+    # Also available: pair.source_table, pair.target_table
+    # Shorthand tuples: pair.source, pair.target
+```
+
+`MatcherResults` provides convenience methods for filtering and subsetting:
 ```python
 top_n_matches = matches.take_top_n(5)
-
 top_n_percent_matches = matches.take_top_percent(25)
-
 one_to_one_matches = matches.one_to_one()
-
-# Filter by minimum score
 high_confidence = matches.filter(min_score=0.7)
-
-# One-to-one with custom threshold (default uses median)
 one_to_one_strict = matches.one_to_one(threshold=0.5)
+```
+
+### Match details (Coma)
+
+When using the Coma matcher, per-sub-matcher score breakdowns are available via `.details`:
+
+```python
+for pair, score in matches.items():
+    details = matches.get_details(pair)
+    if details:
+        print(f"{pair.source_column} <-> {pair.target_column}: {details}")
+        # e.g. {'NameCM': 0.72, 'PathCM': 0.65, 'LeavesCM': 0.58, ...}
 ```
 
 
 ### Measuring effectiveness
-The MatcherResults instance that is returned by `valentine_match` also has a `get_metrics` method that the user can use
 
-```python 
+```python
 metrics = matches.get_metrics(ground_truth)
-``` 
+```
 
-in order to get all effectiveness metrics, such as Precision, Recall, F1-score and others as described in the original Valentine paper. In order to do so, the user needs to also input the ground truth of matches based on which the metrics will be calculated. The ground truth can be given as a list of tuples representing column matches that should hold (see example below).
+Computes Precision, Recall, F1-score and others as described in the original Valentine paper. The ground truth is a list of `(source_column, target_column)` tuples:
 
-By default, all the core metrics will be used for this with default parameters, but the user can also customize which metrics to run with what parameters, and implement own custom metrics by extending from the `Metric` base class. Some sets of metrics are available as well.
+```python
+ground_truth = [("emp_id", "employee_number"), ("fname", "first_name"), ...]
+```
+
+Custom metrics can be specified, and predefined sets are available:
 
 ```python
 from valentine.metrics import F1Score, PrecisionTopNPercent, METRICS_PRECISION_INCREASING_N
 metrics_custom = matches.get_metrics(ground_truth, metrics={F1Score(one_to_one=False), PrecisionTopNPercent(n=70)})
-metrics_prefefined_set = matches.get_metrics(ground_truth, metrics=METRICS_PRECISION_INCREASING_N)
-
+metrics_predefined_set = matches.get_metrics(ground_truth, metrics=METRICS_PRECISION_INCREASING_N)
 ```
 
 
@@ -164,7 +183,9 @@ df2 = pd.read_csv("target_candidates.csv")
 matcher = Coma(use_instances=True)
 matches = valentine_match([df1, df2], matcher)
 
-print(matches)
+# Iterate over results using ColumnPair named fields
+for pair, score in matches.items():
+    print(f"{pair.source_column} <-> {pair.target_column}: {score:.3f}")
 
 # If ground truth available valentine could calculate the metrics
 ground_truth = [
@@ -178,7 +199,6 @@ ground_truth = [
 ]
 
 metrics = matches.get_metrics(ground_truth)
-
 print(metrics)
 ```
 

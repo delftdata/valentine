@@ -1,5 +1,6 @@
 import networkx as nx
 
+from . import Policy
 from .node_pair import NodePair
 
 
@@ -123,13 +124,9 @@ class PropagationGraph:
         c_g = self.__construct_connectivity_graph()
         p_g = self.__initialize_graph(c_g)
 
-        if self.policy == "inverse_product":
+        if self.policy is Policy.INVERSE_PRODUCT:
             return self.__construct_inverse_product(c_g, p_g)
-        if self.policy == "inverse_average":
-            return self.__construct_inverse_average(c_g, p_g)
-
-        print("Wrong policy!")
-        return {}
+        return self.__construct_inverse_average(c_g, p_g)
 
     @staticmethod
     def __initialize_graph(c_g):

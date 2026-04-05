@@ -14,6 +14,7 @@ from valentine.algorithms.cupid import (
     structural_similarity as cupid_struct,
     tree_match as cupid_tree,
 )
+from valentine.algorithms.match import ColumnPair
 from valentine.data_sources.base_column import BaseColumn
 from valentine.data_sources.base_table import BaseTable
 
@@ -303,7 +304,16 @@ class TestCupidLinguisticStructural(unittest.TestCase):
 
         def fake_mapping(st, tt, sims, th):
             key = next(iter(sims.keys()))
-            return {((key[1][0], key[1][2]), (key[0][0], key[0][2])): 1.0}
+            # key = (source_long_name, target_long_name)
+            # long_name = (table_name, table_guid, col_name, col_uid)
+            return {
+                ColumnPair(
+                    source_table=key[0][0],
+                    source_column=key[0][2],
+                    target_table=key[1][0],
+                    target_column=key[1][2],
+                ): 1.0
+            }
 
         # Patch both cupid_model (where Cupid resolves names) and cupid_tree (for consistency)
         orig_tm_m, orig_rc_m, orig_map_m = (

@@ -1,5 +1,6 @@
 import unittest
 
+from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.metrics import (
     F1Score,
@@ -17,11 +18,11 @@ class TestMetrics(unittest.TestCase):
         # and "Title" has two competing candidates (DUMMY1, DUMMY2) to exercise 1-1 logic.
         self.matches = MatcherResults(
             {
-                (("table_1", "Cited by"), ("table_2", "Cited by")): 0.8374313,
-                (("table_1", "Authors"), ("table_2", "Authors")): 0.83498037,
-                (("table_1", "EID"), ("table_2", "EID")): 0.8214057,
-                (("table_1", "Title"), ("table_2", "DUMMY1")): 0.8214057,
-                (("table_1", "Title"), ("table_2", "DUMMY2")): 0.8114057,
+                ColumnPair("table_1", "Cited by", "table_2", "Cited by"): 0.8374313,
+                ColumnPair("table_1", "Authors", "table_2", "Authors"): 0.83498037,
+                ColumnPair("table_1", "EID", "table_2", "EID"): 0.8214057,
+                ColumnPair("table_1", "Title", "table_2", "DUMMY1"): 0.8214057,
+                ColumnPair("table_1", "Title", "table_2", "DUMMY2"): 0.8114057,
             }
         )
 

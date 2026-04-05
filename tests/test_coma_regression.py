@@ -45,7 +45,7 @@ def test_candidates_schema_instance_finds_all_ground_truth():
     matches = valentine_match([df1, df2], Coma(use_instances=True))
 
     for src_col, tgt_col in CANDIDATES_GROUND_TRUTH:
-        found = any(k[0][1] == src_col and k[1][1] == tgt_col for k in matches)
+        found = any(k.source_column == src_col and k.target_column == tgt_col for k in matches)
         assert found, f"Missing ground truth pair: {src_col} <-> {tgt_col}"
 
 
@@ -70,7 +70,7 @@ def test_candidates_schema_only_finds_name_based_pairs():
     matches = valentine_match([df1, df2], Coma(use_instances=False))
 
     for src_col, tgt_col in NAME_MATCHABLE:
-        found = any(k[0][1] == src_col and k[1][1] == tgt_col for k in matches)
+        found = any(k.source_column == src_col and k.target_column == tgt_col for k in matches)
         assert found, f"Schema-only should find: {src_col} <-> {tgt_col}"
 
 

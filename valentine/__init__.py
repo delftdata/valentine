@@ -1,21 +1,30 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Generator, Iterable
 
 import pandas as pd
 
 import valentine.algorithms
 import valentine.data_sources
+from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 
 __all__ = [
-    "NotAValentineMatcher",
+    "ColumnPair",
+    "InvalidMatcherError",
+    "MatcherResults",
     "valentine_match",
 ]
 
 
-class NotAValentineMatcher(Exception):
+class InvalidMatcherError(Exception):
+    """Raised when a non-BaseMatcher object is passed as a matcher."""
+
     pass
+
+
+# Keep the old name as an alias for backward compatibility
+NotAValentineMatcher = InvalidMatcherError
 
 
 def _default_table_name(i: int) -> str:
@@ -31,13 +40,14 @@ def _default_table_name(i: int) -> str:
 
 def _validate_matcher(matcher: valentine.algorithms.BaseMatcher) -> None:
     if not isinstance(matcher, valentine.algorithms.BaseMatcher):
-        raise NotAValentineMatcher("Please provide a valid matcher")
+        raise InvalidMatcherError("Please provide a valid matcher")
 
 
 def valentine_match(
-    dfs: Iterable[pd.DataFrame],
+    dfs: Iterable[pd.DataFrame] | list[pd.DataFrame] | Generator[pd.DataFrame],
     matcher: valentine.algorithms.BaseMatcher,
     df_names: list[str] | None = None,
+    instance_sample_size: int | None = 1000,
 ) -> MatcherResults:
     """Match columns across DataFrames.
 
@@ -53,18 +63,23 @@ def valentine_match(
     df_names : list[str] | None
         Optional names for each DataFrame. If not provided, defaults to
         "aaa", "bbb", etc.
+    instance_sample_size : int | None
+        Optional max number of non-empty rows to use for instance-based
+        sampling in matchers like Coma. If None, no sampling is applied.
 
     Returns
     -------
     MatcherResults
-        Dictionary of column matches sorted by similarity (high to low).
+        Immutable mapping of :class:`ColumnPair` to similarity scores,
+        sorted high to low. Use ``.details`` to access per-matcher
+        score breakdowns (when the matcher provides them).
 
     Raises
     ------
     ValueError
         If fewer than 2 DataFrames are provided, or if ``df_names`` length
         does not match the number of DataFrames.
-    NotAValentineMatcher
+    InvalidMatcherError
         If ``matcher`` is not a valid BaseMatcher instance.
 
     Examples
@@ -76,6 +91,13 @@ def valentine_match(
     Match multiple DataFrames (computes all pairs):
 
     >>> matches = valentine_match([df1, df2, df3], Coma(), df_names=["a", "b", "c"])
+
+    Inspect sub-matcher breakdowns (Coma only):
+
+    >>> for pair, score in matches.items():
+    ...     details = matches.get_details(pair)
+    ...     if details:
+    ...         print(f"{pair.source_column} <-> {pair.target_column}: {details}")
     """
     _validate_matcher(matcher)
 
@@ -91,15 +113,19 @@ def valentine_match(
 
     if df_names is None and len(df_list) > 26:
         raise ValueError(
-            "More than 26 DataFrames require explicit df_names to avoid "
-            "default name collisions"
+            "More than 26 DataFrames require explicit df_names to avoid default name collisions"
         )
 
     tables = [
         valentine.data_sources.DataframeTable(
-            df, name=df_names[i] if df_names is not None else _default_table_name(i)
+            df,
+            name=df_names[i] if df_names is not None else _default_table_name(i),
+            instance_sample_size=instance_sample_size,
         )
         for i, df in enumerate(df_list)
     ]
 
-    return MatcherResults(matcher.get_matches_batch(tables))
+    raw_matches = matcher.get_matches_batch(tables)
+    details = matcher.match_details
+
+    return MatcherResults(raw_matches, details=details)

@@ -37,17 +37,23 @@ class JaccardDistanceMatcher(BaseMatcher):
         Parameters
         ----------
         threshold_dist : float, optional
-            The acceptance threshold for two strings to be considered as equal
+            The acceptance threshold for two strings to be considered as equal.
+        distance_fun : StringDistanceFunction, optional
+            The string distance function to use (default: Levenshtein).
         process_num : int, optional
-            Te number of processes to spawn
+            The number of processes to spawn.
         """
         self.__threshold_dist = float(threshold_dist)
         self.__process_num = int(process_num)
         self.__distance_function = distance_fun
+        if not 0.0 <= self.__threshold_dist <= 1.0:
+            raise ValueError(
+                f"threshold_dist must be between 0.0 and 1.0, got {self.__threshold_dist}"
+            )
+        if self.__process_num < 1:
+            raise ValueError(f"process_num must be >= 1, got {self.__process_num}")
 
-    def get_matches(
-        self, source_input: BaseTable, target_input: BaseTable
-    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    def get_matches(self, source_input: BaseTable, target_input: BaseTable) -> dict:
         source_id = source_input.unique_identifier
         target_id = target_input.unique_identifier
         matches = {}
@@ -162,7 +168,7 @@ class JaccardDistanceMatcher(BaseMatcher):
         distance_function: StringDistanceFunction,
     ):
         for source_column, target_column in product(
-            source_table.get_columns(), target_table.get_columns()
+            source_table.get_instances_columns(), target_table.get_instances_columns()
         ):
             yield (
                 source_column.data,

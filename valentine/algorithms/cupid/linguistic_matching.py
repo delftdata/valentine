@@ -100,14 +100,14 @@ def compute_compatibility(categories):
     return compatibility_table
 
 
-def comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism):
+def comparison(source_tree, target_tree, compatibility_table, th_ns, process_num):
     elements_to_compare = generate_parallel_l_sim_input(
         source_tree, target_tree, compatibility_table, th_ns
     )
-    if parallelism == 1:
+    if process_num == 1:
         l_sim = dict([l_sim_proc(pair, compatibility_table) for pair in elements_to_compare])
     else:
-        with get_context("spawn").Pool(parallelism) as process_pool:
+        with get_context("spawn").Pool(process_num) as process_pool:
             l_sim = dict(
                 process_pool.starmap(
                     l_sim_proc,

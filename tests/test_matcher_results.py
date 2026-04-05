@@ -1,9 +1,10 @@
 import math
 import unittest
+from collections.abc import Mapping
 
 from tests import df1, df2
 from valentine import valentine_match
-from valentine.algorithms import JaccardDistanceMatcher
+from valentine.algorithms import ColumnPair, JaccardDistanceMatcher
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.metrics import Precision
 
@@ -21,8 +22,13 @@ class TestMatcherResults(unittest.TestCase):
             ("office_loc", "work_location"),
         ]
 
-    def test_dict(self):
-        assert isinstance(self.matches, dict)
+    def test_is_mapping(self):
+        assert isinstance(self.matches, Mapping)
+
+    def test_is_not_mutable_dict(self):
+        # MatcherResults should not support mutation
+        assert not hasattr(self.matches, "update")
+        assert not hasattr(self.matches, "pop")
 
     def test_get_metrics(self):
         metrics = self.matches.get_metrics(self.ground_truth)
@@ -36,10 +42,17 @@ class TestMatcherResults(unittest.TestCase):
         n = len(m)
         assert n > 0
 
-        # Add lower-similarity duplicate for each match
-        pairs = list(m.keys())
-        for (ta, ca), (tb, cb) in pairs:
-            m[((ta, ca), (tb, cb + "foo"))] = m[((ta, ca), (tb, cb))] / 2
+        # Build a new MatcherResults with duplicate (lower-score) entries
+        extended = dict(m)
+        for pair in list(m):
+            dup = ColumnPair(
+                pair.source_table,
+                pair.source_column,
+                pair.target_table,
+                pair.target_column + "foo",
+            )
+            extended[dup] = m[pair] / 2
+        m = MatcherResults(extended)
 
         assert len(m) == 2 * n
 
@@ -49,15 +62,17 @@ class TestMatcherResults(unittest.TestCase):
         assert len(m_one_to_one) < len(m)
 
         # None of the lower-similarity "foo" entries should survive
-        for (ta, ca), (tb, cb) in pairs:
-            assert ((ta, ca), (tb, cb + "foo")) not in m_one_to_one
+        for pair in m_one_to_one:
+            assert not pair.target_column.endswith("foo")
 
         # Cache resets on new instance
-        m_entry = MatcherResults(m)
+        m_entry = MatcherResults(dict(m))
         assert m_entry._cached_one_to_one is None
 
         # Add a new entry with distinct columns
-        m_entry[(("extra_src", "BLA"), ("extra_tgt", "BLA"))] = 0.7214057
+        ext2 = dict(m_entry)
+        ext2[ColumnPair("extra_src", "BLA", "extra_tgt", "BLA")] = 0.7214057
+        m_entry = MatcherResults(ext2)
 
         m_entry_one_to_one = m_entry.one_to_one()
         assert m_one_to_one != m_entry_one_to_one
@@ -92,4 +107,17 @@ class TestMatcherResults(unittest.TestCase):
         assert len(take_more_than_all) == len(self.matches)
 
     def test_copy(self):
-        assert self.matches.get_copy() is not self.matches
+        copy = self.matches.get_copy()
+        assert copy is not self.matches
+        assert dict(copy) == dict(self.matches)
+
+    def test_column_pair_named_access(self):
+        """ColumnPair fields are accessible by name."""
+        pair = next(iter(self.matches))
+        assert isinstance(pair, ColumnPair)
+        assert isinstance(pair.source_table, str)
+        assert isinstance(pair.source_column, str)
+        assert isinstance(pair.target_table, str)
+        assert isinstance(pair.target_column, str)
+        assert pair.source == (pair.source_table, pair.source_column)
+        assert pair.target == (pair.target_table, pair.target_column)

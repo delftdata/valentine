@@ -3,6 +3,8 @@ from .coma.coma import Coma
 from .cupid.cupid_model import Cupid
 from .distribution_based.distribution_based import DistributionBased
 from .jaccard_distance.jaccard_distance import JaccardDistanceMatcher
+from .match import ColumnPair
+from .similarity_flooding import Formula, Policy, StringMatcher
 from .similarity_flooding.similarity_flooding import SimilarityFlooding
 
 schema_only_algorithms = [SimilarityFlooding.__name__, Cupid.__name__]
@@ -12,11 +14,15 @@ all_matchers = schema_only_algorithms + instance_only_algorithms + schema_instan
 
 __all__ = [
     "BaseMatcher",
+    "ColumnPair",
     "Coma",
     "Cupid",
     "DistributionBased",
+    "Formula",
     "JaccardDistanceMatcher",
+    "Policy",
     "SimilarityFlooding",
+    "StringMatcher",
     "all_matchers",
     "instance_only_algorithms",
     "schema_instance_algorithms",

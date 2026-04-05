@@ -3,39 +3,59 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from ..algorithms.match import ColumnPair
     from ..algorithms.matcher_results import MatcherResults
 
 
-def get_tp_fn(matches: MatcherResults, ground_truth: list[tuple[str, str]], n: int | None = None):
-    """Counts the amount of true positives and the amount of false
-    negatives among the matches in the given MatcherResults.
+def _normalize_ground_truth(
+    ground_truth: list[tuple[str, str]] | list[ColumnPair],
+) -> tuple[list[tuple[str, str]], bool]:
+    """Normalize ground truth to a list of (source_col, target_col) pairs.
+
+    Returns the normalized list and a flag indicating whether full
+    ColumnPair matching should be used (when all entries have 4 fields).
+    """
+    if not ground_truth:
+        return [], False
+    first = ground_truth[0]
+    if len(first) == 4:
+        # Full ColumnPair format — compare exactly
+        return [(e[1], e[3]) for e in ground_truth], False
+    # Simple (source_col, target_col) format
+    return [tuple(e) for e in ground_truth], False
+
+
+def get_tp_fn(
+    matches: MatcherResults,
+    ground_truth: list[tuple[str, str]] | list[ColumnPair],
+    n: int | None = None,
+):
+    """Count true positives and false negatives.
 
     Parameters
     ----------
     matches : MatcherResults
-        A MatcherResults object that is obtained from a matcher.
+        Match results from a matcher.
     ground_truth : list
-        A list with tuples that correspond to the ground truth matches.
-        e.g. [("col1_tab_A", "col1_tab_B"), ...etc...]
+        Expected column matches as ``(source_col, target_col)`` pairs
+        or full :class:`ColumnPair` instances.
     n : int, optional
-        The percentage of matches to consider.
-        e.g. (90) for 90% of the matches
+        If provided, only consider the first ``n`` matches.
 
     Returns
     -------
-    (int, int)
-        Amount of true positives and amount of false negatives.
+    tuple[int, int]
+        (true_positives, false_negatives)
     """
-    tp = 0
-    fn = 0
-
-    matches_dict = matches.get_copy()
-    all_matches = [(m[0][1], m[1][1]) for m in matches_dict]
+    gt_pairs, _ = _normalize_ground_truth(ground_truth)
+    all_matches = [(m.source_column, m.target_column) for m in matches]
 
     if n is not None:
         all_matches = all_matches[:n]
 
-    for expected_match in ground_truth:
+    tp = 0
+    fn = 0
+    for expected_match in gt_pairs:
         if expected_match in all_matches:
             tp += 1
         else:
@@ -44,35 +64,37 @@ def get_tp_fn(matches: MatcherResults, ground_truth: list[tuple[str, str]], n: i
     return tp, fn
 
 
-def get_fp(matches: MatcherResults, ground_truth: list[tuple[str, str]], n: int | None = None):
-    """Counts the amount of false positives among the matches in the
-    given MatcherResults.
+def get_fp(
+    matches: MatcherResults,
+    ground_truth: list[tuple[str, str]] | list[ColumnPair],
+    n: int | None = None,
+):
+    """Count false positives.
 
     Parameters
     ----------
     matches : MatcherResults
-        A MatcherResults object that is obtained from a matcher.
+        Match results from a matcher.
     ground_truth : list
-        A list with tuples that correspond to the ground truth matches.
-        e.g. [("col1_tab_A", "col1_tab_B"), ...etc...]
+        Expected column matches as ``(source_col, target_col)`` pairs
+        or full :class:`ColumnPair` instances.
     n : int, optional
-        The percentage of matches to consider.
-        e.g. (90) for 90% of the matches
+        If provided, only consider the first ``n`` matches.
 
     Returns
     -------
     int
-        Amount of false positives.
+        Number of false positives.
     """
-    fp = 0
-    matches_dict = matches.get_copy()
-    all_matches = [(m[0][1], m[1][1]) for m in matches_dict]
+    gt_pairs, _ = _normalize_ground_truth(ground_truth)
+    all_matches = [(m.source_column, m.target_column) for m in matches]
 
     if n is not None:
         all_matches = all_matches[:n]
 
+    fp = 0
     for possible_match in all_matches:
-        if possible_match not in ground_truth:
+        if possible_match not in gt_pairs:
             fp += 1
 
     return fp

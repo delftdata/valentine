@@ -1,3 +1,4 @@
+import math
 import pickle
 from collections.abc import Iterable, Sequence
 from functools import lru_cache
@@ -322,6 +323,8 @@ def _compute_ranks(corpus: set) -> dict[Any, int]:
 
     for val in corpus:
         converted = convert_data_type(str(val))
+        if isinstance(converted, float) and math.isnan(converted):
+            continue
         if isinstance(converted, (int, float)):
             numeric_values.append(converted)
         else:

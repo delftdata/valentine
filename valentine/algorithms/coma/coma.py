@@ -4,7 +4,7 @@ from itertools import combinations
 
 from ...data_sources.base_table import BaseTable
 from ..base_matcher import BaseMatcher
-from ..match import Match
+from ..match import ColumnPair, Match
 from .combination import average
 from .matchers import build_matchers
 from .schema import SchemaGraph
@@ -73,14 +73,21 @@ class Coma(BaseMatcher):
         if not use_schema and not use_instances:
             raise ValueError("At least one of use_schema or use_instances must be True")
         self.__max_n = int(max_n)
+        if self.__max_n < 0:
+            raise ValueError(f"max_n must be >= 0, got {self.__max_n}")
         self.__use_instances = use_instances
         self.__use_schema = use_schema
-        self.__delta = delta
-        self.__threshold = threshold
+        self.__delta = float(delta)
+        self.__threshold = float(threshold)
+        if not 0.0 <= self.__delta <= 1.0:
+            raise ValueError(f"delta must be between 0.0 and 1.0, got {self.__delta}")
+        if not 0.0 <= self.__threshold <= 1.0:
+            raise ValueError(f"threshold must be between 0.0 and 1.0, got {self.__threshold}")
 
     def get_matches(
         self, source_input: BaseTable, target_input: BaseTable
-    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    ) -> dict[ColumnPair, float]:
+        self._match_details: dict[ColumnPair, dict[str, float]] = {}
         source_graph = SchemaGraph.from_table(source_input)
         target_graph = SchemaGraph.from_table(target_input)
 
@@ -93,14 +100,13 @@ class Coma(BaseMatcher):
 
         return self._match_pair(source_graph, target_graph, source_input, target_input, corpus)
 
-    def get_matches_batch(
-        self, tables: list[BaseTable]
-    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    def get_matches_batch(self, tables: list[BaseTable]) -> dict[ColumnPair, float]:
         """Match all table pairs with a single global TF-IDF corpus.
 
         Building the corpus from all tables at once gives better IDF
         statistics than building a separate corpus per pair.
         """
+        self._match_details: dict[ColumnPair, dict[str, float]] = {}
         graphs = [(table, SchemaGraph.from_table(table)) for table in tables]
 
         # Build one global TF-IDF corpus from all tables
@@ -109,7 +115,7 @@ class Coma(BaseMatcher):
             all_column_instances = [col.instances for _, graph in graphs for col in graph.columns]
             corpus = TfidfCorpus(all_column_instances)
 
-        matches: dict[tuple[tuple[str, str], tuple[str, str]], float] = {}
+        matches: dict[ColumnPair, float] = {}
         for (t1, g1), (t2, g2) in combinations(graphs, 2):
             matches.update(self._match_pair(g1, g2, t1, t2, corpus))
 
@@ -122,19 +128,26 @@ class Coma(BaseMatcher):
         source_input: BaseTable,
         target_input: BaseTable,
         corpus: TfidfCorpus | None,
-    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    ) -> dict[ColumnPair, float]:
         complex_matchers = build_matchers(
             corpus,
             use_schema=self.__use_schema,
             use_instances=self.__use_instances,
         )
 
-        # Compute all-pairs similarity matrix
+        # Compute all-pairs similarity matrix and collect per-matcher details
         sim_matrix: dict[tuple, float] = {}
+        details_matrix: dict[tuple, dict[str, float]] = {}
         for e1 in source_graph.columns:
             for e2 in target_graph.columns:
-                scores = [cm.compute(e1, e2, source_graph, target_graph) for cm in complex_matchers]
+                scores = []
+                pair_details = {}
+                for cm in complex_matchers:
+                    score = cm.compute(e1, e2, source_graph, target_graph)
+                    scores.append(score)
+                    pair_details[cm.name] = score
                 sim_matrix[(e1, e2)] = average(scores)
+                details_matrix[(e1, e2)] = pair_details
 
         selected = select_both_multiple(
             sim_matrix,
@@ -145,8 +158,8 @@ class Coma(BaseMatcher):
             threshold=self.__threshold,
         )
 
-        # Format output
-        output: dict[tuple[tuple[str, str], tuple[str, str]], float] = {}
+        # Format output and populate match_details
+        output: dict[ColumnPair, float] = {}
         for (e1, e2), sim in selected.items():
             match = Match(
                 target_table_name=target_input.name,
@@ -155,6 +168,10 @@ class Coma(BaseMatcher):
                 source_column_name=e1.name,
                 similarity=float(sim),
             )
-            output.update(match.to_dict)
+            match_dict = match.to_dict
+            output.update(match_dict)
+            # Store per-matcher details keyed by the ColumnPair
+            col_pair = next(iter(match_dict))
+            self._match_details[col_pair] = details_matrix[(e1, e2)]
 
         return output

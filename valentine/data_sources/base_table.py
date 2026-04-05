@@ -35,6 +35,14 @@ class BaseTable(ABC):
     def get_df(self) -> pd.DataFrame:
         raise NotImplementedError
 
+    def get_instances_df(self) -> pd.DataFrame:
+        """Return the DataFrame used for instance-based sampling."""
+        return self.get_df()
+
+    def get_instances_columns(self) -> list[BaseColumn]:
+        """Return columns built from the instance-sampled DataFrame."""
+        return self.get_columns()
+
     @property
     @abstractmethod
     def is_empty(self) -> bool:

@@ -36,7 +36,7 @@ def test_cupid():
     matches_cu_matcher = cu_matcher.get_matches(d1, d2)
     # Check that it actually produced output
     assert len(matches_cu_matcher) > 0
-    cu_matcher = Cupid(parallelism=2)
+    cu_matcher = Cupid(process_num=2)
     matches_cu_matcher = cu_matcher.get_matches(d1, d2)
     # Check that it actually produced output
     assert len(matches_cu_matcher) > 0
@@ -100,8 +100,8 @@ def test_cupid_paper_figure7():
 
     # Extract matched column name pairs for easier assertion
     matched_pairs = {}
-    for ((_t1, col1), (_t2, col2)), score in matches.items():
-        matched_pairs[(col1, col2)] = score
+    for pair, score in matches.items():
+        matched_pairs[(pair.source_column, pair.target_column)] = score
 
     # Columns with identical or near-identical names should be matched
     # (case-insensitive matches that Cupid's linguistic matching handles)
@@ -127,8 +127,8 @@ def _cupid_matched_pairs(source_table, target_table):
     matcher = Cupid()
     matches = matcher.get_matches(source_table, target_table)
     pairs = {}
-    for ((_t1, col1), (_t2, col2)), score in matches.items():
-        pairs[(col1, col2)] = score
+    for pair, score in matches.items():
+        pairs[(pair.source_column, pair.target_column)] = score
     return pairs
 
 

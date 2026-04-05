@@ -40,10 +40,10 @@ def tree_match(
     c_inc,
     c_dec,
     th_ns,
-    parallelism,
+    process_num,
 ):
     compatibility_table = compute_compatibility(categories)
-    l_sims = comparison(source_tree, target_tree, compatibility_table, th_ns, parallelism)
+    l_sims = comparison(source_tree, target_tree, compatibility_table, th_ns, process_num)
     s_leaves = source_tree.get_leaves()
     t_leaves = target_tree.get_leaves()
     sims = get_sims(s_leaves, t_leaves, compatibility_table, l_sims, leaf_w_struct)
@@ -128,9 +128,7 @@ def recompute_wsim(source_tree, target_tree, sims, w_struct=0.6, th_accept=0.14)
     return sims
 
 
-def mapping_generation_leaves(
-    source_tree, target_tree, sims, th_accept
-) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+def mapping_generation_leaves(source_tree, target_tree, sims, th_accept) -> dict:
     s_leaves = source_tree.get_leaf_names()
     t_leaves = target_tree.get_leaf_names()
     leave_combinations = list(product(s_leaves, t_leaves))

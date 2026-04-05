@@ -6,8 +6,6 @@ import pandas as pd
 
 from ...data_sources.base_table import BaseTable
 
-INSTANCES_MAX = 1000
-
 
 @dataclass(eq=False)
 class SchemaElement:
@@ -38,27 +36,17 @@ class SchemaGraph:
             data_type="element",
         )
 
-        # Java's InstanceCSVParser reads rows until 1000 rows have at least one
-        # non-null value. All columns share the same row window. We replicate
-        # this by selecting up to INSTANCES_MAX rows from the DataFrame where
-        # at least one column is non-null, then extracting per-column values.
+        # Instance sampling is enforced by the table (data source). We read
+        # from get_instances_df() so callers can control the row window size.
         all_cols = table.get_columns()
         col_instances: dict[str, list[str]] = {col.name: [] for col in all_cols}
 
-        df = table.get_df()
-        # Keep only rows where at least one value is non-null and non-empty
-        row_count = 0
+        df = table.get_instances_df()
         for _, row in df.iterrows():
-            if row_count >= INSTANCES_MAX:
-                break
-            has_value = False
             for col in all_cols:
                 val = row[col.name]
                 if pd.notna(val) and str(val) != "":
-                    has_value = True
                     col_instances[col.name].append(str(val))
-            if has_value:
-                row_count += 1
 
         columns = []
         for col in all_cols:

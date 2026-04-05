@@ -4,13 +4,14 @@ from abc import ABC, abstractmethod
 from itertools import combinations
 
 from ..data_sources.base_table import BaseTable
+from .match import ColumnPair
 
 
 class BaseMatcher(ABC):
     @abstractmethod
     def get_matches(
         self, source_input: BaseTable, target_input: BaseTable
-    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    ) -> dict[ColumnPair, float]:
         """Match columns between two tables.
 
         Parameters
@@ -23,14 +24,11 @@ class BaseMatcher(ABC):
         Returns
         -------
         dict
-            Mapping of ``((source_table, source_col), (target_table, target_col))``
-            to similarity score.
+            Mapping of :class:`ColumnPair` to similarity score.
         """
         raise NotImplementedError
 
-    def get_matches_batch(
-        self, tables: list[BaseTable]
-    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    def get_matches_batch(self, tables: list[BaseTable]) -> dict[ColumnPair, float]:
         """Match columns across all unique pairs of tables.
 
         The default implementation calls :meth:`get_matches` for each pair
@@ -48,7 +46,18 @@ class BaseMatcher(ABC):
         dict
             Combined matches across all pairs.
         """
-        matches: dict[tuple[tuple[str, str], tuple[str, str]], float] = {}
+        matches: dict[ColumnPair, float] = {}
         for t1, t2 in combinations(tables, 2):
             matches.update(self.get_matches(t1, t2))
         return matches
+
+    @property
+    def match_details(self) -> dict[ColumnPair, dict[str, float]]:
+        """Per-pair score breakdowns from the most recent match call.
+
+        Returns a mapping from :class:`ColumnPair` to a dictionary of
+        ``{matcher_name: score}`` showing how each sub-matcher contributed
+        to the final similarity. Empty by default; override in subclasses
+        that combine multiple matchers (e.g. Coma).
+        """
+        return getattr(self, "_match_details", {})

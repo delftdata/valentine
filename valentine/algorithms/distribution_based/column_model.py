@@ -1,3 +1,4 @@
+import math
 import pickle
 from pathlib import Path
 
@@ -54,7 +55,7 @@ class CorrelationClusteringColumn(BaseColumn):
         self.__table_name = table_name
         self.__table_guid = table_guid
         self.__tmp_dir = tmp_folder_path
-        self.__ranks = self.get_global_ranks(self.__data, self.__tmp_dir)
+        self.__data, self.__ranks = self.get_global_ranks(self.__data, self.__tmp_dir)
         self.quantile_histogram = None
 
     @property
@@ -100,18 +101,20 @@ class CorrelationClusteringColumn(BaseColumn):
 
         Returns
         -------
-        ndarray
-            The ndarray that contains the ranks of the data
+        tuple[list, ndarray]
+            The filtered column data (with unmapped values removed) and the
+            ndarray that contains the ranks of the filtered data.
         """
         with Path(Path(tmp_folder_path) / "ranks.pkl").open("rb") as pkl_file:
             global_ranks: dict = pickle.load(pkl_file)
-            ranks = np.array(
-                sorted(
-                    [
-                        global_ranks[convert_data_type(x)]
-                        for x in column
-                        if convert_data_type(x) in global_ranks
-                    ]
-                )
-            )
-            return ranks
+            filtered_data = []
+            ranks = []
+            for x in column:
+                converted = convert_data_type(str(x))
+                if isinstance(converted, float) and math.isnan(converted):
+                    continue
+                if converted in global_ranks:
+                    filtered_data.append(x)
+                    ranks.append(global_ranks[converted])
+            ranks_arr = np.array(sorted(ranks))
+            return filtered_data, ranks_arr

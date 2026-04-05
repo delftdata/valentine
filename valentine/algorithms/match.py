@@ -1,17 +1,47 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import NamedTuple
+
+
+class ColumnPair(NamedTuple):
+    """A matched pair of columns from two tables.
+
+    Used as the key in match result dictionaries. Provides named access
+    to all four identifiers::
+
+        pair = ColumnPair("orders", "price", "sales", "amount")
+        pair.source_table  # "orders"
+        pair.source_column  # "price"
+        pair.target_table  # "sales"
+        pair.target_column  # "amount"
+        pair.source  # ("orders", "price")
+        pair.target  # ("sales", "amount")
+    """
+
+    source_table: str
+    source_column: str
+    target_table: str
+    target_column: str
+
+    @property
+    def source(self) -> tuple[str, str]:
+        """(source_table, source_column) pair."""
+        return (self.source_table, self.source_column)
+
+    @property
+    def target(self) -> tuple[str, str]:
+        """(target_table, target_column) pair."""
+        return (self.target_table, self.target_column)
 
 
 @dataclass
 class Match:
-    """
-    Class representing a match of two columns. target is the one we want to
-    find the matches of, source an other that exists in the database and the
-    similarity between the two.
+    """Internal helper for building match result entries.
 
-    NOTE: Use the to_dict method when you want to append a match to a list of
-    matches
+    Algorithms create ``Match`` instances and call ``.to_dict`` to produce
+    the ``{ColumnPair: similarity}`` entries that get merged into the
+    final result dictionary.
     """
 
     target_table_name: str
@@ -21,10 +51,12 @@ class Match:
     similarity: float
 
     @property
-    def to_dict(self: Match) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+    def to_dict(self: Match) -> dict[ColumnPair, float]:
         return {
-            (
-                (self.source_table_name, self.source_column_name),
-                (self.target_table_name, self.target_column_name),
+            ColumnPair(
+                source_table=self.source_table_name,
+                source_column=self.source_column_name,
+                target_table=self.target_table_name,
+                target_column=self.target_column_name,
             ): self.similarity
         }

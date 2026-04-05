@@ -74,6 +74,14 @@ class DistributionBased(BaseMatcher):
         self.__threshold2: float = float(threshold2)
         self.__process_num: int = int(process_num)
         self.__use_bloom_filters: bool = bool(use_bloom_filters)
+        if self.__quantiles < 1:
+            raise ValueError(f"quantiles must be >= 1, got {self.__quantiles}")
+        if not 0.0 <= self.__threshold1 <= 1.0:
+            raise ValueError(f"threshold1 must be between 0.0 and 1.0, got {self.__threshold1}")
+        if not 0.0 <= self.__threshold2 <= 1.0:
+            raise ValueError(f"threshold2 must be between 0.0 and 1.0, got {self.__threshold2}")
+        if self.__process_num < 1:
+            raise ValueError(f"process_num must be >= 1, got {self.__process_num}")
         self.__column_names: list = []
 
     def get_matches(self, source_input: BaseTable, target_input: BaseTable):
@@ -104,13 +112,14 @@ class DistributionBased(BaseMatcher):
         with tempfile.TemporaryDirectory() as tmp_folder_path:
             unique_values: set = set()
             for table in tables:
-                for column in table.get_columns():
+                for column in table.get_instances_columns():
                     unique_values.update(column.data)
             generate_global_ranks(unique_values, tmp_folder_path)
             del unique_values
 
             if self.__process_num == 1:
                 for table in tables:
+                    columns: list[BaseColumn] = table.get_instances_columns()
                     self.__column_names.extend(
                         [
                             (
@@ -119,12 +128,11 @@ class DistributionBased(BaseMatcher):
                                 x.name,
                                 x.unique_identifier,
                             )
-                            for x in table.get_columns()
+                            for x in columns
                             if not x.is_empty
                         ]
                     )
 
-                    columns: list[BaseColumn] = table.get_columns()
                     for tup in ingestion_column_generator(
                         columns,
                         table.name,
@@ -137,6 +145,7 @@ class DistributionBased(BaseMatcher):
             else:
                 with get_context("spawn").Pool(self.__process_num) as process_pool:
                     for table in tables:
+                        columns: list[BaseColumn] = table.get_instances_columns()
                         self.__column_names.extend(
                             [
                                 (
@@ -145,11 +154,10 @@ class DistributionBased(BaseMatcher):
                                     x.name,
                                     x.unique_identifier,
                                 )
-                                for x in table.get_columns()
+                                for x in columns
                                 if not x.is_empty
                             ]
                         )
-                        columns: list[BaseColumn] = table.get_columns()
                         process_pool.map(
                             process_columns,
                             ingestion_column_generator(

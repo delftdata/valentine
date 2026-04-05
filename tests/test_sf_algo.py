@@ -5,6 +5,9 @@ import networkx as nx
 import pandas as pd
 
 from valentine.algorithms.similarity_flooding import (
+    Formula,
+    Policy,
+    StringMatcher,
     graph as sf_graph_mod,
     node as sf_node_mod,
     node_pair as sf_nodepair_mod,
@@ -141,16 +144,16 @@ class TestGraphNodePropagationAndSF(unittest.TestCase):
         g2 = sf_graph_mod.Graph(t2).graph
 
         # inverse_average path
-        pg_avg = sf_prop_mod.PropagationGraph(g1, g2, policy="inverse_average").construct_graph()
+        pg_avg = sf_prop_mod.PropagationGraph(
+            g1, g2, policy=Policy.INVERSE_AVERAGE
+        ).construct_graph()
         self.assertIsInstance(pg_avg, nx.DiGraph)
 
         # inverse_product path
-        pg_prod = sf_prop_mod.PropagationGraph(g1, g2, policy="inverse_product").construct_graph()
+        pg_prod = sf_prop_mod.PropagationGraph(
+            g1, g2, policy=Policy.INVERSE_PRODUCT
+        ).construct_graph()
         self.assertIsInstance(pg_prod, nx.DiGraph)
-
-        # unknown policy -> {}
-        pg_wrong = sf_prop_mod.PropagationGraph(g1, g2, policy="unknown").construct_graph()
-        self.assertEqual(pg_wrong, {})
 
     def test_similarity_flooding_all_formulas(self):
         """All formula variants should run without error and return results."""
@@ -164,8 +167,8 @@ class TestGraphNodePropagationAndSF(unittest.TestCase):
             "T",
             [DummyColumn(2, "B", "int", [2]), DummyColumn(4, "D", "float", [2.2])],
         )
-        for formula in ("basic", "formula_a", "formula_b", "formula_c"):
-            sf = sf_sf_mod.SimilarityFlooding(coeff_policy="inverse_average", formula=formula)
+        for formula in Formula:
+            sf = sf_sf_mod.SimilarityFlooding(formula=formula)
             res = sf.get_matches(t_src, t_tgt)
             self.assertIsInstance(res, dict, f"Failed for {formula}")
 
@@ -181,7 +184,7 @@ class TestGraphNodePropagationAndSF(unittest.TestCase):
             "T",
             [DummyColumn(2, "nombre", "int", [2]), DummyColumn(4, "edad", "float", [2.2])],
         )
-        sf = sf_sf_mod.SimilarityFlooding(coeff_policy="inverse_average", formula="formula_b")
+        sf = sf_sf_mod.SimilarityFlooding(formula=Formula.FORMULA_B)
         res = sf.get_matches(t_src, t_tgt)
         self.assertIsInstance(res, dict)
 
@@ -198,7 +201,7 @@ class TestGraphNodePropagationAndSF(unittest.TestCase):
             [DummyColumn(2, "B", "int", [2]), DummyColumn(4, "D", "float", [2.2])],
         )
 
-        sf = sf_sf_mod.SimilarityFlooding(coeff_policy="inverse_average", formula="formula_c")
+        sf = sf_sf_mod.SimilarityFlooding()
         res = sf.get_matches(t_src, t_tgt)
         self.assertIsInstance(res, dict)
         # Not asserting content; weights/edges can vary. Ensures no exceptions and correct type.
@@ -236,7 +239,7 @@ class TestPaperVerification(unittest.TestCase):
         B.add_edge(b, b1, label="l1")
         B.add_edge(b, b2, label="l2")
 
-        pg = sf_prop_mod.PropagationGraph(A, B, policy="inverse_product")
+        pg = sf_prop_mod.PropagationGraph(A, B, policy=Policy.INVERSE_PRODUCT)
         prop_graph = pg.construct_graph()
 
         init_map = {}
@@ -378,8 +381,8 @@ class TestPaperVerification(unittest.TestCase):
         )
 
         results = {}
-        for formula in ("basic", "formula_a", "formula_b", "formula_c"):
-            sf = sf_sf_mod.SimilarityFlooding(coeff_policy="inverse_average", formula=formula)
+        for formula in Formula:
+            sf = sf_sf_mod.SimilarityFlooding(formula=formula)
             results[formula] = sf.get_matches(t_src, t_tgt)
 
         # All formulas should return non-empty results
@@ -388,8 +391,8 @@ class TestPaperVerification(unittest.TestCase):
 
         # Formulas A, B, C should generally produce different similarity values
         # than basic (they use sigma^0 differently)
-        basic_vals = sorted(results["basic"].values())
-        for other in ("formula_a", "formula_b", "formula_c"):
+        basic_vals = sorted(results[Formula.BASIC].values())
+        for other in (Formula.FORMULA_A, Formula.FORMULA_B, Formula.FORMULA_C):
             other_vals = sorted(results[other].values())
             # At least some values should differ
             differs = any(abs(a - b) > 1e-6 for a, b in zip(basic_vals, other_vals, strict=False))
@@ -458,9 +461,9 @@ class TestPaperVerification(unittest.TestCase):
             [DummyColumn(2, "Department", "int", [2]), DummyColumn(4, "Birthdate", "date", [2])],
         )
 
-        for formula in ("formula_b", "formula_c"):
+        for formula in (Formula.FORMULA_B, Formula.FORMULA_C):
             sf = sf_sf_mod.SimilarityFlooding(
-                coeff_policy="inverse_average", formula=formula, string_matcher="prefix_suffix"
+                formula=formula, string_matcher=StringMatcher.PREFIX_SUFFIX
             )
             res = sf.get_matches(t_src, t_tgt)
             self.assertIsInstance(res, dict, f"Failed for {formula}")
@@ -501,17 +504,15 @@ class TestPaperVerification(unittest.TestCase):
             ],
         )
 
-        sf = sf_sf_mod.SimilarityFlooding(
-            coeff_policy="inverse_average", formula="formula_c", string_matcher="prefix_suffix"
-        )
+        sf = sf_sf_mod.SimilarityFlooding(string_matcher=StringMatcher.PREFIX_SUFFIX)
         matches = sf.get_matches(personnel, employee)
 
         self.assertGreater(len(matches), 0)
 
         # Extract column-to-column match dict for easier assertions
         col_matches = {}
-        for (t1, c1), (t2, c2) in matches:
-            col_matches[(c1, c2)] = matches[((t1, c1), (t2, c2))]
+        for pair in matches:
+            col_matches[(pair.source_column, pair.target_column)] = matches[pair]
 
         # Dept <-> DeptNo should be the top match (strongest prefix overlap)
         best_pair = max(col_matches, key=col_matches.get)
@@ -612,19 +613,15 @@ class TestStringMatcher(unittest.TestCase):
             ],
         )
 
-        sf = sf_sf_mod.SimilarityFlooding(
-            coeff_policy="inverse_average",
-            formula="formula_c",
-            string_matcher="prefix_suffix",
-        )
+        sf = sf_sf_mod.SimilarityFlooding(string_matcher=StringMatcher.PREFIX_SUFFIX)
         matches = sf.get_matches(personnel, employee)
         self.assertIsInstance(matches, dict)
         self.assertGreater(len(matches), 0)
 
         # With prefix/suffix matcher, Dept <-> DeptNo should still be top
         col_matches = {}
-        for (t1, c1), (t2, c2) in matches:
-            col_matches[(c1, c2)] = matches[((t1, c1), (t2, c2))]
+        for pair in matches:
+            col_matches[(pair.source_column, pair.target_column)] = matches[pair]
         best_pair = max(col_matches, key=col_matches.get)
         self.assertEqual(best_pair, ("Dept", "DeptNo"))
 
@@ -680,19 +677,15 @@ class TestStringMatcher(unittest.TestCase):
             ],
         )
 
-        sf = sf_sf_mod.SimilarityFlooding(
-            coeff_policy="inverse_average",
-            formula="formula_c",
-            string_matcher="prefix_suffix_tfidf",
-        )
+        sf = sf_sf_mod.SimilarityFlooding(string_matcher=StringMatcher.PREFIX_SUFFIX_TFIDF)
         matches = sf.get_matches(personnel, employee)
         self.assertIsInstance(matches, dict)
         self.assertGreater(len(matches), 0)
 
         # Ranking should be same as without TF-IDF for this simple schema
         col_matches = {}
-        for (t1, c1), (t2, c2) in matches:
-            col_matches[(c1, c2)] = matches[((t1, c1), (t2, c2))]
+        for pair in matches:
+            col_matches[(pair.source_column, pair.target_column)] = matches[pair]
         best_pair = max(col_matches, key=col_matches.get)
         self.assertEqual(best_pair, ("Dept", "DeptNo"))
 
@@ -728,12 +721,12 @@ class TestStringMatcher(unittest.TestCase):
 
         # Without corpus: Dept/DeptNo and Dept/DeptName get same initial sim
         sf_no_corpus = sf_sf_mod.SimilarityFlooding(
-            string_matcher="prefix_suffix_tfidf",
+            string_matcher=StringMatcher.PREFIX_SUFFIX_TFIDF,
         )
         # With Department as corpus: 'No' token has higher df -> lower IDF
         # so DeptNo match is higher than DeptName match
         sf_with_corpus = sf_sf_mod.SimilarityFlooding(
-            string_matcher="prefix_suffix_tfidf",
+            string_matcher=StringMatcher.PREFIX_SUFFIX_TFIDF,
             tfidf_corpus=[department],
         )
 
@@ -741,9 +734,9 @@ class TestStringMatcher(unittest.TestCase):
         matches_with = sf_with_corpus.get_matches(personnel, employee)
 
         def get_sim(matches, c1, c2):
-            for (t1, col1), (t2, col2) in matches:
-                if col1 == c1 and col2 == c2:
-                    return matches[((t1, col1), (t2, col2))]
+            for pair in matches:
+                if pair.source_column == c1 and pair.target_column == c2:
+                    return matches[pair]
             return 0.0
 
         # With corpus, Dept<->DeptNo should score HIGHER than without corpus
@@ -757,8 +750,8 @@ class TestStringMatcher(unittest.TestCase):
 
         # Dept<->DeptNo should still be the top match in both cases
         col_matches = {}
-        for (t1, c1), (t2, c2) in matches_with:
-            col_matches[(c1, c2)] = matches_with[((t1, c1), (t2, c2))]
+        for pair in matches_with:
+            col_matches[(pair.source_column, pair.target_column)] = matches_with[pair]
         best_pair = max(col_matches, key=col_matches.get)
         self.assertEqual(best_pair, ("Dept", "DeptNo"))
 
