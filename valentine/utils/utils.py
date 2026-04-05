@@ -1,6 +1,3 @@
-from pathlib import Path
-
-
 def is_sorted(matches: dict):
     prev = None
     for value in matches.values():
@@ -37,7 +34,3 @@ def normalize_distance(dist: int, str1: str, str2: str):
     """
 
     return 1 - dist / max(len(str1), len(str2), 1)
-
-
-def get_project_root():
-    return str(Path(__file__).parent.parent)

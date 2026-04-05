@@ -47,7 +47,6 @@ The original experimental suite version of Valentine, as first published for the
 ### Requirements
 
 *   *Python* >=3.10,<3.15
-*   *Java*: Only required for the legacy `Coma` matcher (deprecated). The recommended `ComaPy` matcher is pure Python and has no Java dependency.
 
 To install Valentine simply run:
 
@@ -62,7 +61,7 @@ Valentine can be used to find matches among columns of a given pair of pandas Da
 ### Matching methods
 In order to do so, the user can choose one of the following matching methods:
 
-1.   `ComaPy(int: max_n, bool: use_instances, bool: use_schema, float: delta, float: threshold)` is a pure Python implementation of the [COMA 3.0](https://sourceforge.net/projects/coma-ce/) schema matching algorithm. It will be renamed to `Coma` in v1.0.0.
+1.   `Coma(int: max_n, bool: use_instances, bool: use_schema, float: delta, float: threshold)` is a pure Python implementation of the [COMA 3.0](https://sourceforge.net/projects/coma-ce/) schema matching algorithm.
      *    **Parameters**:
            *    **max_n**(*int*) - Maximum number of matches to keep per column, 0 means unlimited (default: 0).
            *    **use_instances**(*bool*) - Whether to use TF-IDF instance-based matching on data values (default: False).
@@ -70,24 +69,18 @@ In order to do so, the user can choose one of the following matching methods:
            *    **delta**(*float*) - Fraction from the best score within which matches are kept (default: 0.15).
            *    **threshold**(*float*) - Absolute minimum similarity score to keep a match (default: 0.0).
 
-2.   `Coma(int: max_n, bool: use_instances, str: java_xmx)` **(deprecated, will be removed in v1.0.0)** is a Java wrapper around [COMA 3.0 Community edition](https://sourceforge.net/projects/coma-ce/). Requires Java. Use `ComaPy` instead.
-     *    **Parameters**:
-           *    **max_n**(*int*) - Maximum number of matches to keep per column, (default: 0).
-           *    **use_instances**(*bool*) - Whether Coma will make use of the data instances or just the schema information, (default: False).
-           *    **java_xmx**(*str*) - The amount of RAM that Coma is allowed to use, (default: "1024m") .
-
-3.   `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](https://www.vldb.org/conf/2001/P049.pdf)
+2.   `Cupid(float: w_struct, float: leaf_w_struct, float: th_accept)` is the python implementation of the paper [Generic Schema Matching with Cupid](https://www.vldb.org/conf/2001/P049.pdf)
      *    **Parameters**:
           *    **w_struct**(*float*) - Structural similarity threshold, default is 0.2.
           *    **leaf_w_struct**(*float*) - Structural similarity threshold, leaf level, default is 0.2.
           *    **th_accept**(*float*) - Accept similarity threshold, default is 0.7.
 
-4.   `DistributionBased(float: threshold1, float: threshold2)` is the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl.acm.org/doi/10.1145/1989323.1989336)
+3.   `DistributionBased(float: threshold1, float: threshold2)` is the python implementation of the paper [Automatic Discovery of Attributes in Relational Databases](https://dl.acm.org/doi/10.1145/1989323.1989336)
      *    **Parameters**:
           *    **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
           *    **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
 
-5.   `JaccardDistanceMatcher(float: threshold_dist)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, optionally enhanced by a string similarity measure of choice.
+4.   `JaccardDistanceMatcher(float: threshold_dist)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, optionally enhanced by a string similarity measure of choice.
      *    **Parameters**:
           *    **threshold_dist**(*float*) - Acceptance threshold for assessing two strings as equal, default is 0.8.
 
@@ -99,7 +92,7 @@ In order to do so, the user can choose one of the following matching methods:
                * `StringDistanceFunction.JaroWinkler`: [Jaro-Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
               * `StringDistanceFunction.Exact`: String equality `==`
 
-6.   `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](https://ieeexplore.ieee.org/document/994702)
+5.   `SimilarityFlooding(str: coeff_policy, str: formula)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](https://ieeexplore.ieee.org/document/994702)
      * **Parameters**: 
         *    **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
         *    **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
@@ -112,7 +105,7 @@ After selecting one of the matching methods, the user can initiate the pairwise 
 matches = valentine_match(df1, df2, matcher, df1_name, df2_name)
 ```
 
-where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of ComaPy, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
+where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardDistanceMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
 
 ### Matching DataFrame Batch
 
@@ -122,7 +115,7 @@ After selecting one of the matching methods, the user can initiate the batch mat
 matches = valentine_match_batch(df_iter_1, df_iter_2, matcher, df_iter_1_names, df_iter_2_names)
 ```
 
-where df_iter_1 and df_iter_2 are the two iterable structures containing pandas DataFrames for which we want to find matches and matcher is one of ComaPy, Cupid, DistributionBased, JaccardLevenMatcher or SimilarityFlooding. The user can also input an iterable with names for each DataFrame. Function ```valentine_match_batch``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
+where df_iter_1 and df_iter_2 are the two iterable structures containing pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardDistanceMatcher or SimilarityFlooding. The user can also input an iterable with names for each DataFrame. Function ```valentine_match_batch``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
 
 
 ### MatcherResults instance
@@ -162,7 +155,7 @@ The following block of code shows: 1) how to run a matcher from Valentine on two
 import os
 import pandas as pd
 from valentine import valentine_match
-from valentine.algorithms import ComaPy
+from valentine.algorithms import Coma
 
 # Load data using pandas
 d1_path = os.path.join('data', 'authors1.csv')
@@ -171,7 +164,7 @@ df1 = pd.read_csv(d1_path)
 df2 = pd.read_csv(d2_path)
 
 # Instantiate matcher and run
-matcher = ComaPy(use_instances=True)
+matcher = Coma(use_instances=True)
 matches = valentine_match(df1, df2, matcher)
 
 print(matches)

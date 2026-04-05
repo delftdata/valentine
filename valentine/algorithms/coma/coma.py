@@ -1,145 +1,124 @@
-import subprocess
-import tempfile
-import time
-import warnings
-from pathlib import Path
+from __future__ import annotations
 
 from ...data_sources.base_table import BaseTable
-from ...utils.utils import get_project_root
 from ..base_matcher import BaseMatcher
 from ..match import Match
-
-
-class JavaException(Exception):
-    pass
+from .combination import average
+from .matchers import build_matchers
+from .schema import SchemaGraph
+from .selection import select_both_multiple
+from .similarity.tfidf import TfidfCorpus
 
 
 class Coma(BaseMatcher):
     """
-    Java-based COMA 3.0 schema matcher.
+    Pure Python implementation of the COMA 3.0 schema matching algorithm.
 
-    .. deprecated::
-        ``Coma`` is deprecated and will be removed in valentine v1.0.0.
-        Use :class:`valentine.algorithms.ComaPy` instead, which is a pure Python
-        implementation that does not require Java. ``ComaPy`` will be renamed
-        to ``Coma`` in v1.0.0.
+    COMA (COmbination of MAtching algorithms) works by composing multiple
+    individual matchers — each targeting a different aspect of schema or data
+    similarity — and combining their scores. This implementation faithfully
+    reproduces the matching pipeline from the original Java COMA 3.0 Community
+    Edition.
+
+    **Schema matchers** (enabled by ``use_schema=True``, the default):
+
+    - *Name*: trigram (Dice) similarity on column names.
+    - *Path*: trigram similarity on dot-separated schema paths.
+    - *Leaves*: name similarity across all leaf-level columns.
+    - *Parents*: structural similarity via parent-level leaf comparison.
+
+    **Instance matcher** (enabled by ``use_instances=True``):
+
+    - *TF-IDF cosine similarity*: each cell value is treated as a document,
+      a global IDF is computed across all columns of both tables, and
+      per-column similarity is aggregated using a max-matching Dice formula.
+
+    The two groups can be used independently or together. At least one of
+    ``use_schema`` or ``use_instances`` must be enabled.
+
+    After computing all-pairs similarity scores, a selection step filters
+    results using bidirectional best-match logic (DIR_BOTH) controlled by
+    ``max_n``, ``delta``, and ``threshold``.
+
+    Parameters
+    ----------
+    max_n : int, optional
+        Maximum number of matches to keep per column (0 = unlimited).
+    use_instances : bool, optional
+        Enable TF-IDF instance-based matching (default: False).
+    use_schema : bool, optional
+        Enable schema-based matching (default: True).
+    delta : float, optional
+        Fraction from the best score within which matches are kept.
+        For example, 0.15 keeps all matches scoring within 15%% of the
+        best match for that column (default: 0.15).
+    threshold : float, optional
+        Absolute minimum similarity score to keep a match (default: 0.0).
     """
 
-    def __init__(self, max_n: int = 0, use_instances: bool = False, java_xmx: str = "1024m"):
-        warnings.warn(
-            "Coma is deprecated and will be removed in valentine v1.0.0. "
-            "Use ComaPy instead, which is a pure Python implementation "
-            "that does not require Java. ComaPy will be renamed to Coma "
-            "in v1.0.0.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
+    def __init__(
+        self,
+        max_n: int = 0,
+        use_instances: bool = False,
+        use_schema: bool = True,
+        delta: float = 0.15,
+        threshold: float = 0.0,
+    ):
+        if not use_schema and not use_instances:
+            raise ValueError("At least one of use_schema or use_instances must be True")
         self.__max_n = int(max_n)
-        self.__strategy = "COMA_OPT_INST" if use_instances else "COMA_OPT"
-        self.__java_XmX = java_xmx
+        self.__use_instances = use_instances
+        self.__use_schema = use_schema
+        self.__delta = delta
+        self.__threshold = threshold
 
     def get_matches(
         self, source_input: BaseTable, target_input: BaseTable
     ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+        # Build schema graphs
+        source_graph = SchemaGraph.from_table(source_input)
+        target_graph = SchemaGraph.from_table(target_input)
 
-        with tempfile.TemporaryDirectory() as tmp_folder_path:
-            s_f_name, t_f_name = self.__write_schema_csv_files(
-                source_input, target_input, tmp_folder_path
+        # Build global TF-IDF corpus if instances are needed
+        corpus = None
+        if self.__use_instances:
+            all_column_instances = [
+                col.instances for col in source_graph.columns + target_graph.columns
+            ]
+            corpus = TfidfCorpus(all_column_instances)
+
+        complex_matchers = build_matchers(
+            corpus,
+            use_schema=self.__use_schema,
+            use_instances=self.__use_instances,
+        )
+
+        # Compute all-pairs similarity matrix
+        sim_matrix: dict[tuple, float] = {}
+        for e1 in source_graph.columns:
+            for e2 in target_graph.columns:
+                scores = [cm.compute(e1, e2, source_graph, target_graph) for cm in complex_matchers]
+                sim_matrix[(e1, e2)] = average(scores)
+
+        selected = select_both_multiple(
+            sim_matrix,
+            source_graph.columns,
+            target_graph.columns,
+            max_n=self.__max_n,
+            delta=self.__delta,
+            threshold=self.__threshold,
+        )
+
+        # Format output
+        output: dict[tuple[tuple[str, str], tuple[str, str]], float] = {}
+        for (e1, e2), sim in selected.items():
+            match = Match(
+                target_table_name=target_input.name,
+                target_column_name=e2.name,
+                source_table_name=source_input.name,
+                source_column_name=e1.name,
+                similarity=float(sim),
             )
-            dataset_name: str = (
-                f"{source_input.name}____{target_input.name}{self.__max_n}{self.__strategy}.txt"
-            )
-            coma_output_file: Path = Path(tmp_folder_path) / dataset_name
-            self.__run_coma_jar(s_f_name, t_f_name, coma_output_file, tmp_folder_path)
-            raw_output = self.__read_coma_output(
-                s_f_name, t_f_name, coma_output_file, tmp_folder_path
-            )
-            matches = self.__process_coma_output(raw_output, target_input, source_input)
+            output.update(match.to_dict)
 
-        return matches
-
-    def __run_coma_jar(
-        self,
-        source_table_f_name: Path,
-        target_table_f_name: Path,
-        coma_output_path: Path,
-        tmp_folder_path: str,
-    ) -> None:
-        jar_path = Path(get_project_root()) / "algorithms" / "coma" / "artifact" / "coma.jar"
-        source_data = Path(tmp_folder_path) / source_table_f_name
-        target_data = Path(tmp_folder_path) / target_table_f_name
-        coma_output_path = Path(tmp_folder_path) / coma_output_path
-        try:
-            subprocess.check_output(
-                [
-                    "java",
-                    f"-Xmx{self.__java_XmX}",
-                    "-cp",
-                    jar_path,
-                    "-DinputFile1=" + str(source_data),
-                    "-DinputFile2=" + str(target_data),
-                    "-DoutputFile=" + str(coma_output_path),
-                    "-DmaxN=" + str(self.__max_n),
-                    "-Dstrategy=" + self.__strategy,
-                    "Main",
-                ],
-                stderr=subprocess.DEVNULL,
-            )
-        except subprocess.CalledProcessError as err:
-            raise JavaException(
-                "Either Java (JRE) is not installed or Java does not have enough memory to operate. "
-                "Try raising the java_xmx parameter of the Coma class"
-            ) from err
-
-    def __write_schema_csv_files(
-        self, table1: BaseTable, table2: BaseTable, tmp_folder_path: str
-    ) -> tuple[Path, Path]:
-        f_name1 = self.__write_csv_file(table1, tmp_folder_path)
-        f_name2 = self.__write_csv_file(table2, tmp_folder_path)
-        return f_name1, f_name2
-
-    def __process_coma_output(self, matches, t_table: BaseTable, s_table: BaseTable) -> dict:
-        if matches is None:
-            return {}
-        formatted_output = {}
-        for match in matches:
-            split_idx = len(match) - match[::-1].find(":") - 1
-            m, similarity = match[:split_idx], match[split_idx + 2 :]
-            m1, m2 = m.split(" <-> ")
-            column1 = self.__get_column(m2)
-            column2 = self.__get_column(m1)
-            if column1 == "" or column2 == "":
-                continue
-            formatted_output.update(
-                Match(t_table.name, column1, s_table.name, column2, float(similarity)).to_dict
-            )
-        return formatted_output
-
-    def __read_coma_output(self, s_f_name, t_f_name, coma_output_path, tmp_folder_path, retries=0):
-        try:
-            with Path(coma_output_path).open() as f:
-                matches = f.readlines()
-            matches = [x.strip() for x in matches]
-            matches.pop()
-        except FileNotFoundError:
-            if retries == 1:
-                self.__run_coma_jar(s_f_name, t_f_name, coma_output_path, tmp_folder_path)
-            elif retries == 3:
-                return []
-            else:
-                time.sleep(1)
-            self.__read_coma_output(
-                s_f_name, t_f_name, coma_output_path, tmp_folder_path, retries + 1
-            )
-        else:
-            return matches
-
-    @staticmethod
-    def __write_csv_file(table: BaseTable, tmp_folder_path: str) -> Path:
-        f_name = Path(tmp_folder_path) / f"{table.name}.csv"
-        table.get_df().to_csv(f_name, index=False)
-        return f_name
-
-    @staticmethod
-    def __get_column(match) -> str:
-        return ".".join(match.split(".")[1:])
+        return output

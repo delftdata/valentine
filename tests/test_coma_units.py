@@ -1,22 +1,22 @@
-"""Unit tests for ComaPy internal modules."""
+"""Unit tests for Coma internal modules."""
 
 from __future__ import annotations
 
 import pandas as pd
 import pytest
 
-from valentine.algorithms.coma_py.combination import (
+from valentine.algorithms.coma.combination import (
     average,
     maximum,
     set_average,
     set_highest,
     weighted,
 )
-from valentine.algorithms.coma_py.schema import SchemaGraph
-from valentine.algorithms.coma_py.selection import select_both_multiple
-from valentine.algorithms.coma_py.similarity.datatype import datatype_similarity
-from valentine.algorithms.coma_py.similarity.tfidf import TfidfCorpus, tfidf_similarity
-from valentine.algorithms.coma_py.similarity.trigram import trigram_similarity
+from valentine.algorithms.coma.schema import SchemaGraph
+from valentine.algorithms.coma.selection import select_both_multiple
+from valentine.algorithms.coma.similarity.datatype import datatype_similarity
+from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus, tfidf_similarity
+from valentine.algorithms.coma.similarity.trigram import trigram_similarity
 from valentine.data_sources import DataframeTable
 
 # ---------------------------------------------------------------------------

@@ -56,11 +56,6 @@ jobs:
           allow-prereleases: true
           cache: "pip"
 
-      - uses: actions/setup-java@v5.2.0
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-
       - name: Install package (from source)
         run: |
           python -m pip install --upgrade pip
@@ -91,11 +86,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           allow-prereleases: true
           cache: "pip"
-
-      - uses: actions/setup-java@v5.2.0
-        with:
-          distribution: 'zulu'
-          java-version: '11'
 
       - name: Download built dists
         uses: actions/download-artifact@v8.0.1

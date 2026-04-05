@@ -24,12 +24,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: Set up Java (for code paths using coma.jar)
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '11'
-
       - name: Install deps
         run: |
           python -m pip install --upgrade pip

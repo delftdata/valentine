@@ -5,7 +5,6 @@ import pytest
 from tests import df1, df2
 from valentine.algorithms import (
     Coma,
-    ComaPy,
     Cupid,
     DistributionBased,
     JaccardDistanceMatcher,
@@ -19,28 +18,13 @@ d2 = DataframeTable(df2, name="authors2")
 
 
 def test_coma():
-    # Test the schema variant of coma
-    coma_matcher_schema = Coma(use_instances=False)
-    matches_coma_matcher_schema = coma_matcher_schema.get_matches(d1, d2)
-    # Check that it actually produced output
-    assert len(matches_coma_matcher_schema) > 0
-    # Test the instance variant of coma
-    coma_matcher_instances = Coma(use_instances=True)
-    matches_coma_matcher_instances = coma_matcher_instances.get_matches(d1, d2)
-    # Check that it actually produced output
-    assert len(matches_coma_matcher_instances) > 0
-    # Assume the Schema and instance should provide different results
-    assert matches_coma_matcher_schema != matches_coma_matcher_instances
-
-
-def test_coma_py():
-    # Test the schema variant of ComaPy
-    coma_py_schema = ComaPy(use_instances=False)
-    matches_schema = coma_py_schema.get_matches(d1, d2)
+    # Test the schema variant of Coma
+    coma_schema = Coma(use_instances=False)
+    matches_schema = coma_schema.get_matches(d1, d2)
     assert len(matches_schema) > 0
-    # Test the instance variant of ComaPy
-    coma_py_instances = ComaPy(use_instances=True)
-    matches_instances = coma_py_instances.get_matches(d1, d2)
+    # Test the instance variant of Coma
+    coma_instances = Coma(use_instances=True)
+    matches_instances = coma_instances.get_matches(d1, d2)
     assert len(matches_instances) > 0
     # Schema and instance should provide different results
     assert matches_schema != matches_instances
