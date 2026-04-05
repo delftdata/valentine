@@ -1,4 +1,5 @@
 import math
+from itertools import combinations
 
 from ...data_sources.base_table import BaseTable
 from ..base_matcher import BaseMatcher
@@ -40,16 +41,47 @@ class SimilarityFlooding(BaseMatcher):
         filtered_matches = self.__filter_map(matches)
         return self.__format_output(filtered_matches)
 
-    def __calculate_initial_mapping(self):
+    def get_matches_batch(self, tables: list[BaseTable]):
+        """
+        Override that computes IDF weights from ALL tables at once when using
+        the ``prefix_suffix_tfidf`` string matcher, so that token frequencies
+        reflect the full schema vocabulary rather than only a single pair.
+        """
+        graphs = [(table, Graph(table).graph) for table in tables]
+
+        # Precompute global IDF weights from all tables
+        precomputed_idf = None
         if self.__string_matcher == "prefix_suffix_tfidf":
-            # Collect non-NodeID node names from both graphs for IDF computation.
-            # Include corpus tables so IDF reflects the full schema vocabulary
-            # (e.g. the paper's G2 contains both Employee and Department tables).
-            all_nodes = list(self.__graph1.nodes()) + list(self.__graph2.nodes())
-            for table in self.__tfidf_corpus:
-                all_nodes.extend(Graph(table).graph.nodes())
+            all_nodes = []
+            for _, g in graphs:
+                all_nodes.extend(g.nodes())
             all_names = [n.name for n in all_nodes if not n.name.startswith("NodeID")]
-            idf_weights = compute_idf_weights(all_names)
+            precomputed_idf = compute_idf_weights(all_names)
+
+        matches = {}
+        for (_t1, g1), (_t2, g2) in combinations(graphs, 2):
+            self.__graph1 = g1
+            self.__graph2 = g2
+            self.__calculate_initial_mapping(precomputed_idf)
+            pair_matches = self.__fixpoint_computation(100, 1e-4)
+            filtered = self.__filter_map(pair_matches)
+            matches.update(self.__format_output(filtered))
+
+        return matches
+
+    def __calculate_initial_mapping(self, precomputed_idf=None):
+        if self.__string_matcher == "prefix_suffix_tfidf":
+            if precomputed_idf is not None:
+                idf_weights = precomputed_idf
+            else:
+                # Collect non-NodeID node names from both graphs for IDF computation.
+                # Include corpus tables so IDF reflects the full schema vocabulary
+                # (e.g. the paper's G2 contains both Employee and Department tables).
+                all_nodes = list(self.__graph1.nodes()) + list(self.__graph2.nodes())
+                for table in self.__tfidf_corpus:
+                    all_nodes.extend(Graph(table).graph.nodes())
+                all_names = [n.name for n in all_nodes if not n.name.startswith("NodeID")]
+                idf_weights = compute_idf_weights(all_names)
 
             def sim_fn(s1, s2):
                 return prefix_suffix_tfidf(s1, s2, idf_weights)

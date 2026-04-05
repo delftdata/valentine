@@ -12,9 +12,13 @@ class TestMatcherResults(unittest.TestCase):
     def setUp(self):
         self.matches = valentine_match([df1, df2], JaccardDistanceMatcher())
         self.ground_truth = [
-            ("Cited by", "Cited by"),
-            ("Authors", "Authors"),
-            ("EID", "EID"),
+            ("emp_id", "employee_number"),
+            ("fname", "first_name"),
+            ("lname", "last_name"),
+            ("dept", "department"),
+            ("annual_salary", "compensation"),
+            ("hire_date", "start_date"),
+            ("office_loc", "work_location"),
         ]
 
     def test_dict(self):
@@ -29,32 +33,36 @@ class TestMatcherResults(unittest.TestCase):
 
     def test_one_to_one(self):
         m = self.matches
+        n = len(m)
+        assert n > 0
 
-        # Add multiple matches per column
+        # Add lower-similarity duplicate for each match
         pairs = list(m.keys())
         for (ta, ca), (tb, cb) in pairs:
             m[((ta, ca), (tb, cb + "foo"))] = m[((ta, ca), (tb, cb))] / 2
 
-        # Verify that len gets corrected from 6 to 3
-        m_one_to_one = m.one_to_one()
-        assert len(m_one_to_one) == 3 and len(m) == 6
+        assert len(m) == 2 * n
 
-        # Verify that none of the lower similarity "foo" entries made it
+        m_one_to_one = m.one_to_one()
+        # one_to_one should remove duplicates, returning fewer entries
+        assert len(m_one_to_one) <= n
+        assert len(m_one_to_one) < len(m)
+
+        # None of the lower-similarity "foo" entries should survive
         for (ta, ca), (tb, cb) in pairs:
             assert ((ta, ca), (tb, cb + "foo")) not in m_one_to_one
 
-        # Verify that the cache resets on a new MatcherResults instance
+        # Cache resets on new instance
         m_entry = MatcherResults(m)
         assert m_entry._cached_one_to_one is None
 
-        # Add one new entry with lower similarity
-        m_entry[(("table_1", "BLA"), ("table_2", "BLA"))] = 0.7214057
+        # Add a new entry with distinct columns
+        m_entry[(("extra_src", "BLA"), ("extra_tgt", "BLA"))] = 0.7214057
 
-        # Verify that the new one_to_one is different from the old one
         m_entry_one_to_one = m_entry.one_to_one()
         assert m_one_to_one != m_entry_one_to_one
 
-        # Verify that all remaining values are above the median
+        # All remaining values should be above the median
         median = sorted(m_entry.values(), reverse=True)[math.ceil(len(m_entry) / 2)]
         for k in m_entry_one_to_one:
             assert m_entry_one_to_one[k] >= median
@@ -63,8 +71,9 @@ class TestMatcherResults(unittest.TestCase):
         take_0_percent = self.matches.take_top_percent(0)
         assert len(take_0_percent) == 0
 
+        n = len(self.matches)
         take_40_percent = self.matches.take_top_percent(40)
-        assert len(take_40_percent) == 2
+        assert len(take_40_percent) == math.ceil(n * 0.4)
 
         take_100_percent = self.matches.take_top_percent(100)
         assert len(take_100_percent) == len(self.matches)

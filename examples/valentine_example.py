@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 
 from valentine import valentine_match
-from valentine.algorithms import JaccardDistanceMatcher
+from valentine.algorithms import Coma
 from valentine.metrics import F1Score, PrecisionTopNPercent
 
 pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
@@ -12,13 +12,13 @@ pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
 def main():
     # Load data using pandas
-    d1_path = Path("data") / "authors1.csv"
-    d2_path = Path("data") / "authors2.csv"
+    d1_path = Path("data") / "source_candidates.csv"
+    d2_path = Path("data") / "target_candidates.csv"
     df1 = pd.read_csv(d1_path)
     df2 = pd.read_csv(d2_path)
 
     # Instantiate matcher and run
-    matcher = JaccardDistanceMatcher()
+    matcher = Coma(use_instances=True)
     matches = valentine_match([df1, df2], matcher)
 
     # MatcherResults is a wrapper object that has several useful
@@ -30,7 +30,15 @@ def main():
     pp.pprint(matches.one_to_one())
 
     # If ground truth available valentine could calculate the metrics
-    ground_truth = [("Cited by", "Cited by"), ("Authors", "Authors"), ("EID", "EID")]
+    ground_truth = [
+        ("emp_id", "employee_number"),
+        ("fname", "first_name"),
+        ("lname", "last_name"),
+        ("dept", "department"),
+        ("annual_salary", "compensation"),
+        ("hire_date", "start_date"),
+        ("office_loc", "work_location"),
+    ]
 
     metrics = matches.get_metrics(ground_truth)
 

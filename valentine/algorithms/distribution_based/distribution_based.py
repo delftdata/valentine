@@ -75,7 +75,6 @@ class DistributionBased(BaseMatcher):
         self.__process_num: int = int(process_num)
         self.__use_bloom_filters: bool = bool(use_bloom_filters)
         self.__column_names: list = []
-        self.__target_name: str = ""
 
     def get_matches(self, source_input: BaseTable, target_input: BaseTable):
         """
@@ -87,20 +86,31 @@ class DistributionBased(BaseMatcher):
         dict
             A dictionary with matches and their similarity
         """
-        self.__column_names: list = []
-        self.__target_name = target_input.name
+        table_order = {source_input.name: 0, target_input.name: 1}
+        return self.__ingest_and_match([source_input, target_input], table_order)
 
-        all_tables: list[BaseTable] = [source_input, target_input]
+    def get_matches_batch(self, tables: list[BaseTable]):
+        """
+        Override that computes global ranks from ALL tables at once, so that
+        the distribution clustering reflects the full data landscape rather
+        than only a single pair.
+        """
+        table_order = {table.name: i for i, table in enumerate(tables)}
+        return self.__ingest_and_match(tables, table_order)
+
+    def __ingest_and_match(self, tables: list[BaseTable], table_order: dict[str, int]):
+        self.__column_names = []
+
         with tempfile.TemporaryDirectory() as tmp_folder_path:
-            data = []
-            for table in all_tables:
+            unique_values: set = set()
+            for table in tables:
                 for column in table.get_columns():
-                    data.extend(column.data)
-            generate_global_ranks(data, tmp_folder_path)
-            del data
+                    unique_values.update(column.data)
+            generate_global_ranks(unique_values, tmp_folder_path)
+            del unique_values
 
             if self.__process_num == 1:
-                for table in all_tables:
+                for table in tables:
                     self.__column_names.extend(
                         [
                             (
@@ -123,10 +133,10 @@ class DistributionBased(BaseMatcher):
                         tmp_folder_path,
                     ):
                         process_columns(tup)
-                matches = self.__find_matches(tmp_folder_path)
+                matches = self.__find_matches(tmp_folder_path, table_order)
             else:
                 with get_context("spawn").Pool(self.__process_num) as process_pool:
-                    for table in all_tables:
+                    for table in tables:
                         self.__column_names.extend(
                             [
                                 (
@@ -151,11 +161,13 @@ class DistributionBased(BaseMatcher):
                             ),
                             chunksize=1,
                         )
-                    matches = self.__find_matches_parallel(tmp_folder_path, process_pool)
+                    matches = self.__find_matches_parallel(
+                        tmp_folder_path, process_pool, table_order
+                    )
 
         return matches
 
-    def __find_matches(self, tmp_folder_path: str):
+    def __find_matches(self, tmp_folder_path: str, table_order: dict[str, int]):
         connected_components = discovery.compute_distribution_clusters(
             self.__column_names, self.__threshold1, tmp_folder_path, self.__quantiles
         )
@@ -182,9 +194,11 @@ class DistributionBased(BaseMatcher):
             results, self.__column_names
         )
 
-        return self.__rank_output(attribute_clusters, tmp_folder_path)
+        return self.__rank_output(attribute_clusters, tmp_folder_path, table_order)
 
-    def __find_matches_parallel(self, tmp_folder_path: str, pool: Pool):
+    def __find_matches_parallel(
+        self, tmp_folder_path: str, pool: Pool, table_order: dict[str, int]
+    ):
         """
         "Main" function of [1] that will calculate first the distribution clusters and then the attribute clusters
 
@@ -194,6 +208,8 @@ class DistributionBased(BaseMatcher):
             The path of the temporary folder that will serve as a cache for the run
         pool: multiprocessing.Pool
             the process pool that will be used in the algorithms 1, 2 and 3 of [1]
+        table_order: dict[str, int]
+            Mapping of table name to position index for consistent match direction
         """
         connected_components = discovery.compute_distribution_clusters_parallel(
             self.__column_names,
@@ -226,9 +242,14 @@ class DistributionBased(BaseMatcher):
             results, self.__column_names
         )
 
-        return self.__rank_output(attribute_clusters, tmp_folder_path)
+        return self.__rank_output(attribute_clusters, tmp_folder_path, table_order)
 
-    def __rank_output(self, attribute_clusters: iter, tmp_folder_path: str):
+    def __rank_output(
+        self,
+        attribute_clusters: iter,
+        tmp_folder_path: str,
+        table_order: dict[str, int],
+    ):
         """
         Take the attribute clusters that the algorithm produces and give a ranked list of matches based on the the EMD
         between each pair inside an attribute cluster . The ranked list will look like:
@@ -240,6 +261,8 @@ class DistributionBased(BaseMatcher):
             The attribute clusters
         tmp_folder_path: str
             The path of the temporary folder that will serve as a cache for the run
+        table_order: dict[str, int]
+            Mapping of table name to position index for consistent match direction
 
         Returns
         -------
@@ -266,7 +289,7 @@ class DistributionBased(BaseMatcher):
                     sim = 1 / (1 + emd)
                     tn_i, _, cn_i, _ = k[0]
                     tn_j, _, cn_j, _ = k[1]
-                    if self.__target_name == tn_i:
+                    if table_order.get(tn_i, 0) > table_order.get(tn_j, 0):
                         matches.update(Match(tn_i, cn_i, tn_j, cn_j, sim).to_dict)
                     else:
                         matches.update(Match(tn_j, cn_j, tn_i, cn_i, sim).to_dict)

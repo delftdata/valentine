@@ -18,6 +18,17 @@ class NotAValentineMatcher(Exception):
     pass
 
 
+def _default_table_name(i: int) -> str:
+    """Generate a default table name that has zero string similarity to other defaults.
+
+    Uses repeated letters (e.g. "aaa", "bbb") so that every pair of default
+    names shares no trigrams, no common prefix/suffix, and has maximum
+    Levenshtein distance — avoiding any influence on schema-based matchers.
+    Supports up to 26 tables; more than that requires explicit ``df_names``.
+    """
+    return chr(ord("a") + i) * 3
+
+
 def _validate_matcher(matcher: valentine.algorithms.BaseMatcher) -> None:
     if not isinstance(matcher, valentine.algorithms.BaseMatcher):
         raise NotAValentineMatcher("Please provide a valid matcher")
@@ -41,7 +52,7 @@ def valentine_match(
         The matching algorithm to use.
     df_names : list[str] | None
         Optional names for each DataFrame. If not provided, defaults to
-        "table_0", "table_1", etc.
+        "aaa", "bbb", etc.
 
     Returns
     -------
@@ -78,9 +89,15 @@ def valentine_match(
             f"Length of df_names ({len(df_names)}) must match number of DataFrames ({len(df_list)})"
         )
 
+    if df_names is None and len(df_list) > 26:
+        raise ValueError(
+            "More than 26 DataFrames require explicit df_names to avoid "
+            "default name collisions"
+        )
+
     tables = [
         valentine.data_sources.DataframeTable(
-            df, name=df_names[i] if df_names is not None else f"table_{i}"
+            df, name=df_names[i] if df_names is not None else _default_table_name(i)
         )
         for i, df in enumerate(df_list)
     ]

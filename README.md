@@ -109,7 +109,7 @@ matches = valentine_match([df1, df2], matcher)
 matches = valentine_match([df1, df2, df3], matcher, df_names=["sales", "orders", "products"])
 ```
 
-Optionally provide `df_names` to label each DataFrame (defaults to "table\_0", "table\_1", etc.). Function `valentine_match` returns a `MatcherResults` object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `filter`, `get_metrics` and more. It stores as keys column pairs from the DataFrames and as values the corresponding similarity scores.
+Optionally provide `df_names` to label each DataFrame (defaults to "aaa", "bbb", etc. — designed to have zero similarity so they don't influence schema-based matchers). Function `valentine_match` returns a `MatcherResults` object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `filter`, `get_metrics` and more. It stores as keys column pairs from the DataFrames and as values the corresponding similarity scores.
 
 
 ### MatcherResults instance
@@ -130,7 +130,7 @@ one_to_one_strict = matches.one_to_one(threshold=0.5)
 
 
 ### Measuring effectiveness
-The MatcherResults instance that is returned by `valentine_match` or `valentine_match_batch` also has a `get_metrics` method that the user can use 
+The MatcherResults instance that is returned by `valentine_match` also has a `get_metrics` method that the user can use
 
 ```python 
 metrics = matches.get_metrics(ground_truth)
@@ -149,19 +149,16 @@ metrics_prefefined_set = matches.get_metrics(ground_truth, metrics=METRICS_PRECI
 
 
 ### Example
-The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about authors and their publications, and then 2) how to assess its effectiveness based on a given ground truth (a more extensive example is shown in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py)):
+The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about job candidates, and then 2) how to assess its effectiveness based on a given ground truth (a more extensive example is shown in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py)):
 
 ```python
-import os
 import pandas as pd
 from valentine import valentine_match
 from valentine.algorithms import Coma
 
 # Load data using pandas
-d1_path = os.path.join('data', 'authors1.csv')
-d2_path = os.path.join('data', 'authors2.csv')
-df1 = pd.read_csv(d1_path)
-df2 = pd.read_csv(d2_path)
+df1 = pd.read_csv("source_candidates.csv")
+df2 = pd.read_csv("target_candidates.csv")
 
 # Instantiate matcher and run
 matcher = Coma(use_instances=True)
@@ -170,30 +167,19 @@ matches = valentine_match([df1, df2], matcher)
 print(matches)
 
 # If ground truth available valentine could calculate the metrics
-ground_truth = [('Cited by', 'Cited by'),
-                ('Authors', 'Authors'),
-                ('EID', 'EID')]
+ground_truth = [
+    ("emp_id", "employee_number"),
+    ("fname", "first_name"),
+    ("lname", "last_name"),
+    ("dept", "department"),
+    ("annual_salary", "compensation"),
+    ("hire_date", "start_date"),
+    ("office_loc", "work_location"),
+]
 
 metrics = matches.get_metrics(ground_truth)
-    
+
 print(metrics)
-```
-
-The output of the above code block is:
-
-```
-{
-     (('table_1', 'Cited by'), ('table_2', 'Cited by')): 0.86994505, 
-     (('table_1', 'Authors'), ('table_2', 'Authors')): 0.8679843, 
-     (('table_1', 'EID'), ('table_2', 'EID')): 0.8571245
-}
-{
-     'Recall': 1.0, 
-     'F1Score': 1.0, 
-     'RecallAtSizeofGroundTruth': 1.0, 
-     'Precision': 1.0, 
-     'PrecisionTop10Percent': 1.0
-}
 ```
 
 ## Cite Valentine

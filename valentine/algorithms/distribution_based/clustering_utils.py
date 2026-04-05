@@ -280,19 +280,20 @@ def cuttoff_column_generator(
         yield matrix_a, column, threshold
 
 
-def generate_global_ranks(data: list, tmp_folder_path: str) -> None:
+def generate_global_ranks(data: Iterable, tmp_folder_path: str) -> None:
     """
     Function that creates a pickle file with the global ranks of all the values inside the database.
 
     Parameters
     ----------
-    data : list
-        All the values from every column
+    data : Iterable
+        All the values from every column (a set of unique values or a list)
     tmp_folder_path: str
         The path of the temporary folder that will serve as a cache for the run
     """
     Path(tmp_folder_path).mkdir(parents=True, exist_ok=True)
-    ranks = _compute_ranks(set(data))
+    corpus = data if isinstance(data, set) else set(data)
+    ranks = _compute_ranks(corpus)
     with Path(Path(tmp_folder_path) / "ranks.pkl").open("wb") as output:
         pickle.dump(ranks, output, pickle.HIGHEST_PROTOCOL)
 
