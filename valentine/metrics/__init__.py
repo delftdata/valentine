@@ -7,6 +7,19 @@ from .metrics import (
     RecallAtSizeofGroundTruth,
 )
 
+__all__ = [
+    "METRICS_ALL",
+    "METRICS_CORE",
+    "METRICS_PRECISION_INCREASING_N",
+    "METRICS_PRECISION_RECALL",
+    "F1Score",
+    "Metric",
+    "Precision",
+    "PrecisionTopNPercent",
+    "Recall",
+    "RecallAtSizeofGroundTruth",
+]
+
 # Some predefined sets of metrics
 METRICS_ALL = {
     metric() for metric in Metric.__subclasses__()

@@ -8,10 +8,11 @@ chardet==7.3.0
 jellyfish==1.2.1
 PuLP==3.3.0
 POT==0.9.6.post1
-sentence-transformers==5.3.0
+scipy==1.16.2
 # data loading
 python-dateutil==2.9.0.post0
 # testing
 pytest==9.0.2
+coverage==7.13.5
 # lint
 ruff==0.15.9

@@ -6,6 +6,12 @@ import valentine.algorithms
 import valentine.data_sources
 from valentine.algorithms.matcher_results import MatcherResults
 
+__all__ = [
+    "NotAValentineMatcher",
+    "valentine_match",
+    "valentine_match_batch",
+]
+
 
 class NotAValentineMatcher(Exception):
     pass

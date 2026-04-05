@@ -1,10 +1,35 @@
-.ipynb_checkpoints
-.DS_Store
-.idea/
+# Python
 __pycache__/
-dist
-valentine.egg-info
-build
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Linting & type checking
+.ruff_cache/
+.mypy_cache/
+
+# IDEs
+.idea/
 .vscode/
-valentine.sublime-workspace
-valentine.sublime-project
+*.sublime-workspace
+*.sublime-project
+
+# OS
+.DS_Store
+.ipynb_checkpoints/
+
+# Environment
+.env
+.env.local
