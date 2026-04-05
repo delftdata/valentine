@@ -33,23 +33,25 @@ class MatcherResults(dict):
         sorted_res = {k: res[k] for k in sorted(res, key=res.get, reverse=True)}
         dict.__init__(self, sorted_res, *args, **kwargs)
 
-    def one_to_one(self: MatcherResults) -> MatcherResults:
-        """A filter that takes a dict of column matches and returns a dict of 1
-        to 1 matches. The filter works in the following way: At first it
-        gets the median similarity of the set of the values and removes all
-        matches that have a similarity lower than that. Then from what
-        remained it matches columns for me highest similarity to the lowest
-        till the columns have at most one match.
+    def one_to_one(self: MatcherResults, threshold: float | None = None) -> MatcherResults:
+        """Filter to one-to-one column matches.
 
-        Once calculated, the one-to-one matches are cached, to avoid redundant
-        calculations for metrics.
+        Starting from the highest-scoring pair, greedily assigns each source
+        and target column at most one match. Pairs below ``threshold`` are
+        discarded. When ``threshold`` is ``None`` (the default), the median
+        similarity score is used.
+
+        Parameters
+        ----------
+        threshold : float | None
+            Minimum similarity to keep. If None, uses the median score.
 
         Returns
         -------
         MatcherResults
             MatcherResults with one-to-one matches.
         """
-        if self._cached_one_to_one is not None:
+        if threshold is None and self._cached_one_to_one is not None:
             return MatcherResults(self._cached_one_to_one.copy())
 
         matches_dict = self.get_copy()
@@ -57,7 +59,8 @@ class MatcherResults(dict):
         set_match_values = set(matches_dict.values())
 
         if len(set_match_values) < 2:
-            self._cached_one_to_one = matches_dict
+            if threshold is None:
+                self._cached_one_to_one = matches_dict
             return MatcherResults(matches_dict)
 
         matched = {}
@@ -66,22 +69,41 @@ class MatcherResults(dict):
             matched[key[0]] = False
             matched[key[1]] = False
 
-        median = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
+        if threshold is None:
+            min_sim = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
+        else:
+            min_sim = threshold
 
         matches1to1_dict = {}
 
         for key in matches_dict:
             if (not matched[key[0]]) and (not matched[key[1]]):
                 similarity = matches_dict.get(key)
-                if similarity is not None and similarity >= median:
+                if similarity is not None and similarity >= min_sim:
                     matches1to1_dict[key] = similarity
                     matched[key[0]] = True
                     matched[key[1]] = True
                 else:
                     break
 
-        self._cached_one_to_one = matches1to1_dict
+        if threshold is None:
+            self._cached_one_to_one = matches1to1_dict
         return MatcherResults(matches1to1_dict)
+
+    def filter(self: MatcherResults, min_score: float) -> MatcherResults:
+        """Filter matches by minimum similarity score.
+
+        Parameters
+        ----------
+        min_score : float
+            Minimum similarity score to keep.
+
+        Returns
+        -------
+        MatcherResults
+            MatcherResults containing only matches with score >= min_score.
+        """
+        return MatcherResults({k: v for k, v in self.items() if v >= min_score})
 
     def take_top_percent(self: MatcherResults, percent: int) -> MatcherResults:
         """Summary

@@ -10,7 +10,7 @@ from valentine.metrics import Precision
 
 class TestMatcherResults(unittest.TestCase):
     def setUp(self):
-        self.matches = valentine_match(df1, df2, JaccardDistanceMatcher())
+        self.matches = valentine_match([df1, df2], JaccardDistanceMatcher())
         self.ground_truth = [
             ("Cited by", "Cited by"),
             ("Authors", "Authors"),

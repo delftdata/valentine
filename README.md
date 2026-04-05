@@ -97,35 +97,35 @@ In order to do so, the user can choose one of the following matching methods:
         *    **coeff_policy**(*str*) - Policy for deciding the weight coefficients of the propagation graph. Choice of "inverse\_product" or "inverse\_average" (default).
         *    **formula**(*str*) - Formula on which iterative fixpoint computation is based. Choice of "basic", "formula\_a", "formula\_b" and "formula\_c" (default).
 
-### Matching DataFrame Pair
+### Matching DataFrames
 
-After selecting one of the matching methods, the user can initiate the pairwise matching process in the following way:
-
-```python
-matches = valentine_match(df1, df2, matcher, df1_name, df2_name)
-```
-
-where df1 and df2 are the two pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardDistanceMatcher or SimilarityFlooding. The user can also input a name for each DataFrame (defaults are "table\_1" and "table\_2"). Function ```valentine_match``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
-
-### Matching DataFrame Batch
-
-After selecting one of the matching methods, the user can initiate the batch matching process in the following way:
+Pass two or more DataFrames as a list (or any iterable) along with a matcher. Valentine will match columns across all unique pairs:
 
 ```python
-matches = valentine_match_batch(df_iter_1, df_iter_2, matcher, df_iter_1_names, df_iter_2_names)
+# Match a pair of DataFrames
+matches = valentine_match([df1, df2], matcher)
+
+# Match multiple DataFrames (computes all N×(N-1)/2 pairs)
+matches = valentine_match([df1, df2, df3], matcher, df_names=["sales", "orders", "products"])
 ```
 
-where df_iter_1 and df_iter_2 are the two iterable structures containing pandas DataFrames for which we want to find matches and matcher is one of Coma, Cupid, DistributionBased, JaccardDistanceMatcher or SimilarityFlooding. The user can also input an iterable with names for each DataFrame. Function ```valentine_match_batch``` returns a MatcherResults object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `get_metrics` and more. It stores as keys column pairs from the two DataFrames and as values the corresponding similarity scores.
+Optionally provide `df_names` to label each DataFrame (defaults to "table\_0", "table\_1", etc.). Function `valentine_match` returns a `MatcherResults` object, which is a dictionary with additional convenience methods, such as `one_to_one`, `take_top_percent`, `filter`, `get_metrics` and more. It stores as keys column pairs from the DataFrames and as values the corresponding similarity scores.
 
 
 ### MatcherResults instance
-The `MatcherResults` instance has some convenience methods that the user can use to either obtain a subset of the data or to transform the data. This instance is a dictionary and is sorted upon instantiation, from high similarity to low similarity.
+The `MatcherResults` instance has convenience methods for filtering and subsetting. It is a dictionary sorted from high similarity to low similarity.
 ```python
 top_n_matches = matches.take_top_n(5)
 
 top_n_percent_matches = matches.take_top_percent(25)
 
 one_to_one_matches = matches.one_to_one()
+
+# Filter by minimum score
+high_confidence = matches.filter(min_score=0.7)
+
+# One-to-one with custom threshold (default uses median)
+one_to_one_strict = matches.one_to_one(threshold=0.5)
 ```
 
 
@@ -165,7 +165,7 @@ df2 = pd.read_csv(d2_path)
 
 # Instantiate matcher and run
 matcher = Coma(use_instances=True)
-matches = valentine_match(df1, df2, matcher)
+matches = valentine_match([df1, df2], matcher)
 
 print(matches)
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from itertools import combinations
+
 from ...data_sources.base_table import BaseTable
 from ..base_matcher import BaseMatcher
 from ..match import Match
@@ -40,6 +42,10 @@ class Coma(BaseMatcher):
     results using bidirectional best-match logic (DIR_BOTH) controlled by
     ``max_n``, ``delta``, and ``threshold``.
 
+    When matching more than two tables via :meth:`get_matches_batch`, the
+    TF-IDF corpus is built once from **all** tables, giving each pair the
+    benefit of global IDF statistics.
+
     Parameters
     ----------
     max_n : int, optional
@@ -75,11 +81,9 @@ class Coma(BaseMatcher):
     def get_matches(
         self, source_input: BaseTable, target_input: BaseTable
     ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
-        # Build schema graphs
         source_graph = SchemaGraph.from_table(source_input)
         target_graph = SchemaGraph.from_table(target_input)
 
-        # Build global TF-IDF corpus if instances are needed
         corpus = None
         if self.__use_instances:
             all_column_instances = [
@@ -87,6 +91,38 @@ class Coma(BaseMatcher):
             ]
             corpus = TfidfCorpus(all_column_instances)
 
+        return self._match_pair(source_graph, target_graph, source_input, target_input, corpus)
+
+    def get_matches_batch(
+        self, tables: list[BaseTable]
+    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
+        """Match all table pairs with a single global TF-IDF corpus.
+
+        Building the corpus from all tables at once gives better IDF
+        statistics than building a separate corpus per pair.
+        """
+        graphs = [(table, SchemaGraph.from_table(table)) for table in tables]
+
+        # Build one global TF-IDF corpus from all tables
+        corpus = None
+        if self.__use_instances:
+            all_column_instances = [col.instances for _, graph in graphs for col in graph.columns]
+            corpus = TfidfCorpus(all_column_instances)
+
+        matches: dict[tuple[tuple[str, str], tuple[str, str]], float] = {}
+        for (t1, g1), (t2, g2) in combinations(graphs, 2):
+            matches.update(self._match_pair(g1, g2, t1, t2, corpus))
+
+        return matches
+
+    def _match_pair(
+        self,
+        source_graph: SchemaGraph,
+        target_graph: SchemaGraph,
+        source_input: BaseTable,
+        target_input: BaseTable,
+        corpus: TfidfCorpus | None,
+    ) -> dict[tuple[tuple[str, str], tuple[str, str]], float]:
         complex_matchers = build_matchers(
             corpus,
             use_schema=self.__use_schema,

@@ -81,7 +81,7 @@ def test_authors_instance_only():
 
 def test_candidates_schema_instance_finds_all_ground_truth():
     """Schema+instance must find all ground truth pairs when names differ."""
-    matches = valentine_match(_src_df, _tgt_df, Coma(use_instances=True))
+    matches = valentine_match([_src_df, _tgt_df], Coma(use_instances=True))
 
     for src_col, tgt_col in CANDIDATES_GROUND_TRUTH:
         found = any(k[0][1] == src_col and k[1][1] == tgt_col for k in matches)
@@ -90,7 +90,7 @@ def test_candidates_schema_instance_finds_all_ground_truth():
 
 def test_candidates_schema_instance_precision():
     """Schema+instance should achieve perfect precision on this dataset."""
-    matches = valentine_match(_src_df, _tgt_df, Coma(use_instances=True))
+    matches = valentine_match([_src_df, _tgt_df], Coma(use_instances=True))
     metrics = matches.get_metrics(CANDIDATES_GROUND_TRUTH)
 
     assert metrics["Precision"] == 1.0, f"Precision={metrics['Precision']:.2f}, expected 1.0"
@@ -98,7 +98,7 @@ def test_candidates_schema_instance_precision():
 
 def test_candidates_instance_only_high_f1():
     """Instance-only should achieve high F1 when data values overlap."""
-    matches = valentine_match(_src_df, _tgt_df, Coma(use_instances=True, use_schema=False))
+    matches = valentine_match([_src_df, _tgt_df], Coma(use_instances=True, use_schema=False))
     metrics = matches.get_metrics(CANDIDATES_GROUND_TRUTH)
 
     assert metrics["F1Score"] >= 0.9, f"F1={metrics['F1Score']:.2f}, expected >= 0.9"
@@ -106,7 +106,7 @@ def test_candidates_instance_only_high_f1():
 
 def test_candidates_schema_only_finds_name_based_pairs():
     """Schema-only should find pairs where names partially overlap."""
-    matches = valentine_match(_src_df, _tgt_df, Coma(use_instances=False))
+    matches = valentine_match([_src_df, _tgt_df], Coma(use_instances=False))
 
     # These have partial name overlap and should be found by schema matching
     name_matchable = [
@@ -131,8 +131,8 @@ def test_no_matchers_raises():
 
 def test_delta_controls_output_count():
     """Smaller delta should produce fewer matches."""
-    strict = valentine_match(_src_df, _tgt_df, Coma(use_instances=True, delta=0.01))
-    relaxed = valentine_match(_src_df, _tgt_df, Coma(use_instances=True, delta=0.15))
+    strict = valentine_match([_src_df, _tgt_df], Coma(use_instances=True, delta=0.01))
+    relaxed = valentine_match([_src_df, _tgt_df], Coma(use_instances=True, delta=0.15))
 
     assert len(relaxed) >= len(strict)
 

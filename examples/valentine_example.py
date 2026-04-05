@@ -19,7 +19,7 @@ def main():
 
     # Instantiate matcher and run
     matcher = JaccardDistanceMatcher()
-    matches = valentine_match(df1, df2, matcher)
+    matches = valentine_match([df1, df2], matcher)
 
     # MatcherResults is a wrapper object that has several useful
     # utility/transformation functions

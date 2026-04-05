@@ -16,7 +16,7 @@ class TestDistributionBasedBenchmark:
 
     def test_authors_accuracy(self):
         """Baseline accuracy on the authors dataset."""
-        matches = valentine_match(df1, df2, DistributionBased())
+        matches = valentine_match([df1, df2], DistributionBased())
         ground_truth = [
             ("Cited by", "Cited by"),
             ("Authors", "Authors"),
@@ -60,7 +60,7 @@ class TestDistributionBasedBenchmark:
             ("rating", "score"),
         ]
 
-        matches = valentine_match(source, target, DistributionBased())
+        matches = valentine_match([source, target], DistributionBased())
         metrics = matches.get_metrics(ground_truth, metrics={Precision(), Recall(), F1Score()})
 
         # Baseline: P=1.0, R=0.75, F1=0.857
@@ -152,7 +152,7 @@ class TestDistributionBasedBenchmark:
             ("name", "person"),
         ]
 
-        matches = valentine_match(source, target, DistributionBased())
+        matches = valentine_match([source, target], DistributionBased())
         metrics = matches.get_metrics(ground_truth, metrics={Precision(), Recall(), F1Score()})
 
         # Baseline: P=1.0, R=1.0, F1=1.0 (both string pairs matched correctly)
@@ -162,8 +162,8 @@ class TestDistributionBasedBenchmark:
 
     def test_bloom_filter_accuracy(self):
         """Verify that Bloom filter mode produces comparable results to exact intersection."""
-        matches_exact = valentine_match(df1, df2, DistributionBased())
-        matches_bloom = valentine_match(df1, df2, DistributionBased(use_bloom_filters=True))
+        matches_exact = valentine_match([df1, df2], DistributionBased())
+        matches_bloom = valentine_match([df1, df2], DistributionBased(use_bloom_filters=True))
         ground_truth = [
             ("Cited by", "Cited by"),
             ("Authors", "Authors"),
