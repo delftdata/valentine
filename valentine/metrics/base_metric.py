@@ -22,24 +22,21 @@ class Metric(ABC):
 
     @abstractmethod
     def apply(
-        self: Metric, matches: MatcherResults, ground_truth: list[tuple[str, str]]
+        self: Metric,
+        matches: MatcherResults,
+        ground_truth: list[tuple[str, str]] | list,
     ) -> dict[str, Any]:
-        """Applies the metric to a `MatcherResults` instance, given ground
-        truth.
+        """Apply the metric to a ``MatcherResults`` instance, given ground truth.
 
         Parameters
         ----------
         matches : MatcherResults
-            The `MatcherResults` instance, obtained from `valentine_match`.
-
-        ground_truth : List[Tuple[str, str]]
-            The ground truth column match pairs, by column name.
-            e.g. [("col1_tab_A", "col1_tab_B"), ...etc...]
-
-        Raises
-        ------
-        NotImplementedError
-        Override this method in concrete implementations.
+            The ``MatcherResults`` instance, obtained from ``valentine_match``.
+        ground_truth : list
+            Expected column matches. Either column-name pairs
+            ``[("src_col", "tgt_col"), ...]`` (table names ignored during
+            comparison) or full :class:`~valentine.algorithms.ColumnPair`
+            instances for table-aware comparison.
         """
         pass
 

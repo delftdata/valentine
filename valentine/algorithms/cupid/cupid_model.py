@@ -5,6 +5,41 @@ from .tree_match import mapping_generation_leaves, recompute_wsim, tree_match
 
 
 class Cupid(BaseMatcher):
+    """Python implementation of the Cupid schema matching algorithm.
+
+    Cupid combines linguistic similarity of column names with structural
+    similarity derived from schema tree shape, following the paper
+    *Generic Schema Matching with Cupid* (Madhavan et al., VLDB 2001).
+
+    Parameters
+    ----------
+    leaf_w_struct : float, optional
+        Weight of structural similarity at leaf level, in ``[0, 1]``
+        (default: ``0.2``).
+    w_struct : float, optional
+        Weight of structural similarity at inner-node level, in ``[0, 1]``
+        (default: ``0.2``).
+    th_accept : float, optional
+        Acceptance similarity threshold for the final mapping, in ``[0, 1]``
+        (default: ``0.7``).
+    th_high : float, optional
+        High-confidence threshold used during structural propagation,
+        in ``[0, 1]`` (default: ``0.6``).
+    th_low : float, optional
+        Low-confidence threshold used during structural propagation,
+        in ``[0, 1]`` (default: ``0.35``).
+    c_inc : float, optional
+        Positive reinforcement coefficient for matching children
+        (must be ``> 0``, default: ``1.2``).
+    c_dec : float, optional
+        Negative reinforcement coefficient for non-matching children
+        (must be ``> 0``, default: ``0.9``).
+    th_ns : float, optional
+        Name-similarity threshold, in ``[0, 1]`` (default: ``0.7``).
+    process_num : int, optional
+        Number of worker processes (must be ``>= 1``, default: ``1``).
+    """
+
     def __init__(
         self,
         leaf_w_struct: float = 0.2,

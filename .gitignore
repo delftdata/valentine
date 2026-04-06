@@ -33,3 +33,5 @@ htmlcov/
 # Environment
 .env
 .env.local
+
+experiments/

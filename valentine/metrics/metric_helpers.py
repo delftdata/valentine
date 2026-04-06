@@ -9,20 +9,37 @@ if TYPE_CHECKING:
 
 def _normalize_ground_truth(
     ground_truth: list[tuple[str, str]] | list[ColumnPair],
-) -> tuple[list[tuple[str, str]], bool]:
-    """Normalize ground truth to a list of (source_col, target_col) pairs.
+) -> tuple[list[tuple], bool]:
+    """Normalize ground truth into a comparable list of tuples.
 
-    Returns the normalized list and a flag indicating whether full
-    ColumnPair matching should be used (when all entries have 4 fields).
+    Two accepted formats:
+
+    - **Column-name pairs** — ``[("source_col", "target_col"), ...]``.
+      Table names are ignored when comparing against matcher results.
+    - **ColumnPair** — full 4-field entries with table names. Comparisons
+      are then table-aware, which matters when matching more than two
+      tables or when source and target share column names.
+
+    Returns
+    -------
+    tuple[list[tuple], bool]
+        The normalized ground truth and a ``table_aware`` flag indicating
+        whether comparisons should include table names.
     """
     if not ground_truth:
         return [], False
     first = ground_truth[0]
     if len(first) == 4:
-        # Full ColumnPair format — compare exactly
-        return [(e[1], e[3]) for e in ground_truth], False
-    # Simple (source_col, target_col) format
-    return [tuple(e) for e in ground_truth], False
+        # Full ColumnPair format — keep table names for exact comparison
+        return [(e[0], e[1], e[2], e[3]) for e in ground_truth], True
+    # Simple (source_col, target_col) format — column names only
+    return [(e[0], e[1]) for e in ground_truth], False
+
+
+def _matches_as_tuples(matches: MatcherResults, table_aware: bool) -> list[tuple]:
+    if table_aware:
+        return [(m.source_table, m.source_column, m.target_table, m.target_column) for m in matches]
+    return [(m.source_column, m.target_column) for m in matches]
 
 
 def get_tp_fn(
@@ -47,16 +64,17 @@ def get_tp_fn(
     tuple[int, int]
         (true_positives, false_negatives)
     """
-    gt_pairs, _ = _normalize_ground_truth(ground_truth)
-    all_matches = [(m.source_column, m.target_column) for m in matches]
+    gt_pairs, table_aware = _normalize_ground_truth(ground_truth)
+    all_matches = _matches_as_tuples(matches, table_aware)
 
     if n is not None:
         all_matches = all_matches[:n]
 
+    match_set = set(all_matches)
     tp = 0
     fn = 0
     for expected_match in gt_pairs:
-        if expected_match in all_matches:
+        if expected_match in match_set:
             tp += 1
         else:
             fn += 1
@@ -86,15 +104,16 @@ def get_fp(
     int
         Number of false positives.
     """
-    gt_pairs, _ = _normalize_ground_truth(ground_truth)
-    all_matches = [(m.source_column, m.target_column) for m in matches]
+    gt_pairs, table_aware = _normalize_ground_truth(ground_truth)
+    all_matches = _matches_as_tuples(matches, table_aware)
 
     if n is not None:
         all_matches = all_matches[:n]
 
+    gt_set = set(gt_pairs)
     fp = 0
     for possible_match in all_matches:
-        if possible_match not in gt_pairs:
+        if possible_match not in gt_set:
             fp += 1
 
     return fp

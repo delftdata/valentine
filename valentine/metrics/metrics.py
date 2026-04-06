@@ -22,8 +22,9 @@ __all__ = [
     "RecallAtSizeofGroundTruth",
 ]
 
-# Ground-truth is expressed as pairs of (left_col_name, right_col_name)
-GroundTruth = Sequence[tuple[str, str]]
+# Ground truth can be either (source_col, target_col) name pairs or
+# full ColumnPair instances (table-aware comparison).
+GroundTruth = Sequence[tuple[str, str]] | Sequence[tuple]
 
 
 def _safe_div(numerator: float, denominator: float) -> float:
@@ -139,9 +140,18 @@ class RecallAtSizeofGroundTruth(Metric):
     This simulates selecting as many predictions as there are gold pairs and
     computing recall at that cutoff: TP / (TP + FN) where the candidate set is
     the top-``len(ground_truth)`` matches by score.
+
+    Attributes
+    ----------
+    one_to_one : bool
+        Whether to apply the one-to-one filter to the MatcherResults first.
     """
 
+    one_to_one: bool = False
+
     def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+        if self.one_to_one:
+            matches = matches.one_to_one()
         n_matches = matches.take_top_n(len(ground_truth))
         tp, fn = get_tp_fn(n_matches, ground_truth)
         recall = _safe_div(tp, tp + fn)

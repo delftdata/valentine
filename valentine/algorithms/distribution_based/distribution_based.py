@@ -16,32 +16,30 @@ from .clustering_utils import (
 
 
 class DistributionBased(BaseMatcher):
-    """
-    A class that contains the data and methods required for the algorithms proposed in
-    "Automatic Discovery of Attributes in Relational Databases" from M. Zhang et al. [1]
+    """Distribution-based column matching.
 
-    Attributes
+    Implementation of the algorithm from *Automatic Discovery of Attributes
+    in Relational Databases* (Zhang et al., SIGMOD 2011). Columns are
+    compared by quantile histograms of their value distributions; Earth
+    Mover's Distance drives the ranking of matches within each cluster.
+
+    Parameters
     ----------
-    __threshold1: float
-        The threshold for phase 1
-    __threshold2: float
-        The threshold for phase 2
-    __quantiles: int
-        the number of quantiles of the histograms
-    __process_num: int
-        The number of processes to spawn
-    __use_bloom_filters: bool
-        Whether to use Bloom filters for approximate intersection in phase 2
-
-    Methods
-    -------
-    find_matches(pool, chunk_size)
-         A dictionary with matches and their similarity
-
-    rank_output(attribute_clusters)
-        Take the attribute clusters that the algorithm produces and give a ranked list of matches based on the the EMD
-        between each pair inside an attribute cluster
-
+    threshold1 : float, optional
+        Distance threshold used in phase 1 (distribution clustering), in
+        ``[0, 1]`` (default: ``0.15``).
+    threshold2 : float, optional
+        Distance threshold used in phase 2 (attribute clustering), in
+        ``[0, 1]`` (default: ``0.15``).
+    quantiles : int, optional
+        Number of quantiles used for histogram summaries (must be ``>= 1``,
+        default: ``256``).
+    process_num : int, optional
+        Number of worker processes (must be ``>= 1``, default: ``1``).
+    use_bloom_filters : bool, optional
+        When ``True``, use Bloom filters for approximate set intersection
+        in phase 2 (Section 4 of the paper). Trades a small false-positive
+        rate for cheaper computation on large columns (default: ``False``).
     """
 
     def __init__(
@@ -52,23 +50,6 @@ class DistributionBased(BaseMatcher):
         process_num: int = 1,
         use_bloom_filters: bool = False,
     ):
-        """
-        Parameters
-        ----------
-        threshold1: float
-            The threshold for phase 1
-        threshold2: float
-            The threshold for phase 2
-        quantiles: int
-            the number of quantiles of the histograms
-        process_num: int
-            The number of processes to spawn
-        use_bloom_filters: bool
-            Whether to use Bloom filters for approximate intersection in phase 2.
-            When True, uses Bloom filters as described in Section 4 of the paper to
-            approximate set intersection, trading a small false positive rate for
-            reduced computation on large columns. Default is False (exact intersection).
-        """
         self.__quantiles: int = int(quantiles)
         self.__threshold1: float = float(threshold1)
         self.__threshold2: float = float(threshold2)

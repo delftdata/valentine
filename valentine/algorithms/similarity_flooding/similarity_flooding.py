@@ -17,6 +17,33 @@ from .string_matcher import (
 
 
 class SimilarityFlooding(BaseMatcher):
+    """Python implementation of the Similarity Flooding schema matcher.
+
+    Similarity Flooding (Melnik, Garcia-Molina, Rahm — ICDE 2002) treats
+    each schema as a labelled graph and iteratively propagates an initial
+    element-level similarity across the graph structure until a fixpoint
+    is reached.
+
+    Parameters
+    ----------
+    coeff_policy : Policy, optional
+        Coefficient policy for the propagation graph. One of
+        :attr:`Policy.INVERSE_AVERAGE` (default) or
+        :attr:`Policy.INVERSE_PRODUCT`.
+    formula : Formula, optional
+        Fixpoint iteration formula. One of :attr:`Formula.BASIC`,
+        :attr:`Formula.FORMULA_A`, :attr:`Formula.FORMULA_B`, or
+        :attr:`Formula.FORMULA_C` (default).
+    string_matcher : StringMatcher, optional
+        String similarity function used for the initial element-level
+        mapping. One of :attr:`StringMatcher.PREFIX_SUFFIX` (default),
+        :attr:`StringMatcher.PREFIX_SUFFIX_TFIDF`, or
+        :attr:`StringMatcher.LEVENSHTEIN`.
+    tfidf_corpus : list[BaseTable] | None, optional
+        Additional tables to include when computing IDF weights for the
+        ``PREFIX_SUFFIX_TFIDF`` matcher. Ignored for other string matchers.
+    """
+
     def __init__(
         self,
         coeff_policy: Policy = Policy.INVERSE_AVERAGE,

@@ -1,15 +1,24 @@
 import unittest
+from dataclasses import dataclass
 
 from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.metrics import (
+    METRICS_ALL,
     F1Score,
+    Metric,
     Precision,
     PrecisionTopNPercent,
     Recall,
     RecallAtSizeofGroundTruth,
 )
 from valentine.metrics.metric_helpers import get_fp, get_tp_fn
+
+
+@dataclass(eq=True, frozen=True)
+class _BogusMetric(Metric):
+    def apply(self, matches, ground_truth):
+        return self.return_format(0.0)
 
 
 class TestMetrics(unittest.TestCase):
@@ -124,6 +133,38 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(tp, 2)
         self.assertEqual(fn, 3)
         self.assertEqual(fp, 0)
+
+    def test_ground_truth_column_pair_table_aware(self) -> None:
+        """ColumnPair ground truth distinguishes identically-named columns
+        across different tables."""
+        matches = MatcherResults(
+            {
+                ColumnPair("t1", "id", "t2", "id"): 0.9,
+                ColumnPair("t1", "id", "t3", "id"): 0.8,
+            }
+        )
+        # With ColumnPair GT, only (t1, t2) pair should count as TP
+        gt = [ColumnPair("t1", "id", "t2", "id")]
+        tp, fn = get_tp_fn(matches, gt)
+        fp = get_fp(matches, gt)
+        self.assertEqual(tp, 1)
+        self.assertEqual(fn, 0)
+        self.assertEqual(fp, 1)  # (t1, t3) pair is FP
+
+        # With column-name GT, both matches count as TP (table names ignored)
+        gt_names = [("id", "id")]
+        tp2, _ = get_tp_fn(matches, gt_names)
+        self.assertEqual(tp2, 1)  # still one GT entry, satisfied by first match
+
+    def test_metrics_all(self) -> None:
+        """METRICS_ALL is a stable, explicit set (no __subclasses__ magic)."""
+        names = {m.name() for m in METRICS_ALL}
+        self.assertIn("Precision", names)
+        self.assertIn("Recall", names)
+        self.assertIn("F1Score", names)
+        self.assertIn("RecallAtSizeofGroundTruth", names)
+        # User-defined Metric subclasses must not bleed into METRICS_ALL
+        self.assertNotIn("_BogusMetric", names)
 
     def test_metric_equals(self) -> None:
         a = PrecisionTopNPercent(n=10, one_to_one=False)

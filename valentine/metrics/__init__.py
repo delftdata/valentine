@@ -20,10 +20,22 @@ __all__ = [
     "RecallAtSizeofGroundTruth",
 ]
 
-# Some predefined sets of metrics
+# Predefined metric sets.
+#
+# ``METRICS_ALL`` is an explicit listing rather than a dynamic scan of
+# :class:`Metric` subclasses so that:
+#   1. metrics requiring constructor arguments aren't silently dropped, and
+#   2. user-defined metrics don't accidentally bleed into the predefined set.
 METRICS_ALL = {
-    metric() for metric in Metric.__subclasses__()
-}  # Note: will also catch newly defined metrics
+    Precision(),
+    Precision(one_to_one=False),
+    Recall(),
+    Recall(one_to_one=False),
+    F1Score(),
+    F1Score(one_to_one=False),
+    PrecisionTopNPercent(),
+    RecallAtSizeofGroundTruth(),
+}
 METRICS_CORE = {
     Precision(),
     Recall(),
