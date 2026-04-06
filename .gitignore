@@ -35,3 +35,7 @@ htmlcov/
 .env.local
 
 experiments/
+
+# Zensical build output & cache
+site/
+.zensical/

@@ -52,6 +52,9 @@ dev = [
     "coverage>=7.0,<8.0",
     "ruff>=0.15,<1.0",
 ]
+docs = [
+    "zensical>=0.0.31,<1.0",
+]
 
 [project.urls]
 Homepage = "https://delftdata.github.io/valentine/"
@@ -61,7 +64,7 @@ Issues = "https://github.com/delftdata/valentine/issues"
 Changelog = "https://github.com/delftdata/valentine/releases"
 
 [tool.setuptools]
-packages = { find = { include = ["valentine*"], exclude = ["tests*", "examples*"] } }
+packages = { find = { include = ["valentine*"], exclude = ["tests*", "examples*", "docs*"] } }
 include-package-data = true
 license-files = ["LICENSE"]
 
@@ -78,6 +81,7 @@ exclude = [
     "dist",
     "__pycache__",
     "docs",
+    "site",
 ]
 
 [tool.ruff.lint]
