@@ -11,9 +11,14 @@ computes Precision, Recall, F1 and related metrics in one call:
 metrics = matches.get_metrics(ground_truth)
 ```
 
-The ground truth can be expressed in two formats.
+This page is the **how-to guide** for using metrics. For the full list
+of built-in metric classes, their parameters, and the predefined metric
+sets, see the [API reference](api.md#metrics-valentinemetrics).
 
 ## Ground-truth formats
+
+`ground_truth` can be expressed in two formats, both accepted by
+[`MatcherResults.get_metrics`](api.md#get_metrics).
 
 **Column-name pairs** (table names ignored):
 
@@ -25,7 +30,8 @@ ground_truth = [
 ]
 ```
 
-**Full `ColumnPair` instances** (table-aware comparison):
+**Full [`ColumnPair`](api.md#columnpair) instances** (table-aware
+comparison):
 
 ```python
 from valentine.algorithms import ColumnPair
@@ -36,13 +42,14 @@ ground_truth = [
 ]
 ```
 
-Use `ColumnPair` ground truth when you're matching more than two tables, or
-when source and target tables share column names — without table info the
-metric code can't tell which match is which.
+Use [`ColumnPair`](api.md#columnpair) ground truth when you're matching
+more than two tables, or when source and target tables share column
+names — without table info the metric code can't tell which match is
+which.
 
 ## Built-in metrics
 
-Valentine ships five metrics, all living in `valentine.metrics`:
+Valentine ships five metrics, all in `valentine.metrics`:
 
 ```python
 from valentine.metrics import (
@@ -54,24 +61,25 @@ from valentine.metrics import (
 )
 ```
 
-| Metric                     | Description                                                                                          |
-|----------------------------|------------------------------------------------------------------------------------------------------|
-| `Precision`                | TP / (TP + FP)                                                                                       |
-| `Recall`                   | TP / (TP + FN)                                                                                       |
-| `F1Score`                  | Harmonic mean of precision and recall                                                                 |
-| `PrecisionTopNPercent`     | Precision restricted to the top-N% of matches by score                                               |
-| `RecallAtSizeofGroundTruth`| Recall when considering the top-`len(ground_truth)` matches                                          |
+| Metric                                                   | What it measures                                                   |
+|----------------------------------------------------------|---------------------------------------------------------------------|
+| [`Precision`](api.md#precision)                           | TP / (TP + FP).                                                    |
+| [`Recall`](api.md#recall)                                 | TP / (TP + FN).                                                    |
+| [`F1Score`](api.md#f1score)                               | Harmonic mean of precision and recall.                             |
+| [`PrecisionTopNPercent`](api.md#precisiontopnpercent)     | Precision restricted to the top `n%` of matches by score.          |
+| [`RecallAtSizeofGroundTruth`](api.md#recallatsizeofgroundtruth) | Recall when selecting the top `len(ground_truth)` matches.  |
 
-`Precision`, `Recall`, `F1Score`, and `PrecisionTopNPercent` have a
-`one_to_one: bool` flag (default `True`). When enabled, the metric is
-computed after reducing the results with `matches.one_to_one()`.
-`PrecisionTopNPercent` additionally takes `n: int` (default `10`) for the
-percentage cutoff.
+`Precision`, `Recall`, `F1Score` and `PrecisionTopNPercent` all accept a
+`one_to_one: bool` flag that applies
+[`MatcherResults.one_to_one()`](api.md#one_to_one) before counting.
+`PrecisionTopNPercent` additionally takes `n: int` for the cutoff, and
+`RecallAtSizeofGroundTruth` defaults to `one_to_one=False`. See the
+[API reference](api.md#built-in-metrics) for full defaults.
 
 ## Default metric set
 
-If you call `get_metrics` with no explicit metric set, Valentine uses
-`METRICS_CORE`:
+If you call [`get_metrics`](api.md#get_metrics) without specifying
+metrics, Valentine uses `METRICS_CORE`:
 
 ```python
 metrics = matches.get_metrics(ground_truth)
@@ -84,26 +92,23 @@ metrics = matches.get_metrics(ground_truth)
 # }
 ```
 
-## Predefined metric sets
-
-Valentine also ships a few preconfigured sets for common experiments:
-
-| Set                              | Contents                                                                  |
-|----------------------------------|---------------------------------------------------------------------------|
-| `METRICS_CORE`                   | Default set used by `get_metrics`.                                        |
-| `METRICS_ALL`                    | Every built-in metric, including both `one_to_one=True` and `=False` variants. |
-| `METRICS_PRECISION_RECALL`       | Just `Precision` and `Recall`.                                            |
-| `METRICS_PRECISION_INCREASING_N` | `PrecisionTopNPercent` at `n = 10, 20, ..., 100`.                          |
+Valentine also ships [`METRICS_ALL`](api.md#predefined-metric-sets),
+[`METRICS_PRECISION_RECALL`](api.md#predefined-metric-sets), and
+[`METRICS_PRECISION_INCREASING_N`](api.md#predefined-metric-sets) for
+common experiment shapes.
 
 ```python
 from valentine.metrics import METRICS_PRECISION_INCREASING_N
 
-metrics = matches.get_metrics(ground_truth, metrics=METRICS_PRECISION_INCREASING_N)
+metrics = matches.get_metrics(
+    ground_truth,
+    metrics=METRICS_PRECISION_INCREASING_N,
+)
 ```
 
 ## Custom metric selection
 
-Pass any set of metric instances to pick exactly what you want:
+Pass any `set` of metric instances to pick exactly what you want:
 
 ```python
 from valentine.metrics import F1Score, PrecisionTopNPercent
@@ -114,13 +119,15 @@ metrics = matches.get_metrics(
 )
 ```
 
-Each metric is computed independently, and the returned dict is keyed by
-the metric's `name()` — which for `PrecisionTopNPercent` substitutes the
+Each metric is computed independently, and the returned dict is keyed
+by the metric's `name()` — which for
+[`PrecisionTopNPercent`](api.md#precisiontopnpercent) substitutes the
 `n` value, so you get `PrecisionTop70Percent` in the output.
 
 ## Defining your own metric
 
-Subclass `Metric` and implement `apply`:
+Subclass [`Metric`](api.md#metric) and implement
+[`apply`](api.md#apply):
 
 ```python
 from dataclasses import dataclass
@@ -139,5 +146,6 @@ class SupportAtK(Metric):
 metrics = matches.get_metrics(ground_truth, metrics={SupportAtK(k=10)})
 ```
 
-The dataclass **must** be `frozen=True` so metric instances are hashable
-and comparable — `get_metrics` takes a `set` of metrics.
+The dataclass **must** be `frozen=True` so metric instances are
+hashable and comparable — [`get_metrics`](api.md#get_metrics) takes a
+`set` of metrics.

@@ -53,7 +53,10 @@ dev = [
     "ruff>=0.15,<1.0",
 ]
 docs = [
-    "zensical>=0.0.31,<1.0",
+    # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
+    # deliberately rather than relying on a range, so a bad release
+    # can't silently break the docs build.
+    "zensical==0.0.31",
 ]
 
 [project.urls]

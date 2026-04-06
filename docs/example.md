@@ -4,9 +4,11 @@ icon: lucide/code
 
 # Full example
 
-Below is an end-to-end walkthrough of matching two DataFrames with Coma,
-inspecting the per-sub-matcher score breakdown, filtering to one-to-one
-matches, and evaluating the result against a ground truth.
+Below is an end-to-end walkthrough of matching two DataFrames with
+[`Coma`](api.md#coma), inspecting the per-sub-matcher score breakdown,
+filtering to one-to-one matches, and evaluating the result against a
+ground truth. Every API touched here is documented in the
+[API reference](api.md).
 
 !!! note
 

@@ -4,16 +4,22 @@ icon: lucide/list-tree
 
 # Matcher results
 
-`valentine_match(...)` returns a `MatcherResults` object — an **immutable
-mapping** of `ColumnPair` keys to similarity scores, sorted from highest
-score to lowest. It behaves like a `dict` for lookup and iteration, but
-cannot be mutated (preventing accidental invalidation of cached derived
-views such as `one_to_one()`).
+[`valentine_match`](api.md#valentine_match) returns a
+[`MatcherResults`](api.md#matcherresults) object — an **immutable
+mapping** of [`ColumnPair`](api.md#columnpair) keys to similarity
+scores, sorted from highest score to lowest. It behaves like a `dict`
+for lookup and iteration, but cannot be mutated (preventing accidental
+invalidation of cached derived views such as
+[`one_to_one()`](api.md#one_to_one)).
+
+For the authoritative method signatures, see the API reference for
+[`MatcherResults`](api.md#matcherresults) and
+[`ColumnPair`](api.md#columnpair).
 
 ## `ColumnPair`
 
-Each key in a `MatcherResults` is a `ColumnPair` namedtuple with four
-named fields:
+Each key in a [`MatcherResults`](api.md#matcherresults) is a
+[`ColumnPair`](api.md#columnpair) namedtuple with four named fields:
 
 ```python
 from valentine.algorithms import ColumnPair
@@ -34,8 +40,9 @@ pair.source         # ("sales", "customer_id")
 pair.target         # ("orders", "cust_id")
 ```
 
-`ColumnPair` is a `NamedTuple`, so it still unpacks like a plain tuple and
-is hashable, immutable, and cheap to store.
+[`ColumnPair`](api.md#columnpair) is a `NamedTuple`, so it still
+unpacks like a plain tuple and is hashable, immutable, and cheap to
+store.
 
 ## Iterating results
 
@@ -53,7 +60,8 @@ matches[pair]
 list(matches)
 ```
 
-But mutation methods do not — `MatcherResults` is immutable by design:
+But mutation methods do not — [`MatcherResults`](api.md#matcherresults)
+is immutable by design:
 
 ```python
 matches.update({...})  # AttributeError
@@ -80,8 +88,15 @@ one_to_one = matches.one_to_one()
 strict = matches.one_to_one(threshold=0.8)
 ```
 
-Every transformation returns a **new** `MatcherResults` instance, so you
-can chain them:
+Each method is documented in full in the API reference:
+[`take_top_n`](api.md#take_top_n),
+[`take_top_percent`](api.md#take_top_percent),
+[`filter`](api.md#filter), and
+[`one_to_one`](api.md#one_to_one).
+
+Every transformation returns a **new**
+[`MatcherResults`](api.md#matcherresults) instance, so you can chain
+them:
 
 ```python
 best_strict_pairs = matches.filter(min_score=0.5).one_to_one(threshold=0.7)
@@ -96,7 +111,8 @@ best_strict_pairs = matches.filter(min_score=0.5).one_to_one(threshold=0.7)
 
 ## Match details (Coma)
 
-When you use `Coma`, each `ColumnPair` comes with a breakdown showing how
+When you use [`Coma`](api.md#coma), each
+[`ColumnPair`](api.md#columnpair) comes with a breakdown showing how
 each sub-matcher contributed to the final similarity score:
 
 ```python
@@ -119,9 +135,10 @@ customer_id <-> cust_id: 0.832
   InstancesCM: 0.91
 ```
 
-`get_details(pair)` returns `None` for matchers that do not populate
-details (i.e. everything except Coma). The full mapping is also available
-via `matches.details`.
+[`get_details(pair)`](api.md#get_details) returns `None` for matchers
+that do not populate details (i.e. everything except
+[`Coma`](api.md#coma)). The full mapping is also available via
+[`matches.details`](api.md#details).
 
 ## Computing metrics
 
@@ -142,7 +159,8 @@ metrics and custom-metric options.
 
 ## Copying
 
-Need an independent copy (e.g. to hand off to downstream code):
+Need an independent copy (e.g. to hand off to downstream code)? Use
+[`get_copy`](api.md#get_copy):
 
 ```python
 copy = matches.get_copy()

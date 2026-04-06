@@ -16,6 +16,8 @@ Copyright &copy; 2026 Delft Data
 repo_name = "delftdata/valentine"
 repo_url = "https://github.com/delftdata/valentine"
 
+extra_css = ["assets/extra.css"]
+
 nav = [
     { "Home" = "index.md" },
     { "Getting started" = "getting-started.md" },
@@ -23,6 +25,8 @@ nav = [
     { "Matcher results" = "results.md" },
     { "Evaluation metrics" = "metrics.md" },
     { "Full example" = "example.md" },
+    { "API reference" = "api.md" },
+    { "Changelog" = "changelog.md" },
     { "Research" = "research.md" },
 ]
 
@@ -49,6 +53,8 @@ features = [
     "navigation.instant.prefetch",
     "navigation.path",
     "navigation.sections",
+    "navigation.tabs",
+    "navigation.tabs.sticky",
     "navigation.top",
     "navigation.tracking",
     "search.highlight",
@@ -56,6 +62,10 @@ features = [
 
 [project.theme.icon]
 logo = "lucide/heart"
+
+[project.theme.font]
+text = "Inter"
+code = "JetBrains Mono"
 
 [[project.theme.palette]]
 scheme = "default"

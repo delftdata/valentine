@@ -4,14 +4,15 @@ icon: lucide/cpu
 
 # Matchers
 
-Every matcher in Valentine subclasses [`BaseMatcher`](#base-matcher) and is
-compatible with the top-level [`valentine_match`](getting-started.md#your-first-match)
-API. You can also call matcher methods directly when you already have
-[`BaseTable`][base-table] objects.
+This page is the **conceptual guide** to Valentine's five matching
+algorithms: what each one does, when to reach for it, and the trade-offs
+involved. For constructor signatures, parameter defaults, and validation
+rules, head straight to the [API reference](api.md#matchers-valentinealgorithms).
 
-  [base-table]: https://github.com/delftdata/valentine/blob/master/valentine/data_sources/base_table.py
-
-All five algorithms live in `valentine.algorithms`:
+Every matcher in Valentine subclasses [`BaseMatcher`](api.md#basematcher)
+and is compatible with the top-level
+[`valentine_match`](api.md#valentine_match) API. All five live in
+`valentine.algorithms`:
 
 ```python
 from valentine.algorithms import (
@@ -23,11 +24,20 @@ from valentine.algorithms import (
 )
 ```
 
+| Matcher                     | Signals                   | Best for                                                                  |
+|-----------------------------|---------------------------|---------------------------------------------------------------------------|
+| [`Coma`](#coma)                           | Schema + instances (optional) | General-purpose first choice. Strong defaults, informative sub-scores. |
+| [`Cupid`](#cupid)                         | Schema only               | Nested schemas where column names and structure matter more than data.   |
+| [`DistributionBased`](#distributionbased) | Instances only            | Matching by value distributions when names are unreliable.               |
+| [`JaccardDistanceMatcher`](#jaccarddistancematcher) | Instances only  | Simple, explainable baseline. Useful for sanity checks.                  |
+| [`SimilarityFlooding`](#similarityflooding) | Schema only             | Structure-heavy schemas where graph neighbourhoods carry signal.         |
+
 ## `Coma`
 
-A pure-Python implementation of the COMA 3.0 schema matching algorithm.
-Coma composes multiple sub-matchers — each targeting a different aspect of
-schema or data similarity — and combines their scores.
+Pure-Python implementation of the COMA 3.0 schema matching algorithm.
+COMA (COmbination of MAtching algorithms) composes multiple sub-matchers
+— each targeting a different aspect of schema or data similarity — and
+combines their scores.
 
 **Schema matchers** (enabled by `use_schema=True`, the default):
 
@@ -38,13 +48,15 @@ schema or data similarity — and combines their scores.
 
 **Instance matcher** (enabled by `use_instances=True`):
 
-- **TF-IDF cosine similarity** — each cell value is treated as a document, a
-  global IDF is computed across all columns of both tables, and per-column
-  similarity is aggregated with a max-matching Dice formula.
+- **TF-IDF cosine similarity** — each cell value is treated as a document,
+  a global IDF is computed across all columns of both tables, and
+  per-column similarity is aggregated with a max-matching Dice formula.
 
 After computing all-pairs similarity scores, a selection step filters
 results using bidirectional best-match logic (DIR_BOTH) controlled by
-`max_n`, `delta`, and `threshold`.
+`max_n`, `delta`, and `threshold`. When matching more than two tables
+via [`get_matches_batch`](api.md#get_matches_batch), the TF-IDF corpus is
+built once from **all** tables.
 
 ```python
 from valentine.algorithms import Coma
@@ -52,26 +64,22 @@ from valentine.algorithms import Coma
 matcher = Coma(use_instances=True)
 ```
 
-| Parameter       | Type    | Default | Description                                                                    |
-|-----------------|---------|---------|--------------------------------------------------------------------------------|
-| `max_n`         | `int`   | `0`     | Maximum number of matches to keep per column (`0` means unlimited).            |
-| `use_instances` | `bool`  | `False` | Enable TF-IDF instance-based matching.                                         |
-| `use_schema`    | `bool`  | `True`  | Enable schema-based matching.                                                  |
-| `delta`         | `float` | `0.15`  | Fraction from the best score within which matches are kept.                    |
-| `threshold`     | `float` | `0.0`   | Absolute minimum similarity score to keep a match.                             |
-
 !!! tip "Match explanations"
 
-    Coma is the only matcher that fills in per-sub-matcher score breakdowns.
-    After running Coma, call `matches.get_details(pair)` to see how each
-    individual sub-matcher contributed to the final score. See
-    [Match details](results.md#match-details-coma).
+    Coma is the only matcher that fills in per-sub-matcher score
+    breakdowns. After running Coma, call `matches.get_details(pair)` to
+    see how each individual sub-matcher contributed to the final score.
+    See [Match details](results.md#match-details-coma).
+
+[:material-book-marked: Full parameter reference &rarr;](api.md#coma)
 
 ## `Cupid`
 
 Python implementation of [*Generic Schema Matching with Cupid*][cupid]
-(Madhavan et al., VLDB 2001). Cupid combines linguistic similarity of
-column names with structural similarity derived from schema tree shape.
+(Madhavan, Bernstein & Rahm, VLDB 2001). Cupid combines linguistic
+similarity of column names with structural similarity derived from the
+shape of the schema tree. Use it when you have deep or nested schemas
+and the column data is unavailable or unreliable.
 
   [cupid]: https://www.vldb.org/conf/2001/P049.pdf
 
@@ -81,24 +89,16 @@ from valentine.algorithms import Cupid
 matcher = Cupid(w_struct=0.2, leaf_w_struct=0.2, th_accept=0.7)
 ```
 
-| Parameter       | Type    | Default | Description                                                    |
-|-----------------|---------|---------|----------------------------------------------------------------|
-| `leaf_w_struct` | `float` | `0.2`   | Weight of structural similarity at leaf level.                 |
-| `w_struct`      | `float` | `0.2`   | Weight of structural similarity at inner-node level.           |
-| `th_accept`     | `float` | `0.7`   | Acceptance similarity threshold for the final mapping.         |
-| `th_high`       | `float` | `0.6`   | High-confidence threshold during structural propagation.      |
-| `th_low`        | `float` | `0.35`  | Low-confidence threshold during structural propagation.       |
-| `c_inc`         | `float` | `1.2`   | Positive reinforcement coefficient for matching children.     |
-| `c_dec`         | `float` | `0.9`   | Negative reinforcement coefficient for non-matching children. |
-| `th_ns`         | `float` | `0.7`   | Name-similarity threshold.                                     |
-| `process_num`   | `int`   | `1`     | Number of worker processes.                                    |
+[:material-book-marked: Full parameter reference &rarr;](api.md#cupid)
 
 ## `DistributionBased`
 
-Python implementation of [*Automatic Discovery of Attributes in Relational
-Databases*][zhang] (Zhang et al., SIGMOD 2011). Columns are compared by
-quantile histograms of their value distributions; Earth Mover's Distance
-drives the ranking of matches within each cluster.
+Python implementation of [*Automatic Discovery of Attributes in
+Relational Databases*][zhang] (Zhang et al., SIGMOD 2011). Columns are
+compared by quantile histograms of their value distributions; Earth
+Mover's Distance drives the ranking of matches within each cluster.
+Great for numeric or categorical data where names give you nothing to
+work with.
 
   [zhang]: https://dl.acm.org/doi/10.1145/1989323.1989336
 
@@ -108,19 +108,20 @@ from valentine.algorithms import DistributionBased
 matcher = DistributionBased(threshold1=0.15, threshold2=0.15)
 ```
 
-| Parameter           | Type    | Default | Description                                                            |
-|---------------------|---------|---------|------------------------------------------------------------------------|
-| `threshold1`        | `float` | `0.15`  | Distance threshold for phase 1 (distribution clustering).              |
-| `threshold2`        | `float` | `0.15`  | Distance threshold for phase 2 (attribute clustering).                 |
-| `quantiles`         | `int`   | `256`   | Number of quantiles used for histogram summaries.                      |
-| `process_num`       | `int`   | `1`     | Number of worker processes.                                            |
-| `use_bloom_filters` | `bool`  | `False` | Use Bloom filters for approximate set intersection in phase 2.        |
+When you pass more than two tables, Valentine calls
+[`get_matches_batch`](api.md#get_matches_batch), which DistributionBased
+overrides to compute **global** value ranks across every table at once —
+giving each pair the benefit of the full data landscape.
+
+[:material-book-marked: Full parameter reference &rarr;](api.md#distributionbased)
 
 ## `JaccardDistanceMatcher`
 
-A baseline instance-based matcher. Columns are compared by Jaccard
-similarity of their value sets, with element equality decided by a
-configurable string distance function.
+A simple, explainable instance-based baseline. Columns are compared by
+Jaccard similarity of their value sets, with element equality decided
+by a configurable string distance function (Levenshtein, Jaro–Winkler,
+exact, …). Useful as a sanity check alongside a heavier matcher, or as
+a fast first pass on clean, short-valued columns.
 
 ```python
 from valentine.algorithms import JaccardDistanceMatcher
@@ -132,28 +133,22 @@ matcher = JaccardDistanceMatcher(
 )
 ```
 
-| Parameter        | Type                     | Default        | Description                                                         |
-|------------------|--------------------------|----------------|---------------------------------------------------------------------|
-| `threshold_dist` | `float`                  | `0.8`          | Threshold above which two strings are considered equal.             |
-| `distance_fun`   | `StringDistanceFunction` | `Levenshtein`  | String similarity function (see below).                             |
-| `process_num`    | `int`                    | `1`            | Number of worker processes.                                         |
+The element-equality function is configured with the
+[`StringDistanceFunction`](api.md#stringdistancefunction) enum, which
+exposes `Levenshtein`, `DamerauLevenshtein`, `Hamming`, `Jaro`,
+`JaroWinkler`, and `Exact`.
 
-`StringDistanceFunction` is an enum exposing:
-
-- `Levenshtein` — [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
-- `DamerauLevenshtein` — [Damerau–Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
-- `Hamming` — [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
-- `Jaro` — [Jaro distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
-- `JaroWinkler` — [Jaro–Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
-- `Exact` — exact string equality (`==`)
+[:material-book-marked: Full parameter reference &rarr;](api.md#jaccarddistancematcher)
 
 ## `SimilarityFlooding`
 
-Python implementation of [*Similarity Flooding: A Versatile Graph Matching
-Algorithm and its Application to Schema Matching*][sf]
-(Melnik, Garcia-Molina, Rahm — ICDE 2002). Each schema is represented as a
-labelled graph; an initial element-level similarity is iteratively
-propagated across the graph until a fixpoint is reached.
+Python implementation of [*Similarity Flooding: A Versatile Graph
+Matching Algorithm and its Application to Schema Matching*][sf]
+(Melnik, Garcia-Molina & Rahm, ICDE 2002). Each schema is represented
+as a labelled graph; an initial element-level similarity is iteratively
+propagated across the graph until a fixpoint is reached. Shines on
+structure-heavy schemas where graph neighbourhoods carry signal beyond
+what pure string matching can pick up.
 
   [sf]: https://ieeexplore.ieee.org/document/994702
 
@@ -172,39 +167,26 @@ matcher = SimilarityFlooding(
 )
 ```
 
-| Parameter        | Type            | Default             | Description                                                                           |
-|------------------|-----------------|---------------------|---------------------------------------------------------------------------------------|
-| `coeff_policy`   | `Policy`        | `INVERSE_AVERAGE`   | Coefficient policy for the propagation graph.                                         |
-| `formula`        | `Formula`       | `FORMULA_C`         | Fixpoint iteration formula.                                                            |
-| `string_matcher` | `StringMatcher` | `PREFIX_SUFFIX`     | String similarity function used for the initial element-level mapping.                 |
-| `tfidf_corpus`   | `list[BaseTable] \| None` | `None`    | Extra tables included when computing IDF weights for `PREFIX_SUFFIX_TFIDF`.            |
+Behaviour is parameterized by three enums:
+[`Policy`](api.md#policy) controls the propagation coefficients,
+[`Formula`](api.md#formula) selects the fixpoint iteration formula, and
+[`StringMatcher`](api.md#stringmatcher) picks the initial element-level
+similarity function. When you select `StringMatcher.PREFIX_SUFFIX_TFIDF`
+and run with more than two tables, Valentine computes a global IDF from
+every table's schema vocabulary.
 
-- `Policy` — `INVERSE_AVERAGE` (default), `INVERSE_PRODUCT`
-- `Formula` — `BASIC`, `FORMULA_A`, `FORMULA_B`, `FORMULA_C` (default)
-- `StringMatcher` — `PREFIX_SUFFIX` (default), `PREFIX_SUFFIX_TFIDF`, `LEVENSHTEIN`
+[:material-book-marked: Full parameter reference &rarr;](api.md#similarityflooding)
 
-## Base matcher
+## Writing a custom matcher
 
-Every matcher extends `BaseMatcher`:
+Every matcher subclasses [`BaseMatcher`](api.md#basematcher) and
+implements at minimum the [`get_matches`](api.md#get_matches) method.
+Override [`get_matches_batch`](api.md#get_matches_batch) if you can
+exploit a holistic view over every table. Populate
+[`match_details`](api.md#match_details) from inside your matcher if you
+want to surface sub-scores to users via
+[`MatcherResults.get_details`](api.md#get_details).
 
-```python
-class BaseMatcher(ABC):
-    def get_matches(self, source, target) -> dict[ColumnPair, float]: ...
-    def get_matches_batch(self, tables) -> dict[ColumnPair, float]: ...
-
-    @property
-    def match_details(self) -> dict[ColumnPair, dict[str, float]]: ...
-```
-
-- `get_matches(source, target)` — match a pair of tables. Must be
-  implemented by every matcher.
-- `get_matches_batch(tables)` — match all unique table pairs. The default
-  implementation loops over pairs, but matchers that benefit from a
-  holistic view (e.g. Coma's TF-IDF corpus) override this to compute
-  cross-table statistics once.
-- `match_details` — optional per-pair sub-matcher score breakdowns. Only
-  Coma currently populates this; other matchers return an empty dict.
-
-Invalid parameters raise `ValueError` at construction time — e.g. thresholds
-outside `[0, 1]`, negative counts, or using `Coma(use_schema=False,
-use_instances=False)`.
+Invalid parameters should raise `ValueError` at construction time —
+the built-in matchers follow this convention for threshold ranges,
+negative counts, and mutually-exclusive flags.

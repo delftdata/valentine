@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    paths:
+      - "docs/**"
+      - "zensical.toml"
+      - ".github/workflows/docs.yml"
+      - "pyproject.toml"
   workflow_dispatch:
 
 permissions:
@@ -17,23 +23,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Install docs extras
+        # Uses the pinned zensical version from pyproject.toml [docs] extra.
+        run: pip install -e ".[docs]"
+      - name: Build site
+        run: zensical build --clean
+      - name: Upload site artifact
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+
+  deploy:
+    # Only deploy on pushes to master (or manual dispatch), not on PRs.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - name: Install Zensical
-        run: pip install zensical
-      - name: Build site
-        run: zensical build --clean
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: site
       - uses: actions/deploy-pages@v4
         id: deployment

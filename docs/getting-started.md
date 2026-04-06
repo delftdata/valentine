@@ -25,12 +25,11 @@ pip install -e ".[dev]"
 
 ## Your first match
 
-The single entry point for matching is [`valentine_match`][valentine_match].
-It takes an iterable of DataFrames and a matcher instance, and returns a
-[`MatcherResults`][results] mapping.
-
-  [valentine_match]: #valentine_match
-  [results]: results.md
+The single entry point for matching is
+[`valentine_match`](api.md#valentine_match). It takes an iterable of
+DataFrames and a matcher instance, and returns a
+[`MatcherResults`](api.md#matcherresults) mapping — see the
+[Matcher results](results.md) guide for everything you can do with it.
 
 ```python
 import pandas as pd
@@ -49,10 +48,11 @@ for pair, score in matches.items():
 
 !!! note "Table names"
 
-    Each `ColumnPair` key in the results carries both a `source_table` and a
-    `target_table`. By default these default to `"aaa"`, `"bbb"`, `"ccc"`,
-    ... — low-similarity names that won't bias schema-based matchers. Pass
-    `df_names=["sales", "orders", ...]` to set your own.
+    Each [`ColumnPair`](api.md#columnpair) key in the results carries
+    both a `source_table` and a `target_table`. By default these default
+    to `"aaa"`, `"bbb"`, `"ccc"`, … — low-similarity names that won't
+    bias schema-based matchers. Pass `df_names=["sales", "orders", ...]`
+    to set your own.
 
 ## Matching many DataFrames
 
@@ -67,28 +67,30 @@ matches = valentine_match(
 )
 ```
 
-Each matcher decides for itself how to handle the batch. Algorithms that
-benefit from a holistic view of all tables (Coma's TF-IDF corpus,
-SimilarityFlooding's IDF weights, DistributionBased's global ranks)
-override [`get_matches_batch`][base-matcher] so their statistics reflect the
-*entire* input rather than just the current pair.
-
-  [base-matcher]: matchers.md#base-matcher
+Each matcher decides for itself how to handle the batch. Algorithms
+that benefit from a holistic view of all tables ([`Coma`](api.md#coma)'s
+TF-IDF corpus, [`SimilarityFlooding`](api.md#similarityflooding)'s IDF
+weights, [`DistributionBased`](api.md#distributionbased)'s global ranks)
+override [`get_matches_batch`](api.md#get_matches_batch) so their
+statistics reflect the *entire* input rather than just the current
+pair.
 
 ## Picking a matcher
 
 Valentine ships with five matching algorithms covering both schema- and
 instance-based matching:
 
-| Matcher                   | Type                 | Good at                                      |
-|---------------------------|----------------------|----------------------------------------------|
-| `Coma`                    | Schema + Instance    | General-purpose, interpretable, well-tuned   |
-| `Cupid`                   | Schema only          | Tree/linguistic similarity                    |
-| `DistributionBased`       | Instance only        | Numeric & categorical value distributions     |
-| `JaccardDistanceMatcher`  | Instance only        | Exact/fuzzy Jaccard on value sets             |
-| `SimilarityFlooding`      | Schema only          | Graph-based fixpoint propagation              |
+| Matcher                                                      | Type                 | Good at                                      |
+|--------------------------------------------------------------|----------------------|----------------------------------------------|
+| [`Coma`](api.md#coma)                                         | Schema + Instance    | General-purpose, interpretable, well-tuned   |
+| [`Cupid`](api.md#cupid)                                       | Schema only          | Tree/linguistic similarity                   |
+| [`DistributionBased`](api.md#distributionbased)               | Instance only        | Numeric & categorical value distributions    |
+| [`JaccardDistanceMatcher`](api.md#jaccarddistancematcher)     | Instance only        | Exact/fuzzy Jaccard on value sets            |
+| [`SimilarityFlooding`](api.md#similarityflooding)             | Schema only          | Graph-based fixpoint propagation             |
 
-See [Matchers](matchers.md) for details on every algorithm and its parameters.
+See [Matchers](matchers.md) for the conceptual guide, or jump straight
+to the [API reference](api.md#matchers-valentinealgorithms) for
+parameter defaults.
 
 ## Evaluating a match
 
@@ -107,4 +109,6 @@ metrics = matches.get_metrics(ground_truth)
 print(metrics)
 ```
 
-Full details are in [Evaluation metrics](metrics.md).
+Full details are in [Evaluation metrics](metrics.md), with the method
+signature documented under
+[`MatcherResults.get_metrics`](api.md#get_metrics).
