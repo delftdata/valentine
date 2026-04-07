@@ -1,4 +1,7 @@
-<h1 align="center">Valentine 💘</h1>
+<h1 align="center">
+  <img src="docs/assets/favicon.png" alt="" width="40" valign="middle">
+  Valentine
+</h1>
 <p align="center"><em>(Schema-) Matching DataFrames Made Easy</em></p>
 
 <p align="center">

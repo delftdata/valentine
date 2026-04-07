@@ -7,9 +7,21 @@ hide:
 
 <div class="valentine-hero" markdown>
 
-# Valentine 💘
+# <img src="assets/favicon.png" alt="" class="valentine-hero-logo"> Valentine
 
 <p class="valentine-tagline"><em>(Schema-) Matching DataFrames Made Easy.</em></p>
+
+[Get started :material-rocket-launch:](getting-started.md){ .md-button .md-button--primary }
+[API reference :material-book-open:](api.md){ .md-button }
+[View on GitHub :fontawesome-brands-github:](https://github.com/delftdata/valentine){ .md-button }
+
+<div class="valentine-chips" markdown>
+[Coma](api.md#coma)
+[Cupid](api.md#cupid)
+[DistributionBased](api.md#distributionbased)
+[JaccardDistanceMatcher](api.md#jaccarddistancematcher)
+[SimilarityFlooding](api.md#similarityflooding)
+</div>
 
 <p class="valentine-badges">
 <a href="https://pypi.org/project/valentine/"><img src="https://img.shields.io/pypi/v/valentine.svg" alt="PyPI version"></a>
@@ -20,10 +32,6 @@ hide:
 <a href="https://github.com/delftdata/valentine/blob/master/LICENSE"><img src="https://img.shields.io/github/license/delftdata/valentine.svg" alt="License"></a>
 </p>
 
-[Get started :material-rocket-launch:](getting-started.md){ .md-button .md-button--primary }
-[API reference :material-book-open:](api.md){ .md-button }
-[View on GitHub :fontawesome-brands-github:](https://github.com/delftdata/valentine){ .md-button }
-
 </div>
 
 Valentine is a Python package for capturing potential relationships among
@@ -31,70 +39,6 @@ columns of different tabular datasets, given as pandas DataFrames. It
 implements several schema- and instance-based matching algorithms behind a
 single, uniform API, and ships with evaluation metrics so you can measure
 match quality against a ground truth.
-
-<div class="valentine-chips" markdown>
-[Coma](api.md#coma)
-[Cupid](api.md#cupid)
-[DistributionBased](api.md#distributionbased)
-[JaccardDistanceMatcher](api.md#jaccarddistancematcher)
-[SimilarityFlooding](api.md#similarityflooding)
-</div>
-
-## Why Valentine?
-
-<div class="grid cards" markdown>
-
--   :material-layers-triple:{ .lg .middle } __One API, many algorithms__
-
-    ---
-
-    Pick any matcher — [`Coma`](api.md#coma), [`Cupid`](api.md#cupid),
-    [`DistributionBased`](api.md#distributionbased),
-    [`JaccardDistanceMatcher`](api.md#jaccarddistancematcher),
-    [`SimilarityFlooding`](api.md#similarityflooding) — and run it with a
-    single [`valentine_match(...)`](api.md#valentine_match) call.
-
--   :material-table-multiple:{ .lg .middle } __Multi-table matching__
-
-    ---
-
-    Pass any iterable of DataFrames and Valentine computes all
-    `N * (N - 1) / 2` unique pairs in one go. Lists, tuples, generators
-    — they all work.
-
--   :material-filter-variant:{ .lg .middle } __Rich, immutable results__
-
-    ---
-
-    [`MatcherResults`](api.md#matcherresults) is an immutable mapping of
-    [`ColumnPair`](api.md#columnpair) to similarity scores, with
-    convenience methods for filtering, one-to-one reduction, and top-N
-    selection.
-
--   :material-chart-bar:{ .lg .middle } __Built-in evaluation__
-
-    ---
-
-    Compute Precision, Recall, F1, and more against a ground truth with
-    a single call to [`get_metrics`](api.md#get_metrics). Plug in your
-    own [`Metric`](api.md#metric) subclasses too.
-
--   :material-magnify-scan:{ .lg .middle } __Match explanations__
-
-    ---
-
-    [`Coma`](api.md#coma) exposes per-sub-matcher score breakdowns via
-    [`get_details`](api.md#get_details) so you can see *why* two columns
-    were matched.
-
--   :material-language-python:{ .lg .middle } __Pure Python, no JVM__
-
-    ---
-
-    Every matcher — including Coma — is implemented in pure Python.
-    No Java, no subprocess, no temp files. Just `pip install valentine`.
-
-</div>
 
 ## Installation
 

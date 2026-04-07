@@ -32,6 +32,31 @@ from valentine.algorithms import (
 | [`JaccardDistanceMatcher`](#jaccarddistancematcher) | Instances only  | Simple, explainable baseline. Useful for sanity checks.                  |
 | [`SimilarityFlooding`](#similarityflooding) | Schema only             | Structure-heavy schemas where graph neighbourhoods carry signal.         |
 
+## Which matcher should I pick?
+
+```mermaid
+flowchart TD
+    A([Start]) --> B{Do you have<br/>column values?}
+    B -- "No, schema only" --> C{Schema is<br/>nested or<br/>graph-shaped?}
+    B -- "Yes" --> D{Names are<br/>reliable?}
+
+    C -- "Nested / linguistic" --> E([<b>Cupid</b><br/>tree + linguistic])
+    C -- "Graph-heavy" --> F([<b>SimilarityFlooding</b><br/>fixpoint propagation])
+
+    D -- "Yes" --> G([<b>Coma</b><br/>schema + instances])
+    D -- "Not really" --> H{Need a quick<br/>baseline?}
+
+    H -- "Yes" --> I([<b>JaccardDistanceMatcher</b><br/>set similarity])
+    H -- "No, go heavy" --> J([<b>DistributionBased</b><br/>EMD on histograms])
+
+    classDef pick fill:#fce4ec,stroke:#e91e63,stroke-width:2px,color:#880e4f;
+    class E,F,G,I,J pick;
+```
+
+When in doubt, start with [`Coma`](#coma) — it's the strongest default
+and the only matcher that ships per-sub-matcher
+[score breakdowns](results.md#match-details-coma).
+
 ## `Coma`
 
 Pure-Python implementation of the COMA 3.0 schema matching algorithm.
@@ -71,6 +96,16 @@ matcher = Coma(use_instances=True)
     see how each individual sub-matcher contributed to the final score.
     See [Match details](results.md#match-details-coma).
 
+**Performance.** Schema-only mode is dominated by trigram comparisons —
+roughly *O(n_left · n_right · L)* in column counts and average name
+length. Adding `use_instances=True` builds a TF-IDF corpus over **all**
+sampled cell values across **all** input tables, so cost grows linearly
+with `instance_sample_size` (default `1000`) and the total number of
+columns. Expect sub-second matching for two ~30-column tables, single
+seconds for ~100 columns, and tens of seconds once you cross a few
+hundred columns with instances enabled. Memory scales with the size of
+the TF-IDF vocabulary; lower `instance_sample_size` if you hit a wall.
+
 [:material-book-marked: Full parameter reference &rarr;](api.md#coma)
 
 ## `Cupid`
@@ -88,6 +123,13 @@ from valentine.algorithms import Cupid
 
 matcher = Cupid(w_struct=0.2, leaf_w_struct=0.2, th_accept=0.7)
 ```
+
+**Performance.** Schema-only and independent of row counts, so cost is
+driven entirely by the size of the schema tree. Expect sub-second
+matching for typical relational schemas (tens to a few hundred
+columns). Deeply nested or wide schemas (XML/JSON-shaped) push runtime
+into seconds because the structural pass propagates similarities across
+neighbouring nodes.
 
 [:material-book-marked: Full parameter reference &rarr;](api.md#cupid)
 
@@ -113,6 +155,15 @@ When you pass more than two tables, Valentine calls
 overrides to compute **global** value ranks across every table at once —
 giving each pair the benefit of the full data landscape.
 
+**Performance.** The most compute-heavy matcher in the package. Cost is
+dominated by Earth Mover's Distance computations between column
+histograms; runtime scales roughly *O(n_columns² · sample_size · log)*
+per pair, so it grows fast with both column count and
+`instance_sample_size`. As a rule of thumb, expect single-digit seconds
+for ~30 columns at the default sample size, and minutes once you cross
+~100 columns or use the full DataFrame. Lower `instance_sample_size`
+aggressively for exploration runs, then bump it up for the final pass.
+
 [:material-book-marked: Full parameter reference &rarr;](api.md#distributionbased)
 
 ## `JaccardDistanceMatcher`
@@ -137,6 +188,14 @@ The element-equality function is configured with the
 [`StringDistanceFunction`](api.md#stringdistancefunction) enum, which
 exposes `Levenshtein`, `DamerauLevenshtein`, `Hamming`, `Jaro`,
 `JaroWinkler`, and `Exact`.
+
+**Performance.** Fast and predictable. With `Exact` element equality
+the cost is essentially set-intersection — milliseconds per column
+pair. Switching to a string-distance function turns each comparison
+into an *O(|A| · |B|)* cross-product over column value sets, so it
+slows down quickly once columns hold more than a few hundred unique
+values. Use it as a fast first pass, or pair it with
+`StringDistanceFunction.Exact` on clean, short-valued columns.
 
 [:material-book-marked: Full parameter reference &rarr;](api.md#jaccarddistancematcher)
 
@@ -174,6 +233,15 @@ Behaviour is parameterized by three enums:
 similarity function. When you select `StringMatcher.PREFIX_SUFFIX_TFIDF`
 and run with more than two tables, Valentine computes a global IDF from
 every table's schema vocabulary.
+
+**Performance.** Schema-only and dominated by the fixpoint iteration
+over the propagation graph. Each iteration is *O(|edges|)*, and the
+graph size grows with the number of schema elements (columns + types +
+labels). Expect sub-second runtime on small relational schemas, single
+seconds on schemas with hundreds of elements. Convergence is the main
+variable: pick a tighter `Formula` if iterations stretch out, and
+prefer `StringMatcher.PREFIX_SUFFIX` over `PREFIX_SUFFIX_TFIDF` when
+you don't need cross-table corpus statistics.
 
 [:material-book-marked: Full parameter reference &rarr;](api.md#similarityflooding)
 

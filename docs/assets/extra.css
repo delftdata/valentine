@@ -28,6 +28,47 @@
     var(--md-primary-fg-color) 55%,
     var(--md-primary-fg-color--light) 100%
   );
+  color: #ffffff;
+}
+
+/* Force readable white text on the gradient bar for both schemes */
+.md-header,
+.md-header a,
+.md-header button,
+.md-header label,
+.md-header__title,
+.md-header__topic,
+.md-tabs,
+.md-tabs a,
+.md-tabs__link,
+.md-tabs__item {
+  color: #ffffff;
+}
+
+.md-header .md-search__input,
+.md-header .md-search__input::placeholder {
+  color: #ffffff;
+}
+
+.md-header .md-search__input {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.md-header .md-search__input::placeholder {
+  opacity: 0.85;
+}
+
+/* Hovered / active tab indicator */
+.md-tabs__link {
+  opacity: 0.78;
+  transition: opacity 0.15s ease;
+}
+
+.md-tabs__link:hover,
+.md-tabs__link--active,
+.md-tabs__item--active .md-tabs__link {
+  opacity: 1;
+  font-weight: 600;
 }
 
 .md-header__title {
@@ -68,6 +109,14 @@
   );
 }
 
+.valentine-hero-logo {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  margin-right: 0.2em;
+  filter: drop-shadow(0 2px 6px rgba(233, 30, 99, 0.25));
+}
+
 .valentine-hero h1 {
   font-size: 3rem;
   margin: 0.25rem 0 0.5rem;
@@ -75,20 +124,22 @@
 
 .valentine-hero .valentine-tagline {
   font-size: 1.15rem;
-  color: var(--md-default-fg-color--light);
+  color: var(--md-default-fg-color);
+  opacity: 0.85;
   margin-bottom: 1.5rem;
 }
 
 .valentine-hero .valentine-badges {
-  margin: 1rem 0 1.5rem;
+  margin: 1.25rem 0 0.25rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.3rem;
   justify-content: center;
+  opacity: 0.85;
 }
 
 .valentine-hero .valentine-badges img {
-  height: 20px;
+  height: 16px;
 }
 
 .valentine-hero .md-button {
@@ -133,6 +184,42 @@
   transform: translateY(-3px);
   border-color: var(--md-primary-fg-color--light);
   box-shadow: 0 6px 20px rgba(233, 30, 99, 0.12);
+}
+
+/* --- 404 page ------------------------------------------------------------ */
+.valentine-404 {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  max-width: 38rem;
+  margin: 0 auto;
+}
+
+.valentine-404-logo {
+  width: 140px;
+  height: auto;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 4px 16px rgba(233, 30, 99, 0.25));
+}
+
+.valentine-404 h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem;
+}
+
+.valentine-404-tagline {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  margin-bottom: 1.5rem;
+}
+
+.valentine-404 .md-button {
+  margin: 0.25rem 0.35rem;
+}
+
+.valentine-404-hint {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
 }
 
 /* --- Code blocks: a touch more breathing room ---------------------------- */

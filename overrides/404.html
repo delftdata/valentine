@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+
+{% block content %}
+  <div class="valentine-404">
+    <img src="{{ 'assets/logo.png' | url }}" alt="Valentine" class="valentine-404-logo">
+    <h1>404 &mdash; this match doesn't exist</h1>
+    <p class="valentine-404-tagline">
+      We looked everywhere and couldn't find a column pair for that URL.
+    </p>
+    <p>
+      <a href="{{ '' | url }}" class="md-button md-button--primary">
+        Back to the homepage
+      </a>
+      <a href="{{ 'api/' | url }}" class="md-button">
+        API reference
+      </a>
+    </p>
+    <p class="valentine-404-hint">
+      If you got here from a link inside the docs, please
+      <a href="https://github.com/delftdata/valentine/issues/new">open an issue</a>
+      so we can fix it.
+    </p>
+  </div>
+{% endblock %}

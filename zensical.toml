@@ -26,6 +26,7 @@ nav = [
     { "Evaluation metrics" = "metrics.md" },
     { "Full example" = "example.md" },
     { "API reference" = "api.md" },
+    { "FAQ" = "faq.md" },
     { "Changelog" = "changelog.md" },
     { "Research" = "research.md" },
 ]
@@ -35,6 +36,7 @@ nav = [
 # ----------------------------------------------------------------------------
 [project.theme]
 
+custom_dir = "overrides"
 language = "en"
 
 features = [
@@ -60,8 +62,8 @@ features = [
     "search.highlight",
 ]
 
-[project.theme.icon]
-logo = "lucide/heart"
+logo = "assets/logo.png"
+favicon = "assets/favicon.png"
 
 [project.theme.font]
 text = "Inter"

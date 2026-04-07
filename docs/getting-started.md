@@ -11,9 +11,23 @@ command. It requires **Python 3.10 or newer** (and is tested up to 3.14).
 
   [pypi]: https://pypi.org/project/valentine/
 
-```shell
-pip install valentine
-```
+=== "pip"
+
+    ```shell
+    pip install valentine
+    ```
+
+=== "uv"
+
+    ```shell
+    uv add valentine
+    ```
+
+=== "poetry"
+
+    ```shell
+    poetry add valentine
+    ```
 
 For local development, clone the repo and install in editable mode:
 
