@@ -13,9 +13,7 @@ existing Levenshtein-based matcher.
 import math
 import re
 
-from jellyfish import levenshtein_distance
-
-from ...utils.utils import normalize_distance
+from rapidfuzz.distance import Levenshtein
 
 
 def _camel_case_split(s: str) -> list[str]:
@@ -162,5 +160,9 @@ def compute_idf_weights(node_names: list[str]) -> dict[str, float]:
 
 
 def levenshtein_sim(s1: str, s2: str) -> float:
-    """Levenshtein-based similarity (valentine's original matcher)."""
-    return normalize_distance(levenshtein_distance(s1, s2), s1, s2)
+    """Levenshtein-based similarity (valentine's original matcher).
+
+    Uses rapidfuzz's C++ implementation, whose ``normalized_similarity``
+    is identical to the previous ``1 - distance / max(len1, len2)`` form.
+    """
+    return Levenshtein.normalized_similarity(s1, s2)

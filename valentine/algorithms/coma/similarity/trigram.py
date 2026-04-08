@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from functools import lru_cache
+
 
 def trigram_similarity(s1: str, s2: str) -> float:
     """
@@ -9,6 +11,15 @@ def trigram_similarity(s1: str, s2: str) -> float:
     case-normalize the entire string and compute character 3-grams
     without tokenization.
     """
+    # Normalise the pair so ``(s1, s2)`` and ``(s2, s1)`` share one cache
+    # entry. trigram similarity is symmetric, so sorting by value is safe.
+    if s1 > s2:
+        s1, s2 = s2, s1
+    return _trigram_similarity_cached(s1, s2)
+
+
+@lru_cache(maxsize=65_536)
+def _trigram_similarity_cached(s1: str, s2: str) -> float:
     if not s1 or not s2:
         return 1.0 if (not s1 and not s2) else 0.0
 

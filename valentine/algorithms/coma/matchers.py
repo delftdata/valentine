@@ -7,6 +7,7 @@ from .combination import average, maximum, set_average
 from .schema import SchemaElement, SchemaGraph
 from .similarity.datatype import datatype_similarity
 from .similarity.tfidf import TfidfCorpus, tfidf_similarity
+from .similarity.tokens import tokens_similarity
 from .similarity.trigram import trigram_similarity
 
 # ---------------------------------------------------------------------------
@@ -89,6 +90,7 @@ class Matcher:
 
 # Predefined matchers
 NAME_MATCHER = Matcher("Name", extract_name, trigram_similarity, set_average)
+TOKENS_MATCHER = Matcher("Tokens", extract_name, tokens_similarity, set_average)
 DATATYPE_MATCHER = Matcher("Datatype", extract_datatype, datatype_similarity, set_average)
 PATH_MATCHER = Matcher("Path", extract_path, trigram_similarity, set_average)
 INSTANCES_DIRECT_MATCHER = Matcher(
@@ -152,7 +154,15 @@ class ComplexMatcher:
 
 
 # Predefined complex matchers
-NAME_CM = ComplexMatcher("NameCM", ctx_selfnode, [NAME_MATCHER], average, set_average)
+# NameCM aggregates trigram ("Name") and token Jaccard ("Tokens") by
+# maximum: trigram handles the well-formed cases while tokens rescues
+# camelCase/abbreviated columns where the raw trigram score is weak
+# (e.g. ``ApproxDate`` <-> ``date_created_approximation``). Using max
+# rather than average keeps the matcher's scale comparable to the
+# original NAME_CM so downstream averaging and selection are unchanged.
+NAME_CM = ComplexMatcher(
+    "NameCM", ctx_selfnode, [NAME_MATCHER, TOKENS_MATCHER], maximum, set_average
+)
 PATH_CM = ComplexMatcher("PathCM", ctx_selfpath, [PATH_MATCHER], average, set_average)
 LEAVES_CM = ComplexMatcher("LeavesCM", ctx_leaves, [NAME_MATCHER], average, set_average)
 PARENTS_CM = ComplexMatcher("ParentsCM", ctx_parents, [LEAVES_CM], average, set_average)

@@ -71,14 +71,18 @@ def _build_sparse_tfidf(
                 cols.append(idx)
                 data.append(w)
 
-    mat = csr_matrix((data, (rows, cols)), shape=(len(docs), len(vocab)))
+    mat = csr_matrix(
+        (np.asarray(data, dtype=np.float32), (rows, cols)),
+        shape=(len(docs), len(vocab)),
+        dtype=np.float32,
+    )
 
     # L2 normalize each row
     norms = np.sqrt(mat.multiply(mat).sum(axis=1)).A1
     norms[norms == 0] = 1.0
     # Multiply by inverse norms (sparse diagonal)
-    mat = mat.multiply(1.0 / norms[:, np.newaxis])
-    return mat.tocsr()
+    mat = mat.multiply((1.0 / norms)[:, np.newaxis].astype(np.float32))
+    return mat.tocsr().astype(np.float32)
 
 
 class TfidfCorpus:
@@ -111,38 +115,75 @@ class TfidfCorpus:
 
         if n_docs == 0 or vocab_size == 0:
             self._idf = np.zeros(0)
-            return
+        else:
+            # Compute global document frequencies and IDF
+            df = np.zeros(vocab_size)
+            for doc in all_docs:
+                for token in set(doc):
+                    df[self._vocab[token]] += 1
+            self._idf = np.zeros(vocab_size)
+            mask = df > 0
+            self._idf[mask] = np.log(n_docs / df[mask])
 
-        # Compute global document frequencies and IDF
-        df = np.zeros(vocab_size)
-        for doc in all_docs:
-            for token in set(doc):
-                df[self._vocab[token]] += 1
-        self._idf = np.zeros(vocab_size)
-        mask = df > 0
-        self._idf[mask] = np.log(n_docs / df[mask])
+        # Per-column TF-IDF row cache. Cupid/Coma call ``similarity`` with
+        # the same ``instances`` list object repeatedly (once per target
+        # column in the cross product), so caching on list identity turns
+        # an O(N*M) rebuild of sparse matrices into O(N+M).
+        self._column_cache: dict[int, tuple[csr_matrix, int]] = {}
+        # Per-pair similarity cache. ``InstancesCM`` evaluates both
+        # ``InstancesDirect`` and ``InstancesAll`` per element pair, and
+        # for flat schemas both extract the same ``elem.instances`` list,
+        # so ``similarity`` would otherwise be called twice with identical
+        # arguments. Caching on the (id, id) pair collapses that to one
+        # computation.
+        self._pair_cache: dict[tuple[int, int], float] = {}
+
+    def _vectorise_column(self, instances: list[str]) -> tuple[csr_matrix, int]:
+        key = id(instances)
+        cached = self._column_cache.get(key)
+        if cached is not None:
+            return cached
+        docs = [d for v in instances if (d := _tokenize(str(v)))]
+        n = len(docs)
+        if n == 0:
+            vecs = csr_matrix((0, max(len(self._vocab), 1)))
+        else:
+            vecs = _build_sparse_tfidf(docs, self._vocab, self._idf)
+        self._column_cache[key] = (vecs, n)
+        return vecs, n
 
     def similarity(self, instances1: list[str], instances2: list[str]) -> float:
         """Compute TF-IDF cosine similarity using the global IDF."""
         if not instances1 or not instances2 or len(self._idf) == 0:
             return 0.0
 
-        docs1 = [d for v in instances1 if (d := _tokenize(str(v)))]
-        docs2 = [d for v in instances2 if (d := _tokenize(str(v)))]
+        id1, id2 = id(instances1), id(instances2)
+        key = (id1, id2) if id1 <= id2 else (id2, id1)
+        cached = self._pair_cache.get(key)
+        if cached is not None:
+            return cached
 
-        if not docs1 or not docs2:
+        vecs1, m = self._vectorise_column(instances1)
+        vecs2, n = self._vectorise_column(instances2)
+
+        if m == 0 or n == 0:
+            self._pair_cache[key] = 0.0
             return 0.0
 
-        vecs1 = _build_sparse_tfidf(docs1, self._vocab, self._idf)
-        vecs2 = _build_sparse_tfidf(docs2, self._vocab, self._idf)
+        # Densify the (m x n) similarity matrix once and let numpy do the
+        # axis maxes. scipy.sparse's csr_matrix.max(axis=...) converts to
+        # CSC under the hood and was the dominant cost on Coma's worst
+        # cases (~10s/dataset on the NYU benchmark). The dense matrix is
+        # bounded by n_instances1 * n_instances2 floats, which stays under
+        # a few hundred MB even on the largest columns we benchmark.
+        sim_dense = (vecs1 @ vecs2.T).toarray()
 
-        sim_sparse = vecs1 @ vecs2.T
+        sum_row_max = float(sim_dense.max(axis=1).sum())
+        sum_col_max = float(sim_dense.max(axis=0).sum())
 
-        m, n = len(docs1), len(docs2)
-        sum_row_max = float(sim_sparse.max(axis=1).toarray().sum())
-        sum_col_max = float(sim_sparse.max(axis=0).toarray().sum())
-
-        return (sum_row_max + sum_col_max) / (m + n)
+        result = (sum_row_max + sum_col_max) / (m + n)
+        self._pair_cache[key] = result
+        return result
 
 
 def tfidf_similarity(instances1: list[str], instances2: list[str]) -> float:

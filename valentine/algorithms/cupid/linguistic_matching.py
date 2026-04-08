@@ -2,17 +2,61 @@ import math
 import operator
 import re
 import string
+from functools import cache, lru_cache
 from itertools import combinations_with_replacement, product, repeat
 from multiprocessing import get_context
 
 import nltk
 from anytree import LevelOrderIter
-from jellyfish import levenshtein_distance
 from nltk.corpus import stopwords, wordnet as wn
+from rapidfuzz.distance import Levenshtein
 
-from ...utils.utils import normalize_distance
 from . import DATATYPE_COMPATIBILITY_TABLE
 from .schema_element import SchemaElement, Token, TokenTypes
+
+
+def _ensure_nltk_data() -> None:
+    """Download the nltk corpora Cupid needs if they are not yet present.
+
+    Centralising this lets us lazily trigger it from any of the call sites
+    that touch wordnet/stopwords without duplicating the download list.
+    """
+    nltk.download("punkt_tab")
+    nltk.download("omw-1.4")
+    nltk.download("stopwords")
+    nltk.download("wordnet")
+
+
+@lru_cache(maxsize=1)
+def _english_stopwords() -> frozenset:
+    """Return the NLTK English stopword list as a cached frozenset.
+
+    ``stopwords.words("english")`` re-reads a corpus file on every call;
+    ``normalization`` hits it once per token, so caching pays off even
+    on a single matcher run.
+    """
+    try:
+        return frozenset(stopwords.words("english"))
+    except LookupError:
+        _ensure_nltk_data()
+        return frozenset(stopwords.words("english"))
+
+
+@lru_cache(maxsize=1)
+def _wordnet_lemma_names() -> frozenset:
+    """Return ``wn.all_lemma_names()`` as a cached frozenset.
+
+    ``wn.all_lemma_names()`` is a generator that walks the entire WordNet
+    corpus on every call (hundreds of thousands of entries). The Cupid
+    linguistic matcher calls ``compute_similarity_wordnet`` hundreds of
+    thousands of times per column pair, so materialising the lemma set once
+    and reusing it is a ~100x speedup on that path alone.
+    """
+    try:
+        return frozenset(wn.all_lemma_names())
+    except LookupError:
+        _ensure_nltk_data()
+        return frozenset(wn.all_lemma_names())
 
 
 def snakecase_convert(name):
@@ -26,10 +70,7 @@ def normalization(element, schema_element=None):
     try:
         tokens = nltk.word_tokenize(element)
     except LookupError:
-        nltk.download("punkt_tab")
-        nltk.download("omw-1.4")
-        nltk.download("stopwords")
-        nltk.download("wordnet")
+        _ensure_nltk_data()
         tokens = nltk.word_tokenize(element)
 
     for token in tokens:
@@ -52,7 +93,7 @@ def normalization(element, schema_element=None):
                 if "_" in token_snake:
                     token_snake = token_snake.replace("_", " ")
                     schema_element = normalization(token_snake, schema_element)
-                elif token.lower() in stopwords.words("english"):
+                elif token.lower() in _english_stopwords():
                     token_obj.data = token.lower()
                     token_obj.ignore = True
                     token_obj.token_type = TokenTypes.COMMON_WORDS
@@ -170,52 +211,104 @@ def name_similarity_tokens(token_set1, token_set2):
 
 
 def get_partial_similarity(token_set1, token_set2):
-    total_sum = 0
+    total_sum = 0.0
     for t1 in token_set1:
+        w1 = t1.data
         max_sim = -math.inf
         for t2 in token_set2:
-            if t1.data == t2.data:
+            w2 = t2.data
+            if w1 == w2:
+                # Short-circuit identical tokens: this is the single most
+                # common case in practice (shared stop-words, shared ids)
+                # and avoids any wordnet / levenshtein work.
                 sim = 1.0
             else:
-                sim = compute_similarity_wordnet(t1.data, t2.data)
-                if math.isnan(sim):
-                    sim = compute_similarity_leven(t1.data, t2.data)
+                sim = _token_similarity(w1, w2)
 
-            max_sim = max(max_sim, sim)
+            if sim > max_sim:  # noqa: PLR1730 - hot loop, avoid max() call overhead
+                max_sim = sim
 
-        total_sum = total_sum + max_sim
+        total_sum += max_sim
 
     return total_sum
 
 
+def _token_similarity(word1: str, word2: str) -> float:
+    """Memoised wordnet-then-levenshtein similarity between two tokens.
+
+    Symmetric-normalized and unbounded: the Cupid hot loop re-compares
+    the same token pairs many times in both orders across schema-element
+    pairs, and on large schemas distinct-pair counts can exceed a
+    bounded LRU, causing churn that erases the cache's value.
+    """
+    if word1 > word2:
+        word1, word2 = word2, word1
+    return _token_similarity_cached(word1, word2)
+
+
+@cache
+def _token_similarity_cached(word1: str, word2: str) -> float:
+    sim = compute_similarity_wordnet(word1, word2)
+    if math.isnan(sim):
+        sim = compute_similarity_leven(word1, word2)
+    return sim
+
+
+@cache
+def _cached_synsets(word: str) -> tuple:
+    """Cache ``wn.synsets`` as a tuple (hashable, stable order).
+
+    Calling ``wn.synsets`` repeatedly for the same token dominates
+    ``compute_similarity_wordnet`` on cold runs.
+    """
+    return tuple(wn.synsets(word))
+
+
 def get_synonyms(word) -> set:
-    return set(wn.synsets(word))
+    return set(_cached_synsets(word))
+
+
+@cache
+def _wup_similarity_cached(s1, s2) -> float:
+    """Symmetric-normalized cache of ``wn.wup_similarity``.
+
+    ``wup_similarity`` walks the WordNet hypernym graph, which is
+    the dominant cost of ``compute_similarity_wordnet``. We memoize
+    on the (id-sorted) synset pair so repeated pair lookups across
+    schema elements only pay for it once.
+    """
+    val = wn.wup_similarity(s1, s2)
+    return val if val is not None else math.nan
+
+
+def _wup_sim(s1, s2) -> float:
+    # Sort by id for a stable symmetric cache key.
+    if id(s1) > id(s2):
+        s1, s2 = s2, s1
+    return _wup_similarity_cached(s1, s2)
 
 
 # the higher, the better
 def compute_similarity_wordnet(word1, word2):
-    try:
-        wn_lemmas = set(wn.all_lemma_names())
-    except LookupError:
-        nltk.download("punkt_tab")
-        nltk.download("omw-1.4")
-        nltk.download("stopwords")
-        nltk.download("wordnet")
-        wn_lemmas = set(wn.all_lemma_names())
-
+    wn_lemmas = _wordnet_lemma_names()
     if word1 not in wn_lemmas or word2 not in wn_lemmas:
         return math.nan
-    allsyns1 = get_synonyms(word1)
-    allsyns2 = get_synonyms(word2)
-    if len(allsyns1) == 0 or len(allsyns2) == 0:
+    allsyns1 = _cached_synsets(word1)
+    allsyns2 = _cached_synsets(word2)
+    if not allsyns1 or not allsyns2:
         return math.nan
-    best = max(wn.wup_similarity(s1, s2) or math.nan for s1, s2 in product(allsyns1, allsyns2))
-    return best
+    best = -math.inf
+    for s1 in allsyns1:
+        for s2 in allsyns2:
+            v = _wup_sim(s1, s2)
+            if v > best:  # noqa: PLR1730 - hot loop
+                best = v
+    return best if best > -math.inf else math.nan
 
 
 # Higher the better
 def compute_similarity_leven(word1, word2):
-    return normalize_distance(levenshtein_distance(word1, word2), word1, word2)
+    return Levenshtein.normalized_similarity(word1, word2)
 
 
 # max is 0.5

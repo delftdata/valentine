@@ -12,6 +12,18 @@ from .column_model import CorrelationClusteringColumn
 from .emd_utils import intersection_emd, quantile_emd
 from .quantile_histogram import QuantileHistogram
 
+# In-memory store for pre-processed columns, keyed first on the tmp folder
+# path (which acts as a per-run namespace) and then on the pickle file name.
+# The disk pickle files are still written as a fallback for the spawn-pool
+# multi-process path, where workers and the main process do not share memory.
+# When running single-process this store eliminates the per-read pickle
+# round-trip that dominated DistributionBased on the NYU benchmark.
+_COLUMN_STORE: dict[str, dict[str, CorrelationClusteringColumn]] = {}
+
+
+def clear_column_store(tmp_folder_path: str) -> None:
+    _COLUMN_STORE.pop(tmp_folder_path, None)
+
 
 def compute_cutoff_threshold(matrix_c: list, threshold: float) -> float:
     """
@@ -106,24 +118,27 @@ def process_emd(tup: tuple) -> tuple[tuple[Any, Any], float]:
     return k, quantile_emd(c1, c2, quantile)
 
 
-@lru_cache(maxsize=512)
 def read_from_cache(file_name: str, tmp_folder_path: str) -> CorrelationClusteringColumn:
     """
-    Function that reads from a pickle file lru cache a column after pre-processing
+    Read a pre-processed column by file name.
 
-    Parameters
-    ----------
-    file_name: str
-        The file name that contains the
-    tmp_folder_path: str
-        The path of the temporary folder that will serve as a cache for the run
-
-    Returns
-    -------
-    CorrelationClusteringColumn
-        The preprocessed column
+    The column is fetched from an in-memory dict populated by
+    ``process_columns`` whenever possible; the on-disk pickle is consulted
+    only as a fallback (for example in spawn-pool workers that do not share
+    memory with the main process, or for backwards compatibility with the
+    old disk-backed code path).
     """
-    return get_column_from_store(file_name, tmp_folder_path)
+    bucket = _COLUMN_STORE.get(tmp_folder_path)
+    if bucket is not None:
+        cached = bucket.get(file_name)
+        if cached is not None:
+            return cached
+    column = get_column_from_store(file_name, tmp_folder_path)
+    # Populate the in-memory store so that subsequent reads stay hot even
+    # when the first access fell through to disk (e.g. inside a worker
+    # process that only executes process_emd).
+    _COLUMN_STORE.setdefault(tmp_folder_path, {})[file_name] = column
+    return column
 
 
 def unwrap_process_input_tuple(
@@ -195,17 +210,35 @@ def process_columns(tup: tuple) -> None:
     Parameters
     ---------
     tup : tuple
-        tuple containing the information of the column to be processed
+        tuple containing the information of the column to be processed.
+        The optional 8th element is a ``write_pickle`` flag (default
+        ``True``) which controls whether the pre-processed column is also
+        persisted to disk. Single-process callers can pass ``False`` to
+        skip the disk write entirely, since ``read_from_cache`` will
+        always hit the in-memory store first.
     """
-    (
-        column_name,
-        column_uid,
-        data,
-        source_name,
-        source_guid,
-        quantiles,
-        tmp_folder_path,
-    ) = tup
+    if len(tup) == 8:
+        (
+            column_name,
+            column_uid,
+            data,
+            source_name,
+            source_guid,
+            quantiles,
+            tmp_folder_path,
+            write_pickle,
+        ) = tup
+    else:
+        (
+            column_name,
+            column_uid,
+            data,
+            source_name,
+            source_guid,
+            quantiles,
+            tmp_folder_path,
+        ) = tup
+        write_pickle = True
     Path(tmp_folder_path).mkdir(parents=True, exist_ok=True)
     column = CorrelationClusteringColumn(
         column_name, column_uid, data, source_name, source_guid, tmp_folder_path
@@ -214,14 +247,14 @@ def process_columns(tup: tuple) -> None:
         column.quantile_histogram = QuantileHistogram(
             column.long_name, column.ranks, column.size, quantiles
         )
-    with Path(
-        Path(tmp_folder_path)
-        / f"{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}.pkl"
-    ).open(
-        "wb",
-    ) as output:
-        pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
-    del column
+    file_name = f"{make_filename_safe(column.table_name)}_{make_filename_safe(column.name)}"
+    if write_pickle:
+        # Persist to disk so spawn-pool workers can read the column back
+        # via ``get_column_from_store``; this is the only inter-process
+        # channel DistributionBased has.
+        with (Path(tmp_folder_path) / f"{file_name}.pkl").open("wb") as output:
+            pickle.dump(column, output, pickle.HIGHEST_PROTOCOL)
+    _COLUMN_STORE.setdefault(tmp_folder_path, {})[file_name] = column
 
 
 def parallel_cutoff_threshold(
@@ -248,7 +281,8 @@ def ingestion_column_generator(
     table_guid: object,
     quantiles: int,
     tmp_folder_path: str,
-) -> Iterable[tuple[str, object, Sequence[Any], str, object, int, str]]:
+    write_pickle: bool = True,
+) -> Iterable[tuple[str, object, Sequence[Any], str, object, int, str, bool]]:
     """
     Generator of incoming pandas dataframe columns
     """
@@ -262,6 +296,7 @@ def ingestion_column_generator(
                 table_guid,
                 quantiles,
                 tmp_folder_path,
+                write_pickle,
             )
 
 

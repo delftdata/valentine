@@ -8,11 +8,13 @@ from ..base_matcher import BaseMatcher
 from ..match import Match
 from . import discovery
 from .clustering_utils import (
+    clear_column_store,
     generate_global_ranks,
     ingestion_column_generator,
     process_columns,
     process_emd,
 )
+from .column_model import clear_global_ranks_cache
 
 
 class DistributionBased(BaseMatcher):
@@ -91,40 +93,15 @@ class DistributionBased(BaseMatcher):
         self.__column_names = []
 
         with tempfile.TemporaryDirectory() as tmp_folder_path:
-            unique_values: set = set()
-            for table in tables:
-                for column in table.get_instances_columns():
-                    unique_values.update(column.data)
-            generate_global_ranks(unique_values, tmp_folder_path)
-            del unique_values
-
-            if self.__process_num == 1:
+            try:
+                unique_values: set = set()
                 for table in tables:
-                    columns: list[BaseColumn] = table.get_instances_columns()
-                    self.__column_names.extend(
-                        [
-                            (
-                                table.name,
-                                table.unique_identifier,
-                                x.name,
-                                x.unique_identifier,
-                            )
-                            for x in columns
-                            if not x.is_empty
-                        ]
-                    )
+                    for column in table.get_instances_columns():
+                        unique_values.update(column.data)
+                generate_global_ranks(unique_values, tmp_folder_path)
+                del unique_values
 
-                    for tup in ingestion_column_generator(
-                        columns,
-                        table.name,
-                        table.unique_identifier,
-                        self.__quantiles,
-                        tmp_folder_path,
-                    ):
-                        process_columns(tup)
-                matches = self.__find_matches(tmp_folder_path, table_order)
-            else:
-                with get_context("spawn").Pool(self.__process_num) as process_pool:
+                if self.__process_num == 1:
                     for table in tables:
                         columns: list[BaseColumn] = table.get_instances_columns()
                         self.__column_names.extend(
@@ -139,22 +116,52 @@ class DistributionBased(BaseMatcher):
                                 if not x.is_empty
                             ]
                         )
-                        process_pool.map(
-                            process_columns,
-                            ingestion_column_generator(
-                                columns,
-                                table.name,
-                                table.unique_identifier,
-                                self.__quantiles,
-                                tmp_folder_path,
-                            ),
-                            chunksize=1,
-                        )
-                    matches = self.__find_matches_parallel(
-                        tmp_folder_path, process_pool, table_order
-                    )
 
-        return matches
+                        for tup in ingestion_column_generator(
+                            columns,
+                            table.name,
+                            table.unique_identifier,
+                            self.__quantiles,
+                            tmp_folder_path,
+                            write_pickle=False,
+                        ):
+                            process_columns(tup)
+                    matches = self.__find_matches(tmp_folder_path, table_order)
+                else:
+                    with get_context("spawn").Pool(self.__process_num) as process_pool:
+                        for table in tables:
+                            columns = table.get_instances_columns()
+                            self.__column_names.extend(
+                                [
+                                    (
+                                        table.name,
+                                        table.unique_identifier,
+                                        x.name,
+                                        x.unique_identifier,
+                                    )
+                                    for x in columns
+                                    if not x.is_empty
+                                ]
+                            )
+                            process_pool.map(
+                                process_columns,
+                                ingestion_column_generator(
+                                    columns,
+                                    table.name,
+                                    table.unique_identifier,
+                                    self.__quantiles,
+                                    tmp_folder_path,
+                                ),
+                                chunksize=1,
+                            )
+                        matches = self.__find_matches_parallel(
+                            tmp_folder_path, process_pool, table_order
+                        )
+
+                return matches
+            finally:
+                clear_column_store(tmp_folder_path)
+                clear_global_ranks_cache(tmp_folder_path)
 
     def __find_matches(self, tmp_folder_path: str, table_order: dict[str, int]):
         connected_components = discovery.compute_distribution_clusters(

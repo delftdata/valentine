@@ -1,19 +1,30 @@
 from itertools import product
-from multiprocessing import get_context
 
-from jellyfish import (
-    damerau_levenshtein_distance,
-    hamming_distance,
-    jaro_similarity,
-    jaro_winkler_similarity,
-    levenshtein_distance,
+import numpy as np
+from rapidfuzz import process
+from rapidfuzz.distance import (
+    DamerauLevenshtein,
+    Hamming,
+    Jaro,
+    JaroWinkler,
+    Levenshtein,
 )
 
 from ...data_sources.base_table import BaseTable
-from ...utils.utils import normalize_distance
 from ..base_matcher import BaseMatcher
 from ..jaccard_distance import StringDistanceFunction
 from ..match import Match
+
+# Map our public StringDistanceFunction enum to the rapidfuzz scorer that
+# returns a normalized similarity in [0, 1]. rapidfuzz.process.cdist runs
+# the comparison in a C++ inner loop with optional thread-level parallelism.
+_SCORER_MAP = {
+    StringDistanceFunction.Levenshtein: Levenshtein.normalized_similarity,
+    StringDistanceFunction.DamerauLevenshtein: DamerauLevenshtein.normalized_similarity,
+    StringDistanceFunction.Hamming: Hamming.normalized_similarity,
+    StringDistanceFunction.Jaro: Jaro.normalized_similarity,
+    StringDistanceFunction.JaroWinkler: JaroWinkler.normalized_similarity,
+}
 
 
 class JaccardDistanceMatcher(BaseMatcher):
@@ -39,7 +50,11 @@ class JaccardDistanceMatcher(BaseMatcher):
         :attr:`StringDistanceFunction.JaroWinkler`, or
         :attr:`StringDistanceFunction.Exact`.
     process_num : int, optional
-        Number of worker processes (must be ``>= 1``, default: ``1``).
+        Number of worker threads passed to ``rapidfuzz.process.cdist``
+        (must be ``>= 1``, default: ``1``). Earlier versions used a
+        ``multiprocessing.Pool``; with rapidfuzz the inner kernel is
+        already C++ and parallelises via OpenMP threads, so the pool is
+        no longer needed.
     """
 
     def __init__(
@@ -59,101 +74,59 @@ class JaccardDistanceMatcher(BaseMatcher):
             raise ValueError(f"process_num must be >= 1, got {self.__process_num}")
 
     def get_matches(self, source_input: BaseTable, target_input: BaseTable) -> dict:
-        source_id = source_input.unique_identifier
-        target_id = target_input.unique_identifier
-        matches = {}
-        if self.__process_num == 1:
-            for combination in self.__get_column_combinations(
-                source_input,
-                target_input,
-                self.__threshold_dist,
-                target_id,
-                source_id,
-                self.__distance_function,
-            ):
-                matches.update(self.process_jaccard_distance(combination))
-        else:
-            with get_context("spawn").Pool(self.__process_num) as process_pool:
-                matches = {}
-                list_of_matches = process_pool.map(
-                    self.process_jaccard_distance,
-                    self.__get_column_combinations(
-                        source_input,
-                        target_input,
-                        self.__threshold_dist,
-                        target_id,
-                        source_id,
-                        self.__distance_function,
-                    ),
-                )
-                for match in list_of_matches:
-                    matches.update(match)
+        matches: dict = {}
+        for combination in self.__get_column_combinations(
+            source_input,
+            target_input,
+            self.__threshold_dist,
+            self.__distance_function,
+        ):
+            matches.update(self.process_jaccard_distance(combination))
         # Remove the pairs with zero similarity
-        matches = {k: v for k, v in matches.items() if v > 0.0}
-        return matches
+        return {k: v for k, v in matches.items() if v > 0.0}
 
     def process_jaccard_distance(self, tup: tuple):
-
         (
             source_data,
             target_data,
             threshold,
-            _,
             target_table_name,
-            _,
             target_column_name,
-            _,
             source_table_name,
-            _,
-            _,
             source_column_name,
-            _,
             distance_function,
         ) = tup
 
-        if len(set(source_data)) < len(set(target_data)):
-            set1 = set(source_data)
-            set2 = set(target_data)
-        else:
-            set1 = set(target_data)
-            set2 = set(source_data)
+        set1 = {str(x) for x in source_data}
+        set2 = {str(x) for x in target_data}
+        # Iterate over the smaller set as queries: cdist scales with
+        # rows x cols, and the row dimension dominates Python-side overhead.
+        if len(set1) > len(set2):
+            set1, set2 = set2, set1
 
         if distance_function == StringDistanceFunction.Exact:
-            threshold = 1.0
-        combinations = self.__get_set_combinations(set1, set2, threshold)
-
-        intersection_cnt = 0
-        for cmb in combinations:
-            if distance_function in [
-                StringDistanceFunction.Levenshtein,
-                StringDistanceFunction.Exact,
-            ]:
-                intersection_cnt = intersection_cnt + self.__process_distance(
-                    (*cmb, levenshtein_distance, True)
-                )
-            elif distance_function == StringDistanceFunction.DamerauLevenshtein:
-                intersection_cnt = intersection_cnt + self.__process_distance(
-                    (*cmb, damerau_levenshtein_distance, True)
-                )
-            elif distance_function == StringDistanceFunction.Hamming:
-                intersection_cnt = intersection_cnt + self.__process_distance(
-                    (*cmb, hamming_distance, True)
-                )
-            elif distance_function == StringDistanceFunction.Jaro:
-                intersection_cnt = intersection_cnt + self.__process_distance(
-                    (*cmb, jaro_similarity, False)
-                )
-            elif distance_function == StringDistanceFunction.JaroWinkler:
-                intersection_cnt = intersection_cnt + self.__process_distance(
-                    (*cmb, jaro_winkler_similarity, False)
-                )
+            intersection_cnt = len(set1 & set2)
+        elif not set1 or not set2:
+            intersection_cnt = 0
+        else:
+            scorer = _SCORER_MAP[distance_function]
+            queries = list(set1)
+            choices = list(set2)
+            scores = process.cdist(
+                queries,
+                choices,
+                scorer=scorer,
+                score_cutoff=threshold,
+                workers=self.__process_num,
+            )
+            # Each query string in set1 contributes 1 to the intersection
+            # if at least one choice in set2 scores >= threshold. Scores
+            # below score_cutoff are returned as 0 by rapidfuzz, so the
+            # comparison is exact even when threshold == 0.
+            intersection_cnt = int(np.count_nonzero((scores >= threshold).any(axis=1)))
 
         union_cnt = len(set1) + len(set2) - intersection_cnt
-
-        if union_cnt == 0:
-            sim = 0.0
-        else:
-            sim = float(intersection_cnt) / union_cnt
+        sim = 0.0 if union_cnt == 0 else float(intersection_cnt) / union_cnt
 
         return Match(
             target_table_name,
@@ -168,8 +141,6 @@ class JaccardDistanceMatcher(BaseMatcher):
         source_table: BaseTable,
         target_table: BaseTable,
         threshold,
-        target_id,
-        source_id,
         distance_function: StringDistanceFunction,
     ):
         for source_column, target_column in product(
@@ -179,65 +150,9 @@ class JaccardDistanceMatcher(BaseMatcher):
                 source_column.data,
                 target_column.data,
                 threshold,
-                target_id,
                 target_table.name,
-                target_table.unique_identifier,
                 target_column.name,
-                target_column.unique_identifier,
                 source_table.name,
-                source_table.unique_identifier,
-                source_id,
                 source_column.name,
-                source_column.unique_identifier,
                 distance_function,
             )
-
-    @staticmethod
-    def __get_set_combinations(set1: set, set2: set, threshold: float):
-        """
-        Function that creates combination between elements of set1 and set2
-
-        Parameters
-        ----------
-        set1 : set
-            The first set that its elements will be taken
-        set2 : set
-            The second set
-        threshold : float
-            The Levenshtein ratio
-
-        Returns
-        -------
-        generator
-            A generator that yields one element from the first set, the second set and the Levenshtein ratio
-        """
-        for s1 in set1:
-            yield str(s1), set2, threshold
-
-    @staticmethod
-    def __process_distance(tup: tuple):
-        """
-        Function that check if there exist entry from the second set that has a greater Levenshtein ratio with the
-        element from the first set than the given threshold
-
-        Parameters
-        ----------
-        tup : tuple
-            A tuple containing one element from the first set, the second set and the threshold of the Levenshtein ratio
-
-        Returns
-        -------
-        int
-            1 if there is such an element 0 if not
-        """
-        s1, set2, threshold, distance_function, normalize = tup
-
-        for s2 in set2:
-            str_s2 = str(s2)
-            dist = distance_function(s1, str_s2)
-            if normalize:
-                if normalize_distance(dist, s1, str_s2) >= threshold:
-                    return 1
-            elif dist >= threshold:
-                return 1
-        return 0

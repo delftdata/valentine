@@ -53,9 +53,16 @@ class BaseTable(ABC):
 
     @staticmethod
     def get_data_type(data: list, d_type: str) -> str:
+        # ``d_type`` is the string form of ``column.dtype``. Pandas has
+        # three textual categories worth handling here: the legacy
+        # ``object`` dtype, the nullable ``string`` dtype, and the
+        # modern ``str`` dtype (pandas 2.1+). All three should be
+        # treated as candidate text (falling back to ``date`` only
+        # when the first value parses as a date).
+        text_like = d_type in ("object", "string", "str")
         new_d_type = ""
         if len(data) != 0:
-            if d_type == "object":
+            if text_like:
                 if is_date(data[0]):
                     new_d_type = "date"
                 else:
@@ -64,7 +71,7 @@ class BaseTable(ABC):
                 new_d_type = "int"
             elif d_type.startswith("float"):
                 new_d_type = "float"
-        elif d_type == "object":
+        elif text_like:
             new_d_type = "varchar"
         else:
             new_d_type = d_type

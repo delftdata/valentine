@@ -7,6 +7,26 @@ import numpy as np
 from ...data_sources.base_column import BaseColumn
 from ...utils.utils import convert_data_type
 
+# Cache of the per-run global-ranks dict keyed on the tmp folder path.
+# ``_intersection_emd_exact`` constructs many ``CorrelationClusteringColumn``
+# instances per matcher run, and without this cache each one re-opens
+# and unpickles the same on-disk ``ranks.pkl``.
+_GLOBAL_RANKS_CACHE: dict[str, dict] = {}
+
+
+def _load_global_ranks(tmp_folder_path: str) -> dict:
+    cached = _GLOBAL_RANKS_CACHE.get(tmp_folder_path)
+    if cached is not None:
+        return cached
+    with Path(Path(tmp_folder_path) / "ranks.pkl").open("rb") as pkl_file:
+        cached = pickle.load(pkl_file)
+    _GLOBAL_RANKS_CACHE[tmp_folder_path] = cached
+    return cached
+
+
+def clear_global_ranks_cache(tmp_folder_path: str) -> None:
+    _GLOBAL_RANKS_CACHE.pop(tmp_folder_path, None)
+
 
 class CorrelationClusteringColumn(BaseColumn):
     """
@@ -105,16 +125,15 @@ class CorrelationClusteringColumn(BaseColumn):
             The filtered column data (with unmapped values removed) and the
             ndarray that contains the ranks of the filtered data.
         """
-        with Path(Path(tmp_folder_path) / "ranks.pkl").open("rb") as pkl_file:
-            global_ranks: dict = pickle.load(pkl_file)
-            filtered_data = []
-            ranks = []
-            for x in column:
-                converted = convert_data_type(str(x))
-                if isinstance(converted, float) and math.isnan(converted):
-                    continue
-                if converted in global_ranks:
-                    filtered_data.append(x)
-                    ranks.append(global_ranks[converted])
-            ranks_arr = np.array(sorted(ranks))
-            return filtered_data, ranks_arr
+        global_ranks = _load_global_ranks(tmp_folder_path)
+        filtered_data = []
+        ranks = []
+        for x in column:
+            converted = convert_data_type(str(x))
+            if isinstance(converted, float) and math.isnan(converted):
+                continue
+            if converted in global_ranks:
+                filtered_data.append(x)
+                ranks.append(global_ranks[converted])
+        ranks_arr = np.array(sorted(ranks))
+        return filtered_data, ranks_arr
