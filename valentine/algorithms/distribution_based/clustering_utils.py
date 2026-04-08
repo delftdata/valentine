@@ -211,34 +211,20 @@ def process_columns(tup: tuple) -> None:
     ---------
     tup : tuple
         tuple containing the information of the column to be processed.
-        The optional 8th element is a ``write_pickle`` flag (default
-        ``True``) which controls whether the pre-processed column is also
-        persisted to disk. Single-process callers can pass ``False`` to
-        skip the disk write entirely, since ``read_from_cache`` will
-        always hit the in-memory store first.
+        The 8th element is a ``write_pickle`` flag (set ``False`` by
+        single-process callers to skip the on-disk pickle write entirely,
+        since ``read_from_cache`` always hits the in-memory store first).
     """
-    if len(tup) == 8:
-        (
-            column_name,
-            column_uid,
-            data,
-            source_name,
-            source_guid,
-            quantiles,
-            tmp_folder_path,
-            write_pickle,
-        ) = tup
-    else:
-        (
-            column_name,
-            column_uid,
-            data,
-            source_name,
-            source_guid,
-            quantiles,
-            tmp_folder_path,
-        ) = tup
-        write_pickle = True
+    (
+        column_name,
+        column_uid,
+        data,
+        source_name,
+        source_guid,
+        quantiles,
+        tmp_folder_path,
+        write_pickle,
+    ) = tup
     Path(tmp_folder_path).mkdir(parents=True, exist_ok=True)
     column = CorrelationClusteringColumn(
         column_name, column_uid, data, source_name, source_guid, tmp_folder_path

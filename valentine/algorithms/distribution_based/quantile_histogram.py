@@ -41,15 +41,6 @@ class QuantileHistogram:
 
     add_values(values, norm=True)
         Add all values to buckets
-
-    normalize_values()
-        Normalize the bucket values based on the normalization factor
-
-    bucket_binary_search(x)
-        Find in which bucket the specific value falls into using binary search
-
-    calc_dist_matrix()
-         Compute the distance matrix between all buckets.
     """
 
     __slots__ = (
@@ -205,47 +196,3 @@ class QuantileHistogram:
             counts /= self.normalization_factor
         self.bucket_values = {i: float(counts[i]) for i in range(n)}
 
-    def normalize_values(self):
-        """
-        Normalize the bucket values based on the normalization factor
-        """
-        self.bucket_values = {
-            k: v / self.normalization_factor for k, v in self.bucket_values.items()
-        }
-
-    def bucket_binary_search(self, x):
-        """
-        Find in which bucket the specific value falls into using binary search
-        Parameters
-        ----------
-        x: int
-            The input value
-
-        Returns
-        -------
-        int
-            The bucket index that the value falls into or -1 if it does not fit in anyone
-        """
-        left = 0
-        right = len(self.bucket_boundaries) - 1
-        while left <= right:
-            mid = left + (right - left) // 2
-            if self.bucket_boundaries[mid][0] <= x <= self.bucket_boundaries[mid][1]:
-                return mid
-            if self.bucket_boundaries[mid][1] < x:
-                left = mid + 1
-            else:
-                right = mid - 1
-        return -1
-
-    def calc_dist_matrix(self):
-        """
-        Compute the distance matrix between all buckets.
-        E.g. with 256 buckets the matrix will be 256x256
-
-        Returns
-        -------
-        ndarray
-            The distances between the buckets
-        """
-        return _bucket_distance_matrix(self.n_buckets)
