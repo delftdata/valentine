@@ -195,4 +195,3 @@ class QuantileHistogram:
         if norm and self.normalization_factor:
             counts /= self.normalization_factor
         self.bucket_values = {i: float(counts[i]) for i in range(n)}
-

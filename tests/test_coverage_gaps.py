@@ -4,6 +4,7 @@ Kept in a dedicated module so that coverage-driven additions don't pollute
 behaviour-focused test files.
 """
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -19,6 +20,21 @@ from valentine.algorithms import (
     SimilarityFlooding,
     StringMatcher,
 )
+from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus
+from valentine.algorithms.coma.similarity.tokens import tokenize_name, tokens_similarity
+from valentine.algorithms.cupid.linguistic_matching import _cached_synsets, get_synonyms
+from valentine.algorithms.distribution_based.clustering_utils import (
+    _COLUMN_STORE,
+    _compute_ranks,
+    generate_global_ranks,
+    ingestion_column_generator,
+    process_columns,
+)
+from valentine.algorithms.distribution_based.column_model import (
+    CorrelationClusteringColumn,
+    clear_global_ranks_cache,
+)
+from valentine.algorithms.distribution_based.quantile_histogram import QuantileHistogram
 from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.data_sources.dataframe.dataframe_table import DataframeTable
@@ -249,11 +265,6 @@ class TestValentineMatchEdges:
 
 class TestComaSimilarityPrimitives:
     def test_tokens_empty_name_returns_empty_tuple(self):
-        from valentine.algorithms.coma.similarity.tokens import (
-            tokenize_name,
-            tokens_similarity,
-        )
-
         assert tokenize_name("") == ()
         assert tokens_similarity("", "anything") == 0.0
         assert tokens_similarity("anything", "") == 0.0
@@ -261,43 +272,31 @@ class TestComaSimilarityPrimitives:
     def test_tokens_dedupes_repeated_token(self):
         # ``aa_aa`` -> ["aa", "aa"]; the second occurrence hits the
         # ``tok in seen`` short-circuit and is dropped.
-        from valentine.algorithms.coma.similarity.tokens import tokenize_name
-
         assert tokenize_name("aa_aa") == ("aa",)
 
     def test_tokens_disjoint_returns_zero(self):
-        from valentine.algorithms.coma.similarity.tokens import tokens_similarity
-
         # Two non-empty names with zero token overlap exercise the
         # ``not inter`` early return inside ``_token_jaccard``.
         assert tokens_similarity("foo", "bar") == 0.0
 
     def test_tokens_abbrev_expansion_matches_full_word(self):
-        from valentine.algorithms.coma.similarity.tokens import tokens_similarity
-
         # ``addr`` expands to ``address``; the two names should overlap
         # via the expanded token even though their raw tokens differ.
         assert tokens_similarity("addr", "address") > 0.0
 
     def test_tfidf_empty_instances_returns_zero(self):
-        from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus
-
         corpus = TfidfCorpus([["alpha beta", "alpha gamma"], ["beta gamma"]])
         # Empty instance lists short-circuit before any vectorisation.
         assert corpus.similarity([], ["alpha"]) == 0.0
         assert corpus.similarity(["alpha"], []) == 0.0
 
     def test_tfidf_empty_corpus_returns_zero(self):
-        from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus
-
         # Constructing a TfidfCorpus from inputs that tokenise to nothing
         # leaves ``_idf`` empty, which is the third leg of the early-out.
         corpus = TfidfCorpus([[""], [""]])
         assert corpus.similarity(["alpha"], ["alpha"]) == 0.0
 
     def test_tfidf_column_that_tokenises_to_nothing(self):
-        from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus
-
         # The corpus has real tokens but one of the queried columns is
         # made up of values that tokenise to the empty string. That
         # exercises the ``n == 0`` branch inside ``_vectorise_column``
@@ -330,11 +329,6 @@ class TestJaccardDistanceEdges:
 
 class TestCupidLinguisticHelpers:
     def test_get_synonyms_returns_set(self):
-        from valentine.algorithms.cupid.linguistic_matching import (
-            _cached_synsets,
-            get_synonyms,
-        )
-
         # ``car`` is a guaranteed WordNet entry; both helpers should
         # return a non-empty collection of synsets, with the public
         # helper returning a (deduplicated) set view of the cached tuple.
@@ -350,19 +344,11 @@ class TestCupidLinguisticHelpers:
 
 class TestDistributionBasedInternals:
     def test_quantile_histogram_empty_values(self, tmp_path):
-        from valentine.algorithms.distribution_based.quantile_histogram import (
-            QuantileHistogram,
-        )
-
-        import numpy as np
-
         # Build a reference histogram from a non-trivial column so we
         # can construct an empty histogram against it. The empty branch
         # in ``add_values`` zero-fills the bucket counts without
         # invoking ``searchsorted``.
-        ref = QuantileHistogram(
-            ("t", "ref"), np.array([1.0, 2.0, 3.0, 4.0, 5.0]), 5, n_quantiles=4
-        )
+        ref = QuantileHistogram(("t", "ref"), np.array([1.0, 2.0, 3.0, 4.0, 5.0]), 5, n_quantiles=4)
         empty = QuantileHistogram(
             ("t", "empty"), np.array([]), 1, n_quantiles=4, reference_hist=ref
         )
@@ -370,15 +356,7 @@ class TestDistributionBasedInternals:
         assert sum(empty.bucket_values.values()) == 0.0
 
     def test_quantile_histogram_values_outside_reference_range(self):
-        from valentine.algorithms.distribution_based.quantile_histogram import (
-            QuantileHistogram,
-        )
-
-        import numpy as np
-
-        ref = QuantileHistogram(
-            ("t", "ref"), np.array([1.0, 2.0, 3.0, 4.0, 5.0]), 5, n_quantiles=4
-        )
+        ref = QuantileHistogram(("t", "ref"), np.array([1.0, 2.0, 3.0, 4.0, 5.0]), 5, n_quantiles=4)
         # Values strictly above every bucket's upper bound: searchsorted
         # returns ``n``, the ``in_range`` mask drops them all, and the
         # resulting bucket counts are zero.
@@ -392,10 +370,6 @@ class TestDistributionBasedInternals:
         assert outlier.is_empty
 
     def test_compute_ranks_skips_nan(self):
-        from valentine.algorithms.distribution_based.clustering_utils import (
-            _compute_ranks,
-        )
-
         # ``_compute_ranks`` walks the corpus and skips entries whose
         # conversion produces NaN. Mixing real numbers with the string
         # ``"nan"`` (which ``convert_data_type`` parses as math.nan)
@@ -405,14 +379,6 @@ class TestDistributionBasedInternals:
         assert set(ranks.keys()) >= {1, 2, 3}
 
     def test_column_model_get_global_ranks_filters_nan_and_unknowns(self, tmp_path):
-        from valentine.algorithms.distribution_based.clustering_utils import (
-            generate_global_ranks,
-        )
-        from valentine.algorithms.distribution_based.column_model import (
-            CorrelationClusteringColumn,
-            clear_global_ranks_cache,
-        )
-
         # Pre-populate a global ranks pickle that maps just two
         # values, then build a column whose data contains: a known
         # value, an unknown value, and a NaN. The two latter rows hit
@@ -430,15 +396,6 @@ class TestDistributionBasedInternals:
         clear_global_ranks_cache(str(tmp_path))
 
     def test_process_columns_skips_histogram_for_empty_column(self, tmp_path):
-        from valentine.algorithms.distribution_based.clustering_utils import (
-            _COLUMN_STORE,
-            process_columns,
-            generate_global_ranks,
-        )
-        from valentine.algorithms.distribution_based.column_model import (
-            clear_global_ranks_cache,
-        )
-
         # An all-unknown data column has size 0 after the global-rank
         # filter, so the ``column.size > 0`` branch in process_columns
         # is skipped and no quantile histogram is built.
@@ -467,11 +424,6 @@ class TestDistributionBasedInternals:
         clear_global_ranks_cache(str(tmp_path))
 
     def test_ingestion_generator_skips_empty_columns(self, tmp_path):
-        from valentine.algorithms.distribution_based.clustering_utils import (
-            ingestion_column_generator,
-        )
-        from valentine.data_sources.dataframe.dataframe_table import DataframeTable
-
         # ``ingestion_column_generator`` filters columns whose
         # ``is_empty`` flag is True. Build a table with both an empty
         # and a non-empty column to hit both legs of that loop branch.
@@ -479,9 +431,7 @@ class TestDistributionBasedInternals:
         table = DataframeTable(df, name="mixed")
         cols = list(table.get_columns())
         produced = list(
-            ingestion_column_generator(
-                cols, "mixed", "guid", 4, str(tmp_path), write_pickle=False
-            )
+            ingestion_column_generator(cols, "mixed", "guid", 4, str(tmp_path), write_pickle=False)
         )
         # Only the non-empty column survives.
         assert len(produced) == 1
