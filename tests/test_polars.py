@@ -4,27 +4,37 @@ All tests are skipped when polars is not installed so that CI environments
 without the optional ``polars`` dependency still pass cleanly.
 """
 
+from __future__ import annotations
+
+import unittest
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-pl = pytest.importorskip("polars")
+try:
+    import polars as pl
 
-from valentine import valentine_match  # noqa: E402
-from valentine.algorithms import (  # noqa: E402
-    Coma,
-    Cupid,
-    DistributionBased,
-    JaccardDistanceMatcher,
-    SimilarityFlooding,
-)
-from valentine.data_sources.polars.polars_table import PolarsTable  # noqa: E402
+    _HAS_POLARS = True
+except ImportError:
+    _HAS_POLARS = False
 
-# Load test data
-_DATA = Path(__file__).parent / "data"
-pl_df1 = pl.read_csv(_DATA / "source_candidates.csv")
-pl_df2 = pl.read_csv(_DATA / "target_candidates.csv")
+if _HAS_POLARS:
+    from valentine import valentine_match
+    from valentine.algorithms import (
+        Coma,
+        Cupid,
+        DistributionBased,
+        JaccardDistanceMatcher,
+        SimilarityFlooding,
+    )
+    from valentine.data_sources.polars.polars_table import PolarsTable
+
+    _DATA = Path(__file__).parent / "data"
+    pl_df1 = pl.read_csv(_DATA / "source_candidates.csv")
+    pl_df2 = pl.read_csv(_DATA / "target_candidates.csv")
+
+_skip = unittest.skipUnless(_HAS_POLARS, "polars not installed")
 
 
 # -- PolarsTable unit tests ------------------------------------------------
