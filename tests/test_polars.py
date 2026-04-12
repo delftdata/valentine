@@ -6,7 +6,6 @@ without the optional ``polars`` dependency still pass cleanly.
 
 from __future__ import annotations
 
-import unittest
 from pathlib import Path
 
 import pandas as pd
@@ -18,6 +17,7 @@ try:
     _HAS_POLARS = True
 except ImportError:
     _HAS_POLARS = False
+    pl = None  # type: ignore[assignment]
 
 if _HAS_POLARS:
     from valentine import valentine_match
@@ -34,12 +34,13 @@ if _HAS_POLARS:
     pl_df1 = pl.read_csv(_DATA / "source_candidates.csv")
     pl_df2 = pl.read_csv(_DATA / "target_candidates.csv")
 
-_skip = unittest.skipUnless(_HAS_POLARS, "polars not installed")
+_skip = pytest.mark.skipif(not _HAS_POLARS, reason="polars not installed")
 
 
 # -- PolarsTable unit tests ------------------------------------------------
 
 
+@_skip
 class TestPolarsTable:
     def test_basic_properties(self):
         table = PolarsTable(pl_df1, name="src")
@@ -116,6 +117,7 @@ class TestPolarsTable:
 # -- Integration: all matchers with Polars input ---------------------------
 
 
+@_skip
 class TestPolarsMatcherIntegration:
     """Verify that every matcher produces results from Polars DataFrames."""
 
@@ -151,6 +153,7 @@ class TestPolarsMatcherIntegration:
 # -- Cross-framework: pandas vs Polars produce same results ----------------
 
 
+@_skip
 class TestPandasPolarsEquivalence:
     """Verify that the same data yields identical match results regardless of
     pandas vs Polars input. This is the key correctness guarantee."""
@@ -197,6 +200,7 @@ class TestPandasPolarsEquivalence:
 # -- Mixed input: pandas + Polars in same call -----------------------------
 
 
+@_skip
 class TestMixedInput:
     def test_pandas_source_polars_target(self):
         pd_df1 = pd.read_csv(_DATA / "source_candidates.csv")
