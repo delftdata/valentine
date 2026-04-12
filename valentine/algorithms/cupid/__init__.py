@@ -123,10 +123,6 @@ def datatype_compatibility(cat1: str, cat2: str) -> float | None:
     return _CROSS_FAMILY.get((f1, f2), 0.0)
 
 
-# Kept for backwards compatibility — old code imports this name.
-# Now computed dynamically instead of being a static dict.
-DATATYPE_COMPATIBILITY_TABLE: dict = {}
-
 __all__ = [
     "cupid_model",
 ]

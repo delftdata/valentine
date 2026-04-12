@@ -2,16 +2,10 @@ import unittest
 
 from tests import d1_path
 from valentine.data_sources.utils import get_delimiter, get_encoding, is_date
-from valentine.utils.utils import convert_data_type, is_sorted
+from valentine.utils.utils import convert_data_type
 
 
 class TestUtils(unittest.TestCase):
-    def test_is_sorted(self):
-        sorted_dict = {"k1": 1, "k2": 2, "k3": 3}
-        assert is_sorted(sorted_dict)
-        unsorted_dict = {"k1": 2, "k2": 1, "k3": 3}
-        assert not is_sorted(unsorted_dict)
-
     def test_convert_data_type(self):
         float_str = "1.1"
         assert isinstance(convert_data_type(float_str), float)

@@ -22,7 +22,7 @@ ground truth. Every API touched here is documented in the
   [polars]: https://github.com/delftdata/valentine/blob/master/examples/valentine_example_polars.py
   [mixed]: https://github.com/delftdata/valentine/blob/master/examples/valentine_example_mixed.py
 
-```python title="valentine_example.py"
+```python title="valentine_example_pandas.py"
 import pprint
 from pathlib import Path
 
