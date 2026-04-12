@@ -17,9 +17,10 @@ def get_encoding(ds_path: str) -> str:
             count += 1
             line = f.readline()
         result = chardet.detect(test_str)
-    if result["encoding"] == "ascii":
+    encoding = result["encoding"]
+    if encoding is None or encoding == "ascii":
         return "utf-8"
-    return result["encoding"]
+    return encoding
 
 
 def get_delimiter(ds_path: Path) -> str:
@@ -27,7 +28,10 @@ def get_delimiter(ds_path: Path) -> str:
     with Path(ds_path).open() as f:
         first_line = f.readline()
         s = csv.Sniffer()
-        return str(s.sniff(first_line).delimiter)
+        try:
+            return str(s.sniff(first_line).delimiter)
+        except csv.Error:
+            return ","
 
 
 def is_date(string, fuzzy=False):

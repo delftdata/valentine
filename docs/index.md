@@ -35,15 +35,17 @@ hide:
 </div>
 
 Valentine is a Python package for capturing potential relationships among
-columns of different tabular datasets, given as pandas DataFrames. It
-implements several schema- and instance-based matching algorithms behind a
+columns of different tabular datasets, given as pandas or Polars DataFrames.
+It implements several schema- and instance-based matching algorithms behind a
 single, uniform API, and ships with evaluation metrics so you can measure
-match quality against a ground truth.
+match quality against a ground truth. Pandas and Polars frames can be freely
+mixed in the same call.
 
 ## Installation
 
 ```shell
-pip install valentine
+pip install valentine            # pandas only
+pip install valentine[polars]    # pandas + Polars support
 ```
 
 Requires Python **>=3.10, <3.15**.

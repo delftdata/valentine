@@ -4,7 +4,7 @@ from itertools import combinations
 from ...data_sources.base_table import BaseTable
 from ..base_matcher import BaseMatcher
 from ..match import Match
-from . import Formula, Policy, StringMatcher
+from . import NODE_ID_PREFIX, Formula, Policy, StringMatcher
 from .graph import Graph
 from .node_pair import NodePair
 from .propagation_graph import PropagationGraph
@@ -81,7 +81,7 @@ class SimilarityFlooding(BaseMatcher):
             all_nodes = []
             for _, g in graphs:
                 all_nodes.extend(g.nodes())
-            all_names = [n.name for n in all_nodes if not n.name.startswith("NodeID")]
+            all_names = [n.name for n in all_nodes if not n.name.startswith(NODE_ID_PREFIX)]
             precomputed_idf = compute_idf_weights(all_names)
 
         matches = {}
@@ -100,13 +100,13 @@ class SimilarityFlooding(BaseMatcher):
             if precomputed_idf is not None:
                 idf_weights = precomputed_idf
             else:
-                # Collect non-NodeID node names from both graphs for IDF computation.
+                # Collect non-structural node names from both graphs for IDF computation.
                 # Include corpus tables so IDF reflects the full schema vocabulary
                 # (e.g. the paper's G2 contains both Employee and Department tables).
                 all_nodes = list(self.__graph1.nodes()) + list(self.__graph2.nodes())
                 for table in self.__tfidf_corpus:
                     all_nodes.extend(Graph(table).graph.nodes())
-                all_names = [n.name for n in all_nodes if not n.name.startswith("NodeID")]
+                all_names = [n.name for n in all_nodes if not n.name.startswith(NODE_ID_PREFIX)]
                 idf_weights = compute_idf_weights(all_names)
 
             def sim_fn(s1, s2):
@@ -122,7 +122,7 @@ class SimilarityFlooding(BaseMatcher):
             n1_name = n1.name
             for n2 in self.__graph2.nodes():
                 n2_name = n2.name
-                if n1_name.startswith("NodeID") or n2_name.startswith("NodeID"):
+                if n1_name.startswith(NODE_ID_PREFIX) or n2_name.startswith(NODE_ID_PREFIX):
                     sim = 0.0
                 else:
                     sim = sim_fn(n1_name, n2_name)
@@ -184,7 +184,7 @@ class SimilarityFlooding(BaseMatcher):
         for key in prev_map:
             n1 = key.node1
             n2 = key.node2
-            if not n1.name.startswith("NodeID"):
+            if not n1.name.startswith(NODE_ID_PREFIX):
                 filtered.pop(key, None)
                 continue
 
@@ -193,7 +193,7 @@ class SimilarityFlooding(BaseMatcher):
                 filtered.pop(key, None)
                 continue
 
-            if not n2.name.startswith("NodeID"):
+            if not n2.name.startswith(NODE_ID_PREFIX):
                 filtered.pop(key, None)
                 continue
 

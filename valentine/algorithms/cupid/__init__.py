@@ -1,67 +1,131 @@
-DATATYPE_COMPATIBILITY_TABLE = {
-    "text": {
-        "keyword": 1.0,
-        "varchar": 1.0,
-        "nvarchar": 0.9,
-        "nchar": 0.8,
-        "char": 0.6,
-    },
-    "keyword": {
-        "text": 1.0,
-        "varchar": 1.0,
-        "nvarchar": 0.9,
-        "nchar": 0.8,
-        "char": 0.6,
-    },
-    "varchar": {
-        "text": 1.0,
-        "keyword": 1.0,
-        "nvarchar": 0.9,
-        "nchar": 0.8,
-        "char": 0.6,
-        "int": 0.1,
-    },
-    "nvarchar": {
-        "text": 0.9,
-        "keyword": 0.9,
-        "varchar": 0.9,
-        "nchar": 0.8,
-        "char": 0.6,
-    },
-    "nchar": {
-        "text": 0.7,
-        "keyword": 0.7,
-        "varchar": 0.7,
-        "nvarchar": 1.0,
-        "char": 0.7,
-    },
-    "char": {
-        "text": 0.7,
-        "keyword": 0.7,
-        "varchar": 0.7,
-        "nchar": 0.8,
-        "nvarchar": 0.6,
-    },
-    "date": {"double": 0.1, "int": 0.1, "decimal": 0.1, "bit": 0.1},
-    "double": {"date": 0.1, "float": 1.0, "decimal": 1.0},
-    "decimal": {"date": 0.1, "float": 1.0, "double": 1.0},
-    "int": {
-        "date": 0.1,
-        "long": 0.8,
-        "short": 0.7,
-        "smallint": 0.7,
-        "integer": 1.0,
-        "varchar": 0.1,
-    },
-    "integer": {"date": 0.1, "long": 0.8, "short": 0.7, "smallint": 0.7, "int": 1.0},
-    "bit": {"time": 0.1, "date": 0.1},
-    "time": {"bit": 0.1},
-    "float": {"double": 0.9},
-    "long": {"short": 0.6, "int": 0.8, "bigint": 1.0, "smallint": 0.6, "integer": 0.8},
-    "bigint": {"short": 0.6, "int": 0.8, "long": 1.0, "smallint": 0.6, "integer": 0.8},
-    "short": {"long": 0.6, "int": 0.8, "bigint": 0.6, "smallint": 1.0, "integer": 0.8},
-    "smallint": {"long": 0.6, "int": 0.8, "bigint": 0.6, "short": 1.0, "integer": 0.8},
+from functools import lru_cache
+
+# ---------------------------------------------------------------------------
+# Generic datatype compatibility
+# ---------------------------------------------------------------------------
+# Instead of a static table of ~20 SQL type names, classify any type string
+# into one of four families and derive compatibility from family distance.
+# Same-family pairs score 1.0; adjacent families (text↔numeric) score 0.1;
+# all others score 0.0. This handles every type Valentine's get_data_type()
+# can produce (varchar, int, float, date) plus arbitrary SQL types.
+
+_TEXT_KEYWORDS = frozenset(
+    {
+        "text",
+        "keyword",
+        "varchar",
+        "nvarchar",
+        "nchar",
+        "char",
+        "string",
+        "str",
+        "utf8",
+        "categorical",
+        "clob",
+        "xml",
+        "json",
+    }
+)
+_INT_KEYWORDS = frozenset(
+    {
+        "int",
+        "integer",
+        "long",
+        "bigint",
+        "short",
+        "smallint",
+        "tinyint",
+        "uint",
+        "bit",
+        "boolean",
+        "bool",
+        "serial",
+    }
+)
+_FLOAT_KEYWORDS = frozenset(
+    {
+        "float",
+        "double",
+        "decimal",
+        "numeric",
+        "real",
+        "number",
+        "money",
+    }
+)
+_DATE_KEYWORDS = frozenset(
+    {
+        "date",
+        "datetime",
+        "time",
+        "timestamp",
+        "interval",
+    }
+)
+
+_FAMILY_TEXT = 0
+_FAMILY_INT = 1
+_FAMILY_FLOAT = 2
+_FAMILY_DATE = 3
+
+# Cross-family compatibility scores.  Same family = 1.0 (handled separately).
+# int↔float are closely related (0.8); text↔int has a small bridge (0.1,
+# matching the original table's varchar↔int entry); everything else is 0.0.
+_CROSS_FAMILY = {
+    (_FAMILY_INT, _FAMILY_FLOAT): 0.8,
+    (_FAMILY_FLOAT, _FAMILY_INT): 0.8,
+    (_FAMILY_TEXT, _FAMILY_INT): 0.1,
+    (_FAMILY_INT, _FAMILY_TEXT): 0.1,
+    (_FAMILY_TEXT, _FAMILY_FLOAT): 0.1,
+    (_FAMILY_FLOAT, _FAMILY_TEXT): 0.1,
+    (_FAMILY_DATE, _FAMILY_INT): 0.1,
+    (_FAMILY_INT, _FAMILY_DATE): 0.1,
+    (_FAMILY_DATE, _FAMILY_FLOAT): 0.1,
+    (_FAMILY_FLOAT, _FAMILY_DATE): 0.1,
 }
+
+
+_FAMILY_GROUPS = (
+    (_FAMILY_TEXT, _TEXT_KEYWORDS),
+    (_FAMILY_INT, _INT_KEYWORDS),
+    (_FAMILY_FLOAT, _FLOAT_KEYWORDS),
+    (_FAMILY_DATE, _DATE_KEYWORDS),
+)
+
+
+@lru_cache(maxsize=256)
+def _classify_type(dtype: str) -> int | None:
+    """Classify a type string into a family, or None if unrecognised."""
+    d = dtype.lower().strip()
+    # Exact match first, then prefix match for parameterised types like "varchar(255)"
+    for family, keywords in _FAMILY_GROUPS:
+        if d in keywords:
+            return family
+    for family, keywords in _FAMILY_GROUPS:
+        if any(d.startswith(kw) for kw in keywords):
+            return family
+    return None
+
+
+def datatype_compatibility(cat1: str, cat2: str) -> float | None:
+    """Return compatibility score for two type strings, or None if unknown.
+
+    Returns 1.0 for same-family pairs, a fractional score for cross-family
+    pairs, and None when at least one type cannot be classified (so the
+    caller can fall back to token-based similarity).
+    """
+    f1 = _classify_type(cat1)
+    f2 = _classify_type(cat2)
+    if f1 is None or f2 is None:
+        return None
+    if f1 == f2:
+        return 1.0
+    return _CROSS_FAMILY.get((f1, f2), 0.0)
+
+
+# Kept for backwards compatibility — old code imports this name.
+# Now computed dynamically instead of being a static dict.
+DATATYPE_COMPATIBILITY_TABLE: dict = {}
 
 __all__ = [
     "cupid_model",

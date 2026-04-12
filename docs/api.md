@@ -36,20 +36,21 @@ from valentine import (
 
 ```python
 valentine_match(
-    dfs: Iterable[pd.DataFrame],
+    dfs: Iterable[pd.DataFrame | pl.DataFrame],
     matcher: BaseMatcher,
     df_names: list[str] | None = None,
     instance_sample_size: int | None = 1000,
 ) -> MatcherResults
 ```
 
-Match columns across every unique pair of DataFrames.
+Match columns across every unique pair of DataFrames. Accepts both pandas
+and Polars DataFrames, which can be freely mixed within the same call.
 
 **Parameters**
 
 | Name                   | Type                         | Default | Description                                                                                                                                                                                                     |
 |------------------------|------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dfs`                  | `Iterable[pd.DataFrame]`     | —       | Two or more DataFrames to match against each other. Any iterable works (list, tuple, generator).                                                                                                               |
+| `dfs`                  | `Iterable[pd.DataFrame \| pl.DataFrame]` | —       | Two or more DataFrames to match against each other. Any iterable works (list, tuple, generator). Pandas and Polars frames may be mixed freely.                                                             |
 | `matcher`              | `BaseMatcher`                | —       | Matcher instance (e.g. `Coma()`, `Cupid()`).                                                                                                                                                                     |
 | `df_names`             | `list[str] \| None`          | `None`  | Optional names for each DataFrame. When `None`, defaults to `"aaa"`, `"bbb"`, `"ccc"`, … (chosen for minimum string similarity so defaults don't influence schema-based matchers). Limited to 26 unnamed tables. |
 | `instance_sample_size` | `int \| None`                | `1000`  | Cap on the number of non-empty rows sampled per column for instance-based matchers (Coma with `use_instances=True`, `DistributionBased`, `JaccardDistanceMatcher`). Pass `None` to use every row. Pass `0` to skip instance data entirely — schema-only matchers are unaffected, but instance-based matchers will see empty columns. |
@@ -666,10 +667,11 @@ are gold matches. One-to-one filtering is **off** by default here.
 ## Data sources (`valentine.data_sources`)
 
 Valentine wraps each DataFrame in a [`DataframeTable`](#dataframetable)
-before handing it to a matcher. Most users never touch this layer —
-[`valentine_match`](#valentine_match) builds the tables for you — but
-the classes are public so that custom matchers and custom data sources
-can be written against the abstractions.
+(pandas) or [`PolarsTable`](#polarstable) (Polars) before handing it to
+a matcher. Most users never touch this layer —
+[`valentine_match`](#valentine_match) auto-detects the frame type and
+builds the tables for you — but the classes are public so that custom
+matchers and custom data sources can be written against the abstractions.
 
 ```python
 from valentine.data_sources import (
@@ -678,6 +680,9 @@ from valentine.data_sources import (
     DataframeTable,
     DataframeColumn,
 )
+
+# With the polars extra installed:
+from valentine.data_sources import PolarsTable, PolarsColumn
 ```
 
 ### `BaseTable`
@@ -753,6 +758,33 @@ content.
 
 [`BaseColumn`](#basecolumn) adapter for a single pandas `Series`.
 Constructed internally by [`DataframeTable`](#dataframetable); exposes
+the column name, detected data type, unique identifier, and sampled
+instance values via the standard [`BaseColumn`](#basecolumn) interface.
+
+### `PolarsTable`
+
+```python
+PolarsTable(
+    df: pl.DataFrame,
+    name: str,
+    instance_sample_size: int | None = 1000,
+)
+```
+
+[`BaseTable`](#basetable) adapter for a Polars DataFrame. Requires the
+`polars` extra (`pip install valentine[polars]`). Has the same interface
+as [`DataframeTable`](#dataframetable).
+
+| Parameter              | Type            | Default | Description                                                                                     |
+|------------------------|-----------------|---------|-------------------------------------------------------------------------------------------------|
+| `df`                   | `pl.DataFrame`  | —       | The Polars DataFrame to wrap.                                                                   |
+| `name`                 | `str`           | —       | Name of the table.                                                                              |
+| `instance_sample_size` | `int \| None`   | `1000`  | Cap on the number of non-empty rows sampled per column. Pass `None` to use the full DataFrame; pass `0` to expose no instance data at all. |
+
+### `PolarsColumn`
+
+[`BaseColumn`](#basecolumn) adapter for a single Polars `Series`.
+Constructed internally by [`PolarsTable`](#polarstable); exposes
 the column name, detected data type, unique identifier, and sampled
 instance values via the standard [`BaseColumn`](#basecolumn) interface.
 

@@ -36,7 +36,7 @@
 
 ---
 
-A Python package for capturing potential relationships among columns of different tabular datasets, given as pandas DataFrames.
+A Python package for capturing potential relationships among columns of different tabular datasets, given as pandas or Polars DataFrames.
 Valentine is based on the paper [**Valentine: Evaluating Matching Techniques for Dataset Discovery**](https://ieeexplore.ieee.org/abstract/document/9458921).
 
 📚 **Full documentation:** <https://delftdata.github.io/valentine/> — getting started, matcher guide, API reference, and migration notes.
@@ -57,9 +57,15 @@ To install Valentine simply run:
 pip install valentine
 ```
 
+To enable **Polars** support, install the optional extra:
+
+```shell
+pip install valentine[polars]
+```
+
 
 ## Usage
-Valentine can be used to find matches among columns of a given pair of pandas DataFrames. 
+Valentine can be used to find matches among columns of a given pair of pandas or Polars DataFrames. You can even mix pandas and Polars frames in the same call — Valentine auto-detects the frame type.
 
 ### Matching methods
 In order to do so, the user can choose one of the following matching methods:
@@ -103,10 +109,10 @@ In order to do so, the user can choose one of the following matching methods:
 
 ### Matching DataFrames
 
-Pass two or more DataFrames as a list (or any iterable) along with a matcher. Valentine will match columns across all unique pairs:
+Pass two or more DataFrames as a list (or any iterable) along with a matcher. Valentine will match columns across all unique pairs. Pandas and Polars frames can be freely mixed:
 
 ```python
-# Match a pair of DataFrames
+# Match a pair of DataFrames (pandas, Polars, or mixed)
 matches = valentine_match([df1, df2], matcher)
 
 # Match multiple DataFrames (computes all N×(N-1)/2 pairs)
@@ -171,7 +177,7 @@ metrics_predefined_set = matches.get_metrics(ground_truth, metrics=METRICS_PRECI
 
 
 ### Example
-The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about job candidates, and then 2) how to assess its effectiveness based on a given ground truth (a more extensive example is shown in [`valentine_example.py`](https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py)):
+The following block of code shows: 1) how to run a matcher from Valentine on two DataFrames storing information about job candidates, and then 2) how to assess its effectiveness based on a given ground truth. More examples are available in the [`examples/`](https://github.com/delftdata/valentine/tree/master/examples) directory, including a [pandas example](https://github.com/delftdata/valentine/blob/master/examples/valentine_example_pandas.py), a [Polars example](https://github.com/delftdata/valentine/blob/master/examples/valentine_example_polars.py), and a [mixed pandas+Polars example](https://github.com/delftdata/valentine/blob/master/examples/valentine_example_mixed.py).
 
 ```python
 import pandas as pd

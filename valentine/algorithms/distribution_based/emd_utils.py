@@ -45,8 +45,14 @@ def quantile_emd(
     )
     if histogram2.is_empty:
         return math.inf
-    h1 = histogram1.get_values / histogram1.get_values.sum()
-    h2 = histogram2.get_values / histogram2.get_values.sum()
+    h1_vals = histogram1.get_values
+    h2_vals = histogram2.get_values
+    h1_sum = h1_vals.sum()
+    h2_sum = h2_vals.sum()
+    if h1_sum == 0 or h2_sum == 0:
+        return math.inf
+    h1 = h1_vals / h1_sum
+    h2 = h2_vals / h2_sum
     return emd2(h1, h2, histogram1.dist_matrix)
 
 

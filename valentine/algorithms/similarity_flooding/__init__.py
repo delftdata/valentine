@@ -4,6 +4,10 @@ TABLE = "Table"
 COLUMN = "Column"
 COLUMN_TYPE = "ColumnType"
 
+# Sentinel prefix for structural node IDs in the SF graph.  Uses a null
+# byte so it can never collide with real column or table names.
+NODE_ID_PREFIX = "\x00NID"
+
 
 class Policy(Enum):
     """Coefficient policy for the propagation graph."""

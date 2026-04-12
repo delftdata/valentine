@@ -1,56 +1,31 @@
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 
+import nltk
 import numpy as np
+from nltk.corpus import stopwords
 from scipy.sparse import csr_matrix
-
-# Lucene StandardAnalyzer English stop words (Lucene 3.x, used by COMA's Java implementation)
-_STOP_WORDS = frozenset(
-    {
-        "a",
-        "an",
-        "and",
-        "are",
-        "as",
-        "at",
-        "be",
-        "but",
-        "by",
-        "for",
-        "if",
-        "in",
-        "into",
-        "is",
-        "it",
-        "no",
-        "not",
-        "of",
-        "on",
-        "or",
-        "such",
-        "that",
-        "the",
-        "their",
-        "then",
-        "there",
-        "these",
-        "they",
-        "this",
-        "to",
-        "was",
-        "will",
-        "with",
-    }
-)
 
 _SPLIT_RE = re.compile(r"[^a-zA-Z0-9]+")
 
 
+@lru_cache(maxsize=1)
+def _english_stopwords() -> frozenset[str]:
+    """Return NLTK English stopwords as a cached frozenset."""
+    try:
+        return frozenset(stopwords.words("english"))
+    except LookupError:
+        nltk.download("stopwords", quiet=True)
+        return frozenset(stopwords.words("english"))
+
+
 def _tokenize(text: str) -> list[str]:
-    """Tokenize like Lucene StandardAnalyzer: lowercase, split on non-alphanum, remove stop words."""
+    """Tokenize: lowercase, split on non-alphanum, remove stop words."""
+    sw = _english_stopwords()
     tokens = _SPLIT_RE.split(text.lower())
-    return [t for t in tokens if t and t not in _STOP_WORDS]
+    return [t for t in tokens if t and t not in sw]
 
 
 def _build_sparse_tfidf(
@@ -129,7 +104,9 @@ class TfidfCorpus:
         # the same ``instances`` list object repeatedly (once per target
         # column in the cross product), so caching on list identity turns
         # an O(N*M) rebuild of sparse matrices into O(N+M).
-        self._column_cache: dict[int, tuple[csr_matrix, int]] = {}
+        # We store a reference to the list alongside the cached value so
+        # that GC cannot reclaim the list and reuse its ``id()``.
+        self._column_cache: dict[int, tuple[list, csr_matrix, int]] = {}
         # Per-pair similarity cache. ``InstancesCM`` evaluates both
         # ``InstancesDirect`` and ``InstancesAll`` per element pair, and
         # for flat schemas both extract the same ``elem.instances`` list,
@@ -142,14 +119,17 @@ class TfidfCorpus:
         key = id(instances)
         cached = self._column_cache.get(key)
         if cached is not None:
-            return cached
+            # Verify the reference is the same object (not a recycled id)
+            ref, vecs, n = cached
+            if ref is instances:
+                return vecs, n
         docs = [d for v in instances if (d := _tokenize(str(v)))]
         n = len(docs)
         if n == 0:
             vecs = csr_matrix((0, max(len(self._vocab), 1)))
         else:
             vecs = _build_sparse_tfidf(docs, self._vocab, self._idf)
-        self._column_cache[key] = (vecs, n)
+        self._column_cache[key] = (instances, vecs, n)
         return vecs, n
 
     def similarity(self, instances1: list[str], instances2: list[str]) -> float:

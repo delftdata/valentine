@@ -1,7 +1,7 @@
 import networkx as nx
 
 from ...data_sources.base_table import BaseTable
-from . import COLUMN, COLUMN_TYPE, TABLE
+from . import COLUMN, COLUMN_TYPE, NODE_ID_PREFIX, TABLE
 from .node import Node
 
 
@@ -23,7 +23,7 @@ class Graph:
         self.unique_id = 1  # unique identifiers to be used for each node
 
         # add table node to the graph
-        self.tbl_node = Node("NodeID" + str(self.unique_id), self.schema.name)
+        self.tbl_node = Node(NODE_ID_PREFIX + str(self.unique_id), self.schema.name)
         attribute_node = Node(self.schema.name, self.schema.name)
         self.graph.add_node(self.tbl_node)
         self.graph.add_edge(self.tbl_node, attribute_node, label="name")
@@ -39,7 +39,7 @@ class Graph:
         elif attribute_node:
             node = Node(column.name, self.schema.name)
         else:
-            node = Node("NodeID" + str(self.unique_id), self.schema.name)
+            node = Node(NODE_ID_PREFIX + str(self.unique_id), self.schema.name)
         node.add_long_name(
             self.schema.name,
             self.schema.unique_identifier,
@@ -74,7 +74,7 @@ class Graph:
             self.graph.add_node(typename_node)
             self.graph.add_edge(clm_node, typename_node, label="name")
             self.graph.add_edge(
-                Node("NodeID" + str(previous_id), table.name), clm_node, label="SQLtype"
+                Node(NODE_ID_PREFIX + str(previous_id), table.name), clm_node, label="SQLtype"
             )
 
     def create_graph(self):

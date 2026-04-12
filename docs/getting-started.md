@@ -29,6 +29,28 @@ command. It requires **Python 3.10 or newer** (and is tested up to 3.14).
     poetry add valentine
     ```
 
+### Polars support
+
+To use Polars DataFrames, install the optional `polars` extra:
+
+=== "pip"
+
+    ```shell
+    pip install valentine[polars]
+    ```
+
+=== "uv"
+
+    ```shell
+    uv add valentine[polars]
+    ```
+
+=== "poetry"
+
+    ```shell
+    poetry add valentine -E polars
+    ```
+
 For local development, clone the repo and install in editable mode:
 
 ```shell
@@ -41,24 +63,61 @@ pip install -e ".[dev]"
 
 The single entry point for matching is
 [`valentine_match`](api.md#valentine_match). It takes an iterable of
-DataFrames and a matcher instance, and returns a
+DataFrames (pandas or Polars) and a matcher instance, and returns a
 [`MatcherResults`](api.md#matcherresults) mapping — see the
 [Matcher results](results.md) guide for everything you can do with it.
 
-```python
-import pandas as pd
-from valentine import valentine_match
-from valentine.algorithms import Coma
+=== "pandas"
 
-df1 = pd.read_csv("source_candidates.csv")
-df2 = pd.read_csv("target_candidates.csv")
+    ```python
+    import pandas as pd
+    from valentine import valentine_match
+    from valentine.algorithms import Coma
 
-matcher = Coma(use_instances=True)
-matches = valentine_match([df1, df2], matcher)
+    df1 = pd.read_csv("source_candidates.csv")
+    df2 = pd.read_csv("target_candidates.csv")
 
-for pair, score in matches.items():
-    print(f"{pair.source_column} <-> {pair.target_column}: {score:.3f}")
-```
+    matcher = Coma(use_instances=True)
+    matches = valentine_match([df1, df2], matcher)
+
+    for pair, score in matches.items():
+        print(f"{pair.source_column} <-> {pair.target_column}: {score:.3f}")
+    ```
+
+=== "Polars"
+
+    ```python
+    import polars as pl
+    from valentine import valentine_match
+    from valentine.algorithms import Coma
+
+    df1 = pl.read_csv("source_candidates.csv")
+    df2 = pl.read_csv("target_candidates.csv")
+
+    matcher = Coma(use_instances=True)
+    matches = valentine_match([df1, df2], matcher)
+
+    for pair, score in matches.items():
+        print(f"{pair.source_column} <-> {pair.target_column}: {score:.3f}")
+    ```
+
+=== "Mixed (pandas + Polars)"
+
+    ```python
+    import pandas as pd
+    import polars as pl
+    from valentine import valentine_match
+    from valentine.algorithms import Coma
+
+    df_pandas = pd.read_csv("source_candidates.csv")
+    df_polars = pl.read_csv("target_candidates.csv")
+
+    matcher = Coma(use_instances=True)
+    matches = valentine_match([df_pandas, df_polars], matcher)
+
+    for pair, score in matches.items():
+        print(f"{pair.source_column} <-> {pair.target_column}: {score:.3f}")
+    ```
 
 !!! note "Table names"
 
@@ -70,8 +129,8 @@ for pair, score in matches.items():
 
 ## Matching many DataFrames
 
-Pass any iterable of DataFrames — list, tuple, generator — and Valentine
-computes all unique pairs:
+Pass any iterable of DataFrames (pandas, Polars, or mixed) — list, tuple,
+generator — and Valentine computes all unique pairs:
 
 ```python
 matches = valentine_match(

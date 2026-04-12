@@ -22,7 +22,10 @@ def compute_ssim(node_s, node_t, sims, th_accept=0.5):
                 s_strong_link.add(s)
                 t_strong_link.add(t)
 
-    return (len(s_strong_link) + len(t_strong_link)) / (len(s_leaves) + len(t_leaves))
+    denom = len(s_leaves) + len(t_leaves)
+    if denom == 0:
+        return 0.0
+    return (len(s_strong_link) + len(t_strong_link)) / denom
 
 
 def change_structural_similarity(leaves_s, leaves_t, sims, factor, leaf_w_struct):

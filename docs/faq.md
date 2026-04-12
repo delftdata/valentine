@@ -7,6 +7,26 @@ icon: lucide/help-circle
 Common questions and gotchas. If yours isn't here, open an issue on
 [GitHub](https://github.com/delftdata/valentine/issues).
 
+## Can I use Polars instead of pandas?
+
+Yes. Install the optional extra with `pip install valentine[polars]` and pass
+Polars DataFrames directly to [`valentine_match`](api.md#valentine_match).
+You can even mix pandas and Polars frames in the same call — Valentine
+auto-detects the frame type and wraps each one in the appropriate data
+source (`DataframeTable` or `PolarsTable`).
+
+```python
+import pandas as pd
+import polars as pl
+from valentine import valentine_match
+from valentine.algorithms import Coma
+
+df_pandas = pd.read_csv("source.csv")
+df_polars = pl.read_csv("target.csv")
+
+matches = valentine_match([df_pandas, df_polars], Coma())
+```
+
 ## Which matcher should I use?
 
 Start with [`Coma`](api.md#coma). It is the strongest default, handles

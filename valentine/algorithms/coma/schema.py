@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-import pandas as pd
-
 from ...data_sources.base_table import BaseTable
 
 
@@ -36,25 +34,22 @@ class SchemaGraph:
             data_type="element",
         )
 
-        # Instance sampling is enforced by the table (data source). We read
-        # from get_instances_df() so callers can control the row window size.
-        all_cols = table.get_columns()
-        col_instances: dict[str, list[str]] = {col.name: [] for col in all_cols}
-
-        df = table.get_instances_df()
-        for _, row in df.iterrows():
-            for col in all_cols:
-                val = row[col.name]
-                if pd.notna(val) and str(val) != "":
-                    col_instances[col.name].append(str(val))
+        # Use the instance-sampled columns directly. Each column's
+        # ``.data`` property already contains the non-null values as
+        # a plain list, so we just stringify them. This avoids any
+        # dependency on the frame type (pandas/Polars).
+        instance_cols = table.get_instances_columns()
+        instance_lookup = {col.name: col.data for col in instance_cols}
 
         columns = []
-        for col in all_cols:
+        for col in table.get_columns():
+            raw = instance_lookup.get(col.name, [])
+            instances = [str(v) for v in raw if v is not None and str(v) != ""]
             elem = SchemaElement(
                 name=col.name,
                 accession=f"{table.name}.{col.name}",
                 data_type=col.data_type,
-                instances=col_instances[col.name],
+                instances=instances,
             )
             columns.append(elem)
         return cls(root=root, columns=columns)

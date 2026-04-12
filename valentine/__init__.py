@@ -1,13 +1,18 @@
 from __future__ import annotations
 
 from collections.abc import Generator, Iterable
-
-import pandas as pd
+from typing import Any
 
 import valentine.algorithms
 import valentine.data_sources
 from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
+from valentine.data_sources.base_table import BaseTable
+
+try:
+    from valentine.data_sources.polars.polars_table import PolarsTable as _PolarsTable
+except ImportError:
+    _PolarsTable = None
 
 __all__ = [
     "ColumnPair",
@@ -43,21 +48,44 @@ def _validate_matcher(matcher: valentine.algorithms.BaseMatcher) -> None:
         raise InvalidMatcherError("Please provide a valid matcher")
 
 
+def _is_polars_frame(obj: Any) -> bool:
+    """Return True if *obj* is a Polars DataFrame without importing polars."""
+    return type(obj).__module__.startswith("polars")
+
+
+def _wrap_frame(
+    df: Any,
+    name: str,
+    instance_sample_size: int | None,
+) -> BaseTable:
+    """Wrap a pandas or Polars DataFrame in the appropriate BaseTable."""
+    if _is_polars_frame(df):
+        if _PolarsTable is None:
+            raise ImportError(
+                "Polars DataFrames require the 'polars' extra: pip install valentine[polars]"
+            )
+        return _PolarsTable(df, name=name, instance_sample_size=instance_sample_size)
+    return valentine.data_sources.DataframeTable(
+        df, name=name, instance_sample_size=instance_sample_size
+    )
+
+
 def valentine_match(
-    dfs: Iterable[pd.DataFrame] | list[pd.DataFrame] | Generator[pd.DataFrame],
+    dfs: Iterable[Any] | list[Any] | Generator[Any],
     matcher: valentine.algorithms.BaseMatcher,
     df_names: list[str] | None = None,
     instance_sample_size: int | None = 1000,
 ) -> MatcherResults:
     """Match columns across DataFrames.
 
-    Accepts any iterable of DataFrames (list, generator, tuple, etc.) and
-    matches columns across all unique pairs.
+    Accepts any iterable of DataFrames (pandas or Polars) and matches
+    columns across all unique pairs.
 
     Parameters
     ----------
-    dfs : Iterable[pd.DataFrame]
-        Two or more DataFrames to match against each other.
+    dfs : Iterable[pd.DataFrame | pl.DataFrame]
+        Two or more DataFrames to match against each other. Pandas and
+        Polars frames may be mixed freely within the same call.
     matcher : BaseMatcher
         The matching algorithm to use.
     df_names : list[str] | None
@@ -84,9 +112,14 @@ def valentine_match(
 
     Examples
     --------
-    Match two DataFrames:
+    Match two pandas DataFrames:
 
     >>> matches = valentine_match([df1, df2], Coma())
+
+    Match Polars DataFrames:
+
+    >>> import polars as pl
+    >>> matches = valentine_match([pl_df1, pl_df2], Coma())
 
     Match multiple DataFrames (computes all pairs):
 
@@ -117,7 +150,7 @@ def valentine_match(
         )
 
     tables = [
-        valentine.data_sources.DataframeTable(
+        _wrap_frame(
             df,
             name=df_names[i] if df_names is not None else _default_table_name(i),
             instance_sample_size=instance_sample_size,

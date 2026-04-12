@@ -13,9 +13,14 @@ ground truth. Every API touched here is documented in the
 !!! note
 
     The same script lives in the repo at
-    [`examples/valentine_example.py`][source].
+    [`examples/valentine_example_pandas.py`][source]. Additional examples:
 
-  [source]: https://github.com/delftdata/valentine/blob/master/examples/valentine_example.py
+    - [`valentine_example_polars.py`][polars] — Polars DataFrames
+    - [`valentine_example_mixed.py`][mixed] — mixing pandas and Polars in the same call
+
+  [source]: https://github.com/delftdata/valentine/blob/master/examples/valentine_example_pandas.py
+  [polars]: https://github.com/delftdata/valentine/blob/master/examples/valentine_example_polars.py
+  [mixed]: https://github.com/delftdata/valentine/blob/master/examples/valentine_example_mixed.py
 
 ```python title="valentine_example.py"
 import pprint

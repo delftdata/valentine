@@ -11,7 +11,7 @@ from anytree import LevelOrderIter
 from nltk.corpus import stopwords, wordnet as wn
 from rapidfuzz.distance import Levenshtein
 
-from . import DATATYPE_COMPATIBILITY_TABLE
+from . import datatype_compatibility
 from .schema_element import SchemaElement, Token, TokenTypes
 
 
@@ -125,9 +125,11 @@ def compute_compatibility(categories):
         if cat1 == cat2:
             compatibility_table[cat1][cat2] = 1.0
             compatibility_table[cat2][cat1] = 1.0
-        elif cat1 in DATATYPE_COMPATIBILITY_TABLE and cat2 in DATATYPE_COMPATIBILITY_TABLE[cat1]:
-            compatibility_table[cat1][cat2] = DATATYPE_COMPATIBILITY_TABLE[cat1][cat2]
-            compatibility_table[cat2][cat1] = DATATYPE_COMPATIBILITY_TABLE[cat1][cat2]
+            continue
+        compat = datatype_compatibility(cat1, cat2)
+        if compat is not None:
+            compatibility_table[cat1][cat2] = compat
+            compatibility_table[cat2][cat1] = compat
         else:
             tokens1 = [Token().add_data(t) for t in nltk.word_tokenize(cat1) if t.isalnum()]
             for token in tokens1:
@@ -205,6 +207,8 @@ def data_type_similarity(token_set1, token_set2):
 
 # max is 1
 def name_similarity_tokens(token_set1, token_set2):
+    if not token_set1 or not token_set2:
+        return 0.0
     sum1 = get_partial_similarity(token_set1, token_set2)
     sum2 = get_partial_similarity(token_set2, token_set1)
     return (sum1 + sum2) / (len(token_set1) + len(token_set2))

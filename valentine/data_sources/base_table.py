@@ -1,6 +1,7 @@
-from abc import ABC, abstractmethod
+from __future__ import annotations
 
-import pandas as pd
+from abc import ABC, abstractmethod
+from typing import Any
 
 from .base_column import BaseColumn
 from .utils import is_date
@@ -8,7 +9,11 @@ from .utils import is_date
 
 class BaseTable(ABC):
     """
-    Abstract class representing a table
+    Abstract class representing a table.
+
+    Subclasses wrap a concrete frame type (pandas DataFrame, Polars
+    DataFrame, etc.) and expose its contents through a uniform
+    column-oriented interface that the matching algorithms consume.
     """
 
     def __str__(self):
@@ -32,15 +37,16 @@ class BaseTable(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_df(self) -> pd.DataFrame:
+    def get_df(self) -> Any:
+        """Return the underlying frame object (pandas/Polars/…)."""
         raise NotImplementedError
 
-    def get_instances_df(self) -> pd.DataFrame:
-        """Return the DataFrame used for instance-based sampling."""
+    def get_instances_df(self) -> Any:
+        """Return the frame used for instance-based sampling."""
         return self.get_df()
 
     def get_instances_columns(self) -> list[BaseColumn]:
-        """Return columns built from the instance-sampled DataFrame."""
+        """Return columns built from the instance-sampled frame."""
         return self.get_columns()
 
     @property
@@ -53,13 +59,21 @@ class BaseTable(ABC):
 
     @staticmethod
     def get_data_type(data: list, d_type: str) -> str:
-        # ``d_type`` is the string form of ``column.dtype``. Pandas has
-        # three textual categories worth handling here: the legacy
-        # ``object`` dtype, the nullable ``string`` dtype, and the
-        # modern ``str`` dtype (pandas 2.1+). All three should be
-        # treated as candidate text (falling back to ``date`` only
-        # when the first value parses as a date).
-        text_like = d_type in ("object", "string", "str")
+        """Map a dtype string to a canonical Valentine type.
+
+        Recognises text-like types from both pandas (``object``,
+        ``string``, ``str``) and Polars (``Utf8``, ``String``,
+        ``Categorical``), as well as numeric and date categories.
+        """
+        text_like = d_type.lower() in (
+            "object",
+            "string",
+            "str",
+            "utf8",
+            "categorical",
+            "boolean",
+            "bool",
+        )
         new_d_type = ""
         if len(data) != 0:
             if text_like:
@@ -67,10 +81,12 @@ class BaseTable(ABC):
                     new_d_type = "date"
                 else:
                     new_d_type = "varchar"
-            elif d_type.startswith("int"):
+            elif d_type.lower().startswith("int") or d_type.lower().startswith("uint"):
                 new_d_type = "int"
-            elif d_type.startswith("float"):
+            elif d_type.lower().startswith("float") or d_type.lower() == "decimal":
                 new_d_type = "float"
+            elif d_type.lower() in ("date", "datetime", "time"):
+                new_d_type = "date"
         elif text_like:
             new_d_type = "varchar"
         else:
