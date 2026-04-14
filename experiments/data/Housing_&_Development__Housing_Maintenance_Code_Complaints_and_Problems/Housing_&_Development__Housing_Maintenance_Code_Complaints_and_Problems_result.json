@@ -1,0 +1,77 @@
+{
+  "table_name": "Housing_&_Development__Housing_Maintenance_Code_Complaints_and_Problems",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 1296.0,
+  "mappings_found": 37,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 12,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 12,
+    "total_ground_truth": 12,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 12,
+    "transform_total": 12,
+    "difficulty_breakdown": {
+      "schema_L3_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "schema_L2_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "value_VM3_recall": 1.0
+    }
+  },
+  "ground_truth_meta": {
+    "original_table": "Housing_&_Development__Housing_Maintenance_Code_Complaints_and_Problems",
+    "source_dims": [
+      60213,
+      21
+    ],
+    "target_dims": [
+      60214,
+      24
+    ],
+    "overlap_rows": 20427,
+    "overlap_cols": [
+      "problem_id",
+      "complaint_id",
+      "building_id",
+      "unique_key",
+      "bin",
+      "bbl",
+      "nta",
+      "council_district",
+      "complaint_status_date",
+      "longitude",
+      "block",
+      "problem_duplicate_flag"
+    ],
+    "schema_difficulty_distribution": {
+      "L3": 4,
+      "L1": 7,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 6,
+      "VM2": 5,
+      "VM3": 1
+    },
+    "has_ambiguous_mappings": false,
+    "num_ambiguous": 0,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 7
+  },
+  "conversation_stats": {
+    "total_turns": 38,
+    "tool_calls": 37,
+    "accepted_turns": 36,
+    "rejected_turns": 1,
+    "rejection_rate": 0.02631578947368421
+  },
+  "timestamp": "2026-02-11T13:36:26.462446"
+}

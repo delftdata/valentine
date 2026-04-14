@@ -1,0 +1,69 @@
+{
+  "table_name": "City_Government__Capital_Projects",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 643.6,
+  "mappings_found": 25,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 5,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 5,
+    "total_ground_truth": 5,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 5,
+    "transform_total": 5,
+    "difficulty_breakdown": {
+      "schema_L4_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "value_VM2_recall": 1.0
+    },
+    "ambiguous_correct": 2,
+    "ambiguous_total": 2,
+    "ambiguous_accuracy": 1.0
+  },
+  "ground_truth_meta": {
+    "original_table": "City_Government__Capital_Projects",
+    "source_dims": [
+      1962,
+      11
+    ],
+    "target_dims": [
+      1963,
+      10
+    ],
+    "overlap_rows": 605,
+    "overlap_cols": [
+      "pid",
+      "date_reported_as_of",
+      "forecast_completion",
+      "total_schedule_changes",
+      "total_budget_changes"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 2,
+      "L1": 3
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 3,
+      "VM2": 2
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 9
+  },
+  "conversation_stats": {
+    "total_turns": 26,
+    "tool_calls": 25,
+    "accepted_turns": 21,
+    "rejected_turns": 4,
+    "rejection_rate": 0.15384615384615385
+  },
+  "timestamp": "2026-02-11T01:33:27.128537"
+}

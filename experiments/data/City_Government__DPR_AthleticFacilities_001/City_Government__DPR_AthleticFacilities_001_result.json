@@ -1,0 +1,75 @@
+{
+  "table_name": "City_Government__DPR_AthleticFacilities_001",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 2024.3,
+  "mappings_found": 69,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 10,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 10,
+    "total_ground_truth": 10,
+    "transformation_accuracy": 0.9,
+    "transform_correct": 9,
+    "transform_total": 10,
+    "difficulty_breakdown": {
+      "schema_L1_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "schema_L3_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L2_recall": 1.0,
+      "value_VM3_recall": 1.0
+    }
+  },
+  "ground_truth_meta": {
+    "original_table": "City_Government__DPR_AthleticFacilities_001",
+    "source_dims": [
+      4152,
+      30
+    ],
+    "target_dims": [
+      4153,
+      25
+    ],
+    "overlap_rows": 1449,
+    "overlap_cols": [
+      "gispropnum",
+      "system",
+      "maintenanceagreement",
+      "track_and_field",
+      "volleyball",
+      "adult_football",
+      "accessible",
+      "hockey",
+      "stlength",
+      "field_lighted"
+    ],
+    "schema_difficulty_distribution": {
+      "L1": 3,
+      "L3": 6,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM2": 3,
+      "VM1": 4,
+      "VM3": 3
+    },
+    "has_ambiguous_mappings": false,
+    "num_ambiguous": 0,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 11
+  },
+  "conversation_stats": {
+    "total_turns": 70,
+    "tool_calls": 69,
+    "accepted_turns": 64,
+    "rejected_turns": 5,
+    "rejection_rate": 0.07142857142857142
+  },
+  "timestamp": "2026-02-11T02:31:21.605978"
+}

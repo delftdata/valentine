@@ -1,0 +1,75 @@
+{
+  "table_name": "City_Government__NYC_Municipal_Building_Energy_Benchmarking_Results",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 1896.3,
+  "mappings_found": 44,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 5,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 5,
+    "total_ground_truth": 5,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 5,
+    "transform_total": 5,
+    "difficulty_breakdown": {
+      "schema_L4_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L3_recall": 1.0,
+      "value_VM5_recall": 1.0,
+      "schema_L2_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "schema_L1_recall": 1.0
+    },
+    "ambiguous_correct": 1,
+    "ambiguous_total": 1,
+    "ambiguous_accuracy": 1.0
+  },
+  "ground_truth_meta": {
+    "original_table": "City_Government__NYC_Municipal_Building_Energy_Benchmarking_Results",
+    "source_dims": [
+      1525,
+      9
+    ],
+    "target_dims": [
+      1526,
+      8
+    ],
+    "overlap_rows": 574,
+    "overlap_cols": [
+      "borough",
+      "block",
+      "lot",
+      "bin",
+      "_2014_ghg_emissions_intensity_kgco2e_ft"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 1,
+      "L3": 2,
+      "L2": 1,
+      "L1": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 3,
+      "VM5": 1,
+      "VM2": 1
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 1,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 7
+  },
+  "conversation_stats": {
+    "total_turns": 45,
+    "tool_calls": 44,
+    "accepted_turns": 36,
+    "rejected_turns": 8,
+    "rejection_rate": 0.17777777777777778
+  },
+  "timestamp": "2026-02-11T03:10:25.082428"
+}

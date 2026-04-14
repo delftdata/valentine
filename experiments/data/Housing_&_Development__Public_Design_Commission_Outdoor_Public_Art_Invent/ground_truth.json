@@ -1,0 +1,494 @@
+{
+  "meta": {
+    "original_table": "Housing_&_Development__Public_Design_Commission_Outdoor_Public_Art_Invent",
+    "source_dims": [
+      434,
+      24
+    ],
+    "target_dims": [
+      434,
+      34
+    ],
+    "overlap_rows": 88,
+    "overlap_cols": [
+      "borough",
+      "block",
+      "lot",
+      "foundry",
+      "state",
+      "primary_artist_first",
+      "date_created_approximation",
+      "primary_architect_middle",
+      "inscription",
+      "pdc_records",
+      "artwork_type1",
+      "material",
+      "subject_keyword",
+      "secondary_architect_last",
+      "landscape_architect_last"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 2,
+      "L3": 11,
+      "L1": 2
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 7,
+      "VM2": 5,
+      "VM3": 3
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 15
+  },
+  "matches": [
+    {
+      "source_column": "architect",
+      "target_column": "secondary_architect_last",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "secondary_architect_middle",
+        "trap_appeal": "Both columns share the prefix \u2018secondary_architect\u2019, so a generic \u2018architect\u2019 field could plausibly refer to either the middle name/initial or the surname.",
+        "value_distinguisher": "The middle column samples are initials or given names (e.g., \u201cL.\u201d, \u201cHenry\u201d, \u201cCoe\u201d), while the last column samples are full surnames (e.g., \u201cEmbury II\u201d, \u201cMeyer\u201d, \u201cBarber\u201d).",
+        "name_similarity_explanation": "'architect' is ambiguous between 'secondary_architect_last' and 'secondary_architect_middle'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "landscape_architect",
+      "target_column": "landscape_architect_last",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "landscape_architect_middle",
+        "trap_appeal": "Both columns share the prefix 'landscape_architect', so a source field named 'landscape_architect' could plausibly map to either the middle or last name column.",
+        "value_distinguisher": "The 'last' column holds surnames like 'Bosworth', 'Clarke', 'Sasaki', whereas the 'middle' column contains initials or organizational entries such as 'D.', 'Presbrey-Leland Inc.', 'Department of Parks and Recreation'.",
+        "name_similarity_explanation": "'landscape_architect' is ambiguous between 'landscape_architect_last' and 'landscape_architect_middle'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "borough_x",
+      "target_column": "borough",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().title()"
+    },
+    {
+      "source_column": "BlkNum",
+      "target_column": "block",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: str(x).zfill(4)"
+    },
+    {
+      "source_column": "LotID",
+      "target_column": "lot",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: int(x) if pd.notnull(x) else None"
+    },
+    {
+      "source_column": "foundry",
+      "target_column": "foundry",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match, no transformation needed",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "state",
+      "target_column": "state",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().upper()"
+    },
+    {
+      "source_column": "ArtistGiven",
+      "target_column": "primary_artist_first",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "x.capitalize()"
+    },
+    {
+      "source_column": "ApproxDate",
+      "target_column": "date_created_approximation",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: True if str(x).strip().upper()=='Y' else False"
+    },
+    {
+      "source_column": "ArchMiddle",
+      "target_column": "primary_architect_middle",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "EngravingText",
+      "target_column": "inscription",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: ' '.join(str(x).strip().split())"
+    },
+    {
+      "source_column": "RecordIDs",
+      "target_column": "pdc_records",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "ArtForm",
+      "target_column": "artwork_type1",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 3,
+      "transformation_code": "lambda x: str(x).strip().rstrip('s').title()"
+    },
+    {
+      "source_column": "Medium",
+      "target_column": "material",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: ('Bronze' if 'bronze' in x.strip().lower() else 'Granite' if 'granite' in x.strip().lower() else 'Limestone' if 'limestone' in x.strip().lower() else 'Aluminum' if 'aluminum' in x.strip().lower() else 'Brick' if 'brick' in x.strip().lower() else 'Stone' if 'stone' in x.strip().lower() else x.strip().title())"
+    },
+    {
+      "source_column": "SubjectTags",
+      "target_column": "subject_keyword",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().lower()"
+    }
+  ],
+  "value_transformations": {
+    "borough_x": {
+      "original_col": "borough",
+      "code": "lambda x: str(x).strip().title()",
+      "description": "Trim leading/trailing whitespace and convert text to title case to ensure consistent borough names.",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "str(x).strip()",
+          "description": "Remove any leading or trailing whitespace"
+        },
+        {
+          "condition": "always",
+          "transform": ".title()",
+          "description": "Convert text to title case (e.g., 'bronx' \u2192 'Bronx')"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "BlkNum": {
+      "original_col": "block",
+      "code": "lambda x: str(x).zfill(4)",
+      "description": "Pad block codes with leading zeros to ensure a uniform 4-character string.",
+      "type": "text",
+      "complexity": "simple_format",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "str(x).zfill(4)",
+          "description": "Convert input to string and pad with leading zeros to length 4"
+        }
+      ],
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)"
+    },
+    "LotID": {
+      "original_col": "lot",
+      "code": "lambda x: int(x) if pd.notnull(x) else None",
+      "description": "Cast float values to integers, removing the '.0' decimal when present; preserve nulls as None.",
+      "type": "date",
+      "complexity": "simple_format",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "transform": "int(x)",
+          "description": "Convert non-null float to integer to remove '.0' suffix"
+        }
+      ],
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)"
+    },
+    "state": {
+      "original_col": "state",
+      "code": "lambda x: str(x).strip().upper()",
+      "description": "Trim any leading/trailing whitespace and convert the state code to uppercase.",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "strip()",
+          "description": "Remove leading/trailing whitespace"
+        },
+        {
+          "condition": "always",
+          "transform": "upper()",
+          "description": "Convert to uppercase letters"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "ArtistGiven": {
+      "original_col": "primary_artist_first",
+      "code": "x.capitalize()",
+      "description": "LLM enrichment transformation",
+      "type": "text",
+      "complexity": "moderate_transform",
+      "num_operations": 1,
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)"
+    },
+    "ApproxDate": {
+      "original_col": "date_created_approximation",
+      "code": "lambda x: True if str(x).strip().upper()=='Y' else False",
+      "description": "Normalize the input by trimming whitespace and uppercasing, then map 'Y'\u2192True and all other values (e.g. 'N')\u2192False.",
+      "type": "categorical",
+      "complexity": "complex_transform",
+      "num_operations": 2,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "normalized value == 'Y'",
+          "transform": "True",
+          "description": "Mark approximation flag as True when input is 'Y'."
+        },
+        {
+          "condition": "otherwise",
+          "transform": "False",
+          "description": "Mark approximation flag as False for 'N' or any other value."
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "EngravingText": {
+      "original_col": "inscription",
+      "code": "lambda x: ' '.join(str(x).strip().split())",
+      "description": "Trim leading/trailing whitespace and collapse any sequence of whitespace (spaces, tabs, newlines) into a single space, preserving the original text content.",
+      "type": "text",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "strip()",
+          "description": "Remove leading and trailing whitespace."
+        },
+        {
+          "condition": "always",
+          "transform": "split() + join()",
+          "description": "Collapse all internal whitespace sequences into single spaces."
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "ArtForm": {
+      "original_col": "artwork_type1",
+      "code": "lambda x: str(x).strip().rstrip('s').title()",
+      "description": "Trim whitespace, remove a trailing 's' (to normalize simple plurals), then convert to title-case.",
+      "type": "categorical",
+      "complexity": "moderate_transform",
+      "num_operations": 3,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "operation": "strip",
+          "description": "Remove leading and trailing whitespace"
+        },
+        {
+          "operation": "rstrip('s')",
+          "description": "Drop any trailing 's' to singularize (e.g. 'Statues' \u2192 'Statue')"
+        },
+        {
+          "operation": "title",
+          "description": "Convert the result to title-case for consistent formatting"
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "Medium": {
+      "original_col": "material",
+      "code": "lambda x: ('Bronze' if 'bronze' in x.strip().lower() else 'Granite' if 'granite' in x.strip().lower() else 'Limestone' if 'limestone' in x.strip().lower() else 'Aluminum' if 'aluminum' in x.strip().lower() else 'Brick' if 'brick' in x.strip().lower() else 'Stone' if 'stone' in x.strip().lower() else x.strip().title())",
+      "description": "Standardizes material names by inspecting the lower-cased text for key substrings and mapping them to a base material category. Unknown materials are simply title-cased.",
+      "type": "text",
+      "complexity": "complex_transform",
+      "num_operations": 1,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "if 'bronze' in lowercased value",
+          "transform": "return 'Bronze'",
+          "description": "All bronze variants map to 'Bronze'"
+        },
+        {
+          "condition": "elif 'granite' in lowercased value",
+          "transform": "return 'Granite'",
+          "description": "All granite variants map to 'Granite'"
+        },
+        {
+          "condition": "elif 'limestone' in lowercased value",
+          "transform": "return 'Limestone'",
+          "description": "Map limestone variants to 'Limestone'"
+        },
+        {
+          "condition": "elif 'aluminum' in lowercased value",
+          "transform": "return 'Aluminum'",
+          "description": "Map to 'Aluminum'"
+        },
+        {
+          "condition": "elif 'brick' in lowercased value",
+          "transform": "return 'Brick'",
+          "description": "Map to 'Brick'"
+        },
+        {
+          "condition": "elif 'stone' in lowercased value",
+          "transform": "return 'Stone'",
+          "description": "Map to 'Stone'"
+        },
+        {
+          "condition": "else",
+          "transform": "return title-cased original",
+          "description": "Fallback: title-case whatever remains"
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "SubjectTags": {
+      "original_col": "subject_keyword",
+      "code": "lambda x: str(x).strip().lower()",
+      "description": "Trim leading/trailing whitespace and convert the subject keyword to lowercase for consistent categorical analysis.",
+      "type": "text",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "operation": "strip",
+          "description": "Remove leading and trailing whitespace"
+        },
+        {
+          "operation": "lower",
+          "description": "Convert all characters to lowercase"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    }
+  },
+  "ambiguous_scenarios": [
+    {
+      "source_column": "architect",
+      "wrong_target": "secondary_architect_middle",
+      "correct_target": "secondary_architect_last",
+      "wrong_target_reason": "Both columns share the prefix \u2018secondary_architect\u2019, so a generic \u2018architect\u2019 field could plausibly refer to either the middle name/initial or the surname.",
+      "discovery_reason": "The middle column samples are initials or given names (e.g., \u201cL.\u201d, \u201cHenry\u201d, \u201cCoe\u201d), while the last column samples are full surnames (e.g., \u201cEmbury II\u201d, \u201cMeyer\u201d, \u201cBarber\u201d).",
+      "name_similarity_explanation": "'architect' is ambiguous between 'secondary_architect_last' and 'secondary_architect_middle'"
+    },
+    {
+      "source_column": "landscape_architect",
+      "wrong_target": "landscape_architect_middle",
+      "correct_target": "landscape_architect_last",
+      "wrong_target_reason": "Both columns share the prefix 'landscape_architect', so a source field named 'landscape_architect' could plausibly map to either the middle or last name column.",
+      "discovery_reason": "The 'last' column holds surnames like 'Bosworth', 'Clarke', 'Sasaki', whereas the 'middle' column contains initials or organizational entries such as 'D.', 'Presbrey-Leland Inc.', 'Department of Parks and Recreation'.",
+      "name_similarity_explanation": "'landscape_architect' is ambiguous between 'landscape_architect_last' and 'landscape_architect_middle'"
+    }
+  ],
+  "false_positive_scenarios": []
+}

@@ -1,0 +1,276 @@
+{
+  "meta": {
+    "original_table": "City_Government__DSNY_Districts_With_Disposal_Vendor_Assignments",
+    "source_dims": [
+      35,
+      16
+    ],
+    "target_dims": [
+      35,
+      17
+    ],
+    "overlap_rows": 11,
+    "overlap_cols": [
+      "district",
+      "districtcode",
+      "mgp_curb_pri",
+      "mgp_roro37_pri",
+      "pap_ezp_sec",
+      "ref_ezp_sec",
+      "ref_roro_pri",
+      "pap_curb_pri"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 2,
+      "L1": 1,
+      "L3": 4,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 4,
+      "VM2": 3,
+      "VM3": 1
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 11
+  },
+  "matches": [
+    {
+      "source_column": "roro_pri",
+      "target_column": "ref_roro_pri",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "pap_roro_pri",
+        "trap_appeal": "Both column names end in \u201croro_pri\u201d, so a loader mapping \u201croro_pri\u201d could just as easily pick the ref_ version or the pap_ version.",
+        "value_distinguisher": "ref_roro_pri samples are Reworld \u2013 Essex, Southwest MTS, WM-Harlem River, etc., while pap_roro_pri samples are Visy 59th St, Sims \u2013 Bklyn/Bronx/LIC, so they clearly refer to different sets of locations.",
+        "name_similarity_explanation": "'roro_pri' is ambiguous between 'ref_roro_pri' and 'pap_roro_pri'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "curb",
+      "target_column": "pap_curb_pri",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "mgp_curb_sec",
+        "trap_appeal": "Both column names contain the substring \u201ccurb,\u201d so a user selecting \u201ccurb\u201d could easily think it refers to either the PAP curb\u2010pickup or the MGP curb\u2010pickup.",
+        "value_distinguisher": "pap_curb_pri values (e.g. \u201cSims - Bronx,\u201d \u201cVisy 59th St.\u201d) differ from mgp_curb_sec values (e.g. \u201cSims - LIC,\u201d \u201cSims - NJ\u201d).",
+        "name_similarity_explanation": "'curb' is ambiguous between 'pap_curb_pri' and 'mgp_curb_sec'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "district",
+      "target_column": "district",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: { 'prefix': str(x)[:2], 'district_number': int(str(x)[2:]) }"
+    },
+    {
+      "source_column": "DistNum",
+      "target_column": "districtcode",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(int(x)).zfill(3)"
+    },
+    {
+      "source_column": "mgp_curb_pri_src",
+      "target_column": "mgp_curb_pri",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L2",
+      "schema_difficulty_reasoning": "High name similarity with minor syntactic differences",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).split('-', 1)[1].strip() if x and '-' in str(x) else x"
+    },
+    {
+      "source_column": "MGP_R37P",
+      "target_column": "mgp_roro37_pri",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: x.split(' - ')[1].strip() if isinstance(x, str) and ' - ' in x else x"
+    },
+    {
+      "source_column": "pap_ezp_sc",
+      "target_column": "pap_ezp_sec",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "REF_EZPS",
+      "target_column": "ref_ezp_sec",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: str(x).strip()"
+    }
+  ],
+  "value_transformations": {
+    "district": {
+      "original_col": "district",
+      "code": "lambda x: { 'prefix': str(x)[:2], 'district_number': int(str(x)[2:]) }",
+      "description": "Splits the district code into its two-letter prefix and converts the trailing two digits into an integer.",
+      "type": "text",
+      "complexity": "moderate_transform",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "str(x)[:2]",
+          "description": "Extract the first two characters as the prefix"
+        },
+        {
+          "condition": "always",
+          "transform": "int(str(x)[2:])",
+          "description": "Parse the remaining characters as an integer"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "DistNum": {
+      "original_col": "districtcode",
+      "code": "lambda x: str(int(x)).zfill(3)",
+      "description": "Cast the input to integer (to guard against strings like ' 105'), then format it as a three\u2010digit string by adding leading zeros if necessary.",
+      "type": "date",
+      "complexity": "moderate_transform",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "int(x)",
+          "description": "Ensure the value is numeric and drop any stray whitespace or non\u2010digit padding"
+        },
+        {
+          "condition": "always",
+          "transform": "str(...).zfill(3)",
+          "description": "Convert back to string and pad with leading zeros to a width of 3"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "mgp_curb_pri_src": {
+      "original_col": "mgp_curb_pri",
+      "code": "lambda x: str(x).split('-', 1)[1].strip() if x and '-' in str(x) else x",
+      "description": "Extracts the location part after the 'Sims - ' prefix and trims whitespace.",
+      "type": "categorical",
+      "complexity": "moderate_transform",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "operation": "split",
+          "description": "Split the string on the first hyphen to separate prefix and suffix."
+        },
+        {
+          "operation": "strip",
+          "description": "Trim whitespace from the extracted suffix."
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "MGP_R37P": {
+      "original_col": "mgp_roro37_pri",
+      "code": "lambda x: x.split(' - ')[1].strip() if isinstance(x, str) and ' - ' in x else x",
+      "description": "Extracts the location portion after the 'Sims - ' prefix; if the pattern is not present, returns the original value.",
+      "type": "categorical",
+      "complexity": "moderate_transform",
+      "num_operations": 1,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "x is a string and contains ' - '",
+          "transform": "split on ' - ' and take the second element, then strip whitespace",
+          "description": "Extract the location name (e.g., 'Bronx', 'LIC', 'Jersey')."
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "REF_EZPS": {
+      "original_col": "ref_ezp_sec",
+      "code": "lambda x: str(x).strip()",
+      "description": "Remove leading and trailing whitespace from the category values",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "strip()",
+          "description": "Trim leading/trailing whitespace from the string"
+        }
+      ],
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)"
+    }
+  },
+  "ambiguous_scenarios": [
+    {
+      "source_column": "roro_pri",
+      "wrong_target": "pap_roro_pri",
+      "correct_target": "ref_roro_pri",
+      "wrong_target_reason": "Both column names end in \u201croro_pri\u201d, so a loader mapping \u201croro_pri\u201d could just as easily pick the ref_ version or the pap_ version.",
+      "discovery_reason": "ref_roro_pri samples are Reworld \u2013 Essex, Southwest MTS, WM-Harlem River, etc., while pap_roro_pri samples are Visy 59th St, Sims \u2013 Bklyn/Bronx/LIC, so they clearly refer to different sets of locations.",
+      "name_similarity_explanation": "'roro_pri' is ambiguous between 'ref_roro_pri' and 'pap_roro_pri'"
+    },
+    {
+      "source_column": "curb",
+      "wrong_target": "mgp_curb_sec",
+      "correct_target": "pap_curb_pri",
+      "wrong_target_reason": "Both column names contain the substring \u201ccurb,\u201d so a user selecting \u201ccurb\u201d could easily think it refers to either the PAP curb\u2010pickup or the MGP curb\u2010pickup.",
+      "discovery_reason": "pap_curb_pri values (e.g. \u201cSims - Bronx,\u201d \u201cVisy 59th St.\u201d) differ from mgp_curb_sec values (e.g. \u201cSims - LIC,\u201d \u201cSims - NJ\u201d).",
+      "name_similarity_explanation": "'curb' is ambiguous between 'pap_curb_pri' and 'mgp_curb_sec'"
+    }
+  ],
+  "false_positive_scenarios": []
+}

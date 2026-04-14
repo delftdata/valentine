@@ -1,0 +1,78 @@
+{
+  "table_name": "City_Government__DSNY_Districts_With_Disposal_Vendor_Assignments",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 1034.5,
+  "mappings_found": 35,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 8,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 8,
+    "total_ground_truth": 8,
+    "transformation_accuracy": 0.625,
+    "transform_correct": 5,
+    "transform_total": 8,
+    "difficulty_breakdown": {
+      "schema_L4_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "schema_L3_recall": 1.0,
+      "schema_L2_recall": 1.0,
+      "value_VM3_recall": 1.0
+    },
+    "ambiguous_correct": 2,
+    "ambiguous_total": 2,
+    "ambiguous_accuracy": 1.0
+  },
+  "ground_truth_meta": {
+    "original_table": "City_Government__DSNY_Districts_With_Disposal_Vendor_Assignments",
+    "source_dims": [
+      35,
+      16
+    ],
+    "target_dims": [
+      35,
+      17
+    ],
+    "overlap_rows": 11,
+    "overlap_cols": [
+      "district",
+      "districtcode",
+      "mgp_curb_pri",
+      "mgp_roro37_pri",
+      "pap_ezp_sec",
+      "ref_ezp_sec",
+      "ref_roro_pri",
+      "pap_curb_pri"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 2,
+      "L1": 1,
+      "L3": 4,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 4,
+      "VM2": 3,
+      "VM3": 1
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 11
+  },
+  "conversation_stats": {
+    "total_turns": 37,
+    "tool_calls": 35,
+    "accepted_turns": 31,
+    "rejected_turns": 5,
+    "rejection_rate": 0.13513513513513514
+  },
+  "timestamp": "2026-02-11T13:14:50.427117"
+}

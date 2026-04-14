@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "original_table": "Education__COVID-19_Free_Meals_Locations",
+    "source_dims": [
+      187,
+      7
+    ],
+    "target_dims": [
+      187,
+      9
+    ],
+    "overlap_rows": 42,
+    "overlap_cols": [
+      "district",
+      "sfcode",
+      "city",
+      "bldgcode",
+      "siteaddress"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 1,
+      "L1": 2,
+      "L3": 2
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 3,
+      "VM2": 2
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 1,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 8
+  },
+  "matches": [
+    {
+      "source_column": "location",
+      "target_column": "siteaddress",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "longitude",
+        "trap_appeal": "Both an address and a coordinate pair can be described as a 'location', so a generic 'location' field could be mapped mistakenly to either the street address or the longitude value.",
+        "value_distinguisher": "siteaddress samples are textual street addresses (e.g., '421 EAST 106 STREET'), whereas longitude samples are numeric floats around \u201373.7 to \u201373.9.",
+        "name_similarity_explanation": "'location' is ambiguous between 'siteaddress' and 'longitude'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "district",
+      "target_column": "district",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: 'District ' + str(int(x)) if x is not None else None"
+    },
+    {
+      "source_column": "SanFacID",
+      "target_column": "sfcode",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "UrbanZone",
+      "target_column": "city",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().title()"
+    },
+    {
+      "source_column": "bldgcode",
+      "target_column": "bldgcode",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match, no transformation needed",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    }
+  ],
+  "value_transformations": {
+    "district": {
+      "original_col": "district",
+      "code": "lambda x: 'District ' + str(int(x)) if x is not None else None",
+      "description": "Converts each numeric district code to a string with the prefix 'District '",
+      "type": "date",
+      "complexity": "moderate_transform",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "description": "Prefix the integer code with 'District '",
+          "transform": "'District ' + str(int(x))"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)"
+    },
+    "UrbanZone": {
+      "original_col": "city",
+      "code": "lambda x: str(x).strip().title()",
+      "description": "Strips leading/trailing whitespace and converts the city name to title case.",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "strip whitespace",
+          "description": "Removes any leading or trailing spaces from the string."
+        },
+        {
+          "condition": "always",
+          "transform": "title case",
+          "description": "Capitalizes the first letter of each word and lowercases the rest."
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    }
+  },
+  "ambiguous_scenarios": [
+    {
+      "source_column": "location",
+      "wrong_target": "longitude",
+      "correct_target": "siteaddress",
+      "wrong_target_reason": "Both an address and a coordinate pair can be described as a 'location', so a generic 'location' field could be mapped mistakenly to either the street address or the longitude value.",
+      "discovery_reason": "siteaddress samples are textual street addresses (e.g., '421 EAST 106 STREET'), whereas longitude samples are numeric floats around \u201373.7 to \u201373.9.",
+      "name_similarity_explanation": "'location' is ambiguous between 'siteaddress' and 'longitude'"
+    }
+  ],
+  "false_positive_scenarios": []
+}

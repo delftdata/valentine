@@ -70,7 +70,7 @@ Issues = "https://github.com/delftdata/valentine/issues"
 Changelog = "https://github.com/delftdata/valentine/releases"
 
 [tool.setuptools]
-packages = { find = { include = ["valentine*"], exclude = ["tests*", "examples*", "docs*"] } }
+packages = { find = { include = ["valentine*"], exclude = ["tests*", "examples*", "docs*", "experiments*"] } }
 include-package-data = true
 license-files = ["LICENSE"]
 

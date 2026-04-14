@@ -1,0 +1,164 @@
+{
+  "matchers": {
+    "Coma": {
+      "pairs": {
+        "customers": {
+          "seconds": 0.0239,
+          "f1": 0.8889,
+          "n_matches": 5
+        },
+        "orders": {
+          "seconds": 0.0289,
+          "f1": 0.75,
+          "n_matches": 4
+        },
+        "products": {
+          "seconds": 0.0236,
+          "f1": 0.8,
+          "n_matches": 6
+        },
+        "events": {
+          "seconds": 0.0236,
+          "f1": 1.0,
+          "n_matches": 4
+        },
+        "addresses": {
+          "seconds": 0.0201,
+          "f1": 0.8889,
+          "n_matches": 5
+        }
+      },
+      "total_seconds": 0.1201,
+      "worst_seconds": 0.0289,
+      "mean_f1": 0.8656
+    },
+    "Cupid": {
+      "pairs": {
+        "customers": {
+          "seconds": 2.0323,
+          "f1": 0.8889,
+          "n_matches": 6
+        },
+        "orders": {
+          "seconds": 0.0541,
+          "f1": 0.75,
+          "n_matches": 3
+        },
+        "products": {
+          "seconds": 0.0805,
+          "f1": 0.9091,
+          "n_matches": 6
+        },
+        "events": {
+          "seconds": 0.0126,
+          "f1": 1.0,
+          "n_matches": 4
+        },
+        "addresses": {
+          "seconds": 0.0659,
+          "f1": 0.75,
+          "n_matches": 3
+        }
+      },
+      "total_seconds": 2.2454,
+      "worst_seconds": 2.0323,
+      "mean_f1": 0.8596
+    },
+    "DistributionBased": {
+      "pairs": {
+        "customers": {
+          "seconds": 0.0711,
+          "f1": 1.0,
+          "n_matches": 7
+        },
+        "orders": {
+          "seconds": 0.1058,
+          "f1": 0.75,
+          "n_matches": 4
+        },
+        "products": {
+          "seconds": 0.0928,
+          "f1": 0.8,
+          "n_matches": 5
+        },
+        "events": {
+          "seconds": 0.0626,
+          "f1": 1.0,
+          "n_matches": 4
+        },
+        "addresses": {
+          "seconds": 0.0753,
+          "f1": 0.75,
+          "n_matches": 3
+        }
+      },
+      "total_seconds": 0.4076,
+      "worst_seconds": 0.1058,
+      "mean_f1": 0.86
+    },
+    "JaccardDistanceMatcher": {
+      "pairs": {
+        "customers": {
+          "seconds": 0.0106,
+          "f1": 1.0,
+          "n_matches": 7
+        },
+        "orders": {
+          "seconds": 0.0154,
+          "f1": 0.8889,
+          "n_matches": 11
+        },
+        "products": {
+          "seconds": 0.0098,
+          "f1": 1.0,
+          "n_matches": 7
+        },
+        "events": {
+          "seconds": 0.0121,
+          "f1": 1.0,
+          "n_matches": 6
+        },
+        "addresses": {
+          "seconds": 0.0098,
+          "f1": 1.0,
+          "n_matches": 5
+        }
+      },
+      "total_seconds": 0.0577,
+      "worst_seconds": 0.0154,
+      "mean_f1": 0.9778
+    },
+    "SimilarityFlooding": {
+      "pairs": {
+        "customers": {
+          "seconds": 0.0423,
+          "f1": 0.8889,
+          "n_matches": 25
+        },
+        "orders": {
+          "seconds": 0.035,
+          "f1": 0.8889,
+          "n_matches": 25
+        },
+        "products": {
+          "seconds": 0.0596,
+          "f1": 0.9091,
+          "n_matches": 36
+        },
+        "events": {
+          "seconds": 0.0336,
+          "f1": 1.0,
+          "n_matches": 16
+        },
+        "addresses": {
+          "seconds": 0.0372,
+          "f1": 1.0,
+          "n_matches": 25
+        }
+      },
+      "total_seconds": 0.2077,
+      "worst_seconds": 0.0596,
+      "mean_f1": 0.9374
+    }
+  }
+}

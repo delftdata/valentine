@@ -1,0 +1,71 @@
+{
+  "table_name": "Education__COVID-19_Free_Meals_Locations",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 736.4,
+  "mappings_found": 35,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 5,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 5,
+    "total_ground_truth": 5,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 5,
+    "transform_total": 5,
+    "difficulty_breakdown": {
+      "schema_L4_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "schema_L3_recall": 1.0
+    },
+    "ambiguous_correct": 1,
+    "ambiguous_total": 1,
+    "ambiguous_accuracy": 1.0
+  },
+  "ground_truth_meta": {
+    "original_table": "Education__COVID-19_Free_Meals_Locations",
+    "source_dims": [
+      187,
+      7
+    ],
+    "target_dims": [
+      187,
+      9
+    ],
+    "overlap_rows": 42,
+    "overlap_cols": [
+      "district",
+      "sfcode",
+      "city",
+      "bldgcode",
+      "siteaddress"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 1,
+      "L1": 2,
+      "L3": 2
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 3,
+      "VM2": 2
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 1,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 8
+  },
+  "conversation_stats": {
+    "total_turns": 36,
+    "tool_calls": 35,
+    "accepted_turns": 32,
+    "rejected_turns": 3,
+    "rejection_rate": 0.08333333333333333
+  },
+  "timestamp": "2026-02-11T03:22:41.501979"
+}

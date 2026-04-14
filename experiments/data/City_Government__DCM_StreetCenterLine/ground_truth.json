@@ -1,0 +1,293 @@
+{
+  "meta": {
+    "original_table": "City_Government__DCM_StreetCenterLine",
+    "source_dims": [
+      33793,
+      13
+    ],
+    "target_dims": [
+      33794,
+      11
+    ],
+    "overlap_rows": 13526,
+    "overlap_cols": [
+      "borough",
+      "street_nm",
+      "feat_type",
+      "roadway_typ",
+      "record_st",
+      "stair_st",
+      "feat_statu",
+      "old_st_nm"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 1,
+      "L1": 4,
+      "L3": 1,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 1,
+      "VM2": 4,
+      "VM3": 1,
+      "VM5": 1
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 12
+  },
+  "matches": [
+    {
+      "source_column": "st",
+      "target_column": "old_st_nm",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "old_st_nm",
+        "trap_appeal": "Both column names contain the letters \u201cst\u201d and a user might abbreviate either \u201cstatus\u201d or \u201cstreet\u201d to just \u201cst.\u201d",
+        "value_distinguisher": "feat_statu values are uniform codes (always \u201cCity_St\u201d), whereas old_st_nm holds full street names (e.g. \u201cDelancey Street,\u201d \u201c43 Avenue\u201d).",
+        "name_similarity_explanation": "'st' is ambiguous between 'feat_statu' and 'old_st_nm'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "borough",
+      "target_column": "borough",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().title()"
+    },
+    {
+      "source_column": "street_nm",
+      "target_column": "street_nm",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().title()"
+    },
+    {
+      "source_column": "feat_type_id",
+      "target_column": "feat_type",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: 1 if str(x).strip() == 'Mapped_St' else 0"
+    },
+    {
+      "source_column": "roadway_typ",
+      "target_column": "roadway_typ",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).replace('_', ' ').title()"
+    },
+    {
+      "source_column": "record_st",
+      "target_column": "record_st",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM5",
+      "value_mapping_reasoning": "Dictionary learning: Explicit value mapping dictionary inferred from data patterns",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: value_mapping_dict.get(str(x).strip().upper(), None)",
+      "expert_transformation": {
+        "type": "dictionary_learning",
+        "value_mapping_dict": {
+          "Y": true,
+          "N": false
+        },
+        "num_mappings": 2
+      }
+    },
+    {
+      "source_column": "STAIR_ST",
+      "target_column": "stair_st",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L2",
+      "schema_difficulty_reasoning": "High name similarity with minor syntactic differences",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(x).strip().upper()"
+    }
+  ],
+  "value_transformations": {
+    "borough": {
+      "original_col": "borough",
+      "code": "lambda x: str(x).strip().title()",
+      "description": "Trims leading/trailing whitespace and converts to title case (e.g., 'queens ' \u2192 'Queens').",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "N/A",
+          "transform": "str(x).strip()",
+          "description": "Removes leading and trailing whitespace."
+        },
+        {
+          "condition": "N/A",
+          "transform": ".title()",
+          "description": "Converts to title case for consistent capitalization."
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "street_nm": {
+      "original_col": "street_nm",
+      "code": "lambda x: str(x).strip().title()",
+      "description": "Trim leading/trailing whitespace and convert each street name to title case.",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "strip()",
+          "description": "Remove leading and trailing whitespace"
+        },
+        {
+          "condition": "always",
+          "transform": "title()",
+          "description": "Convert to title case (first letter of each word uppercase)"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "feat_type_id": {
+      "original_col": "feat_type",
+      "code": "lambda x: 1 if str(x).strip() == 'Mapped_St' else 0",
+      "description": "Maps 'Mapped_St' to 1 and all other values (e.g., 'Not_mapped') to 0 for modeling purposes.",
+      "type": "categorical",
+      "complexity": "complex_transform",
+      "num_operations": 1,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "str(x).strip() == 'Mapped_St'",
+          "transform": "1",
+          "description": "Assigns 1 when the feature is mapped."
+        },
+        {
+          "condition": "otherwise",
+          "transform": "0",
+          "description": "Assigns 0 when the feature is not mapped or has any other value."
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "roadway_typ": {
+      "original_col": "roadway_typ",
+      "code": "lambda x: str(x).replace('_', ' ').title()",
+      "description": "Replaces underscores with spaces and converts the string to title case.",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "str(x).replace('_', ' ')",
+          "description": "Convert underscore separators into spaces"
+        },
+        {
+          "condition": "always",
+          "transform": ".title()",
+          "description": "Apply title casing to the result"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "record_st": {
+      "original_col": "record_st",
+      "code": "lambda x: value_mapping_dict.get(str(x).strip().upper(), None)",
+      "value_mapping_dict": {
+        "Y": true,
+        "N": false
+      },
+      "description": "Trim whitespace, uppercase the input, then map 'Y'\u2192True and 'N'\u2192False. Returns None for any unexpected value.",
+      "type": "categorical",
+      "complexity": "expert_dictionary",
+      "num_operations": 1,
+      "expert_type": "dictionary_learning",
+      "value_mapping_difficulty": "VM5",
+      "value_mapping_reasoning": "Dictionary learning: Explicit value mapping dictionary inferred from data patterns"
+    },
+    "STAIR_ST": {
+      "original_col": "stair_st",
+      "code": "lambda x: str(x).strip().upper()",
+      "description": "Trim any surrounding whitespace and convert the flag to uppercase for consistency (e.g., ' n' \u2192 'N').",
+      "type": "categorical",
+      "complexity": "simple_format",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "strip()",
+          "description": "Remove leading and trailing whitespace"
+        },
+        {
+          "condition": "always",
+          "transform": "upper()",
+          "description": "Convert to uppercase"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    }
+  },
+  "ambiguous_scenarios": [
+    {
+      "source_column": "st",
+      "wrong_target": "old_st_nm",
+      "correct_target": "feat_statu",
+      "wrong_target_reason": "Both column names contain the letters \u201cst\u201d and a user might abbreviate either \u201cstatus\u201d or \u201cstreet\u201d to just \u201cst.\u201d",
+      "discovery_reason": "feat_statu values are uniform codes (always \u201cCity_St\u201d), whereas old_st_nm holds full street names (e.g. \u201cDelancey Street,\u201d \u201c43 Avenue\u201d).",
+      "name_similarity_explanation": "'st' is ambiguous between 'feat_statu' and 'old_st_nm'"
+    },
+    {
+      "source_column": "st",
+      "wrong_target": "paper_st",
+      "correct_target": "old_st_nm",
+      "wrong_target_reason": "Both column names end with \u201c_st,\u201d which could be read as either \u201cstreet\u201d or an abbreviation for \u201cstatus.\u201d",
+      "discovery_reason": "old_st_nm holds full street names (e.g. \u201cDelancey Street,\u201d \u201c43 Avenue\u201d), whereas paper_st contains boolean-style flags (\u201cN\u201d, \u201cyes\u201d).",
+      "name_similarity_explanation": "'st' is ambiguous between 'old_st_nm' and 'paper_st'"
+    }
+  ],
+  "false_positive_scenarios": []
+}

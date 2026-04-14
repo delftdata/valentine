@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "original_table": "City_Government__NYC_Municipal_Building_Energy_Benchmarking_Results",
+    "source_dims": [
+      1525,
+      9
+    ],
+    "target_dims": [
+      1526,
+      8
+    ],
+    "overlap_rows": 574,
+    "overlap_cols": [
+      "borough",
+      "block",
+      "lot",
+      "bin",
+      "_2014_ghg_emissions_intensity_kgco2e_ft"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 1,
+      "L3": 2,
+      "L2": 1,
+      "L1": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 3,
+      "VM5": 1,
+      "VM2": 1
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 1,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 7
+  },
+  "matches": [
+    {
+      "source_column": "ghg_emissions_intensity",
+      "target_column": "_2014_ghg_emissions_intensity_kgco2e_ft",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "_2010_ghg_emissions_intensity_kgco2e_ft",
+        "trap_appeal": "Both columns contain the exact phrase 'ghg_emissions_intensity' and differ only by the year prefix, making the year omission plausible.",
+        "value_distinguisher": "2010 samples: 5.1, 5.1, 6.2, 7.5, 8.6 vs 2014 samples: 5.3, 5.5, 5.8, 7.1, 9.6 (2014 includes 9.6 and no repeated 5.1).",
+        "name_similarity_explanation": "'ghg_emissions_intensity' is ambiguous between '_2014_ghg_emissions_intensity_kgco2e_ft' and '_2010_ghg_emissions_intensity_kgco2e_ft'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "BRGH_CD",
+      "target_column": "borough",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM5",
+      "value_mapping_reasoning": "Dictionary learning: Explicit value mapping dictionary inferred from data patterns",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: mapping_dict.get(str(int(x)) if x is not None else None, 'Unknown')",
+      "expert_transformation": {
+        "type": "dictionary_learning",
+        "value_mapping_dict": {
+          "1": "Manhattan",
+          "2": "Bronx",
+          "3": "Brooklyn",
+          "4": "Queens",
+          "5": "Staten Island"
+        },
+        "num_mappings": 5
+      }
+    },
+    {
+      "source_column": "src_block",
+      "target_column": "block",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "LOT",
+      "target_column": "lot",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L2",
+      "schema_difficulty_reasoning": "High name similarity with minor syntactic differences",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: pd.to_datetime(x, unit='D', origin='1899-12-30', errors='coerce')"
+    },
+    {
+      "source_column": "bin",
+      "target_column": "bin",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match, no transformation needed",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    }
+  ],
+  "value_transformations": {
+    "BRGH_CD": {
+      "original_col": "borough",
+      "code": "lambda x: mapping_dict.get(str(int(x)) if x is not None else None, 'Unknown')",
+      "value_mapping_dict": {
+        "1": "Manhattan",
+        "2": "Bronx",
+        "3": "Brooklyn",
+        "4": "Queens",
+        "5": "Staten Island"
+      },
+      "description": "Converts numeric borough codes (1\u20135) into their corresponding borough names, defaulting to 'Unknown' for any other or missing code.",
+      "type": "date",
+      "complexity": "expert_dictionary",
+      "num_operations": 1,
+      "expert_type": "dictionary_learning",
+      "value_mapping_difficulty": "VM5",
+      "value_mapping_reasoning": "Dictionary learning: Explicit value mapping dictionary inferred from data patterns"
+    },
+    "LOT": {
+      "original_col": "lot",
+      "code": "lambda x: pd.to_datetime(x, unit='D', origin='1899-12-30', errors='coerce')",
+      "description": "Convert the numeric day-offset (Excel serial) into a proper datetime, using 1899-12-30 as the origin and coercing invalid or missing values to NaT.",
+      "type": "date",
+      "complexity": "moderate_transform",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "transform": "pd.to_datetime(x, unit='D', origin='1899-12-30', errors='coerce')",
+          "description": "Interpret the float as days since 1899-12-30 and convert to pandas.Timestamp"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)"
+    }
+  },
+  "ambiguous_scenarios": [
+    {
+      "source_column": "ghg_emissions_intensity",
+      "wrong_target": "_2010_ghg_emissions_intensity_kgco2e_ft",
+      "correct_target": "_2014_ghg_emissions_intensity_kgco2e_ft",
+      "wrong_target_reason": "Both columns contain the exact phrase 'ghg_emissions_intensity' and differ only by the year prefix, making the year omission plausible.",
+      "discovery_reason": "2010 samples: 5.1, 5.1, 6.2, 7.5, 8.6 vs 2014 samples: 5.3, 5.5, 5.8, 7.1, 9.6 (2014 includes 9.6 and no repeated 5.1).",
+      "name_similarity_explanation": "'ghg_emissions_intensity' is ambiguous between '_2014_ghg_emissions_intensity_kgco2e_ft' and '_2010_ghg_emissions_intensity_kgco2e_ft'"
+    }
+  ],
+  "false_positive_scenarios": []
+}

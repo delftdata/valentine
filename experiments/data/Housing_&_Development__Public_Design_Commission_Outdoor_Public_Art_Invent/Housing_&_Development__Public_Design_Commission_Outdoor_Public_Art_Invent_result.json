@@ -1,0 +1,83 @@
+{
+  "table_name": "Housing_&_Development__Public_Design_Commission_Outdoor_Public_Art_Invent",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 943.4,
+  "mappings_found": 34,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 15,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 15,
+    "total_ground_truth": 15,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 15,
+    "transform_total": 15,
+    "difficulty_breakdown": {
+      "schema_L4_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L3_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "value_VM3_recall": 1.0
+    },
+    "ambiguous_correct": 2,
+    "ambiguous_total": 2,
+    "ambiguous_accuracy": 1.0
+  },
+  "ground_truth_meta": {
+    "original_table": "Housing_&_Development__Public_Design_Commission_Outdoor_Public_Art_Invent",
+    "source_dims": [
+      434,
+      24
+    ],
+    "target_dims": [
+      434,
+      34
+    ],
+    "overlap_rows": 88,
+    "overlap_cols": [
+      "borough",
+      "block",
+      "lot",
+      "foundry",
+      "state",
+      "primary_artist_first",
+      "date_created_approximation",
+      "primary_architect_middle",
+      "inscription",
+      "pdc_records",
+      "artwork_type1",
+      "material",
+      "subject_keyword",
+      "secondary_architect_last",
+      "landscape_architect_last"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 2,
+      "L3": 11,
+      "L1": 2
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 7,
+      "VM2": 5,
+      "VM3": 3
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 15
+  },
+  "conversation_stats": {
+    "total_turns": 39,
+    "tool_calls": 34,
+    "accepted_turns": 31,
+    "rejected_turns": 7,
+    "rejection_rate": 0.1794871794871795
+  },
+  "timestamp": "2026-02-11T13:52:09.854723"
+}

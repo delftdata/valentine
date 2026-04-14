@@ -1,0 +1,80 @@
+{
+  "table_name": "City_Government__DCM_StreetCenterLine",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 1450.1,
+  "mappings_found": 30,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 7,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 7,
+    "total_ground_truth": 7,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 7,
+    "transform_total": 7,
+    "difficulty_breakdown": {
+      "schema_L4_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "value_VM2_recall": 1.0,
+      "schema_L3_recall": 1.0,
+      "value_VM3_recall": 1.0,
+      "value_VM5_recall": 1.0,
+      "schema_L2_recall": 1.0
+    },
+    "ambiguous_correct": 1,
+    "ambiguous_total": 2,
+    "ambiguous_accuracy": 0.5
+  },
+  "ground_truth_meta": {
+    "original_table": "City_Government__DCM_StreetCenterLine",
+    "source_dims": [
+      33793,
+      13
+    ],
+    "target_dims": [
+      33794,
+      11
+    ],
+    "overlap_rows": 13526,
+    "overlap_cols": [
+      "borough",
+      "street_nm",
+      "feat_type",
+      "roadway_typ",
+      "record_st",
+      "stair_st",
+      "feat_statu",
+      "old_st_nm"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 1,
+      "L1": 4,
+      "L3": 1,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 1,
+      "VM2": 4,
+      "VM3": 1,
+      "VM5": 1
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 12
+  },
+  "conversation_stats": {
+    "total_turns": 31,
+    "tool_calls": 30,
+    "accepted_turns": 29,
+    "rejected_turns": 2,
+    "rejection_rate": 0.06451612903225806
+  },
+  "timestamp": "2026-02-11T01:57:37.235588"
+}

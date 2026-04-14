@@ -5,7 +5,7 @@ polars==1.39.3
 nltk==3.9.4
 anytree==2.13.0
 networkx==3.6.1
-chardet==7.4.1
+chardet==7.4.3
 rapidfuzz==3.14.5
 PuLP==3.3.0
 POT==0.9.6.post1

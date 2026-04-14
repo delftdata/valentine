@@ -1,0 +1,333 @@
+{
+  "meta": {
+    "original_table": "City_Government__DPR_AthleticFacilities_001",
+    "source_dims": [
+      4152,
+      30
+    ],
+    "target_dims": [
+      4153,
+      25
+    ],
+    "overlap_rows": 1449,
+    "overlap_cols": [
+      "gispropnum",
+      "system",
+      "maintenanceagreement",
+      "track_and_field",
+      "volleyball",
+      "adult_football",
+      "accessible",
+      "hockey",
+      "stlength",
+      "field_lighted"
+    ],
+    "schema_difficulty_distribution": {
+      "L1": 3,
+      "L3": 6,
+      "L2": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM2": 3,
+      "VM1": 4,
+      "VM3": 3
+    },
+    "has_ambiguous_mappings": false,
+    "num_ambiguous": 0,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 11
+  },
+  "matches": [
+    {
+      "source_column": "gispropnum",
+      "target_column": "gispropnum",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: (str(x)[0], int(''.join([c for c in str(x) if c.isdigit()])))"
+    },
+    {
+      "source_column": "SysRef",
+      "target_column": "system",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    },
+    {
+      "source_column": "maintenanceagreement",
+      "target_column": "maintenanceagreement",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: int(x)"
+    },
+    {
+      "source_column": "tbl_track_and_field",
+      "target_column": "track_and_field",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L2",
+      "schema_difficulty_reasoning": "High name similarity with minor syntactic differences",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: int(x)"
+    },
+    {
+      "source_column": "Volly",
+      "target_column": "volleyball",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: 1 if str(x).strip().lower() == 'true' else 0 if str(x).strip().lower() == 'false' else None"
+    },
+    {
+      "source_column": "adult_football_id",
+      "target_column": "adult_football",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "'AFB' if x else 'NONE'"
+    },
+    {
+      "source_column": "accessible_code",
+      "target_column": "accessible",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: 1 if str(x).strip().lower() in ('true','1','yes') else 0"
+    },
+    {
+      "source_column": "hockey",
+      "target_column": "hockey",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: 1 if str(x).strip().lower() == 'true' else 0"
+    },
+    {
+      "source_column": "LnMeters",
+      "target_column": "stlength",
+      "confidence": 1.0,
+      "match_type": "semantic_llm",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: str(__import__('datetime').timedelta(days=float(x)))"
+    },
+    {
+      "source_column": "field_lighted_new",
+      "target_column": "field_lighted",
+      "confidence": 1.0,
+      "match_type": "syntactic_noise",
+      "schema_difficulty": "L3",
+      "schema_difficulty_reasoning": "Requires semantic matching and careful analysis",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation needed",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null
+    }
+  ],
+  "value_transformations": {
+    "gispropnum": {
+      "original_col": "gispropnum",
+      "code": "lambda x: (str(x)[0], int(''.join([c for c in str(x) if c.isdigit()])))",
+      "description": "Splits the code into its alphabetic prefix and numeric part, returning a tuple(prefix, number). Non\u2010digit characters are stripped before converting the numeric portion to an integer.",
+      "type": "categorical",
+      "complexity": "moderate_transform",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "str(x)[0]",
+          "description": "Extract the first character as the prefix"
+        },
+        {
+          "condition": "always",
+          "transform": "int(''.join([c for c in str(x) if c.isdigit()]))",
+          "description": "Gather all digits into a string and convert to integer"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "maintenanceagreement": {
+      "original_col": "maintenanceagreement",
+      "code": "lambda x: int(x)",
+      "description": "Convert boolean values to integers: True\u21921, False\u21920",
+      "type": "categorical_numeric",
+      "complexity": "simple_format",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "none",
+          "transform": "int(x)",
+          "description": "Cast the boolean value directly to an integer"
+        }
+      ],
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)"
+    },
+    "tbl_track_and_field": {
+      "original_col": "track_and_field",
+      "code": "lambda x: int(x)",
+      "description": "Cast boolean values to integers (False\u21920, True\u21921)",
+      "type": "categorical_numeric",
+      "complexity": "simple_format",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "int(x)",
+          "description": "Convert the boolean to its integer equivalent"
+        }
+      ],
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)"
+    },
+    "Volly": {
+      "original_col": "volleyball",
+      "code": "lambda x: 1 if str(x).strip().lower() == 'true' else 0 if str(x).strip().lower() == 'false' else None",
+      "description": "Convert boolean-like strings into binary numeric values: 'True'\u21921, 'False'\u21920, others\u2192None.",
+      "type": "categorical_numeric",
+      "complexity": "complex_transform",
+      "num_operations": 1,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "str(x).strip().lower() == 'true'",
+          "transform": "1",
+          "description": "Map True to 1"
+        },
+        {
+          "condition": "str(x).strip().lower() == 'false'",
+          "transform": "0",
+          "description": "Map False to 0"
+        },
+        {
+          "condition": "else",
+          "transform": "None",
+          "description": "Any other value set to None"
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "adult_football_id": {
+      "original_col": "adult_football",
+      "code": "'AFB' if x else 'NONE'",
+      "description": "LLM enrichment transformation",
+      "type": "categorical_numeric",
+      "complexity": "moderate_transform",
+      "num_operations": 1,
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)"
+    },
+    "accessible_code": {
+      "original_col": "accessible",
+      "code": "lambda x: 1 if str(x).strip().lower() in ('true','1','yes') else 0",
+      "description": "Map boolean\u2010like inputs (string or native bool) to numeric flags: 1 for truthy values, 0 otherwise.",
+      "type": "categorical_numeric",
+      "complexity": "complex_transform",
+      "num_operations": 2,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "str(x).strip().lower() in ('true','1','yes')",
+          "transform": "1",
+          "description": "If the input represents a true value, return 1."
+        },
+        {
+          "condition": "otherwise",
+          "transform": "0",
+          "description": "All other values are treated as false and mapped to 0."
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "hockey": {
+      "original_col": "hockey",
+      "code": "lambda x: 1 if str(x).strip().lower() == 'true' else 0",
+      "description": "Convert boolean-like values (True/False) to numeric flags (1/0).",
+      "type": "categorical_numeric",
+      "complexity": "complex_transform",
+      "num_operations": 1,
+      "has_conditional_logic": true,
+      "operations": [
+        {
+          "condition": "str(x).strip().lower() == 'true'",
+          "transform": "1",
+          "description": "If the (possibly string) value represents True, output 1"
+        },
+        {
+          "condition": "else",
+          "transform": "0",
+          "description": "For any other value (including 'False'), output 0"
+        }
+      ],
+      "value_mapping_difficulty": "VM3",
+      "value_mapping_reasoning": "Complex transformation requiring conditional logic or multiple dependent operations"
+    },
+    "LnMeters": {
+      "original_col": "stlength",
+      "code": "lambda x: str(__import__('datetime').timedelta(days=float(x)))",
+      "description": "Converts a float representing days (including fractional part) into a human\u2010readable string of the form 'D days, HH:MM:SS'.",
+      "type": "date",
+      "complexity": "moderate_transform",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "float(x)",
+          "description": "Cast the input value to float."
+        },
+        {
+          "condition": "after casting",
+          "transform": "datetime.timedelta(days=cast_value)",
+          "description": "Convert the float days to a timedelta and then to string."
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    }
+  },
+  "ambiguous_scenarios": [],
+  "false_positive_scenarios": []
+}

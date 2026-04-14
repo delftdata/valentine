@@ -1,0 +1,185 @@
+{
+  "meta": {
+    "original_table": "City_Government__Capital_Projects",
+    "source_dims": [
+      1962,
+      11
+    ],
+    "target_dims": [
+      1963,
+      10
+    ],
+    "overlap_rows": 605,
+    "overlap_cols": [
+      "pid",
+      "date_reported_as_of",
+      "forecast_completion",
+      "total_schedule_changes",
+      "total_budget_changes"
+    ],
+    "schema_difficulty_distribution": {
+      "L4": 2,
+      "L1": 3
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 3,
+      "VM2": 2
+    },
+    "has_ambiguous_mappings": true,
+    "num_ambiguous": 2,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 9
+  },
+  "matches": [
+    {
+      "source_column": "total_changes",
+      "target_column": "total_schedule_changes",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "total_budget_changes",
+        "trap_appeal": "Both columns share the prefix \u201ctotal_\u201d and suffix \u201c_changes,\u201d so dropping the middle word yields \u201ctotal_changes,\u201d which looks like a natural simplification of either name.",
+        "value_distinguisher": "The schedule changes values (e.g., 916.0, 2086.0, 2252.0) are small integer counts, whereas the budget changes are large monetary floats (e.g., 6,752,000.0; \u201310,555,000.0; 73,735,148.87).",
+        "name_similarity_explanation": "'total_changes' is ambiguous between 'total_schedule_changes' and 'total_budget_changes'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "changes",
+      "target_column": "total_budget_changes",
+      "confidence": 1.0,
+      "match_type": "ambiguous_llm",
+      "schema_difficulty": "L4",
+      "schema_difficulty_reasoning": "Ambiguous mapping requiring value analysis to disambiguate",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "No value transformation (identity mapping)",
+      "value_mapping_num_operations": 0,
+      "transformation_code": null,
+      "ambiguous_config": {
+        "trap_target": "latest_schedule_changes",
+        "trap_appeal": "Both target columns share the suffix '_changes', so a source field named 'changes' could reasonably map to either budget or schedule adjustments.",
+        "value_distinguisher": "total_budget_changes values are large floats in the millions (e.g. 67,520,00.0; 142,277,136.0; -10,555,000.0), whereas latest_schedule_changes are small numbers (e.g. 0.0; 197.0; 337.0) representing days.",
+        "name_similarity_explanation": "'changes' is ambiguous between 'total_budget_changes' and 'latest_schedule_changes'",
+        "requires_backtrack": true
+      }
+    },
+    {
+      "source_column": "pid",
+      "target_column": "pid",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)",
+      "value_mapping_num_operations": 2,
+      "transformation_code": "lambda x: (pd.to_datetime('1899-12-30') + pd.to_timedelta(int(x), unit='D')).date()"
+    },
+    {
+      "source_column": "date_reported_as_of",
+      "target_column": "date_reported_as_of",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: str(x).split('T')[0]"
+    },
+    {
+      "source_column": "forecast_completion",
+      "target_column": "forecast_completion",
+      "confidence": 1.0,
+      "match_type": "exact",
+      "schema_difficulty": "L1",
+      "schema_difficulty_reasoning": "Exact name match with value transformation",
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)",
+      "value_mapping_num_operations": 1,
+      "transformation_code": "lambda x: str(x).split('T')[0] if x is not None else None"
+    }
+  ],
+  "value_transformations": {
+    "pid": {
+      "original_col": "pid",
+      "code": "lambda x: (pd.to_datetime('1899-12-30') + pd.to_timedelta(int(x), unit='D')).date()",
+      "description": "Converts an Excel\u2010style serial date (days since 1899-12-30) into a Python date object.",
+      "type": "date",
+      "complexity": "moderate_transform",
+      "num_operations": 2,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "add x days to the base date '1899-12-30'",
+          "description": "Interprets the integer as days since the base to produce a datetime"
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Two simple operations or moderate transformation (e.g., strip + case, unit conversion + round)"
+    },
+    "date_reported_as_of": {
+      "original_col": "date_reported_as_of",
+      "code": "lambda x: str(x).split('T')[0]",
+      "description": "Removes the time and milliseconds portion from an ISO timestamp, leaving only the date (YYYY-MM-DD).",
+      "type": "date",
+      "complexity": "simple_format",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "always",
+          "transform": "split at 'T' and take the first element",
+          "description": "Extracts the date portion from the timestamp string"
+        }
+      ],
+      "value_mapping_difficulty": "VM1",
+      "value_mapping_reasoning": "Single simple format operation (e.g., case change, whitespace trim, multiply by constant)"
+    },
+    "forecast_completion": {
+      "original_col": "forecast_completion",
+      "code": "lambda x: str(x).split('T')[0] if x is not None else None",
+      "description": "Extracts the date portion (YYYY-MM-DD) from an ISO 8601 datetime string by removing the time and milliseconds.",
+      "type": "date",
+      "complexity": "moderate_transform",
+      "num_operations": 1,
+      "has_conditional_logic": false,
+      "operations": [
+        {
+          "condition": "x is not None",
+          "transform": "str(x).split('T')[0]",
+          "description": "Split on 'T' and take the first element to get the date."
+        }
+      ],
+      "value_mapping_difficulty": "VM2",
+      "value_mapping_reasoning": "Moderate transformation operation (e.g., substring extraction, replace, split)"
+    }
+  },
+  "ambiguous_scenarios": [
+    {
+      "source_column": "total_changes",
+      "wrong_target": "total_budget_changes",
+      "correct_target": "total_schedule_changes",
+      "wrong_target_reason": "Both columns share the prefix \u201ctotal_\u201d and suffix \u201c_changes,\u201d so dropping the middle word yields \u201ctotal_changes,\u201d which looks like a natural simplification of either name.",
+      "discovery_reason": "The schedule changes values (e.g., 916.0, 2086.0, 2252.0) are small integer counts, whereas the budget changes are large monetary floats (e.g., 6,752,000.0; \u201310,555,000.0; 73,735,148.87).",
+      "name_similarity_explanation": "'total_changes' is ambiguous between 'total_schedule_changes' and 'total_budget_changes'"
+    },
+    {
+      "source_column": "changes",
+      "wrong_target": "latest_schedule_changes",
+      "correct_target": "total_budget_changes",
+      "wrong_target_reason": "Both target columns share the suffix '_changes', so a source field named 'changes' could reasonably map to either budget or schedule adjustments.",
+      "discovery_reason": "total_budget_changes values are large floats in the millions (e.g. 67,520,00.0; 142,277,136.0; -10,555,000.0), whereas latest_schedule_changes are small numbers (e.g. 0.0; 197.0; 337.0) representing days.",
+      "name_similarity_explanation": "'changes' is ambiguous between 'total_budget_changes' and 'latest_schedule_changes'"
+    }
+  ],
+  "false_positive_scenarios": []
+}

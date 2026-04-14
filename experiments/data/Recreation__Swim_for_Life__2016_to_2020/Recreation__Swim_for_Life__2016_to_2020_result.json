@@ -1,0 +1,66 @@
+{
+  "table_name": "Recreation__Swim_for_Life:_2016_to_2020",
+  "status": "success",
+  "agent_mode": "langchain_multi_agent_trajectory",
+  "runtime_seconds": 421.1,
+  "mappings_found": 17,
+  "metrics": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "true_positives": 5,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "total_predicted": 5,
+    "total_ground_truth": 5,
+    "transformation_accuracy": 1.0,
+    "transform_correct": 5,
+    "transform_total": 5,
+    "difficulty_breakdown": {
+      "schema_L3_recall": 1.0,
+      "value_VM1_recall": 1.0,
+      "schema_L1_recall": 1.0,
+      "value_VM3_recall": 1.0
+    }
+  },
+  "ground_truth_meta": {
+    "original_table": "Recreation__Swim_for_Life:_2016_to_2020",
+    "source_dims": [
+      11044,
+      8
+    ],
+    "target_dims": [
+      11045,
+      10
+    ],
+    "overlap_rows": 2437,
+    "overlap_cols": [
+      "training_entity",
+      "training_site",
+      "school_year",
+      "session",
+      "class_number"
+    ],
+    "schema_difficulty_distribution": {
+      "L3": 4,
+      "L1": 1
+    },
+    "value_mapping_difficulty_distribution": {
+      "VM1": 4,
+      "VM3": 1
+    },
+    "has_ambiguous_mappings": false,
+    "num_ambiguous": 0,
+    "has_false_positives": false,
+    "num_false_positives": 0,
+    "llm_calls": 5
+  },
+  "conversation_stats": {
+    "total_turns": 18,
+    "tool_calls": 17,
+    "accepted_turns": 16,
+    "rejected_turns": 1,
+    "rejection_rate": 0.05555555555555555
+  },
+  "timestamp": "2026-02-11T04:03:51.771475"
+}
