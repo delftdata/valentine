@@ -23,10 +23,10 @@ _TOKEN_PATTERNS = re.compile(
 )
 
 # Minimum length for the short side of an abbreviation pair.
-_MIN_ABBREV_LEN = 3
+_MIN_ABBREV_LEN = 2
 # The short token must cover at least this fraction of the long token
 # to be considered an abbreviation (avoids spurious matches like
-# "cat" → "concatenation").
+# "at" → "attention").
 _MIN_COVERAGE = 0.3
 
 
@@ -78,6 +78,10 @@ def _is_abbreviation_of(a: str, b: str) -> bool:
     True
     >>> _is_abbreviation_of("qty", "quantity")
     True
+    >>> _is_abbreviation_of("st", "street")
+    True
+    >>> _is_abbreviation_of("dr", "drive")
+    True
     >>> _is_abbreviation_of("cat", "customer")
     False
     """
@@ -95,8 +99,10 @@ def _is_abbreviation_of(a: str, b: str) -> bool:
     return _is_subsequence(short, long)
 
 
-def _soft_jaccard(tokens1: tuple[str, ...], tokens2: tuple[str, ...]) -> float:
-    """Jaccard-like similarity with generic abbreviation matching.
+def _soft_dice(tokens1: tuple[str, ...], tokens2: tuple[str, ...]) -> float:
+    """Dice-Sørensen similarity with generic abbreviation matching.
+
+    ``2 * |intersection| / (|A| + |B|)``
 
     Instead of requiring exact token equality for the intersection,
     tokens from one set can match tokens in the other via
@@ -120,52 +126,15 @@ def _soft_jaccard(tokens1: tuple[str, ...], tokens2: tuple[str, ...]) -> float:
                 break
     if matched == 0:
         return 0.0
-    return matched / (len(tokens1) + len(tokens2) - matched)
-
-
-def _containment_bonus(tokens1: tuple[str, ...], tokens2: tuple[str, ...]) -> float:
-    """Return a bonus when all tokens from one side appear in the other.
-
-    This catches cases like ``curb`` ⊂ ``pap_curb_pri`` or
-    ``ArtForm`` ⊂ ``artwork_type1`` where soft Jaccard penalises the
-    unmatched tokens on the longer side but the short side is fully
-    contained.
-
-    Returns a value in [0, 0.15] that is added to the base Jaccard
-    score. The bonus is proportional to how much of the longer side
-    is covered, so ``curb`` in a 3-token name gets less than ``art form``
-    in a 3-token name.
-    """
-    if not tokens1 or not tokens2:
-        return 0.0
-    short, long = (tokens1, tokens2) if len(tokens1) <= len(tokens2) else (tokens2, tokens1)
-    # Check if every token in the short side has a match in the long side
-    long_list = list(long)
-    used: set[int] = set()
-    for t in short:
-        found = False
-        for j, t2 in enumerate(long_list):
-            if j not in used and _is_abbreviation_of(t, t2):
-                used.add(j)
-                found = True
-                break
-        if not found:
-            return 0.0
-    # All short tokens matched — bonus scaled by coverage ratio
-    coverage = len(short) / len(long)
-    return 0.15 * coverage
+    return 2 * matched / (len(tokens1) + len(tokens2))
 
 
 def tokens_similarity(name1: str, name2: str) -> float:
     """Token-level similarity between two column names.
 
-    Uses soft Jaccard with generic abbreviation detection, plus a
-    containment bonus when all tokens from one name appear within the
-    other. This catches partial matches like ``curb`` inside
-    ``pap_curb_pri``.
+    Uses the Dice-Sørensen coefficient with generic abbreviation
+    detection to compare tokenised column names.
     """
     t1 = tokenize_name(name1)
     t2 = tokenize_name(name2)
-    base = _soft_jaccard(t1, t2)
-    bonus = _containment_bonus(t1, t2)
-    return min(base + bonus, 1.0)
+    return _soft_dice(t1, t2)

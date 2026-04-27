@@ -68,21 +68,9 @@ _FAMILY_INT = 1
 _FAMILY_FLOAT = 2
 _FAMILY_DATE = 3
 
-# Cross-family compatibility scores.  Same family = 1.0 (handled separately).
-# int↔float are closely related (0.8); text↔int has a small bridge (0.1,
-# matching the original table's varchar↔int entry); everything else is 0.0.
-_CROSS_FAMILY = {
-    (_FAMILY_INT, _FAMILY_FLOAT): 0.8,
-    (_FAMILY_FLOAT, _FAMILY_INT): 0.8,
-    (_FAMILY_TEXT, _FAMILY_INT): 0.1,
-    (_FAMILY_INT, _FAMILY_TEXT): 0.1,
-    (_FAMILY_TEXT, _FAMILY_FLOAT): 0.1,
-    (_FAMILY_FLOAT, _FAMILY_TEXT): 0.1,
-    (_FAMILY_DATE, _FAMILY_INT): 0.1,
-    (_FAMILY_INT, _FAMILY_DATE): 0.1,
-    (_FAMILY_DATE, _FAMILY_FLOAT): 0.1,
-    (_FAMILY_FLOAT, _FAMILY_DATE): 0.1,
-}
+# Cross-family compatibility: binary — different family = 0.0.
+# Same family = 1.0 (handled separately in datatype_compatibility).
+_CROSS_FAMILY: dict[tuple[int, int], float] = {}
 
 
 _FAMILY_GROUPS = (

@@ -51,7 +51,7 @@ from valentine.algorithms import (
     JaccardDistanceMatcher,
     SimilarityFlooding,
 )
-from valentine.metrics import F1Score
+from valentine.metrics import F1Score, MeanReciprocalRank, RecallAtSizeofGroundTruth
 
 try:
     from pyinstrument import Profiler  # type: ignore[import-not-found]
@@ -68,7 +68,8 @@ MatcherFactory = Callable[[], BaseMatcher]
 
 def _matcher_builders() -> list[tuple[str, MatcherFactory]]:
     return [
-        ("Coma", lambda: Coma(use_instances=True)),
+        ("Coma", Coma),
+        ("Coma_Inst", lambda: Coma(use_instances=True)),
         ("Cupid", Cupid),
         ("DistributionBased", DistributionBased),
         ("JaccardDistanceMatcher", JaccardDistanceMatcher),
@@ -352,11 +353,18 @@ def _convert_pairs_to_polars(pairs: list[SyntheticPair]) -> list[SyntheticPair]:
 # ---------------------------------------------------------------------------
 
 
-def _f1(matches, ground_truth: list[tuple[str, str]]) -> float | None:
+_BENCH_METRICS = {F1Score(), RecallAtSizeofGroundTruth(), MeanReciprocalRank()}
+
+
+def _compute_metrics(matches, ground_truth: list[tuple[str, str]]) -> dict[str, float | None]:
     if not ground_truth:
-        return None
-    metrics = matches.get_metrics(ground_truth, metrics={F1Score()})
-    return float(next(iter(metrics.values())))
+        return {"f1": None, "recall_at_gt": None, "mrr": None}
+    raw = matches.get_metrics(ground_truth, metrics=_BENCH_METRICS)
+    return {
+        "f1": round(raw.get("F1Score", 0.0), 4),
+        "recall_at_gt": round(raw.get("RecallAtSizeofGroundTruth", 0.0), 4),
+        "mrr": round(raw.get("MeanReciprocalRank", 0.0), 4),
+    }
 
 
 def _run_bench(
@@ -393,22 +401,25 @@ def _run_bench(
                 out = profile_dir / f"{pair.name}__{matcher_name}.html"
                 out.write_text(profiler.output_html(), encoding="utf-8")
 
-            f1 = _f1(matches, pair.ground_truth)
+            metrics = _compute_metrics(matches, pair.ground_truth)
             per_matcher[matcher_name]["pairs"][pair.name] = {
                 "seconds": round(elapsed, 4),
-                "f1": None if f1 is None else round(f1, 4),
                 "n_matches": len(matches),
+                **metrics,
             }
-            f1_str = "n/a" if f1 is None else f"{f1:.3f}"
-            print(f"  {matcher_name:25s} {elapsed:7.2f}s  F1={f1_str}")
+            f1_str = "n/a" if metrics["f1"] is None else f"{metrics['f1']:.3f}"
+            mrr_str = "n/a" if metrics["mrr"] is None else f"{metrics['mrr']:.3f}"
+            print(f"  {matcher_name:25s} {elapsed:7.2f}s  F1={f1_str}  MRR={mrr_str}")
 
     # Aggregate
     for entry in per_matcher.values():
         seconds = [p["seconds"] for p in entry["pairs"].values()]
         f1s = [p["f1"] for p in entry["pairs"].values() if p["f1"] is not None]
+        mrrs = [p["mrr"] for p in entry["pairs"].values() if p["mrr"] is not None]
         entry["total_seconds"] = round(sum(seconds), 4)
         entry["worst_seconds"] = round(max(seconds), 4)
         entry["mean_f1"] = round(statistics.fmean(f1s), 4) if f1s else None
+        entry["mean_mrr"] = round(statistics.fmean(mrrs), 4) if mrrs else None
 
     return {"matchers": per_matcher}
 
@@ -443,16 +454,22 @@ def _compare_accuracy(
             if base_pair is None:
                 continue
 
-            cur_f1 = cur_pair.get("f1")
-            base_f1 = base_pair.get("f1")
-            if cur_f1 is not None and base_f1 is not None and abs(cur_f1 - base_f1) > f1_tolerance:
-                delta = cur_f1 - base_f1
-                tag = "IMPROVED" if delta > 0 else "REGRESSION"
-                lines.append(
-                    f"  {matcher_name}/{pair_name}: "
-                    f"F1 {base_f1:.4f} -> {cur_f1:.4f} ({delta:+.4f})  [{tag}]"
-                )
-                changed = True
+            for metric_key in ("f1", "recall_at_gt", "mrr"):
+                cur_val = cur_pair.get(metric_key)
+                base_val = base_pair.get(metric_key)
+                if (
+                    cur_val is not None
+                    and base_val is not None
+                    and abs(cur_val - base_val) > f1_tolerance
+                ):
+                    delta = cur_val - base_val
+                    tag = "IMPROVED" if delta > 0 else "REGRESSION"
+                    lines.append(
+                        f"  {matcher_name}/{pair_name}: "
+                        f"{metric_key} {base_val:.4f} -> {cur_val:.4f} "
+                        f"({delta:+.4f})  [{tag}]"
+                    )
+                    changed = True
 
             cur_n = cur_pair.get("n_matches")
             base_n = base_pair.get("n_matches")
@@ -575,10 +592,12 @@ def main() -> int:
     print("\nTotals:")
     for matcher_name, data in results["matchers"].items():
         f1 = data["mean_f1"]
+        mrr = data.get("mean_mrr")
         f1_str = "n/a" if f1 is None else f"{f1:.3f}"
+        mrr_str = "n/a" if mrr is None else f"{mrr:.3f}"
         print(
             f"  {matcher_name:25s} total {data['total_seconds']:7.2f}s "
-            f"worst {data['worst_seconds']:6.2f}s  mean F1={f1_str}"
+            f"worst {data['worst_seconds']:6.2f}s  mean F1={f1_str}  mean MRR={mrr_str}"
         )
 
     if args.output:

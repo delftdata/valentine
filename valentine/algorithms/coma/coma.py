@@ -60,6 +60,9 @@ class Coma(BaseMatcher):
         best match for that column (default: 0.15).
     threshold : float, optional
         Absolute minimum similarity score to keep a match (default: 0.0).
+    instance_weight : float, optional
+        Weight for the instance matcher relative to schema matchers
+        (which always have weight 1.0). Default: 1.0 (uniform).
     """
 
     def __init__(
@@ -69,6 +72,7 @@ class Coma(BaseMatcher):
         use_schema: bool = True,
         delta: float = 0.15,
         threshold: float = 0.0,
+        instance_weight: float = 1.0,
     ):
         if not use_schema and not use_instances:
             raise ValueError("At least one of use_schema or use_instances must be True")
@@ -77,6 +81,7 @@ class Coma(BaseMatcher):
             raise ValueError(f"max_n must be >= 0, got {self.__max_n}")
         self.__use_instances = use_instances
         self.__use_schema = use_schema
+        self.__instance_weight = float(instance_weight)
         self.__delta = float(delta)
         self.__threshold = float(threshold)
         if not 0.0 <= self.__delta <= 1.0:
@@ -135,15 +140,9 @@ class Coma(BaseMatcher):
             use_instances=self.__use_instances,
         )
 
-        # Weight the instance matcher more heavily than the schema-only
-        # matchers when instances are enabled. Under the prior uniform
-        # average, InstancesCM was diluted to 1/N of the final score,
-        # even though instance evidence is often the only way to
-        # disambiguate name-similar columns (e.g. primary_artist_middle
-        # vs primary_artist_first). The 3.0 weight was tuned against
-        # the NYU benchmark suite and improved mean F1 without
-        # introducing any per-dataset regressions.
-        matcher_weights = [1.3 if cm.name == "InstancesCM" else 1.0 for cm in complex_matchers]
+        matcher_weights = [
+            self.__instance_weight if cm.name == "InstancesCM" else 1.0 for cm in complex_matchers
+        ]
 
         # Compute all-pairs similarity matrix and collect per-matcher details
         sim_matrix: dict[tuple, float] = {}

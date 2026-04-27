@@ -33,7 +33,6 @@ NAME_MATCHABLE = [
     ("fname", "first_name"),
     ("lname", "last_name"),
     ("dept", "department"),
-    ("hire_date", "start_date"),
 ]
 
 

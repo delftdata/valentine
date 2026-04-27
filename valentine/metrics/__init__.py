@@ -1,6 +1,7 @@
 from .base_metric import Metric
 from .metrics import (
     F1Score,
+    MeanReciprocalRank,
     Precision,
     PrecisionTopNPercent,
     Recall,
@@ -13,6 +14,7 @@ __all__ = [
     "METRICS_PRECISION_INCREASING_N",
     "METRICS_PRECISION_RECALL",
     "F1Score",
+    "MeanReciprocalRank",
     "Metric",
     "Precision",
     "PrecisionTopNPercent",
@@ -35,6 +37,7 @@ METRICS_ALL = {
     F1Score(one_to_one=False),
     PrecisionTopNPercent(),
     RecallAtSizeofGroundTruth(),
+    MeanReciprocalRank(),
 }
 METRICS_CORE = {
     Precision(),
@@ -42,6 +45,7 @@ METRICS_CORE = {
     F1Score(),
     PrecisionTopNPercent(),
     RecallAtSizeofGroundTruth(),
+    MeanReciprocalRank(),
 }
 METRICS_PRECISION_RECALL = {Precision(), Recall()}
 METRICS_PRECISION_INCREASING_N = {PrecisionTopNPercent(n=x + 10) for x in range(0, 100, 10)}

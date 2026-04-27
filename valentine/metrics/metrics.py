@@ -11,11 +11,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from .base_metric import Metric
-from .metric_helpers import get_fp, get_tp_fn
+from .metric_helpers import _matches_as_tuples, _normalize_ground_truth, get_fp, get_tp_fn
 
 # Public exports
 __all__ = [
     "F1Score",
+    "MeanReciprocalRank",
     "Precision",
     "PrecisionTopNPercent",
     "Recall",
@@ -156,3 +157,37 @@ class RecallAtSizeofGroundTruth(Metric):
         tp, fn = get_tp_fn(n_matches, ground_truth)
         recall = _safe_div(tp, tp + fn)
         return self.return_format(recall)
+
+
+@dataclass(eq=True, frozen=True)
+class MeanReciprocalRank(Metric):
+    """Mean Reciprocal Rank (MRR).
+
+    For each ground truth pair, finds its rank (1-indexed position) in
+    the matcher results sorted by descending score. The reciprocal rank
+    is ``1/rank`` if the pair is found, or ``0`` if absent. MRR is the
+    mean of reciprocal ranks across all ground truth pairs.
+
+    Attributes
+    ----------
+    one_to_one : bool
+        Whether to apply the one-to-one filter to the MatcherResults first.
+    """
+
+    one_to_one: bool = False
+
+    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+        if self.one_to_one:
+            matches = matches.one_to_one()
+
+        gt_pairs, table_aware = _normalize_ground_truth(ground_truth)
+        ranked = _matches_as_tuples(matches, table_aware)
+
+        if not gt_pairs:
+            return self.return_format(0.0)
+
+        # Build position lookup (1-indexed)
+        position = {m: i + 1 for i, m in enumerate(ranked)}
+
+        rr_sum = sum(1.0 / position[gt] for gt in gt_pairs if gt in position)
+        return self.return_format(rr_sum / len(gt_pairs))
