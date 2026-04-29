@@ -186,8 +186,29 @@ class MeanReciprocalRank(Metric):
         if not gt_pairs:
             return self.return_format(0.0)
 
-        # Build position lookup (1-indexed)
-        position = {m: i + 1 for i, m in enumerate(ranked)}
+        # Group gold targets by source key (table-aware or column-only).
+        gold_by_source: dict[tuple, set[tuple]] = {}
+        for pair in gt_pairs:
+            source_key = pair[:2] if table_aware else (pair[0],)
+            target_key = pair[2:] if table_aware else (pair[1],)
+            gold_by_source.setdefault(source_key, set()).add(target_key)
 
-        rr_sum = sum(1.0 / position[gt] for gt in gt_pairs if gt in position)
-        return self.return_format(rr_sum / len(gt_pairs))
+        if not gold_by_source:
+            return self.return_format(0.0)
+
+        # Walk ranked predictions; record the rank (1-based, per-source) of
+        # the first correct target for each source.
+        per_source_rank: dict[tuple, int] = {}
+        per_source_seen: dict[tuple, int] = {}
+        for pred in ranked:
+            source_key = pred[:2] if table_aware else (pred[0],)
+            target_key = pred[2:] if table_aware else (pred[1],)
+            if source_key not in gold_by_source or source_key in per_source_rank:
+                continue
+            per_source_seen[source_key] = per_source_seen.get(source_key, 0) + 1
+            if target_key in gold_by_source[source_key]:
+                per_source_rank[source_key] = per_source_seen[source_key]
+
+        reciprocal_sum = sum(1.0 / r for r in per_source_rank.values())
+        mrr = reciprocal_sum / len(gold_by_source)
+        return self.return_format(mrr)
