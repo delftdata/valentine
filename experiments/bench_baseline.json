@@ -3,260 +3,260 @@
     "Coma": {
       "pairs": {
         "customers": {
-          "seconds": 0.0119,
+          "seconds": 0.0118,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0106,
+          "seconds": 0.012,
           "n_matches": 4,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
-          "mrr": 0.4167
+          "mrr": 0.8
         },
         "products": {
-          "seconds": 0.0108,
+          "seconds": 0.0126,
           "n_matches": 6,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4083
+          "mrr": 1.0
         },
         "events": {
-          "seconds": 0.011,
+          "seconds": 0.0154,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.5208
+          "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0101,
+          "seconds": 0.0121,
           "n_matches": 5,
           "f1": 0.8889,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         }
       },
-      "total_seconds": 0.0544,
-      "worst_seconds": 0.0119,
+      "total_seconds": 0.0639,
+      "worst_seconds": 0.0154,
       "mean_f1": 0.9556,
-      "mean_mrr": 0.4518
+      "mean_mrr": 0.96
     },
     "Coma_Inst": {
       "pairs": {
         "customers": {
-          "seconds": 0.0238,
+          "seconds": 0.022,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0285,
+          "seconds": 0.0301,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         },
         "products": {
-          "seconds": 0.0235,
+          "seconds": 0.0268,
           "n_matches": 6,
           "f1": 0.9091,
           "recall_at_gt": 1.0,
-          "mrr": 0.4083
+          "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0255,
+          "seconds": 0.0288,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.5208
+          "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0215,
+          "seconds": 0.0225,
           "n_matches": 5,
           "f1": 0.8889,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         }
       },
-      "total_seconds": 0.1228,
-      "worst_seconds": 0.0285,
+      "total_seconds": 0.1302,
+      "worst_seconds": 0.0301,
       "mean_f1": 0.9596,
-      "mean_mrr": 0.4598
+      "mean_mrr": 1.0
     },
     "Cupid": {
       "pairs": {
         "customers": {
-          "seconds": 2.1081,
+          "seconds": 2.261,
           "n_matches": 6,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
-          "mrr": 0.4167
+          "mrr": 0.8
         },
         "orders": {
-          "seconds": 0.0274,
+          "seconds": 0.0314,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
-          "mrr": 0.3667
+          "mrr": 0.6
         },
         "products": {
-          "seconds": 0.0336,
+          "seconds": 0.0374,
           "n_matches": 6,
           "f1": 0.9091,
           "recall_at_gt": 0.8333,
-          "mrr": 0.375
+          "mrr": 0.8333
         },
         "events": {
-          "seconds": 0.0159,
+          "seconds": 0.0218,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.5208
+          "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0697,
+          "seconds": 0.0647,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
-          "mrr": 0.3667
+          "mrr": 0.6
         }
       },
-      "total_seconds": 2.2547,
-      "worst_seconds": 2.1081,
+      "total_seconds": 2.4163,
+      "worst_seconds": 2.261,
       "mean_f1": 0.8596,
-      "mean_mrr": 0.4092
+      "mean_mrr": 0.7667
     },
     "DistributionBased": {
       "pairs": {
         "customers": {
-          "seconds": 0.0802,
+          "seconds": 0.0889,
           "n_matches": 7,
-          "f1": 1.0,
+          "f1": 0.8889,
           "recall_at_gt": 0.8,
-          "mrr": 0.45
+          "mrr": 0.9
         },
         "orders": {
-          "seconds": 0.111,
+          "seconds": 0.1134,
           "n_matches": 4,
           "f1": 0.75,
           "recall_at_gt": 0.8,
-          "mrr": 0.4167
+          "mrr": 0.8
         },
         "products": {
-          "seconds": 0.1007,
+          "seconds": 0.0988,
           "n_matches": 5,
           "f1": 0.8,
           "recall_at_gt": 0.8333,
-          "mrr": 0.3806
+          "mrr": 0.8333
         },
         "events": {
-          "seconds": 0.0693,
+          "seconds": 0.0686,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.5208
+          "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0735,
+          "seconds": 0.0648,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
-          "mrr": 0.3667
+          "mrr": 0.6
         }
       },
-      "total_seconds": 0.4347,
-      "worst_seconds": 0.111,
-      "mean_f1": 0.86,
-      "mean_mrr": 0.427
+      "total_seconds": 0.4345,
+      "worst_seconds": 0.1134,
+      "mean_f1": 0.8378,
+      "mean_mrr": 0.8267
     },
     "JaccardDistanceMatcher": {
       "pairs": {
         "customers": {
-          "seconds": 0.0112,
+          "seconds": 0.0108,
           "n_matches": 7,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0145,
+          "seconds": 0.0217,
           "n_matches": 11,
           "f1": 0.8889,
           "recall_at_gt": 0.6,
-          "mrr": 0.4222
+          "mrr": 1.0
         },
         "products": {
-          "seconds": 0.0201,
+          "seconds": 0.0111,
           "n_matches": 7,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4083
+          "mrr": 1.0
         },
         "events": {
           "seconds": 0.0114,
           "n_matches": 6,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.5208
+          "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.01,
+          "seconds": 0.0095,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.4567
+          "mrr": 1.0
         }
       },
-      "total_seconds": 0.0672,
-      "worst_seconds": 0.0201,
+      "total_seconds": 0.0645,
+      "worst_seconds": 0.0217,
       "mean_f1": 0.9778,
-      "mean_mrr": 0.4529
+      "mean_mrr": 1.0
     },
     "SimilarityFlooding": {
       "pairs": {
         "customers": {
-          "seconds": 0.0437,
+          "seconds": 0.0438,
           "n_matches": 25,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
-          "mrr": 0.4321
+          "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0377,
+          "seconds": 0.0414,
           "n_matches": 25,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
-          "mrr": 0.4317
+          "mrr": 0.9
         },
         "products": {
-          "seconds": 0.0621,
+          "seconds": 0.0701,
           "n_matches": 36,
           "f1": 0.9091,
           "recall_at_gt": 0.8333,
-          "mrr": 0.3957
+          "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0348,
+          "seconds": 0.0344,
           "n_matches": 16,
           "f1": 1.0,
           "recall_at_gt": 1.0,
-          "mrr": 0.5208
+          "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0406,
+          "seconds": 0.0385,
           "n_matches": 25,
           "f1": 1.0,
           "recall_at_gt": 0.8,
-          "mrr": 0.4452
+          "mrr": 1.0
         }
       },
-      "total_seconds": 0.2189,
-      "worst_seconds": 0.0621,
+      "total_seconds": 0.2282,
+      "worst_seconds": 0.0701,
       "mean_f1": 0.9374,
-      "mean_mrr": 0.4451
+      "mean_mrr": 0.98
     }
   }
 }
