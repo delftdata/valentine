@@ -3,200 +3,200 @@
     "Coma": {
       "pairs": {
         "customers": {
-          "seconds": 0.0118,
+          "seconds": 0.0204,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.012,
+          "seconds": 0.0098,
           "n_matches": 4,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 0.8
         },
         "products": {
-          "seconds": 0.0126,
+          "seconds": 0.0166,
           "n_matches": 6,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0154,
+          "seconds": 0.0125,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0121,
+          "seconds": 0.0112,
           "n_matches": 5,
           "f1": 0.8889,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.0639,
-      "worst_seconds": 0.0154,
+      "total_seconds": 0.0705,
+      "worst_seconds": 0.0204,
       "mean_f1": 0.9556,
       "mean_mrr": 0.96
     },
     "Coma_Inst": {
       "pairs": {
         "customers": {
-          "seconds": 0.022,
+          "seconds": 0.0306,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0301,
+          "seconds": 0.0333,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "products": {
-          "seconds": 0.0268,
+          "seconds": 0.0233,
           "n_matches": 6,
           "f1": 0.9091,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0288,
+          "seconds": 0.0245,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0225,
+          "seconds": 0.022,
           "n_matches": 5,
           "f1": 0.8889,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.1302,
-      "worst_seconds": 0.0301,
+      "total_seconds": 0.1337,
+      "worst_seconds": 0.0333,
       "mean_f1": 0.9596,
       "mean_mrr": 1.0
     },
     "Cupid": {
       "pairs": {
         "customers": {
-          "seconds": 2.261,
+          "seconds": 2.0127,
           "n_matches": 6,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 0.8
         },
         "orders": {
-          "seconds": 0.0314,
+          "seconds": 0.0297,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
           "mrr": 0.6
         },
         "products": {
-          "seconds": 0.0374,
+          "seconds": 0.0301,
           "n_matches": 6,
           "f1": 0.9091,
           "recall_at_gt": 0.8333,
           "mrr": 0.8333
         },
         "events": {
-          "seconds": 0.0218,
+          "seconds": 0.0151,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0647,
+          "seconds": 0.0657,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
           "mrr": 0.6
         }
       },
-      "total_seconds": 2.4163,
-      "worst_seconds": 2.261,
+      "total_seconds": 2.1533,
+      "worst_seconds": 2.0127,
       "mean_f1": 0.8596,
       "mean_mrr": 0.7667
     },
     "DistributionBased": {
       "pairs": {
         "customers": {
-          "seconds": 0.0889,
+          "seconds": 0.0993,
           "n_matches": 7,
-          "f1": 0.8889,
-          "recall_at_gt": 0.8,
-          "mrr": 0.9
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.1134,
+          "seconds": 0.0918,
           "n_matches": 4,
           "f1": 0.75,
           "recall_at_gt": 0.8,
           "mrr": 0.8
         },
         "products": {
-          "seconds": 0.0988,
+          "seconds": 0.0773,
           "n_matches": 5,
           "f1": 0.8,
           "recall_at_gt": 0.8333,
           "mrr": 0.8333
         },
         "events": {
-          "seconds": 0.0686,
+          "seconds": 0.0601,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0648,
+          "seconds": 0.0795,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
           "mrr": 0.6
         }
       },
-      "total_seconds": 0.4345,
-      "worst_seconds": 0.1134,
-      "mean_f1": 0.8378,
-      "mean_mrr": 0.8267
+      "total_seconds": 0.408,
+      "worst_seconds": 0.0993,
+      "mean_f1": 0.86,
+      "mean_mrr": 0.8467
     },
     "JaccardDistanceMatcher": {
       "pairs": {
         "customers": {
-          "seconds": 0.0108,
-          "n_matches": 7,
-          "f1": 1.0,
-          "recall_at_gt": 1.0,
-          "mrr": 1.0
-        },
-        "orders": {
-          "seconds": 0.0217,
-          "n_matches": 11,
-          "f1": 0.8889,
-          "recall_at_gt": 0.6,
-          "mrr": 1.0
-        },
-        "products": {
           "seconds": 0.0111,
           "n_matches": 7,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
+        "orders": {
+          "seconds": 0.0139,
+          "n_matches": 11,
+          "f1": 0.8889,
+          "recall_at_gt": 0.6,
+          "mrr": 1.0
+        },
+        "products": {
+          "seconds": 0.0101,
+          "n_matches": 7,
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
+        },
         "events": {
-          "seconds": 0.0114,
+          "seconds": 0.0116,
           "n_matches": 6,
           "f1": 1.0,
           "recall_at_gt": 1.0,
@@ -210,51 +210,51 @@
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.0645,
-      "worst_seconds": 0.0217,
+      "total_seconds": 0.0562,
+      "worst_seconds": 0.0139,
       "mean_f1": 0.9778,
       "mean_mrr": 1.0
     },
     "SimilarityFlooding": {
       "pairs": {
         "customers": {
-          "seconds": 0.0438,
+          "seconds": 0.0437,
           "n_matches": 25,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0414,
+          "seconds": 0.0369,
           "n_matches": 25,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 0.9
         },
         "products": {
-          "seconds": 0.0701,
+          "seconds": 0.0644,
           "n_matches": 36,
           "f1": 0.9091,
           "recall_at_gt": 0.8333,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0344,
+          "seconds": 0.0364,
           "n_matches": 16,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0385,
+          "seconds": 0.0388,
           "n_matches": 25,
           "f1": 1.0,
           "recall_at_gt": 0.8,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.2282,
-      "worst_seconds": 0.0701,
+      "total_seconds": 0.2202,
+      "worst_seconds": 0.0644,
       "mean_f1": 0.9374,
       "mean_mrr": 0.98
     }
