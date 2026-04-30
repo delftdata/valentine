@@ -59,7 +59,7 @@ docs = [
     # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
     # deliberately rather than relying on a range, so a bad release
     # can't silently break the docs build.
-    "zensical==0.0.31",
+    "zensical==0.0.37",
 ]
 
 [project.urls]
