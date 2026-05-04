@@ -87,13 +87,13 @@ class TestMatcherResultsInternals:
         assert bare.details == {}
         assert bare.get_details(next(iter(bare))) is None
 
-    def test_one_to_one_with_explicit_threshold(self):
-        result = self.results.one_to_one(threshold=0.7)
+    def test_one_to_one_greedy_with_explicit_threshold(self):
+        result = self.results.one_to_one_greedy(threshold=0.7)
         # Only entries >= 0.7 survive the explicit threshold path
         assert all(score >= 0.7 for score in result.values())
         assert len(result) == 3
 
-    def test_one_to_one_identical_scores(self):
+    def test_one_to_one_hungarian_identical_scores(self):
         # Less than two distinct values -> early return branch
         flat = MatcherResults(
             {
@@ -101,7 +101,7 @@ class TestMatcherResultsInternals:
                 ColumnPair("s", "b", "t", "b"): 0.5,
             }
         )
-        assert len(flat.one_to_one()) == len(flat)
+        assert len(flat.one_to_one_hungarian()) == len(flat)
 
     def test_filter(self):
         result = self.results.filter(min_score=0.75)

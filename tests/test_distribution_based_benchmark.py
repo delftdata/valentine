@@ -65,8 +65,9 @@ class TestDistributionBasedBenchmark:
         metrics = matches.get_metrics(ground_truth, metrics={Precision(), Recall(), F1Score()})
 
         # Baseline: P=1.0, R=0.75, F1=0.857
-        # The algorithm correctly finds all 4 pairs (raw Recall=1.0), but one_to_one()
-        # post-processing may filter the weakest match below the median threshold.
+        # The algorithm correctly finds all 4 pairs (raw Recall=1.0), but the
+        # one_to_one_hungarian() post-processing may filter the weakest match
+        # below the median threshold.
         assert metrics["Precision"] >= 1.0, f"Precision dropped to {metrics['Precision']}"
         assert metrics["Recall"] >= 0.75, f"Recall dropped to {metrics['Recall']}"
         assert metrics["F1Score"] >= 0.85, f"F1Score dropped to {metrics['F1Score']}"

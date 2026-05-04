@@ -10,8 +10,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from .base_metric import Metric
-from .metric_helpers import _matches_as_tuples, _normalize_ground_truth, get_fp, get_tp_fn
+from .base_metric import Metric, OneToOneMethod
+from .metric_helpers import (
+    _apply_one_to_one,
+    _matches_as_tuples,
+    _normalize_ground_truth,
+    get_fp,
+    get_tp_fn,
+)
 
 # Public exports
 __all__ = [
@@ -45,9 +51,14 @@ class Precision(Metric):
 
     one_to_one: bool = True
 
-    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+    def apply(
+        self,
+        matches: Any,
+        ground_truth: GroundTruth,
+        one_to_one_method: OneToOneMethod = "hungarian",
+    ) -> dict[str, float]:
         if self.one_to_one:
-            matches = matches.one_to_one()
+            matches = _apply_one_to_one(matches, one_to_one_method)
 
         tp, _ = get_tp_fn(matches, ground_truth)
         fp = get_fp(matches, ground_truth)
@@ -67,9 +78,14 @@ class Recall(Metric):
 
     one_to_one: bool = True
 
-    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+    def apply(
+        self,
+        matches: Any,
+        ground_truth: GroundTruth,
+        one_to_one_method: OneToOneMethod = "hungarian",
+    ) -> dict[str, float]:
         if self.one_to_one:
-            matches = matches.one_to_one()
+            matches = _apply_one_to_one(matches, one_to_one_method)
 
         tp, fn = get_tp_fn(matches, ground_truth)
         recall = _safe_div(tp, tp + fn)
@@ -88,9 +104,14 @@ class F1Score(Metric):
 
     one_to_one: bool = True
 
-    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+    def apply(
+        self,
+        matches: Any,
+        ground_truth: GroundTruth,
+        one_to_one_method: OneToOneMethod = "hungarian",
+    ) -> dict[str, float]:
         if self.one_to_one:
-            matches = matches.one_to_one()
+            matches = _apply_one_to_one(matches, one_to_one_method)
 
         tp, fn = get_tp_fn(matches, ground_truth)
         fp = get_fp(matches, ground_truth)
@@ -120,9 +141,14 @@ class PrecisionTopNPercent(Metric):
         # Replace the 'N' in the base name with the chosen percent, e.g. "PrecisionTop70Percent".
         return super().name().replace("N", str(self.n))
 
-    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+    def apply(
+        self,
+        matches: Any,
+        ground_truth: GroundTruth,
+        one_to_one_method: OneToOneMethod = "hungarian",
+    ) -> dict[str, float]:
         if self.one_to_one:
-            matches = matches.one_to_one()
+            matches = _apply_one_to_one(matches, one_to_one_method)
 
         # Clamp N to a sensible range without mutating the dataclass.
         n_clamped = min(100, max(0, int(self.n)))
@@ -150,9 +176,14 @@ class RecallAtSizeofGroundTruth(Metric):
 
     one_to_one: bool = False
 
-    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+    def apply(
+        self,
+        matches: Any,
+        ground_truth: GroundTruth,
+        one_to_one_method: OneToOneMethod = "hungarian",
+    ) -> dict[str, float]:
         if self.one_to_one:
-            matches = matches.one_to_one()
+            matches = _apply_one_to_one(matches, one_to_one_method)
         n_matches = matches.take_top_n(len(ground_truth))
         tp, fn = get_tp_fn(n_matches, ground_truth)
         recall = _safe_div(tp, tp + fn)
@@ -176,9 +207,14 @@ class MeanReciprocalRank(Metric):
 
     one_to_one: bool = False
 
-    def apply(self, matches: Any, ground_truth: GroundTruth) -> dict[str, float]:
+    def apply(
+        self,
+        matches: Any,
+        ground_truth: GroundTruth,
+        one_to_one_method: OneToOneMethod = "hungarian",
+    ) -> dict[str, float]:
         if self.one_to_one:
-            matches = matches.one_to_one()
+            matches = _apply_one_to_one(matches, one_to_one_method)
 
         gt_pairs, table_aware = _normalize_ground_truth(ground_truth)
         ranked = _matches_as_tuples(matches, table_aware)

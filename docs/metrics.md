@@ -71,7 +71,7 @@ from valentine.metrics import (
 
 `Precision`, `Recall`, `F1Score` and `PrecisionTopNPercent` all accept a
 `one_to_one: bool` flag that applies
-[`MatcherResults.one_to_one()`](api.md#one_to_one) before counting.
+[`MatcherResults.one_to_one_hungarian()`](api.md#one_to_one_hungarian) before counting.
 `PrecisionTopNPercent` additionally takes `n: int` for the cutoff, and
 `RecallAtSizeofGroundTruth` defaults to `one_to_one=False`. See the
 [API reference](api.md#built-in-metrics) for full defaults.

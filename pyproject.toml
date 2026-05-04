@@ -55,6 +55,9 @@ dev = [
 polars = [
     "polars>=1.0,<2.0",
 ]
+embeddings = [
+    "sentence-transformers>=2.0,<6.0",
+]
 docs = [
     # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
     # deliberately rather than relying on a range, so a bad release

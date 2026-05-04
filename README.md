@@ -137,9 +137,9 @@ for pair, score in matches.items():
 ```python
 top_n_matches = matches.take_top_n(5)
 top_n_percent_matches = matches.take_top_percent(25)
-one_to_one_matches = matches.one_to_one()
+one_to_one_matches = matches.one_to_one_hungarian()
 high_confidence = matches.filter(min_score=0.7)
-one_to_one_strict = matches.one_to_one(threshold=0.5)
+one_to_one_strict = matches.one_to_one_hungarian(threshold=0.5)
 ```
 
 ### Match details (Coma)

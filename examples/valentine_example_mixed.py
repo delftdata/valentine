@@ -37,7 +37,7 @@ def main():
         print(f"  {pair.source_column:>20s} <-> {pair.target_column:<20s}  {score:.4f}")
 
     print("\nOne-to-one matches:")
-    for pair, score in matches.one_to_one().items():
+    for pair, score in matches.one_to_one_hungarian().items():
         print(f"  {pair.source_column:>20s} <-> {pair.target_column:<20s}  {score:.4f}")
 
     # Evaluate against ground truth

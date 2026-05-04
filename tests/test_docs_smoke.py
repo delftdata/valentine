@@ -130,7 +130,9 @@ def test_data_sources_exports():
 def test_matcher_results_documented_methods():
     """Every MatcherResults method referenced in the docs must exist."""
     for name in (
-        "one_to_one",
+        "one_to_one_hungarian",
+        "one_to_one_greedy",
+        "one_to_one_mutual_top",
         "filter",
         "take_top_n",
         "take_top_percent",

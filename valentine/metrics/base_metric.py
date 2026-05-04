@@ -4,13 +4,17 @@ metrics.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from ..algorithms.matcher_results import MatcherResults
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, final
+
+# Valid choices for the 1:1 selection algorithm used by Precision /
+# Recall / F1Score / PrecisionTopNPercent when ``one_to_one=True``.
+OneToOneMethod = Literal["greedy", "hungarian", "mutual_top"]
 
 
 @dataclass(eq=True, frozen=True)
@@ -25,6 +29,7 @@ class Metric(ABC):
         self: Metric,
         matches: MatcherResults,
         ground_truth: list[tuple[str, str]] | list,
+        one_to_one_method: OneToOneMethod = "hungarian",
     ) -> dict[str, Any]:
         """Apply the metric to a ``MatcherResults`` instance, given ground truth.
 
@@ -37,6 +42,13 @@ class Metric(ABC):
             ``[("src_col", "tgt_col"), ...]`` (table names ignored during
             comparison) or full :class:`~valentine.algorithms.ColumnPair`
             instances for table-aware comparison.
+        one_to_one_method : {"greedy", "hungarian", "mutual_top"}
+            Selection algorithm used when the metric's ``one_to_one``
+            field is ``True``. Defaults to ``"hungarian"`` (globally
+            optimal). ``"greedy"`` matches the legacy behaviour;
+            ``"mutual_top"`` keeps only mutually-confirmed pairs (top-1
+            on each side).  Ignored when ``one_to_one`` is ``False`` or
+            for metrics that do not apply 1:1 filtering.
         """
         pass
 

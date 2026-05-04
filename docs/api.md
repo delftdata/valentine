@@ -141,7 +141,8 @@ class MatcherResults(Mapping[ColumnPair, float]):
 Immutable `Mapping` returned by [`valentine_match`](#valentine_match).
 Entries are sorted from highest to lowest similarity score on
 construction. Because the mapping is immutable, derived views (such as
-the cached result of [`one_to_one`](#one_to_one)) cannot be silently
+the cached result of [`one_to_one_hungarian`](#one_to_one_hungarian))
+cannot be silently
 invalidated.
 
 ### Mapping protocol
@@ -186,21 +187,47 @@ All transformations return a **new** `MatcherResults` instance; the
 original is left untouched. Sub-matcher details are carried over to the
 filtered subset.
 
-#### `one_to_one`
+#### `one_to_one_hungarian`
 
 ```python
-def one_to_one(threshold: float | None = None) -> MatcherResults
+def one_to_one_hungarian(threshold: float | None = None) -> MatcherResults
 ```
 
-Greedy bipartite filter: starting from the highest-scoring pair, assign
-each source and each target column **at most one** partner. Pairs below
-`threshold` are discarded.
+Default 1:1 selector. Globally optimal bipartite filter via Hungarian
+assignment (`scipy.optimize.linear_sum_assignment`): each source and
+each target column appears in **at most one** returned pair, with the
+assignment chosen to maximise total similarity. Pairs below `threshold`
+are discarded.
 
 - `threshold=None` (default) uses the median of unique similarity scores
   as the cutoff, and the result is cached.
 - Passing an explicit `threshold` bypasses the cache.
 - When the input has fewer than two distinct score values, all entries
   are returned unchanged.
+
+#### `one_to_one_greedy`
+
+```python
+def one_to_one_greedy(threshold: float | None = None) -> MatcherResults
+```
+
+Greedy bipartite filter, kept for backwards compatibility. Starting
+from the highest-scoring pair, greedily assigns each source and each
+target column at most one partner. Same threshold semantics as
+`one_to_one_hungarian`. Greedy can lock in a locally-best pair that
+blocks a better global assignment, so prefer the Hungarian variant
+unless you need the legacy behaviour.
+
+#### `one_to_one_mutual_top`
+
+```python
+def one_to_one_mutual_top(n: int = 1) -> MatcherResults
+```
+
+Mutual top-`n` filter: keeps pair `(s, t)` only if `t` is in `s`'s
+top-`n` targets AND `s` is in `t`'s top-`n` sources. With `n=1` this
+is the classic mutual nearest-neighbour filter — high-precision, drops
+one-sided affinities. Strictly stricter than `one_to_one_hungarian`.
 
 #### `filter`
 
@@ -615,7 +642,7 @@ Precision(one_to_one: bool = True)
 ```
 
 `TP / (TP + FP)`. When `one_to_one=True` (default), applies
-`MatcherResults.one_to_one()` before counting.
+`MatcherResults.one_to_one_hungarian()` before counting.
 
 #### `Recall`
 

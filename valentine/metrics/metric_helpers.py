@@ -5,6 +5,26 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..algorithms.match import ColumnPair
     from ..algorithms.matcher_results import MatcherResults
+    from .base_metric import OneToOneMethod
+
+
+def _apply_one_to_one(matches: MatcherResults, method: OneToOneMethod) -> MatcherResults:
+    """Dispatch ``matches`` through the requested 1:1 selection algorithm.
+
+    ``method`` is one of ``"greedy"``, ``"hungarian"``, or ``"mutual_top"``;
+    invalid values raise ``ValueError``. Mutual-top defaults to ``n=1``
+    (mutual nearest neighbour).
+    """
+    if method == "hungarian":
+        return matches.one_to_one_hungarian()
+    if method == "greedy":
+        return matches.one_to_one_greedy()
+    if method == "mutual_top":
+        return matches.one_to_one_mutual_top()
+    raise ValueError(
+        f"Unknown one_to_one_method: {method!r}; "
+        "expected 'greedy', 'hungarian', or 'mutual_top'"
+    )
 
 
 def _normalize_ground_truth(

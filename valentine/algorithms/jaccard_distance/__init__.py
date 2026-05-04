@@ -8,3 +8,6 @@ class StringDistanceFunction(Enum):
     JaroWinkler = auto()
     Hamming = auto()
     Exact = auto()
+    # Sentence-transformer embedding cosine similarity. Requires the
+    # ``sentence-transformers`` extra (``pip install valentine[embeddings]``).
+    Embedding = auto()
