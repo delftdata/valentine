@@ -63,6 +63,12 @@ To enable **Polars** support, install the optional extra:
 pip install valentine[polars]
 ```
 
+To enable the **sentence-transformer embedding** distance for `JaccardDistanceMatcher` (see below), install:
+
+```shell
+pip install valentine[embeddings]
+```
+
 
 ## Usage
 Valentine can be used to find matches among columns of a given pair of pandas or Polars DataFrames. You can even mix pandas and Polars frames in the same call — Valentine auto-detects the frame type.
@@ -89,17 +95,21 @@ In order to do so, the user can choose one of the following matching methods:
           *    **threshold1**(*float*) - The threshold for phase 1 of the method, default is 0.15.
           *    **threshold2**(*float*) - The threshold for phase 2 of the method, default is 0.15.
 
-4.   `JaccardDistanceMatcher(float: threshold_dist)` is a baseline method that uses Jaccard Similarity between columns to assess their correspondence score, optionally enhanced by a string similarity measure of choice.
+4.   `JaccardDistanceMatcher(...)` is a baseline method that scores column pairs by **Tversky** similarity over their value sets (Jaccard by default). Element equality between values can be decided by a configurable string distance function, including a sentence-transformer **embedding** option for semantic matching.
      *    **Parameters**:
-          *    **threshold_dist**(*float*) - Acceptance threshold for assessing two strings as equal, default is 0.8.
-
-          *    **distance_fun**(*StringDistanceFunction*) - String similarity function used to assess whether two strings are equal. The enumeration class type `StringDistanceFunction` can be imported from `valentine.algorithms.jaccard_distance`. Functions currently supported are:
-   		       * `StringDistanceFunction.Levenshtein`: [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)
+          *    **threshold_dist**(*float*) - Acceptance threshold above which two values are considered equal under the chosen `distance_fun`, default is 0.8. For embeddings, ~0.7 is a typical operating point.
+          *    **distance_fun**(*StringDistanceFunction*) - Per-value similarity function. The enumeration class `StringDistanceFunction` can be imported from `valentine.algorithms.jaccard_distance`. Functions currently supported are:
+   		       * `StringDistanceFunction.Levenshtein`: [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance) (default)
                * `StringDistanceFunction.DamerauLevenshtein`: [Damerau-Levenshtein distance](https://en.wikipedia.org/wiki/Damerau%E2%80%93Levenshtein_distance)
                * `StringDistanceFunction.Hamming`: [Hamming distance](https://en.wikipedia.org/wiki/Hamming_distance)
                * `StringDistanceFunction.Jaro`: [Jaro distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
                * `StringDistanceFunction.JaroWinkler`: [Jaro-Winkler distance](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance)
-              * `StringDistanceFunction.Exact`: String equality `==`
+               * `StringDistanceFunction.Exact`: String equality `==`
+               * `StringDistanceFunction.Embedding`: cosine similarity on sentence-transformer embeddings (requires the `valentine[embeddings]` extra)
+          *    **tversky_alpha**(*float*) / **tversky_beta**(*float*) - Tversky penalty weights for unmatched values on each side (defaults `1.0`, `1.0`). Defaults give Jaccard; `0.5, 0.5` gives Sørensen-Dice; `1.0, 0.0` (or vice versa) gives set containment — useful when one column is expected to be a subset of the other.
+          *    **embedding_model**(*str*) - Sentence-transformers model name when `distance_fun=Embedding` (default `"all-MiniLM-L6-v2"`).
+          *    **embedding_device**(*str* or *None*) - Device override (`"cpu"`, `"cuda"`, `"mps"`). `None` (default) auto-picks: cuda → mps → cpu.
+          *    **embedding_batch_size**(*int* or *None*) - Encode batch size; `None` uses the sentence-transformers default (32). Larger values amortise per-call overhead on capable hardware.
 
 5.   `SimilarityFlooding(Policy: coeff_policy, Formula: formula, StringMatcher: string_matcher)` is the python implementation of the paper [Similarity Flooding: A Versatile Graph Matching Algorithmand its Application to Schema Matching](https://ieeexplore.ieee.org/document/994702)
      * **Parameters**:
@@ -137,10 +147,16 @@ for pair, score in matches.items():
 ```python
 top_n_matches = matches.take_top_n(5)
 top_n_percent_matches = matches.take_top_percent(25)
-one_to_one_matches = matches.one_to_one_hungarian()
 high_confidence = matches.filter(min_score=0.7)
+
+# One-to-one selectors — three flavours, pick the one that fits your task:
+one_to_one_matches = matches.one_to_one_hungarian()           # globally optimal (default)
 one_to_one_strict = matches.one_to_one_hungarian(threshold=0.5)
+greedy_legacy = matches.one_to_one_greedy()                   # legacy greedy assignment
+mutual_only = matches.one_to_one_mutual_top(n=1)              # mutual nearest neighbour
 ```
+
+`one_to_one_hungarian` (Hungarian assignment via `scipy.optimize.linear_sum_assignment`) is the recommended default and is what `Precision` / `Recall` / `F1Score` apply when their `one_to_one` flag is set. `one_to_one_greedy` preserves the legacy greedy behaviour for backwards compatibility. `one_to_one_mutual_top(n)` keeps a pair only when each side ranks the other in its top-`n` — a high-precision filter that drops one-sided affinities.
 
 ### Match details (Coma)
 
@@ -174,6 +190,15 @@ from valentine.metrics import F1Score, PrecisionTopNPercent, METRICS_PRECISION_I
 metrics_custom = matches.get_metrics(ground_truth, metrics={F1Score(one_to_one=False), PrecisionTopNPercent(n=70)})
 metrics_predefined_set = matches.get_metrics(ground_truth, metrics=METRICS_PRECISION_INCREASING_N)
 ```
+
+The 1:1 selection algorithm used when a metric's `one_to_one` flag is `True` can be overridden per call (default `"hungarian"`):
+
+```python
+metrics_strict   = matches.get_metrics(ground_truth, metrics={F1Score()}, one_to_one_method="mutual_top")
+metrics_legacy   = matches.get_metrics(ground_truth, metrics={F1Score()}, one_to_one_method="greedy")
+```
+
+Valid values are `"hungarian"` (default), `"greedy"`, and `"mutual_top"`. Metrics whose `one_to_one` flag is `False` (e.g. `MeanReciprocalRank`, `RecallAtSizeofGroundTruth`) ignore the argument.
 
 
 ### Example
