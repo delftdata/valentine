@@ -8,8 +8,15 @@ on:
 
 jobs:
   bench:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    name: bench (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.14']
 
     steps:
       - uses: actions/checkout@v6.0.2
@@ -17,8 +24,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
         with:
-          python-version: '3.14'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
+
+      - name: Set deterministic environment
+        run: |
+          echo "OMP_NUM_THREADS=1" >> $GITHUB_ENV
+          echo "MKL_NUM_THREADS=1" >> $GITHUB_ENV
+          echo "PYTHONHASHSEED=0" >> $GITHUB_ENV
 
       - name: Install package
         run: |
@@ -29,7 +42,7 @@ jobs:
         run: |
           python experiments/bench.py \
             --quick \
-            --output bench_results.json \
+            --output bench_results_${{ matrix.os }}.json \
             --baseline experiments/bench_baseline.json \
             --accuracy-only
 
@@ -37,6 +50,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: bench-results
-          path: bench_results.json
+          name: bench-results-${{ matrix.os }}
+          path: bench_results_${{ matrix.os }}.json
           if-no-files-found: warn
