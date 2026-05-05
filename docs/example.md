@@ -60,7 +60,7 @@ def main():
 
     # 4. Reduce to one-to-one matches (greedy, highest-first).
     print("\nGetting the one-to-one matches:")
-    pp.pprint(matches.one_to_one())
+    pp.pprint(matches.one_to_one_hungarian())
 
     # 5. If you have a ground truth, compute evaluation metrics.
     ground_truth = [

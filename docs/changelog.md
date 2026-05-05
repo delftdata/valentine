@@ -84,7 +84,7 @@ coming from 0.5.x or earlier, the changes below will affect your code.
   `valentine_match` / `valentine_match_batch` pair.
 - **Immutable [`MatcherResults`](api.md#matcherresults).** The result
   object is now a `Mapping`, not a `dict` subclass. Derived views
-  (e.g. [`one_to_one()`](api.md#one_to_one)) are cached and cannot be
+  (e.g. [`one_to_one_hungarian()`](api.md#one_to_one_hungarian)) are cached and cannot be
   silently invalidated.
 - [`Coma`](api.md#coma) is now a pure-Python implementation of
   COMA 3.0 — no JVM dependency. Constructor signature updated to

@@ -173,14 +173,15 @@ class DistributionBased(BaseMatcher):
         for components in connected_components:
             if len(components) > 1:
                 i = i + 1
+                sorted_components = sorted(components)
                 edges = discovery.compute_attributes(
-                    list(components),
+                    sorted_components,
                     self.__threshold2,
                     tmp_folder_path,
                     self.__quantiles,
                     self.__use_bloom_filters,
                 )
-                all_attributes.append((list(components), edges))
+                all_attributes.append((sorted_components, edges))
 
         results = []
         for components, edges in all_attributes:
@@ -220,15 +221,16 @@ class DistributionBased(BaseMatcher):
         for components in connected_components:
             if len(components) > 1:
                 i = i + 1
+                sorted_components = sorted(components)
                 edges = discovery.compute_attributes_parallel(
-                    list(components),
+                    sorted_components,
                     self.__threshold2,
                     pool,
                     tmp_folder_path,
                     self.__quantiles,
                     self.__use_bloom_filters,
                 )
-                all_attributes.append((list(components), edges))
+                all_attributes.append((sorted_components, edges))
 
         results = []
         for components, edges in all_attributes:
@@ -266,27 +268,60 @@ class DistributionBased(BaseMatcher):
             A ranked list that will look like: ((table_name1, column_name1), (table_name2, column_name2)): similarity
         """
         matches = {}
-        for cluster in attribute_clusters:
+
+        sorted_clusters = sorted(
+            [sorted(cluster) for cluster in attribute_clusters], key=lambda c: (len(c), c)
+        )
+
+        for cluster in sorted_clusters:
             if len(cluster) < 2:
                 continue
+
             for combination in combinations(cluster, 2):
                 table1 = combination[0][0]
                 table2 = combination[1][0]
-                if table1 != table2:
-                    k, emd = process_emd(
-                        (
-                            (combination[0], combination[1]),
-                            self.__quantiles,
-                            False,
-                            tmp_folder_path,
-                            False,
-                        )
+
+                if table1 == table2:
+                    continue
+
+                k, emd = process_emd(
+                    (
+                        (combination[0], combination[1]),
+                        self.__quantiles,
+                        False,
+                        tmp_folder_path,
+                        False,
                     )
-                    sim = 1 / (1 + emd)
-                    tn_i, _, cn_i, _ = k[0]
-                    tn_j, _, cn_j, _ = k[1]
-                    if table_order.get(tn_i, 0) > table_order.get(tn_j, 0):
-                        matches.update(Match(tn_i, cn_i, tn_j, cn_j, sim).to_dict)
-                    else:
-                        matches.update(Match(tn_j, cn_j, tn_i, cn_i, sim).to_dict)
-        return matches
+                )
+
+                emd = float(round(emd, 12))
+                sim = 1 / (1 + emd)
+
+                tn_i, _, cn_i, _ = k[0]
+                tn_j, _, cn_j, _ = k[1]
+
+                order_i = table_order.get(tn_i, float("inf"))
+                order_j = table_order.get(tn_j, float("inf"))
+
+                if (order_i, tn_i, cn_i) > (order_j, tn_j, cn_j):
+                    match_obj = Match(tn_i, cn_i, tn_j, cn_j, sim)
+                else:
+                    match_obj = Match(tn_j, cn_j, tn_i, cn_i, sim)
+
+                # Deterministic overwrite rule
+                key = (
+                    match_obj.source_table_name,
+                    match_obj.source_column_name,
+                    match_obj.target_table_name,
+                    match_obj.target_column_name,
+                )
+
+                if key not in matches or sim > matches[key].similarity:
+                    matches[key] = match_obj
+
+        # Convert back to expected format
+        final_matches = {}
+        for m in matches.values():
+            final_matches.update(m.to_dict)
+
+        return final_matches

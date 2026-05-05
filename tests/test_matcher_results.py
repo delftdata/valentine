@@ -37,7 +37,7 @@ class TestMatcherResults(unittest.TestCase):
         metrics_specific = self.matches.get_metrics(self.ground_truth, metrics={Precision()})
         assert "Precision" in metrics_specific
 
-    def test_one_to_one(self):
+    def test_one_to_one_greedy(self):
         m = self.matches
         n = len(m)
         assert n > 0
@@ -56,8 +56,8 @@ class TestMatcherResults(unittest.TestCase):
 
         assert len(m) == 2 * n
 
-        m_one_to_one = m.one_to_one()
-        # one_to_one should remove duplicates, returning fewer entries
+        m_one_to_one = m.one_to_one_greedy()
+        # 1:1 should remove duplicates, returning fewer entries
         assert len(m_one_to_one) <= n
         assert len(m_one_to_one) < len(m)
 
@@ -65,16 +65,17 @@ class TestMatcherResults(unittest.TestCase):
         for pair in m_one_to_one:
             assert not pair.target_column.endswith("foo")
 
-        # Cache resets on new instance
+        # Cache resets on new instance — Hungarian is the cached default,
+        # not greedy. Verify the default-path cache lifecycle here.
         m_entry = MatcherResults(dict(m))
-        assert m_entry._cached_one_to_one is None
+        assert m_entry._cached_hungarian is None
 
         # Add a new entry with distinct columns
         ext2 = dict(m_entry)
         ext2[ColumnPair("extra_src", "BLA", "extra_tgt", "BLA")] = 0.7214057
         m_entry = MatcherResults(ext2)
 
-        m_entry_one_to_one = m_entry.one_to_one()
+        m_entry_one_to_one = m_entry.one_to_one_greedy()
         assert m_one_to_one != m_entry_one_to_one
 
         # All remaining values should be above the median

@@ -10,7 +10,7 @@ mapping** of [`ColumnPair`](api.md#columnpair) keys to similarity
 scores, sorted from highest score to lowest. It behaves like a `dict`
 for lookup and iteration, but cannot be mutated (preventing accidental
 invalidation of cached derived views such as
-[`one_to_one()`](api.md#one_to_one)).
+[`one_to_one_hungarian()`](api.md#one_to_one_hungarian)).
 
 For the authoritative method signatures, see the API reference for
 [`MatcherResults`](api.md#matcherresults) and
@@ -82,24 +82,24 @@ strong = matches.filter(min_score=0.7)
 
 # Reduce to one-to-one matches (greedy, highest-first). Threshold defaults
 # to the median score of the current results.
-one_to_one = matches.one_to_one()
+one_to_one = matches.one_to_one_hungarian()
 
 # Override the threshold to be stricter
-strict = matches.one_to_one(threshold=0.8)
+strict = matches.one_to_one_hungarian(threshold=0.8)
 ```
 
 Each method is documented in full in the API reference:
 [`take_top_n`](api.md#take_top_n),
 [`take_top_percent`](api.md#take_top_percent),
 [`filter`](api.md#filter), and
-[`one_to_one`](api.md#one_to_one).
+[`one_to_one`](api.md#one_to_one_hungarian).
 
 Every transformation returns a **new**
 [`MatcherResults`](api.md#matcherresults) instance, so you can chain
 them:
 
 ```python
-best_strict_pairs = matches.filter(min_score=0.5).one_to_one(threshold=0.7)
+best_strict_pairs = matches.filter(min_score=0.5).one_to_one_hungarian(threshold=0.7)
 ```
 
 !!! tip "Details propagation"

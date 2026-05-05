@@ -61,12 +61,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
           pip install ".[polars]" || true
+          pip install ".[embeddings]"
 
       - name: Install test deps
         run: pip install pytest==9.0.2
 
-      - name: Run tests (unittest)
-        run: python -m unittest discover tests
+      - name: Run tests
+        run: python -m pytest -q tests
 
   # 3) Test the built wheel on all OS/Python
   test_wheel:
@@ -106,12 +107,13 @@ jobs:
             pip install dist/*.tar.gz
           fi
           pip install polars || true
+          pip install "sentence-transformers>=2.0,<6.0"
 
       - name: Install test deps
         run: pip install pytest==9.0.2
 
       - name: Run tests (against installed wheel)
-        run: python -m unittest discover tests
+        run: python -m pytest -q tests
 
   # 4) Publish to PyPI on Release (tag publish event)
   publish-to-pypi:

@@ -95,7 +95,7 @@ provides three reduction helpers:
 ```python
 matches.take_top_n(10)              # absolute top 10
 matches.take_top_percent(5)         # top 5%
-matches.one_to_one()                # bidirectional best matches
+matches.one_to_one_hungarian()                # bidirectional best matches
 ```
 
 All three return a new `MatcherResults` — the original is immutable.

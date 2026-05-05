@@ -35,7 +35,7 @@ def main():
             print(f"  {'':>20s}      [{breakdown}]")
 
     print("\nGetting the one-to-one matches:")
-    pp.pprint(matches.one_to_one())
+    pp.pprint(matches.one_to_one_hungarian())
 
     # If ground truth available valentine could calculate the metrics
     ground_truth = [

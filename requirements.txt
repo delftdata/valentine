@@ -10,6 +10,7 @@ rapidfuzz==3.14.5
 PuLP==3.3.0
 POT==0.9.6.post1
 scipy==1.17.1
+sentence-transformers==5.4.1
 # data loading
 python-dateutil==2.9.0.post0
 # testing

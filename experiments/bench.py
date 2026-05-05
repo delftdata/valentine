@@ -26,6 +26,7 @@ Optional dependency: ``pyinstrument`` for ``--profile``. Install with
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import statistics
 import sys
@@ -51,6 +52,7 @@ from valentine.algorithms import (
     JaccardDistanceMatcher,
     SimilarityFlooding,
 )
+from valentine.algorithms.jaccard_distance import StringDistanceFunction
 from valentine.metrics import F1Score, MeanReciprocalRank, RecallAtSizeofGroundTruth
 
 try:
@@ -67,7 +69,7 @@ MatcherFactory = Callable[[], BaseMatcher]
 
 
 def _matcher_builders() -> list[tuple[str, MatcherFactory]]:
-    return [
+    builders: list[tuple[str, MatcherFactory]] = [
         ("Coma", Coma),
         ("Coma_Inst", lambda: Coma(use_instances=True)),
         ("Cupid", Cupid),
@@ -75,6 +77,42 @@ def _matcher_builders() -> list[tuple[str, MatcherFactory]]:
         ("JaccardDistanceMatcher", JaccardDistanceMatcher),
         ("SimilarityFlooding", SimilarityFlooding),
     ]
+    # Only include the embedding variant when sentence-transformers is
+    # actually importable; otherwise the bench would crash on import.
+    if importlib.util.find_spec("sentence_transformers") is not None:
+        builders.append(
+            (
+                "JaccardDistanceMatcher_emb",
+                # embedding_device=None lets sentence-transformers / torch
+                # auto-pick: cuda > mps > cpu. So the bench transparently
+                # uses GPU on CUDA boxes and MPS on Apple Silicon without
+                # any config; CPU-only machines fall back automatically.
+                #
+                # embedding_batch_size is left unset, so the encode call
+                # uses sentence-transformers' library default (32). This
+                # is the out-of-the-box operating point. To trade memory
+                # for speed on capable hardware, pass an explicit larger
+                # value (e.g. embedding_batch_size=128 or 256): on the
+                # NYU full suite that drops total wall time from ~15s to
+                # ~11s on MPS without affecting accuracy.
+                #
+                # tversky_alpha=tversky_beta=1.0 reduces to Jaccard (the
+                # default; matches prior behaviour). Set both to 0.5 for
+                # Dice, or one to 0 to recover set containment — natural
+                # for subset/superset workloads (dataset discovery), but
+                # on the NYU bench it regressed mean F1 by ~12pp because
+                # asymmetric scoring inflates similarity for size-
+                # asymmetric pairs. match_weighting defaults to Binary
+                # (count-based intersection); switch to Margin to weight
+                # each value by its top1-vs-top2 confidence gap.
+                lambda: JaccardDistanceMatcher(
+                    distance_fun=StringDistanceFunction.Embedding,
+                    threshold_dist=0.7,
+                    embedding_device=None,
+                ),
+            )
+        )
+    return builders
 
 
 # ---------------------------------------------------------------------------

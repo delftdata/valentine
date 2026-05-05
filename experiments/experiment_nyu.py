@@ -1,3 +1,4 @@
+import importlib.util
 import json
 import time
 from pathlib import Path
@@ -12,6 +13,7 @@ from valentine.algorithms import (
     JaccardDistanceMatcher,
     SimilarityFlooding,
 )
+from valentine.algorithms.jaccard_distance import StringDistanceFunction
 
 
 def _iter_datasets(data_root: Path) -> list[Path]:
@@ -43,13 +45,25 @@ def _load_ground_truth(path: Path) -> list[tuple[str, str]]:
 
 
 def _matcher_builders():
-    return [
+    builders = [
         ("Coma", lambda: Coma(use_instances=True)),
         ("Cupid", Cupid),
         ("DistributionBased", DistributionBased),
         ("JaccardDistanceMatcher", JaccardDistanceMatcher),
         ("SimilarityFlooding", SimilarityFlooding),
     ]
+    if importlib.util.find_spec("sentence_transformers") is not None:
+        builders.append(
+            (
+                "JaccardDistanceMatcher_emb",
+                lambda: JaccardDistanceMatcher(
+                    distance_fun=StringDistanceFunction.Embedding,
+                    threshold_dist=0.7,
+                    embedding_device=None,
+                ),
+            )
+        )
+    return builders
 
 
 def main():

@@ -3,260 +3,303 @@
     "Coma": {
       "pairs": {
         "customers": {
-          "seconds": 0.0204,
+          "seconds": 0.0049,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0098,
+          "seconds": 0.0053,
           "n_matches": 4,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 0.8
         },
         "products": {
-          "seconds": 0.0166,
+          "seconds": 0.005,
           "n_matches": 6,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0125,
+          "seconds": 0.0054,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0112,
+          "seconds": 0.0046,
           "n_matches": 5,
           "f1": 0.8889,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.0705,
-      "worst_seconds": 0.0204,
+      "total_seconds": 0.0252,
+      "worst_seconds": 0.0054,
       "mean_f1": 0.9556,
       "mean_mrr": 0.96
     },
     "Coma_Inst": {
       "pairs": {
         "customers": {
-          "seconds": 0.0306,
+          "seconds": 0.0139,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0333,
+          "seconds": 0.0154,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "products": {
-          "seconds": 0.0233,
+          "seconds": 0.012,
           "n_matches": 6,
           "f1": 0.9091,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0245,
+          "seconds": 0.0117,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.022,
+          "seconds": 0.0103,
           "n_matches": 5,
           "f1": 0.8889,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.1337,
-      "worst_seconds": 0.0333,
+      "total_seconds": 0.0633,
+      "worst_seconds": 0.0154,
       "mean_f1": 0.9596,
       "mean_mrr": 1.0
     },
     "Cupid": {
       "pairs": {
         "customers": {
-          "seconds": 2.0127,
+          "seconds": 1.285,
           "n_matches": 6,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 0.8
         },
         "orders": {
-          "seconds": 0.0297,
+          "seconds": 0.018,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
           "mrr": 0.6
         },
         "products": {
-          "seconds": 0.0301,
+          "seconds": 0.0193,
           "n_matches": 6,
           "f1": 0.9091,
           "recall_at_gt": 0.8333,
           "mrr": 0.8333
         },
         "events": {
-          "seconds": 0.0151,
+          "seconds": 0.0091,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0657,
+          "seconds": 0.0417,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
           "mrr": 0.6
         }
       },
-      "total_seconds": 2.1533,
-      "worst_seconds": 2.0127,
+      "total_seconds": 1.3731,
+      "worst_seconds": 1.285,
       "mean_f1": 0.8596,
       "mean_mrr": 0.7667
     },
     "DistributionBased": {
       "pairs": {
         "customers": {
-          "seconds": 0.0993,
+          "seconds": 0.1268,
           "n_matches": 7,
           "f1": 1.0,
-          "recall_at_gt": 1.0,
-          "mrr": 1.0
+          "recall_at_gt": 0.8,
+          "mrr": 0.9
         },
         "orders": {
-          "seconds": 0.0918,
+          "seconds": 0.13,
           "n_matches": 4,
           "f1": 0.75,
           "recall_at_gt": 0.8,
           "mrr": 0.8
         },
         "products": {
-          "seconds": 0.0773,
+          "seconds": 0.1572,
           "n_matches": 5,
           "f1": 0.8,
           "recall_at_gt": 0.8333,
           "mrr": 0.8333
         },
         "events": {
-          "seconds": 0.0601,
+          "seconds": 0.1085,
           "n_matches": 4,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0795,
+          "seconds": 0.149,
           "n_matches": 3,
           "f1": 0.75,
           "recall_at_gt": 0.6,
           "mrr": 0.6
         }
       },
-      "total_seconds": 0.408,
-      "worst_seconds": 0.0993,
+      "total_seconds": 0.6715,
+      "worst_seconds": 0.1572,
       "mean_f1": 0.86,
-      "mean_mrr": 0.8467
+      "mean_mrr": 0.8267
     },
     "JaccardDistanceMatcher": {
       "pairs": {
         "customers": {
-          "seconds": 0.0111,
+          "seconds": 0.005,
           "n_matches": 7,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0139,
+          "seconds": 0.0089,
           "n_matches": 11,
           "f1": 0.8889,
           "recall_at_gt": 0.6,
           "mrr": 1.0
         },
         "products": {
-          "seconds": 0.0101,
+          "seconds": 0.0051,
           "n_matches": 7,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0116,
+          "seconds": 0.0061,
           "n_matches": 6,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0095,
+          "seconds": 0.0045,
           "n_matches": 5,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.0562,
-      "worst_seconds": 0.0139,
+      "total_seconds": 0.0296,
+      "worst_seconds": 0.0089,
       "mean_f1": 0.9778,
       "mean_mrr": 1.0
     },
     "SimilarityFlooding": {
       "pairs": {
         "customers": {
-          "seconds": 0.0437,
+          "seconds": 0.0244,
           "n_matches": 25,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 1.0
         },
         "orders": {
-          "seconds": 0.0369,
+          "seconds": 0.0237,
           "n_matches": 25,
           "f1": 0.8889,
           "recall_at_gt": 0.8,
           "mrr": 0.9
         },
         "products": {
-          "seconds": 0.0644,
+          "seconds": 0.0333,
           "n_matches": 36,
           "f1": 0.9091,
           "recall_at_gt": 0.8333,
           "mrr": 1.0
         },
         "events": {
-          "seconds": 0.0364,
+          "seconds": 0.0226,
           "n_matches": 16,
           "f1": 1.0,
           "recall_at_gt": 1.0,
           "mrr": 1.0
         },
         "addresses": {
-          "seconds": 0.0388,
+          "seconds": 0.0208,
           "n_matches": 25,
           "f1": 1.0,
           "recall_at_gt": 0.8,
           "mrr": 1.0
         }
       },
-      "total_seconds": 0.2202,
-      "worst_seconds": 0.0644,
+      "total_seconds": 0.1248,
+      "worst_seconds": 0.0333,
       "mean_f1": 0.9374,
       "mean_mrr": 0.98
+    },
+    "JaccardDistanceMatcher_emb": {
+      "pairs": {
+        "customers": {
+          "seconds": 6.3396,
+          "n_matches": 7,
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
+        },
+        "orders": {
+          "seconds": 0.2713,
+          "n_matches": 18,
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
+        },
+        "products": {
+          "seconds": 0.1497,
+          "n_matches": 10,
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
+        },
+        "events": {
+          "seconds": 0.0724,
+          "n_matches": 6,
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
+        },
+        "addresses": {
+          "seconds": 0.1303,
+          "n_matches": 11,
+          "f1": 1.0,
+          "recall_at_gt": 1.0,
+          "mrr": 1.0
+        }
+      },
+      "total_seconds": 6.9633,
+      "worst_seconds": 6.3396,
+      "mean_f1": 1.0,
+      "mean_mrr": 1.0
     }
   }
 }

@@ -37,7 +37,10 @@ class MatcherResults(Mapping):
         sorted_matches = dict(sorted(matches.items(), key=lambda x: x[1], reverse=True))
         self._data: dict[ColumnPair, float] = sorted_matches
         self._details: dict[ColumnPair, dict[str, float]] = details or {}
-        self._cached_one_to_one: MatcherResults | None = None
+        # Cached default 1:1 selection (Hungarian, since it is the default
+        # filter used by Precision / Recall / F1Score). Greedy and mutual
+        # variants are niche and not cached.
+        self._cached_hungarian: MatcherResults | None = None
 
     # -- Mapping protocol --------------------------------------------------
 
@@ -87,34 +90,118 @@ class MatcherResults(Mapping):
 
     # -- Transformations ---------------------------------------------------
 
-    def one_to_one(self, threshold: float | None = None) -> MatcherResults:
-        """Filter to one-to-one column matches.
+    def one_to_one_hungarian(self, threshold: float | None = None) -> MatcherResults:  # noqa: PLR0912
+        """Globally optimal 1:1 column matching via Hungarian assignment.
 
-        Starting from the highest-scoring pair, greedily assigns each source
-        and target column at most one match. Pairs below ``threshold`` are
-        discarded. When ``threshold`` is ``None`` (the default), the median
-        similarity score is used.
+        This is the **default** 1:1 selector — it is what
+        :class:`Precision` / :class:`Recall` / :class:`F1Score` call when
+        their ``one_to_one`` flag is set. Each source and target appears
+        in at most one returned pair, with the assignment chosen to
+        maximise **total** similarity over all valid one-to-one
+        assignments. Cost is O(n³) on column counts via
+        ``scipy.optimize.linear_sum_assignment`` — negligible for
+        typical schema sizes — and almost always strictly better than
+        the greedy variant.
 
         Parameters
         ----------
         threshold : float | None
-            Minimum similarity to keep. If None, uses the median score.
+            Minimum similarity to keep. If ``None``, uses the median
+            similarity score.
 
         Returns
         -------
         MatcherResults
-            A new instance with one-to-one matches only.
+            A new instance with the Hungarian-optimal one-to-one
+            assignment, post-thresholding.
         """
-        if threshold is None and self._cached_one_to_one is not None:
-            return self._cached_one_to_one
+        if threshold is None and self._cached_hungarian is not None:
+            return self._cached_hungarian
+        if not self._data:
+            result = MatcherResults({})
+            if threshold is None:
+                self._cached_hungarian = result
+            return result
+
+        # Stable index of unique sources and targets.
+        sources: list[tuple[str, str]] = []
+        source_idx: dict[tuple[str, str], int] = {}
+        targets: list[tuple[str, str]] = []
+        target_idx: dict[tuple[str, str], int] = {}
+        for cp in self._data:
+            if cp.source not in source_idx:
+                source_idx[cp.source] = len(sources)
+                sources.append(cp.source)
+            if cp.target not in target_idx:
+                target_idx[cp.target] = len(targets)
+                targets.append(cp.target)
+
+        m, n = len(sources), len(targets)
+        sim = [[0.0] * n for _ in range(m)]
+        pair_lookup: dict[tuple, ColumnPair] = {}
+        for cp, score in self._data.items():
+            sim[source_idx[cp.source]][target_idx[cp.target]] = score
+            pair_lookup[(cp.source, cp.target)] = cp
+
+        # Hungarian minimises cost; we want max similarity.
+        from scipy.optimize import linear_sum_assignment  # noqa: PLC0415
+
+        cost = [[-s for s in row] for row in sim]
+        row_ind, col_ind = linear_sum_assignment(cost)
 
         set_match_values = set(self._data.values())
-
         if len(set_match_values) < 2:
             result = MatcherResults(dict(self._data), details=dict(self._details))
             if threshold is None:
-                self._cached_one_to_one = result
+                self._cached_hungarian = result
             return result
+        if threshold is None:
+            min_sim = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
+        else:
+            min_sim = threshold
+
+        selected: dict[ColumnPair, float] = {}
+        for r, c in zip(row_ind, col_ind, strict=False):
+            cp = pair_lookup.get((sources[r], targets[c]))
+            if cp is None:
+                continue  # no actual pair at this (s, t)
+            score = self._data[cp]
+            if score >= min_sim:
+                selected[cp] = score
+
+        filtered_details = {k: v for k, v in self._details.items() if k in selected}
+        result = MatcherResults(selected, details=filtered_details)
+        if threshold is None:
+            self._cached_hungarian = result
+        return result
+
+    def one_to_one_greedy(self, threshold: float | None = None) -> MatcherResults:
+        """Greedy 1:1 column matching, kept for backwards compatibility.
+
+        Starting from the highest-scoring pair, greedily assigns each
+        source and target column at most one match. Pairs below
+        ``threshold`` are discarded. When ``threshold`` is ``None`` (the
+        default), the median similarity score is used.
+
+        Greedy can lock in a locally-best pair that blocks a better
+        globally-optimal assignment, so :meth:`one_to_one_hungarian` is
+        the recommended default; this method is exposed for
+        compatibility and for test pinning.
+
+        Parameters
+        ----------
+        threshold : float | None
+            Minimum similarity to keep. If ``None``, uses the median score.
+
+        Returns
+        -------
+        MatcherResults
+            A new instance with the greedy 1:1 assignment.
+        """
+        set_match_values = set(self._data.values())
+
+        if len(set_match_values) < 2:
+            return MatcherResults(dict(self._data), details=dict(self._details))
 
         matched: dict[tuple[str, str], bool] = {}
         for key in self._data:
@@ -137,10 +224,57 @@ class MatcherResults(Mapping):
                     break
 
         filtered_details = {k: v for k, v in self._details.items() if k in matches1to1}
-        result = MatcherResults(matches1to1, details=filtered_details)
-        if threshold is None:
-            self._cached_one_to_one = result
-        return result
+        return MatcherResults(matches1to1, details=filtered_details)
+
+    def one_to_one_mutual_top(self, n: int = 1) -> MatcherResults:
+        """Keep pairs where each side ranks the other in its top *n*.
+
+        Pair ``(s, t)`` survives iff ``t`` is among ``s``'s ``n`` highest-
+        scoring targets AND ``s`` is among ``t``'s ``n`` highest-scoring
+        sources. With ``n=1`` this is the classic mutual nearest-
+        neighbour filter — high-precision, drops one-sided affinities.
+        Strictly stricter than :meth:`one_to_one_hungarian`: only
+        mutually-confirmed pairs survive, even at the cost of recall.
+
+        Parameters
+        ----------
+        n : int
+            Top-n cutoff per side (default 1 = mutual nearest neighbour).
+
+        Returns
+        -------
+        MatcherResults
+            A new instance with only the mutually-confirmed pairs.
+        """
+        if n < 1:
+            raise ValueError(f"n must be >= 1, got {n}")
+        if not self._data:
+            return MatcherResults({})
+
+        by_source: dict[tuple[str, str], list[tuple[float, tuple[str, str]]]] = {}
+        by_target: dict[tuple[str, str], list[tuple[float, tuple[str, str]]]] = {}
+        for cp, score in self._data.items():
+            by_source.setdefault(cp.source, []).append((score, cp.target))
+            by_target.setdefault(cp.target, []).append((score, cp.source))
+
+        src_top: dict[tuple[str, str], set] = {}
+        for s, lst in by_source.items():
+            lst.sort(reverse=True)
+            src_top[s] = {t for _, t in lst[:n]}
+        tgt_top: dict[tuple[str, str], set] = {}
+        for t, lst in by_target.items():
+            lst.sort(reverse=True)
+            tgt_top[t] = {s for _, s in lst[:n]}
+
+        selected: dict[ColumnPair, float] = {
+            cp: score
+            for cp, score in self._data.items()
+            if cp.target in src_top.get(cp.source, set())
+            and cp.source in tgt_top.get(cp.target, set())
+        }
+
+        filtered_details = {k: v for k, v in self._details.items() if k in selected}
+        return MatcherResults(selected, details=filtered_details)
 
     def filter(self, min_score: float) -> MatcherResults:
         """Filter matches by minimum similarity score.
@@ -223,6 +357,7 @@ class MatcherResults(Mapping):
         self,
         ground_truth: list[tuple[str, str]] | list[ColumnPair],
         metrics: set[Metric] = METRICS_CORE,
+        one_to_one_method: str = "hungarian",
     ) -> dict[str, Any]:
         """Compute evaluation metrics against a ground truth.
 
@@ -235,6 +370,10 @@ class MatcherResults(Mapping):
             comparison.
         metrics : set[Metric], optional
             Set of metric instances to compute (default: ``METRICS_CORE``).
+        one_to_one_method : {"greedy", "hungarian", "mutual_top"}
+            Selection algorithm passed to each metric's ``apply`` method
+            for use when the metric's ``one_to_one`` flag is ``True``
+            (default: ``"hungarian"``).
 
         Returns
         -------
@@ -243,7 +382,7 @@ class MatcherResults(Mapping):
         """
         res: dict[str, Any] = {}
         for metric in metrics:
-            res.update(metric.apply(self, ground_truth))
+            res.update(metric.apply(self, ground_truth, one_to_one_method=one_to_one_method))
         return res
 
     # -- Copies ------------------------------------------------------------
