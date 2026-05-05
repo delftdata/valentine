@@ -3,10 +3,11 @@ from __future__ import annotations
 import re
 from functools import lru_cache
 
-import nltk
 import numpy as np
 from nltk.corpus import stopwords
 from scipy.sparse import csr_matrix
+
+from ....utils.utils import ensure_nltk_data
 
 _SPLIT_RE = re.compile(r"[^a-zA-Z0-9]+")
 
@@ -17,7 +18,7 @@ def _english_stopwords() -> frozenset[str]:
     try:
         return frozenset(stopwords.words("english"))
     except LookupError:
-        nltk.download("stopwords", quiet=True)
+        ensure_nltk_data()
         return frozenset(stopwords.words("english"))
 
 

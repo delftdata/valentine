@@ -11,20 +11,9 @@ from anytree import LevelOrderIter
 from nltk.corpus import stopwords, wordnet as wn
 from rapidfuzz.distance import Levenshtein
 
+from ...utils.utils import ensure_nltk_data as _ensure_nltk_data
 from . import datatype_compatibility
 from .schema_element import SchemaElement, Token, TokenTypes
-
-
-def _ensure_nltk_data() -> None:
-    """Download the nltk corpora Cupid needs if they are not yet present.
-
-    Centralising this lets us lazily trigger it from any of the call sites
-    that touch wordnet/stopwords without duplicating the download list.
-    """
-    nltk.download("punkt_tab")
-    nltk.download("omw-1.4")
-    nltk.download("stopwords")
-    nltk.download("wordnet")
 
 
 @lru_cache(maxsize=1)
