@@ -66,8 +66,8 @@ jobs:
       - name: Install test deps
         run: pip install pytest==9.0.2
 
-      - name: Run tests (unittest)
-        run: python -m unittest discover tests
+      - name: Run tests
+        run: python -m pytest -q tests
 
   # 3) Test the built wheel on all OS/Python
   test_wheel:
@@ -113,7 +113,7 @@ jobs:
         run: pip install pytest==9.0.2
 
       - name: Run tests (against installed wheel)
-        run: python -m unittest discover tests
+        run: python -m pytest -q tests
 
   # 4) Publish to PyPI on Release (tag publish event)
   publish-to-pypi:

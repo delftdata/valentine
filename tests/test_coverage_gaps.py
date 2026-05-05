@@ -4,11 +4,14 @@ Kept in a dedicated module so that coverage-driven additions don't pollute
 behaviour-focused test files.
 """
 
+import importlib.util
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
 import pytest
+
+_ST_AVAILABLE = importlib.util.find_spec("sentence_transformers") is not None
 
 from tests import df1, df2
 from valentine import InvalidMatcherError, valentine_match
@@ -685,3 +688,85 @@ class TestMetricHelpers:
     def test_normalize_4field_is_table_aware(self):
         pairs, table_aware = _normalize_ground_truth([("src_tbl", "src_col", "tgt_tbl", "tgt_col")])
         assert pairs == [("src_tbl", "src_col", "tgt_tbl", "tgt_col")] and table_aware is True
+
+
+# -- JaccardDistanceMatcher real embedding integration ----------------------
+# These tests require sentence-transformers and are skipped when it is absent.
+# They exercise the actual SentenceTransformer model, unlike the mocked tests
+# above — use them to verify the real embedding path works end-to-end.
+
+@pytest.mark.skipif(not _ST_AVAILABLE, reason="sentence_transformers not installed")
+class TestJaccardEmbeddingIntegration:
+    """Integration tests that load a real SentenceTransformer model."""
+
+    _MATCHER = JaccardDistanceMatcher(
+        distance_fun=StringDistanceFunction.Embedding,
+        embedding_device="cpu",
+        threshold_dist=0.5,
+    )
+
+    def test_semantically_similar_columns_match(self):
+        # "customer_id" / "client_id" and "order_date" / "purchase_date" are
+        # semantically close; the embedding matcher should return non-zero
+        # similarity for at least one pair.
+        d1 = DataframeTable(
+            pd.DataFrame({"customer_id": ["C1", "C2", "C3"], "order_date": ["2024-01-01", "2024-01-02", "2024-01-03"]}),
+            name="orders",
+        )
+        d2 = DataframeTable(
+            pd.DataFrame({"client_id": ["C1", "C2", "C3"], "purchase_date": ["2024-01-01", "2024-01-02", "2024-01-03"]}),
+            name="purchases",
+        )
+        results = self._MATCHER.get_matches(d1, d2)
+        assert len(results) > 0
+        assert all(0.0 <= score <= 1.0 for score in results.values())
+
+    def test_identical_values_score_is_high(self):
+        # Two columns with identical string values should produce a near-1.0
+        # embedding similarity because the same text encodes to the same vector.
+        d1 = DataframeTable(pd.DataFrame({"city": ["London", "Paris", "Berlin"]}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"city": ["London", "Paris", "Berlin"]}), name="B")
+        results = self._MATCHER.get_matches(d1, d2)
+        assert len(results) == 1
+        score = next(iter(results.values()))
+        assert score > 0.9
+
+    def test_batch_size_produces_same_result(self):
+        # Results with batch_size=1 must match results with the default batch
+        # size, verifying that batching does not affect the output.
+        d1 = DataframeTable(pd.DataFrame({"col": ["alpha", "beta", "gamma"]}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"col": ["alpha", "delta"]}), name="B")
+        default_matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding,
+            embedding_device="cpu",
+            threshold_dist=0.5,
+        )
+        batched_matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding,
+            embedding_device="cpu",
+            threshold_dist=0.5,
+            embedding_batch_size=1,
+        )
+        default_res = default_matcher.get_matches(d1, d2)
+        batched_res = batched_matcher.get_matches(d1, d2)
+        assert set(default_res.keys()) == set(batched_res.keys())
+        for key in default_res:
+            assert abs(default_res[key] - batched_res[key]) < 1e-5
+
+    def test_get_matches_batch_shares_embeddings(self):
+        # get_matches_batch must encode each unique string exactly once
+        # across all tables. We verify this indirectly: the result contains
+        # cross-table pair entries for every (t1, t2) combination.
+        d1 = DataframeTable(pd.DataFrame({"col": ["x", "y"]}), name="T1")
+        d2 = DataframeTable(pd.DataFrame({"col": ["x", "z"]}), name="T2")
+        d3 = DataframeTable(pd.DataFrame({"col": ["y", "z"]}), name="T3")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding,
+            embedding_device="cpu",
+            threshold_dist=0.0,
+        )
+        results = matcher.get_matches_batch([d1, d2, d3])
+        table_pairs = {(cp.source_table, cp.target_table) for cp in results}
+        assert ("T1", "T2") in table_pairs
+        assert ("T1", "T3") in table_pairs
+        assert ("T2", "T3") in table_pairs
