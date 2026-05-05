@@ -25,7 +25,6 @@ from valentine.algorithms import (
 from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus
 from valentine.algorithms.coma.similarity.tokens import tokenize_name, tokens_similarity
 from valentine.algorithms.cupid.linguistic_matching import _cached_synsets, get_synonyms
-from valentine.algorithms.jaccard_distance import StringDistanceFunction
 from valentine.algorithms.distribution_based.clustering_utils import (
     _COLUMN_STORE,
     _compute_ranks,
@@ -38,9 +37,11 @@ from valentine.algorithms.distribution_based.column_model import (
     clear_global_ranks_cache,
 )
 from valentine.algorithms.distribution_based.quantile_histogram import QuantileHistogram
+from valentine.algorithms.jaccard_distance import StringDistanceFunction
 from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.data_sources.dataframe.dataframe_table import DataframeTable
+from valentine.metrics.metric_helpers import _apply_one_to_one, _normalize_ground_truth
 
 # -- MatcherResults dunder & transformation coverage ------------------------
 
@@ -469,6 +470,7 @@ _EMB_PATCH = "valentine.algorithms.jaccard_distance.jaccard_distance._load_sente
 
 def _fake_encoder(dim: int = 4) -> MagicMock:
     """Return a mock SentenceTransformer that yields deterministic L2-normalised embeddings."""
+
     def encode(texts, **kwargs):
         rng = np.random.default_rng(0)
         emb = rng.random((len(texts), dim)).astype(np.float32)
@@ -598,7 +600,7 @@ class TestHungarianCachingAndThreshold:
 
 class TestMutualTopN:
     def setup_method(self):
-        # 3 sources × 3 targets; diagonal pairs are mutual nearest neighbours.
+        # 3 sources x 3 targets; diagonal pairs are mutual nearest neighbours.
         self.data = {
             ColumnPair("s", "a", "t", "x"): 0.9,
             ColumnPair("s", "b", "t", "y"): 0.8,
@@ -652,15 +654,15 @@ class TestGreedyEarlyReturn:
 
 # -- metric_helpers dispatch & ground-truth normalisation ------------------
 
-from valentine.metrics.metric_helpers import _apply_one_to_one, _normalize_ground_truth
-
 
 class TestMetricHelpers:
     def _two_pair_results(self):
-        return MatcherResults({
-            ColumnPair("s", "a", "t", "x"): 0.9,
-            ColumnPair("s", "b", "t", "y"): 0.8,
-        })
+        return MatcherResults(
+            {
+                ColumnPair("s", "a", "t", "x"): 0.9,
+                ColumnPair("s", "b", "t", "y"): 0.8,
+            }
+        )
 
     def test_apply_invalid_method_raises(self):
         with pytest.raises(ValueError, match="Unknown one_to_one_method"):
@@ -670,9 +672,7 @@ class TestMetricHelpers:
         assert isinstance(_apply_one_to_one(self._two_pair_results(), "greedy"), MatcherResults)
 
     def test_apply_mutual_top_dispatches(self):
-        assert isinstance(
-            _apply_one_to_one(self._two_pair_results(), "mutual_top"), MatcherResults
-        )
+        assert isinstance(_apply_one_to_one(self._two_pair_results(), "mutual_top"), MatcherResults)
 
     def test_normalize_empty_returns_false_flag(self):
         pairs, table_aware = _normalize_ground_truth([])
@@ -683,7 +683,5 @@ class TestMetricHelpers:
         assert pairs == [("src_col", "tgt_col")] and table_aware is False
 
     def test_normalize_4field_is_table_aware(self):
-        pairs, table_aware = _normalize_ground_truth(
-            [("src_tbl", "src_col", "tgt_tbl", "tgt_col")]
-        )
+        pairs, table_aware = _normalize_ground_truth([("src_tbl", "src_col", "tgt_tbl", "tgt_col")])
         assert pairs == [("src_tbl", "src_col", "tgt_tbl", "tgt_col")] and table_aware is True
