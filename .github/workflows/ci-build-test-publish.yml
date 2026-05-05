@@ -61,6 +61,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
           pip install ".[polars]" || true
+          pip install ".[embeddings]"
 
       - name: Install test deps
         run: pip install pytest==9.0.2
@@ -106,6 +107,7 @@ jobs:
             pip install dist/*.tar.gz
           fi
           pip install polars || true
+          pip install "sentence-transformers>=2.0,<6.0"
 
       - name: Install test deps
         run: pip install pytest==9.0.2
