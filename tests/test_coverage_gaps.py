@@ -11,8 +11,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-_ST_AVAILABLE = importlib.util.find_spec("sentence_transformers") is not None
-
 from tests import df1, df2
 from valentine import InvalidMatcherError, valentine_match
 from valentine.algorithms import (
@@ -45,6 +43,8 @@ from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.data_sources.dataframe.dataframe_table import DataframeTable
 from valentine.metrics.metric_helpers import _apply_one_to_one, _normalize_ground_truth
+
+_ST_AVAILABLE = importlib.util.find_spec("sentence_transformers") is not None
 
 # -- MatcherResults dunder & transformation coverage ------------------------
 
@@ -695,6 +695,7 @@ class TestMetricHelpers:
 # They exercise the actual SentenceTransformer model, unlike the mocked tests
 # above — use them to verify the real embedding path works end-to-end.
 
+
 @pytest.mark.skipif(not _ST_AVAILABLE, reason="sentence_transformers not installed")
 class TestJaccardEmbeddingIntegration:
     """Integration tests that load a real SentenceTransformer model."""
@@ -710,11 +711,21 @@ class TestJaccardEmbeddingIntegration:
         # semantically close; the embedding matcher should return non-zero
         # similarity for at least one pair.
         d1 = DataframeTable(
-            pd.DataFrame({"customer_id": ["C1", "C2", "C3"], "order_date": ["2024-01-01", "2024-01-02", "2024-01-03"]}),
+            pd.DataFrame(
+                {
+                    "customer_id": ["C1", "C2", "C3"],
+                    "order_date": ["2024-01-01", "2024-01-02", "2024-01-03"],
+                }
+            ),
             name="orders",
         )
         d2 = DataframeTable(
-            pd.DataFrame({"client_id": ["C1", "C2", "C3"], "purchase_date": ["2024-01-01", "2024-01-02", "2024-01-03"]}),
+            pd.DataFrame(
+                {
+                    "client_id": ["C1", "C2", "C3"],
+                    "purchase_date": ["2024-01-01", "2024-01-02", "2024-01-03"],
+                }
+            ),
             name="purchases",
         )
         results = self._MATCHER.get_matches(d1, d2)

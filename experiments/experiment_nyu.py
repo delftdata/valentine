@@ -53,14 +53,16 @@ def _matcher_builders():
         ("SimilarityFlooding", SimilarityFlooding),
     ]
     if importlib.util.find_spec("sentence_transformers") is not None:
-        builders.append((
-            "JaccardDistanceMatcher_emb",
-            lambda: JaccardDistanceMatcher(
-                distance_fun=StringDistanceFunction.Embedding,
-                threshold_dist=0.7,
-                embedding_device=None,
-            ),
-        ))
+        builders.append(
+            (
+                "JaccardDistanceMatcher_emb",
+                lambda: JaccardDistanceMatcher(
+                    distance_fun=StringDistanceFunction.Embedding,
+                    threshold_dist=0.7,
+                    embedding_device=None,
+                ),
+            )
+        )
     return builders
 
 
