@@ -39,6 +39,7 @@ jobs:
           pip install .
 
       - name: Run accuracy regression check
+        shell: bash
         run: |
           python experiments/bench.py \
             --quick \
