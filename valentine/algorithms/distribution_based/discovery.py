@@ -52,9 +52,7 @@ def compute_distribution_clusters(
 
     graph = create_graph(columns, edges_per_column)
 
-    connected_components = list(nx.connected_components(graph))
-
-    return connected_components
+    return sorted(nx.connected_components(graph), key=sorted)
 
 
 def compute_distribution_clusters_parallel(
@@ -99,9 +97,7 @@ def compute_distribution_clusters_parallel(
 
     graph = create_graph(columns, edges_per_column)
 
-    connected_components = list(nx.connected_components(graph))
-
-    return connected_components
+    return sorted(nx.connected_components(graph), key=sorted)
 
 
 def compute_attributes(
@@ -278,7 +274,7 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
                 if len({u, v, w}) == 3:
                     opt_model += x_vars[u, w] <= x_vars[u, v] + x_vars[v, w]
 
-    opt_model.solve(PULP_CBC_CMD(msg=False))
+    opt_model.solve(PULP_CBC_CMD(msg=False, options=["RandomS", "42"]))
 
     result = {}
 
@@ -319,8 +315,7 @@ def process_correlation_clustering_result(results: list, columns: list):
         m1, m2 = match
         edges_per_column.append([(m1, m2)])
     graph = create_graph(columns, edges_per_column)
-    connected_components = list(nx.connected_components(graph))
-    return connected_components
+    return sorted(nx.connected_components(graph), key=sorted)
 
 
 def create_graph(nodes: list, edges_per_column: list):

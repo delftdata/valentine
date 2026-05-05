@@ -173,14 +173,15 @@ class DistributionBased(BaseMatcher):
         for components in connected_components:
             if len(components) > 1:
                 i = i + 1
+                sorted_components = sorted(components)
                 edges = discovery.compute_attributes(
-                    list(components),
+                    sorted_components,
                     self.__threshold2,
                     tmp_folder_path,
                     self.__quantiles,
                     self.__use_bloom_filters,
                 )
-                all_attributes.append((list(components), edges))
+                all_attributes.append((sorted_components, edges))
 
         results = []
         for components, edges in all_attributes:
@@ -220,15 +221,16 @@ class DistributionBased(BaseMatcher):
         for components in connected_components:
             if len(components) > 1:
                 i = i + 1
+                sorted_components = sorted(components)
                 edges = discovery.compute_attributes_parallel(
-                    list(components),
+                    sorted_components,
                     self.__threshold2,
                     pool,
                     tmp_folder_path,
                     self.__quantiles,
                     self.__use_bloom_filters,
                 )
-                all_attributes.append((list(components), edges))
+                all_attributes.append((sorted_components, edges))
 
         results = []
         for components, edges in all_attributes:
