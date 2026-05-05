@@ -21,10 +21,14 @@ def _ensure_nltk_data() -> None:
     Centralising this lets us lazily trigger it from any of the call sites
     that touch wordnet/stopwords without duplicating the download list.
     """
-    nltk.download("punkt_tab")
-    nltk.download("omw-1.4")
-    nltk.download("stopwords")
-    nltk.download("wordnet")
+    resources = ["punkt_tab", "omw-1.4", "stopwords", "wordnet"]
+    failed = [r for r in resources if not nltk.download(r, quiet=True)]
+    if failed:
+        raise LookupError(
+            f"Failed to download required NLTK resource(s): {failed}. "
+            "Check your network connection or run "
+            "`python -m nltk.downloader " + " ".join(failed) + "` manually."
+        )
 
 
 @lru_cache(maxsize=1)
