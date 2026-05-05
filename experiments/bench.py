@@ -26,6 +26,7 @@ Optional dependency: ``pyinstrument`` for ``--profile``. Install with
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import statistics
 import sys
@@ -78,9 +79,7 @@ def _matcher_builders() -> list[tuple[str, MatcherFactory]]:
     ]
     # Only include the embedding variant when sentence-transformers is
     # actually importable; otherwise the bench would crash on import.
-    try:
-        import sentence_transformers 
-
+    if importlib.util.find_spec("sentence_transformers") is not None:
         builders.append(
             (
                 "JaccardDistanceMatcher_emb",
@@ -113,8 +112,6 @@ def _matcher_builders() -> list[tuple[str, MatcherFactory]]:
                 ),
             )
         )
-    except ImportError:
-        pass
     return builders
 
 

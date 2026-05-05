@@ -44,7 +44,7 @@ def _load_sentence_transformer(model_name: str, device: str | None):
     does not silently reuse a model loaded elsewhere.
     """
     try:
-        from sentence_transformers import SentenceTransformer
+        from sentence_transformers import SentenceTransformer  # noqa: PLC0415
     except ImportError as exc:  # pragma: no cover - depends on optional extra
         raise ImportError(
             "StringDistanceFunction.Embedding requires the 'sentence-transformers' "
@@ -107,10 +107,10 @@ class JaccardDistanceMatcher(BaseMatcher):
     tversky_alpha : float, optional
         Tversky penalty for unmatched values on the *reference* side
         (default: ``1.0``). The pair-similarity reduction is
-        ``T(A, B; α, β) = |A∩B| / (|A∩B| + α·|A−B| + β·|B−A|)``,
+        ``T(A, B; a, b) = |A∩B| / (|A∩B| + a·|A-B| + b·|B-A|)``,
         symmetrised by computing both ``T(A, B)`` and ``T(B, A)`` and
         taking the max so the matcher remains direction-agnostic. With
-        ``α = β = 1.0`` this reduces to Jaccard; with ``α = 1.0,
+        ``a = b = 1.0`` this reduces to Jaccard; with ``a = 1.0,
         β = 0.0`` (or vice versa) it reduces to ``max(|∩|/|A|, |∩|/|B|)``,
         i.e. set containment — the right choice when one column is
         expected to be a subset of the other. Intermediate values trade
@@ -231,11 +231,12 @@ class JaccardDistanceMatcher(BaseMatcher):
                     vocab[v] = len(vocab)
 
         if not vocab:
-            return {key: (values, np.zeros((0, 0), dtype=np.float32)) for key, values in col_values.items()}
+            return {
+                key: (values, np.zeros((0, 0), dtype=np.float32))
+                for key, values in col_values.items()
+            }
 
-        model = _load_sentence_transformer(
-            self.__embedding_model_name, self.__embedding_device
-        )
+        model = _load_sentence_transformer(self.__embedding_model_name, self.__embedding_device)
         encode_kwargs: dict = {
             "normalize_embeddings": True,
             "show_progress_bar": False,
@@ -243,9 +244,7 @@ class JaccardDistanceMatcher(BaseMatcher):
         }
         if self.__embedding_batch_size is not None:
             encode_kwargs["batch_size"] = self.__embedding_batch_size
-        all_embeddings = model.encode(list(vocab.keys()), **encode_kwargs).astype(
-            np.float32
-        )
+        all_embeddings = model.encode(list(vocab.keys()), **encode_kwargs).astype(np.float32)
 
         dim = all_embeddings.shape[1]
         out: dict[tuple[str, str], tuple[list[str], np.ndarray]] = {}
@@ -352,9 +351,7 @@ class JaccardDistanceMatcher(BaseMatcher):
         return self.__aggregate(a_match, b_match, len(src_values), len(tgt_values))
 
     @staticmethod
-    def __directional_counts(
-        scores: np.ndarray, threshold: float
-    ) -> tuple[float, float]:
+    def __directional_counts(scores: np.ndarray, threshold: float) -> tuple[float, float]:
         """Count rows / columns whose best entry is at least ``threshold``.
 
         ``scores[i, j]`` is the similarity between A's i-th value and B's
@@ -368,17 +365,15 @@ class JaccardDistanceMatcher(BaseMatcher):
             float(np.count_nonzero(hits.any(axis=0))),
         )
 
-    def __aggregate(
-        self, a_match: float, b_match: float, a_size: int, b_size: int
-    ) -> float:
+    def __aggregate(self, a_match: float, b_match: float, a_size: int, b_size: int) -> float:
         """Reduce directional match counts to a similarity score via Tversky.
 
         Uses the asymmetric Tversky index in both directions and returns
         the larger of the two so the matcher stays direction-agnostic:
 
-            T(A, B; α, β) = a_match / (a_match + α·(|A|−a_match) + β·(|B|−b_match))
+            T(A, B; a, b) = a_match / (a_match + a·(|A|-a_match) + b·(|B|-b_match))
 
-        With α = β = 1 this is Jaccard; α = 1, β = 0 (or vice versa)
+        With a = b = 1 this is Jaccard; a = 1, b = 0 (or vice versa)
         recovers ``max(|∩|/|A|, |∩|/|B|)`` containment.
         """
         if a_size == 0 or b_size == 0:

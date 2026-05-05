@@ -22,8 +22,7 @@ def _apply_one_to_one(matches: MatcherResults, method: OneToOneMethod) -> Matche
     if method == "mutual_top":
         return matches.one_to_one_mutual_top()
     raise ValueError(
-        f"Unknown one_to_one_method: {method!r}; "
-        "expected 'greedy', 'hungarian', or 'mutual_top'"
+        f"Unknown one_to_one_method: {method!r}; expected 'greedy', 'hungarian', or 'mutual_top'"
     )
 
 

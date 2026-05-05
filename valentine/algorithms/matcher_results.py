@@ -90,7 +90,7 @@ class MatcherResults(Mapping):
 
     # -- Transformations ---------------------------------------------------
 
-    def one_to_one_hungarian(self, threshold: float | None = None) -> MatcherResults:
+    def one_to_one_hungarian(self, threshold: float | None = None) -> MatcherResults:  # noqa: PLR0912
         """Globally optimal 1:1 column matching via Hungarian assignment.
 
         This is the **default** 1:1 selector — it is what
@@ -144,7 +144,7 @@ class MatcherResults(Mapping):
             pair_lookup[(cp.source, cp.target)] = cp
 
         # Hungarian minimises cost; we want max similarity.
-        from scipy.optimize import linear_sum_assignment
+        from scipy.optimize import linear_sum_assignment  # noqa: PLC0415
 
         cost = [[-s for s in row] for row in sim]
         row_ind, col_ind = linear_sum_assignment(cost)
@@ -266,10 +266,12 @@ class MatcherResults(Mapping):
             lst.sort(reverse=True)
             tgt_top[t] = {s for _, s in lst[:n]}
 
-        selected: dict[ColumnPair, float] = {}
-        for cp, score in self._data.items():
-            if cp.target in src_top.get(cp.source, set()) and cp.source in tgt_top.get(cp.target, set()):
-                selected[cp] = score
+        selected: dict[ColumnPair, float] = {
+            cp: score
+            for cp, score in self._data.items()
+            if cp.target in src_top.get(cp.source, set())
+            and cp.source in tgt_top.get(cp.target, set())
+        }
 
         filtered_details = {k: v for k, v in self._details.items() if k in selected}
         return MatcherResults(selected, details=filtered_details)
