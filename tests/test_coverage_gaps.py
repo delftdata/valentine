@@ -4,6 +4,8 @@ Kept in a dedicated module so that coverage-driven additions don't pollute
 behaviour-focused test files.
 """
 
+from unittest.mock import MagicMock, patch
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -23,6 +25,7 @@ from valentine.algorithms import (
 from valentine.algorithms.coma.similarity.tfidf import TfidfCorpus
 from valentine.algorithms.coma.similarity.tokens import tokenize_name, tokens_similarity
 from valentine.algorithms.cupid.linguistic_matching import _cached_synsets, get_synonyms
+from valentine.algorithms.jaccard_distance import StringDistanceFunction
 from valentine.algorithms.distribution_based.clustering_utils import (
     _COLUMN_STORE,
     _compute_ranks,
@@ -436,3 +439,251 @@ class TestDistributionBasedInternals:
         # Only the non-empty column survives.
         assert len(produced) == 1
         assert produced[0][0] == "full"
+
+
+# -- JaccardDistanceMatcher parameter validation ----------------------------
+
+
+class TestJaccardParameterValidation:
+    def test_embedding_batch_size_zero_raises(self):
+        with pytest.raises(ValueError, match="embedding_batch_size"):
+            JaccardDistanceMatcher(embedding_batch_size=0)
+
+    def test_embedding_batch_size_negative_raises(self):
+        with pytest.raises(ValueError, match="embedding_batch_size"):
+            JaccardDistanceMatcher(embedding_batch_size=-1)
+
+    def test_tversky_alpha_negative_raises(self):
+        with pytest.raises(ValueError, match="tversky"):
+            JaccardDistanceMatcher(tversky_alpha=-0.1)
+
+    def test_tversky_beta_negative_raises(self):
+        with pytest.raises(ValueError, match="tversky"):
+            JaccardDistanceMatcher(tversky_beta=-0.5)
+
+
+# -- JaccardDistanceMatcher embedding path ----------------------------------
+
+_EMB_PATCH = "valentine.algorithms.jaccard_distance.jaccard_distance._load_sentence_transformer"
+
+
+def _fake_encoder(dim: int = 4) -> MagicMock:
+    """Return a mock SentenceTransformer that yields deterministic L2-normalised embeddings."""
+    def encode(texts, **kwargs):
+        rng = np.random.default_rng(0)
+        emb = rng.random((len(texts), dim)).astype(np.float32)
+        norms = np.linalg.norm(emb, axis=1, keepdims=True)
+        return emb / np.where(norms == 0, 1.0, norms)
+
+    mock = MagicMock()
+    mock.encode.side_effect = encode
+    return mock
+
+
+class TestJaccardEmbeddingPath:
+    @patch(_EMB_PATCH)
+    def test_embedding_produces_matches(self, mock_load):
+        mock_load.return_value = _fake_encoder()
+        d1 = DataframeTable(pd.DataFrame({"col": ["alpha", "beta", "gamma"]}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"col": ["alpha", "delta", "epsilon"]}), name="B")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding, threshold_dist=0.0
+        )
+        assert len(matcher.get_matches(d1, d2)) > 0
+
+    @patch(_EMB_PATCH)
+    def test_embedding_encode_called_once_globally(self, mock_load):
+        mock = _fake_encoder()
+        mock_load.return_value = mock
+        d1 = DataframeTable(pd.DataFrame({"c1": ["a", "b"], "c2": ["c", "d"]}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"c1": ["e", "f"], "c2": ["g", "h"]}), name="B")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding, threshold_dist=0.0
+        )
+        matcher.get_matches(d1, d2)
+        assert mock.encode.call_count == 1
+        assert set(mock.encode.call_args[0][0]) == {"a", "b", "c", "d", "e", "f", "g", "h"}
+
+    @patch(_EMB_PATCH)
+    def test_embedding_batch_size_forwarded_to_encode(self, mock_load):
+        mock = _fake_encoder()
+        mock_load.return_value = mock
+        d1 = DataframeTable(pd.DataFrame({"col": ["x", "y"]}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"col": ["z", "w"]}), name="B")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding,
+            threshold_dist=0.0,
+            embedding_batch_size=32,
+        )
+        matcher.get_matches(d1, d2)
+        assert mock.encode.call_args[1].get("batch_size") == 32
+
+    @patch(_EMB_PATCH)
+    def test_embedding_no_batch_size_not_forwarded(self, mock_load):
+        mock = _fake_encoder()
+        mock_load.return_value = mock
+        d1 = DataframeTable(pd.DataFrame({"col": ["x", "y"]}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"col": ["z", "w"]}), name="B")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding, threshold_dist=0.0
+        )
+        matcher.get_matches(d1, d2)
+        assert "batch_size" not in mock.encode.call_args[1]
+
+    def test_all_empty_columns_skips_encode(self):
+        # vocab is empty → early return before _load_sentence_transformer is called,
+        # so no ImportError even though sentence_transformers is not installed.
+        d1 = DataframeTable(pd.DataFrame({"col": pd.Series([], dtype="object")}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"col": pd.Series([], dtype="object")}), name="B")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding, threshold_dist=0.5
+        )
+        results = matcher.get_matches(d1, d2)
+        assert all(score == 0.0 for score in results.values())
+
+    @patch(_EMB_PATCH)
+    def test_empty_source_column_similarity_is_zero(self, mock_load):
+        mock_load.return_value = _fake_encoder()
+        d1 = DataframeTable(pd.DataFrame({"col": pd.Series([], dtype="object")}), name="A")
+        d2 = DataframeTable(pd.DataFrame({"col": ["x", "y"]}), name="B")
+        matcher = JaccardDistanceMatcher(
+            distance_fun=StringDistanceFunction.Embedding, threshold_dist=0.5
+        )
+        results = matcher.get_matches(d1, d2)
+        assert all(score == 0.0 for score in results.values())
+
+
+# -- MatcherResults.one_to_one_hungarian caching & threshold ----------------
+
+
+class TestHungarianCachingAndThreshold:
+    def setup_method(self):
+        self.data = {
+            ColumnPair("s", "a", "t", "x"): 0.9,
+            ColumnPair("s", "b", "t", "y"): 0.8,
+            ColumnPair("s", "c", "t", "z"): 0.7,
+            ColumnPair("s", "a", "t", "y"): 0.4,
+            ColumnPair("s", "b", "t", "z"): 0.3,
+            ColumnPair("s", "c", "t", "x"): 0.2,
+        }
+        self.results = MatcherResults(self.data)
+
+    def test_cache_hit_returns_same_object(self):
+        first = self.results.one_to_one_hungarian()
+        second = self.results.one_to_one_hungarian()
+        assert first is second
+
+    def test_empty_data_result_is_cached(self):
+        empty = MatcherResults({})
+        result = empty.one_to_one_hungarian()
+        assert len(result) == 0
+        assert empty._cached_hungarian is result
+
+    def test_empty_data_with_explicit_threshold_not_cached(self):
+        empty = MatcherResults({})
+        empty.one_to_one_hungarian(threshold=0.5)
+        assert empty._cached_hungarian is None
+
+    def test_explicit_threshold_result_not_cached(self):
+        self.results.one_to_one_hungarian(threshold=0.8)
+        assert self.results._cached_hungarian is None
+
+    def test_explicit_threshold_filters_correctly(self):
+        result = self.results.one_to_one_hungarian(threshold=0.8)
+        assert all(score >= 0.8 for score in result.values())
+
+
+# -- MatcherResults.one_to_one_mutual_top -----------------------------------
+
+
+class TestMutualTopN:
+    def setup_method(self):
+        # 3 sources × 3 targets; diagonal pairs are mutual nearest neighbours.
+        self.data = {
+            ColumnPair("s", "a", "t", "x"): 0.9,
+            ColumnPair("s", "b", "t", "y"): 0.8,
+            ColumnPair("s", "c", "t", "z"): 0.7,
+            ColumnPair("s", "a", "t", "y"): 0.4,
+            ColumnPair("s", "b", "t", "z"): 0.3,
+            ColumnPair("s", "c", "t", "x"): 0.2,
+        }
+        self.results = MatcherResults(self.data)
+
+    def test_n_zero_raises(self):
+        with pytest.raises(ValueError, match="n must be >= 1"):
+            self.results.one_to_one_mutual_top(n=0)
+
+    def test_n_negative_raises(self):
+        with pytest.raises(ValueError, match="n must be >= 1"):
+            self.results.one_to_one_mutual_top(n=-1)
+
+    def test_empty_data_returns_empty(self):
+        assert len(MatcherResults({}).one_to_one_mutual_top()) == 0
+
+    def test_n1_keeps_only_mutual_nearest(self):
+        result = self.results.one_to_one_mutual_top(n=1)
+        pairs = {(cp.source_column, cp.target_column) for cp in result}
+        assert pairs == {("a", "x"), ("b", "y"), ("c", "z")}
+
+    def test_n2_admits_more_pairs_than_n1(self):
+        assert len(self.results.one_to_one_mutual_top(n=2)) >= len(
+            self.results.one_to_one_mutual_top(n=1)
+        )
+
+    def test_details_preserved_for_surviving_pairs(self):
+        details = {k: {"score": v} for k, v in self.data.items()}
+        result = MatcherResults(self.data, details=details).one_to_one_mutual_top(n=1)
+        for cp in result:
+            assert cp in result.details
+
+
+# -- MatcherResults.one_to_one_greedy early-return branch ------------------
+
+
+class TestGreedyEarlyReturn:
+    def test_all_identical_scores_returns_all_pairs(self):
+        # < 2 distinct values → skip threshold logic and return everything.
+        data = {
+            ColumnPair("s", "a", "t", "x"): 0.5,
+            ColumnPair("s", "b", "t", "y"): 0.5,
+        }
+        assert len(MatcherResults(data).one_to_one_greedy()) == 2
+
+
+# -- metric_helpers dispatch & ground-truth normalisation ------------------
+
+from valentine.metrics.metric_helpers import _apply_one_to_one, _normalize_ground_truth
+
+
+class TestMetricHelpers:
+    def _two_pair_results(self):
+        return MatcherResults({
+            ColumnPair("s", "a", "t", "x"): 0.9,
+            ColumnPair("s", "b", "t", "y"): 0.8,
+        })
+
+    def test_apply_invalid_method_raises(self):
+        with pytest.raises(ValueError, match="Unknown one_to_one_method"):
+            _apply_one_to_one(self._two_pair_results(), "invalid")
+
+    def test_apply_greedy_dispatches(self):
+        assert isinstance(_apply_one_to_one(self._two_pair_results(), "greedy"), MatcherResults)
+
+    def test_apply_mutual_top_dispatches(self):
+        assert isinstance(
+            _apply_one_to_one(self._two_pair_results(), "mutual_top"), MatcherResults
+        )
+
+    def test_normalize_empty_returns_false_flag(self):
+        pairs, table_aware = _normalize_ground_truth([])
+        assert pairs == [] and table_aware is False
+
+    def test_normalize_2field_not_table_aware(self):
+        pairs, table_aware = _normalize_ground_truth([("src_col", "tgt_col")])
+        assert pairs == [("src_col", "tgt_col")] and table_aware is False
+
+    def test_normalize_4field_is_table_aware(self):
+        pairs, table_aware = _normalize_ground_truth(
+            [("src_tbl", "src_col", "tgt_tbl", "tgt_col")]
+        )
+        assert pairs == [("src_tbl", "src_col", "tgt_tbl", "tgt_col")] and table_aware is True
