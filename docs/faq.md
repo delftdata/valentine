@@ -157,7 +157,7 @@ filtered = {
 **No.** Every matcher in v1.x is pure Python — including the COMA
 implementation. There is no JVM, no subprocess, no temp file shuffling.
 The Java version of COMA was removed in
-[v1.0.0](changelog.md#v100-api-redesign).
+[v1.0.0](changelog.md#v100-2026-05-06).
 
 ## What changed in v1.0.0?
 
