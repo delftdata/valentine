@@ -80,8 +80,8 @@ top_quarter = matches.take_top_percent(25)
 # Filter by an absolute score threshold
 strong = matches.filter(min_score=0.7)
 
-# Reduce to one-to-one matches (greedy, highest-first). Threshold defaults
-# to the median score of the current results.
+# Reduce to one-to-one matches (globally optimal Hungarian assignment).
+# Threshold defaults to the median score of the current results.
 one_to_one = matches.one_to_one_hungarian()
 
 # Override the threshold to be stricter
@@ -92,7 +92,7 @@ Each method is documented in full in the API reference:
 [`take_top_n`](api.md#take_top_n),
 [`take_top_percent`](api.md#take_top_percent),
 [`filter`](api.md#filter), and
-[`one_to_one`](api.md#one_to_one_hungarian).
+[`one_to_one_hungarian`](api.md#one_to_one_hungarian).
 
 Every transformation returns a **new**
 [`MatcherResults`](api.md#matcherresults) instance, so you can chain
@@ -105,9 +105,9 @@ best_strict_pairs = matches.filter(min_score=0.5).one_to_one_hungarian(threshold
 !!! tip "Details propagation"
 
     When a matcher provides per-pair sub-matcher breakdowns, those details
-    are filtered alongside the data when you call `filter`, `one_to_one`,
-    `take_top_n`, or `take_top_percent` — the derived `MatcherResults`
-    keeps only the details for its surviving pairs.
+    are filtered alongside the data when you call `filter`,
+    `one_to_one_hungarian`, `take_top_n`, or `take_top_percent` — the
+    derived `MatcherResults` keeps only the details for its surviving pairs.
 
 ## Match details (Coma)
 

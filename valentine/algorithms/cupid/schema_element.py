@@ -1,3 +1,4 @@
+import warnings
 from collections import namedtuple
 from enum import Enum
 
@@ -22,7 +23,10 @@ class SchemaElement:
         if isinstance(token, Token):
             self.tokens.append(token)
         else:
-            print("Incorrect token type. The type should be 'Token'")
+            warnings.warn(
+                f"Incorrect token type: expected 'Token', got {type(token).__name__!r}.",
+                stacklevel=2,
+            )
 
     def get_tokens_data(self, tokens=None):
         if tokens is None:

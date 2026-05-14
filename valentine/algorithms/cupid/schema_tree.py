@@ -1,3 +1,5 @@
+import logging
+
 from anytree import RenderTree
 
 from .linguistic_matching import normalization
@@ -49,7 +51,7 @@ class SchemaTree:
     def print_schema_tree(self):
         for pre, _, node in self.get_schema_tree():
             tree_str = f"{pre}{node.name + str(node.categories)}"
-            print(tree_str.ljust(8))
+            logging.debug(tree_str.ljust(8))
 
     def get_leaves(self):
         return self.get_node(self.schema_name).leaves

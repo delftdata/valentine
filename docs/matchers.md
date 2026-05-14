@@ -100,11 +100,13 @@ matcher = Coma(use_instances=True)
 roughly *O(n_left · n_right · L)* in column counts and average name
 length. Adding `use_instances=True` builds a TF-IDF corpus over **all**
 sampled cell values across **all** input tables, so cost grows linearly
-with `instance_sample_size` (default `1000`) and the total number of
-columns. Expect sub-second matching for two ~30-column tables, single
-seconds for ~100 columns, and tens of seconds once you cross a few
-hundred columns with instances enabled. Memory scales with the size of
-the TF-IDF vocabulary; lower `instance_sample_size` if you hit a wall.
+with the `instance_sample_size` parameter of
+[`valentine_match`](api.md#valentine_match) (default `1000`) and the
+total number of columns. Expect sub-second matching for two ~30-column
+tables, single seconds for ~100 columns, and tens of seconds once you
+cross a few hundred columns with instances enabled. Memory scales with the
+size of the TF-IDF vocabulary; lower `instance_sample_size` in the
+`valentine_match` call if you hit a wall.
 
 [:material-book-marked: Full parameter reference &rarr;](api.md#coma)
 
@@ -168,34 +170,57 @@ aggressively for exploration runs, then bump it up for the final pass.
 
 ## `JaccardDistanceMatcher`
 
-A simple, explainable instance-based baseline. Columns are compared by
-Jaccard similarity of their value sets, with element equality decided
-by a configurable string distance function (Levenshtein, Jaro–Winkler,
-exact, …). Useful as a sanity check alongside a heavier matcher, or as
-a fast first pass on clean, short-valued columns.
+An instance-based matcher that compares columns by Jaccard (or Tversky)
+similarity of their value sets. Element equality is configurable: choose
+from classic string-distance functions (Levenshtein, Jaro–Winkler, exact,
+…) or switch to sentence-transformer **embeddings** for semantic matching.
+Useful as a sanity check alongside a heavier matcher, or as a fast first
+pass on clean, short-valued columns.
 
 ```python
 from valentine.algorithms import JaccardDistanceMatcher
 from valentine.algorithms.jaccard_distance import StringDistanceFunction
 
+# Classic string-distance mode (default)
 matcher = JaccardDistanceMatcher(
     threshold_dist=0.8,
     distance_fun=StringDistanceFunction.Levenshtein,
+)
+
+# Embedding mode — requires pip install valentine[embeddings]
+matcher = JaccardDistanceMatcher(
+    distance_fun=StringDistanceFunction.Embedding,
+    threshold_dist=0.7,          # cosine similarity threshold
+    embedding_model="all-MiniLM-L6-v2",
+    embedding_device=None,       # auto: CUDA → MPS → CPU
 )
 ```
 
 The element-equality function is configured with the
 [`StringDistanceFunction`](api.md#stringdistancefunction) enum, which
 exposes `Levenshtein`, `DamerauLevenshtein`, `Hamming`, `Jaro`,
-`JaroWinkler`, and `Exact`.
+`JaroWinkler`, `Exact`, and `Embedding`.
 
-**Performance.** Fast and predictable. With `Exact` element equality
-the cost is essentially set-intersection — milliseconds per column
-pair. Switching to a string-distance function turns each comparison
-into an *O(|A| · |B|)* cross-product over column value sets, so it
-slows down quickly once columns hold more than a few hundred unique
-values. Use it as a fast first pass, or pair it with
-`StringDistanceFunction.Exact` on clean, short-valued columns.
+The value-set comparison itself can be generalised from Jaccard to
+[Tversky similarity](https://en.wikipedia.org/wiki/Tversky_index) via
+the `tversky_alpha` and `tversky_beta` parameters (both default `0.5`,
+reproducing Jaccard exactly). Other presets: `alpha=beta=1` gives
+Sørensen–Dice; `alpha=1, beta=0` gives set containment.
+
+When `distance_fun=StringDistanceFunction.Embedding`, `JaccardDistanceMatcher`
+overrides [`get_matches_batch`](api.md#get_matches_batch) to embed every
+unique column value **once** across all tables, sharing the forward pass
+across all pairs.
+
+**Performance.** With `Exact` element equality the cost is essentially
+set-intersection — milliseconds per column pair. Switching to a
+string-distance function turns each comparison into an *O(|A| · |B|)*
+cross-product over column value sets, so it slows down quickly once
+columns hold more than a few hundred unique values. Embedding mode is
+the slowest option (one model forward pass per unique value), but the
+`get_matches_batch` override amortises embedding cost across all column
+pairs in a batch — making it relatively more efficient as the number of
+tables grows.
 
 [:material-book-marked: Full parameter reference &rarr;](api.md#jaccarddistancematcher)
 

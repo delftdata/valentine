@@ -21,7 +21,7 @@ For the full commit history, see [GitHub releases][releases].
     to empty. Keep sub-section order consistent:
     *Added · Changed · Deprecated · Removed · Fixed · Security*.
 
-## Unreleased
+<!-- ## Unreleased
 
 ### Added
 
@@ -47,10 +47,18 @@ For the full commit history, see [GitHub releases][releases].
 
 - _Nothing yet._
 
-## v1.0.0 — API redesign
+-->
 
-v1.0.0 is a significant redesign of Valentine's public API. If you are
+## v1.0.0 — 2026-05-14
+
+v1.0.0 is a significant redesign of Valentine's public API together
+with a performance and accuracy overhaul of every matcher. If you are
 coming from 0.5.x or earlier, the changes below will affect your code.
+
+**Headline:** 13×–243× per-matcher speedup on the NYU Open Data
+benchmark (1,442 s → 19 s total), pure-Python Coma (no JVM), Polars
+support, embedding-based Jaccard, and Hungarian as the new default
+1:1 selector.
 
 ### Added
 
@@ -73,6 +81,41 @@ coming from 0.5.x or earlier, the changes below will affect your code.
   and `METRICS_PRECISION_INCREASING_N` alongside the existing
   `METRICS_CORE` — see
   [Predefined metric sets](api.md#predefined-metric-sets).
+- `MeanReciprocalRank` (MRR) metric, also added to `METRICS_ALL` and
+  `METRICS_CORE`. Per-source ranking: for each source column, finds
+  the rank of the first correct target in the column's ranked
+  predictions.
+- **Polars support.** New `PolarsTable` / `PolarsColumn` adapters in
+  `valentine/data_sources/polars/`. `valentine_match` auto-detects
+  pandas and Polars frames and supports mixing them in a single call.
+  Install with `pip install valentine[polars]`.
+- **Embedding-based string distance** for `JaccardDistanceMatcher` via
+  `StringDistanceFunction.Embedding`, using sentence-transformers
+  cosine similarity. Knobs: `embedding_model`, `embedding_device`
+  (auto-picks `cuda` → `mps` → `cpu`), `embedding_batch_size`. One
+  global encode pass per match call. Install with
+  `pip install valentine[embeddings]`. *(Closes #65.)*
+- **Tversky-based set-similarity reduction** in
+  `JaccardDistanceMatcher` (`tversky_alpha`, `tversky_beta`). Defaults
+  reproduce Jaccard exactly; `α=β=0.5` gives Sørensen-Dice, `α=1, β=0`
+  gives containment.
+- **Three named one-to-one selectors** on
+  [`MatcherResults`](api.md#matcherresults):
+  [`one_to_one_hungarian()`](api.md#one_to_one_hungarian) (new
+  default — globally optimal via `scipy.optimize.linear_sum_assignment`),
+  [`one_to_one_greedy()`](api.md#one_to_one_greedy) (previous
+  behaviour), and
+  [`one_to_one_mutual_top(n)`](api.md#one_to_one_mutual_top) (mutual
+  nearest-neighbour filter).
+- **Pluggable 1:1 algorithm** in the metrics API. New
+  `one_to_one_method` keyword on `Metric.apply()` and
+  `MatcherResults.get_metrics()` accepts `"hungarian" | "greedy" |
+  "mutual_top"`. Defaults to `"hungarian"`.
+- Configurable `instance_weight` constructor parameter on
+  [`Coma`](api.md#coma) (default `1.0`).
+- Generic abbreviation matching in Coma name similarity — handles
+  prefix and ordered-subsequence forms (`dept`→`department`,
+  `fname`→`firstname`, `st`→`street`).
 - Full [documentation site](https://delftdata.github.io/valentine/)
   with matcher guide, API reference, and migration notes.
 
@@ -95,6 +138,23 @@ coming from 0.5.x or earlier, the changes below will affect your code.
 - Parameter validation happens at matcher construction time: invalid
   thresholds, negative counts, or mutually-exclusive flags raise
   `ValueError` immediately rather than failing mid-match.
+- **13×–243× faster per matcher across the NYU benchmark suite (1,442 s → 19 s total).** Coma uses TF-IDF cosine on cached float32 sparse CSR matrices with
+  pair-level memoisation; Cupid caches WordNet synsets and lemma walks;
+  DistributionBased replaces the per-row `bucket_binary_search` with
+  `np.searchsorted` + `np.bincount` over precomputed bound arrays;
+  `JaccardDistanceMatcher` uses `rapidfuzz.process.cdist` with a
+  `score_cutoff` short-circuit. Full per-matcher numbers in the
+  [Benchmark](benchmark.md) page.
+- `BaseTable.get_data_type` treats pandas `"str"` / `"string"` dtypes
+  as text (previously misclassified as unknown).
+- Cupid datatype compatibility is now binary (same family = 1.0,
+  different = 0.0); a generic family-based classifier handles
+  arbitrary SQL type strings (`varchar(255)`, `bigint`, …).
+- Coma TF-IDF stopwords switched from a 33-word Lucene frozenset to
+  NLTK's 179-word English stopwords for stronger noise filtering.
+- The default 1:1 selector for the metrics API is now Hungarian.
+  Existing callers that relied on greedy selection should pass
+  `one_to_one_method="greedy"`.
 
 ### Deprecated
 
@@ -111,6 +171,34 @@ coming from 0.5.x or earlier, the changes below will affect your code.
 - The Java-backed COMA wrapper and its JVM dependency.
 - Mutable `dict` semantics on match results (`__setitem__`, `update`,
   `pop`, …).
+- `MatcherResults.one_to_one()` — use one of the three explicitly
+  named selectors:
+  [`one_to_one_hungarian()`](api.md#one_to_one_hungarian) (new
+  default), [`one_to_one_greedy()`](api.md#one_to_one_greedy)
+  (previous behaviour), or
+  [`one_to_one_mutual_top(n)`](api.md#one_to_one_mutual_top).
+- Redundant Coma matchers in flat tabular schemas: `LEAVES_CM`,
+  `PARENTS_CM`, `PATH_CM`, `SIBLINGS_CM`, `DATATYPE_MATCHER`, and the
+  predefined `INSTANCES_CM`. These produced constant or
+  duplicate-of-`NAME_CM` scores on tabular inputs, diluting the
+  signal.
+
+### Fixed
+
+- DistributionBased: `quantile_emd` now returns `inf` instead of
+  dividing by zero when histogram values sum to zero.
+- Coma: TF-IDF cache stores list reference alongside its `id()` key
+  to detect `id()` reuse after garbage collection, preventing stale
+  cache hits.
+- SimilarityFlooding: `NodeID` prefix collision fixed (columns named
+  `"NodeID*"` no longer collide with internal graph nodes); tokeniser
+  now handles `snake_case`, `SCREAMING_SNAKE`, hyphens, and embedded
+  digits.
+- Data source utilities: `get_encoding` handles `chardet` returning
+  `None`; `get_delimiter` catches `csv.Sniffer` failures on malformed
+  input.
+- NLTK data downloads are now resilient: retried, atomic, and silent
+  when data is already present.
 
 ### Migrating from 0.5.x
 
@@ -227,3 +315,32 @@ you no longer need a JVM — [`Coma`](api.md#coma) is now pure Python and
 ships with the package. The constructor signature has changed slightly;
 see the [API reference](api.md#coma) for the new parameters
 (`max_n`, `use_instances`, `use_schema`, `delta`, `threshold`).
+
+#### 7. `one_to_one()` is gone — pick a selector
+
+`MatcherResults.one_to_one()` has been replaced by three explicitly
+named selectors:
+
+```python
+# Before
+filtered = matches.one_to_one()
+
+# After — globally optimal (new default), recommended:
+filtered = matches.one_to_one_hungarian()
+
+# After — preserve previous greedy behaviour:
+filtered = matches.one_to_one_greedy()
+
+# After — mutual nearest neighbour:
+filtered = matches.one_to_one_mutual_top(n=1)
+```
+
+The metrics API also takes the algorithm as a per-call argument:
+
+```python
+matches.get_metrics(gt, metrics={F1Score()},
+                    one_to_one_method="hungarian")  # default
+```
+
+Custom [`Metric`](api.md#metric) subclasses that override `apply` need
+to accept the new `one_to_one_method` keyword (or `**kwargs`).

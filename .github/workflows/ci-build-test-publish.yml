@@ -64,7 +64,7 @@ jobs:
           pip install ".[embeddings]"
 
       - name: Install test deps
-        run: pip install pytest==9.0.2
+        run: pip install pytest==9.0.3
 
       - name: Run tests
         run: python -m pytest -q tests

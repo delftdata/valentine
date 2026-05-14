@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "valentine"
-version = "1.0.0.dev0"
+version = "1.0.0"
 description = "Valentine: find relationships between columns of different tabular datasets"
 readme = "README.md"
 authors = [
@@ -17,7 +17,7 @@ license = { file = "LICENSE" }
 keywords = ["matching", "valentine", "schema matching", "dataset discovery", "coma", "cupid", "similarity flooding"]
 
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "License :: OSI Approved :: Apache Software License",
@@ -62,7 +62,7 @@ docs = [
     # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
     # deliberately rather than relying on a range, so a bad release
     # can't silently break the docs build.
-    "zensical==0.0.37",
+    "zensical==0.0.41",
 ]
 
 [project.urls]

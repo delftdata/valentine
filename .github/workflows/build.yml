@@ -30,7 +30,7 @@ jobs:
           pip install .
           pip install ".[polars]" || true
           pip install ".[embeddings]"
-          pip install pytest==9.0.2 coverage==7.13.5 ruff==0.15.12
+          pip install pytest==9.0.3 coverage==7.14.0 ruff==0.15.12
 
       - name: Ruff lint (must pass)
         run: ruff check .

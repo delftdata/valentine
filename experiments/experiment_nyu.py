@@ -1,59 +1,115 @@
+"""NYU experiment runner — wall-clock timing + accuracy.
+
+Per-dataset timeout of 120 s prevents hanging on large datasets.
+
+Usage:
+    python -u experiments/experiment_nyu.py [data_root]
+"""
+
+from __future__ import annotations
+
 import importlib.util
 import json
+import statistics
+import sys
 import time
+import warnings
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
 from pathlib import Path
 
 import pandas as pd
 
-from valentine import valentine_match
-from valentine.algorithms import (
+# Suppress noisy deprecation warnings from optional dependencies before
+# importing valentine so they don't clutter experiment output.
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+from valentine import valentine_match  # noqa: E402
+from valentine.algorithms import (  # noqa: E402
     Coma,
     Cupid,
     DistributionBased,
     JaccardDistanceMatcher,
     SimilarityFlooding,
 )
-from valentine.algorithms.jaccard_distance import StringDistanceFunction
+from valentine.metrics import F1Score, RecallAtSizeofGroundTruth  # noqa: E402
+
+DATASET_TIMEOUT = 120  # seconds per dataset per matcher
+
+# ---------------------------------------------------------------------------
+# Data loading
+# ---------------------------------------------------------------------------
 
 
-def _iter_datasets(data_root: Path) -> list[Path]:
+def load_datasets(data_root: Path):
     datasets = []
     for entry in sorted(data_root.iterdir()):
         if not entry.is_dir():
             continue
-        source_path = entry / "source_table.csv"
-        target_path = entry / "target_table.csv"
-        if source_path.exists() and target_path.exists():
-            datasets.append(entry)
+        src_path = entry / "source_table.csv"
+        tgt_path = entry / "target_table.csv"
+        if not (src_path.exists() and tgt_path.exists()):
+            continue
+        src = pd.read_csv(src_path)
+        tgt = pd.read_csv(tgt_path)
+        gt = []
+        gt_path = entry / "ground_truth.json"
+        if gt_path.exists():
+            data = json.loads(gt_path.read_text(encoding="utf-8"))
+            for match in data.get("matches", []):
+                sc = match.get("source_column")
+                tc = match.get("target_column")
+                if sc and tc:
+                    gt.append((sc, tc))
+        datasets.append((entry.name, src, tgt, gt))
     return datasets
 
 
-def _load_ground_truth(path: Path) -> list[tuple[str, str]]:
-    if not path.exists():
-        return []
-    with path.open("r", encoding="utf-8") as handle:
-        data = json.load(handle)
-    matches = data.get("matches", [])
-    ground_truth = []
-    for match in matches:
-        source_col = match.get("source_column")
-        target_col = match.get("target_column")
-        if source_col is None or target_col is None:
-            continue
-        ground_truth.append((source_col, target_col))
-    return ground_truth
+# ---------------------------------------------------------------------------
+# MRR
+# ---------------------------------------------------------------------------
 
 
-def _matcher_builders():
-    builders = [
-        ("Coma", lambda: Coma(use_instances=True)),
+def _mrr(matches, ground_truth):
+    rank_map: dict[tuple[str, str], int] = {}
+    for rank, key in enumerate(matches.keys(), start=1):
+        src_col, tgt_col = key.source_column, key.target_column
+        for pair in [(src_col, tgt_col), (tgt_col, src_col)]:
+            rank_map.setdefault(pair, rank)
+    rr = [
+        1.0 / rank_map[(sc, tc)]
+        if (sc, tc) in rank_map
+        else (1.0 / rank_map[(tc, sc)] if (tc, sc) in rank_map else 0.0)
+        for sc, tc in ground_truth
+    ]
+    return round(statistics.mean(rr), 4) if rr else 0.0
+
+
+_METRICS = {F1Score(), RecallAtSizeofGroundTruth()}
+
+
+def _run_one(src, tgt, matcher):
+    """Run a single match — called inside a thread so it can be timed out."""
+    return valentine_match([src, tgt], matcher)
+
+
+# ---------------------------------------------------------------------------
+# Matchers
+# ---------------------------------------------------------------------------
+
+
+def _build_matchers():
+    matchers = [
+        ("Coma", lambda: Coma(use_instances=False)),
+        ("Coma_Inst", lambda: Coma(use_instances=True)),
         ("Cupid", Cupid),
         ("DistributionBased", DistributionBased),
         ("JaccardDistanceMatcher", JaccardDistanceMatcher),
         ("SimilarityFlooding", SimilarityFlooding),
     ]
     if importlib.util.find_spec("sentence_transformers") is not None:
-        builders.append(
+        from valentine.algorithms.jaccard_distance import StringDistanceFunction  # noqa: PLC0415
+
+        matchers.append(
             (
                 "JaccardDistanceMatcher_emb",
                 lambda: JaccardDistanceMatcher(
@@ -63,73 +119,123 @@ def _matcher_builders():
                 ),
             )
         )
-    return builders
+    return matchers
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 
 def main():
     data_root = Path(__file__).resolve().parent / "data"
-    datasets = _iter_datasets(data_root)
-    if not datasets:
-        raise SystemExit(f"No datasets found under {data_root}")
+    if len(sys.argv) > 1:
+        data_root = Path(sys.argv[1])
+    datasets = load_datasets(data_root)
+    print(f"Found {len(datasets)} datasets", flush=True)
 
-    results = []
-    failures = []
+    all_results: dict = {}
 
-    for dataset_dir in datasets:
-        dataset_name = dataset_dir.name
-        source_path = dataset_dir / "source_table.csv"
-        target_path = dataset_dir / "target_table.csv"
-        ground_truth_path = dataset_dir / "ground_truth.json"
+    for matcher_name, factory in _build_matchers():
+        print(f"\n{'=' * 60}", flush=True)
+        print(f"  {matcher_name}", flush=True)
+        print(f"{'=' * 60}", flush=True)
+        per_dataset: list[dict] = []
+        matcher_total = 0.0
 
-        df_source = pd.read_csv(source_path)
-        df_target = pd.read_csv(target_path)
-        ground_truth = _load_ground_truth(ground_truth_path)
-
-        print(f"\nDataset: {dataset_name}")
-        print(
-            f"  Source columns: {len(df_source.columns)} | Target columns: {len(df_target.columns)}"
-        )
-        print(f"  Ground truth pairs: {len(ground_truth)}")
-
-        for matcher_name, builder in _matcher_builders():
-            matcher = builder()
-            start = time.perf_counter()
+        for ds_name, src, tgt, gt in datasets:
+            matcher = factory()
+            t0 = time.perf_counter()
             try:
-                matches = valentine_match([df_source, df_target], matcher)
-                metrics = matches.get_metrics(ground_truth) if ground_truth else {}
-                elapsed = time.perf_counter() - start
-                results.append(
+                ex = ThreadPoolExecutor(max_workers=1)
+                future = ex.submit(_run_one, src, tgt, matcher)
+                try:
+                    matches = future.result(timeout=DATASET_TIMEOUT)
+                finally:
+                    ex.shutdown(wait=False)
+
+                elapsed = time.perf_counter() - t0
+                matcher_total += elapsed
+
+                if gt:
+                    raw = matches.get_metrics(gt, metrics=_METRICS)
+                    f1 = round(raw.get("F1Score", 0.0), 4)
+                    recall_at_gt = round(raw.get("RecallAtSizeofGroundTruth", 0.0), 4)
+                    mrr = _mrr(matches, gt)
+                else:
+                    f1 = recall_at_gt = mrr = None
+
+                print(
+                    f"  {ds_name[:48]:48s}  {elapsed:6.2f}s  "
+                    f"F1={f1!s:6}  recall@gt={recall_at_gt!s:6}  MRR={mrr}",
+                    flush=True,
+                )
+                per_dataset.append(
                     {
-                        "dataset": dataset_name,
-                        "matcher": matcher_name,
+                        "dataset": ds_name,
                         "seconds": round(elapsed, 4),
-                        **metrics,
+                        "n_src_cols": len(src.columns),
+                        "n_tgt_cols": len(tgt.columns),
+                        "n_matches": len(matches),
+                        "f1": f1,
+                        "recall_at_gt": recall_at_gt,
+                        "mrr": mrr,
                     }
                 )
-                print(f"  {matcher_name}: {metrics} (time: {elapsed:.2f}s)")
-            except Exception as exc:  # Keep moving to finish all datasets/algorithms
-                elapsed = time.perf_counter() - start
-                failures.append(
-                    {
-                        "dataset": dataset_name,
-                        "matcher": matcher_name,
-                        "seconds": round(elapsed, 4),
-                        "error": str(exc),
-                    }
+
+            except FuturesTimeout:
+                elapsed = time.perf_counter() - t0
+                matcher_total += elapsed
+                print(f"  {ds_name[:48]:48s}  TIMEOUT (>{DATASET_TIMEOUT}s)", flush=True)
+                per_dataset.append(
+                    {"dataset": ds_name, "seconds": round(elapsed, 4), "error": "TIMEOUT"}
                 )
-                print(f"  {matcher_name}: failed after {elapsed:.2f}s ({exc})")
 
-    if results:
-        print("\nSummary (metrics per dataset/algorithm):")
-        summary = pd.DataFrame(results)
-        print(summary.to_string(index=False))
+            except Exception as exc:
+                elapsed = time.perf_counter() - t0
+                matcher_total += elapsed
+                print(f"  {ds_name[:48]:48s}  {elapsed:6.2f}s  ERROR: {exc}", flush=True)
+                per_dataset.append(
+                    {"dataset": ds_name, "seconds": round(elapsed, 4), "error": str(exc)}
+                )
 
-    if failures:
-        print("\nFailures:")
-        for failure in failures:
-            print(
-                f"  {failure['dataset']} | {failure['matcher']} | {failure['seconds']}s | {failure['error']}"
-            )
+        f1s = [r["f1"] for r in per_dataset if isinstance(r.get("f1"), float)]
+        recs = [r["recall_at_gt"] for r in per_dataset if isinstance(r.get("recall_at_gt"), float)]
+        mrrs = [r["mrr"] for r in per_dataset if isinstance(r.get("mrr"), float)]
+        mean_f1 = round(statistics.mean(f1s), 4) if f1s else None
+        mean_rec = round(statistics.mean(recs), 4) if recs else None
+        mean_mrr = round(statistics.mean(mrrs), 4) if mrrs else None
+        print(
+            f"\n  Total: {matcher_total:.2f}s  mean F1={mean_f1}  mean recall@gt={mean_rec}  mean MRR={mean_mrr}",
+            flush=True,
+        )
+
+        all_results[matcher_name] = {
+            "datasets": per_dataset,
+            "total_seconds": round(matcher_total, 4),
+            "mean_f1": mean_f1,
+            "mean_recall_at_gt": mean_rec,
+            "mean_mrr": mean_mrr,
+        }
+
+    # Summary
+    print(f"\n{'=' * 60}", flush=True)
+    print("SUMMARY", flush=True)
+    print(f"{'=' * 60}", flush=True)
+    print(
+        f"  {'Matcher':<28} {'Total(s)':>9} {'mean F1':>9} {'recall@gt':>10} {'mean MRR':>10}",
+        flush=True,
+    )
+    print(f"  {'-' * 68}", flush=True)
+    for name, r in all_results.items():
+        print(
+            f"  {name:<28} {r['total_seconds']:>9.2f} {r['mean_f1']!s:>9} {r['mean_recall_at_gt']!s:>10} {r['mean_mrr']!s:>10}",
+            flush=True,
+        )
+
+    out = Path("nyu_results.json")
+    out.write_text(json.dumps(all_results, indent=2), encoding="utf-8")
+    print(f"\nWrote {out}", flush=True)
 
 
 if __name__ == "__main__":

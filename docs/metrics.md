@@ -49,7 +49,7 @@ which.
 
 ## Built-in metrics
 
-Valentine ships five metrics, all in `valentine.metrics`:
+Valentine ships six metrics, all in `valentine.metrics`:
 
 ```python
 from valentine.metrics import (
@@ -58,16 +58,18 @@ from valentine.metrics import (
     F1Score,
     PrecisionTopNPercent,
     RecallAtSizeofGroundTruth,
+    MeanReciprocalRank,
 )
 ```
 
-| Metric                                                   | What it measures                                                   |
-|----------------------------------------------------------|---------------------------------------------------------------------|
-| [`Precision`](api.md#precision)                           | TP / (TP + FP).                                                    |
-| [`Recall`](api.md#recall)                                 | TP / (TP + FN).                                                    |
-| [`F1Score`](api.md#f1score)                               | Harmonic mean of precision and recall.                             |
-| [`PrecisionTopNPercent`](api.md#precisiontopnpercent)     | Precision restricted to the top `n%` of matches by score.          |
-| [`RecallAtSizeofGroundTruth`](api.md#recallatsizeofgroundtruth) | Recall when selecting the top `len(ground_truth)` matches.  |
+| Metric                                                             | What it measures                                                                              |
+|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| [`Precision`](api.md#precision)                                    | TP / (TP + FP).                                                                               |
+| [`Recall`](api.md#recall)                                          | TP / (TP + FN).                                                                               |
+| [`F1Score`](api.md#f1score)                                        | Harmonic mean of precision and recall.                                                        |
+| [`PrecisionTopNPercent`](api.md#precisiontopnpercent)              | Precision restricted to the top `n%` of matches by score.                                     |
+| [`RecallAtSizeofGroundTruth`](api.md#recallatsizeofgroundtruth)    | Recall when selecting the top `len(ground_truth)` matches.                                    |
+| [`MeanReciprocalRank`](api.md#meanreciprocalrank)                  | Average reciprocal rank of the first correct match per source column (standard IR metric).    |
 
 `Precision`, `Recall`, `F1Score` and `PrecisionTopNPercent` all accept a
 `one_to_one: bool` flag that applies
@@ -89,6 +91,7 @@ metrics = matches.get_metrics(ground_truth)
 #   "F1Score": ...,
 #   "PrecisionTop10Percent": ...,
 #   "RecallAtSizeofGroundTruth": ...,
+#   "MeanReciprocalRank": ...,
 # }
 ```
 
