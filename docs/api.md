@@ -269,6 +269,7 @@ Return a shallow copy of the instance.
 def get_metrics(
     ground_truth: list[tuple[str, str]] | list[ColumnPair],
     metrics: set[Metric] = METRICS_CORE,
+    one_to_one_method: str = "hungarian",
 ) -> dict[str, Any]
 ```
 
@@ -284,6 +285,14 @@ be either:
 Both formats may also be passed as plain 2- or 4-tuples; they are
 normalized internally. Returns a flat `dict` keyed by metric name
 (e.g. `{"Precision": 0.9, "Recall": 0.8, "F1Score": 0.85, …}`).
+
+**Parameters**
+
+| Name                | Type                                              | Default          | Description                                                                                                                           |
+|---------------------|---------------------------------------------------|------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `ground_truth`      | `list[tuple[str, str]] \| list[ColumnPair]`       | —                | Expected column-pair mappings. Column-name pairs are table-agnostic; `ColumnPair` instances are table-aware.                          |
+| `metrics`           | `set[Metric]`                                     | `METRICS_CORE`   | Set of [`Metric`](#metric) instances to compute.                                                                                      |
+| `one_to_one_method` | `str`                                             | `"hungarian"`    | 1:1 selector used by metrics that apply one-to-one filtering. One of `"hungarian"`, `"greedy"`, or `"mutual_top"`.                    |
 
 ---
 
@@ -373,8 +382,9 @@ def get_matches_batch(tables: list[BaseTable]) -> dict[ColumnPair, float]
 
 Match columns across every unique pair of tables. Override this method
 in subclasses that benefit from a holistic view (e.g. global TF-IDF
-corpus, global distribution ranks). Both `Coma`, `DistributionBased`,
-and `SimilarityFlooding` override it.
+corpus, global distribution ranks). All three of `Coma`, `DistributionBased`,
+and `SimilarityFlooding` override it, as does `JaccardDistanceMatcher` when
+`distance_fun=StringDistanceFunction.Embedding`.
 
 #### `match_details`
 
@@ -397,6 +407,7 @@ Coma(
     use_schema: bool = True,
     delta: float = 0.15,
     threshold: float = 0.0,
+    instance_weight: float = 1.0,
 )
 ```
 
@@ -406,11 +417,12 @@ and selects results using bidirectional best-match logic.
 
 | Parameter       | Type    | Default | Description                                                                                                                     |
 |-----------------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------|
-| `max_n`         | `int`   | `0`     | Maximum number of matches to keep per column. `0` means unlimited. Must be `>= 0`.                                              |
-| `use_instances` | `bool`  | `False` | Enable TF-IDF instance-based matching.                                                                                          |
-| `use_schema`    | `bool`  | `True`  | Enable schema-based matching. At least one of `use_schema` and `use_instances` must be `True`.                                  |
-| `delta`         | `float` | `0.15`  | Fraction from the best per-column score within which matches are kept (e.g. `0.15` keeps all within 15% of the column's best). Must be in `[0, 1]`. |
-| `threshold`     | `float` | `0.0`   | Absolute minimum similarity to keep a match. Must be in `[0, 1]`.                                                               |
+| `max_n`            | `int`   | `0`   | Maximum number of matches to keep per column. `0` means unlimited. Must be `>= 0`.                                              |
+| `use_instances`    | `bool`  | `False` | Enable TF-IDF instance-based matching.                                                                                        |
+| `use_schema`       | `bool`  | `True`  | Enable schema-based matching. At least one of `use_schema` and `use_instances` must be `True`.                                |
+| `delta`            | `float` | `0.15`  | Fraction from the best per-column score within which matches are kept (e.g. `0.15` keeps all within 15% of the column's best). Must be in `[0, 1]`. |
+| `threshold`        | `float` | `0.0`   | Absolute minimum similarity to keep a match. Must be in `[0, 1]`.                                                             |
+| `instance_weight`  | `float` | `1.0`   | Relative weight of the instance matcher score when combining with schema scores. Must be `>= 0`.                               |
 
 Populates `MatcherResults.details` with `{name, path, leaves, parents, instances}` sub-scores.
 
@@ -480,31 +492,44 @@ JaccardDistanceMatcher(
     threshold_dist: float = 0.8,
     distance_fun: StringDistanceFunction = StringDistanceFunction.Levenshtein,
     process_num: int = 1,
+    embedding_model: str = "all-MiniLM-L6-v2",
+    embedding_device: str | None = None,
+    embedding_batch_size: int = 64,
+    tversky_alpha: float = 0.5,
+    tversky_beta: float = 0.5,
 )
 ```
 
-Baseline instance-based matcher using Jaccard similarity of column
-value sets, with configurable string-distance-based element equality.
+Instance-based matcher using Jaccard (or Tversky) similarity of column
+value sets, with configurable string-distance or embedding-based element
+equality. Overrides `get_matches_batch` to share a single embedding pass
+across all column pairs when `distance_fun=StringDistanceFunction.Embedding`.
 
-| Parameter        | Type                     | Default                          | Description                                                                                                                      |
-|------------------|--------------------------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `threshold_dist` | `float`                  | `0.8`                            | Threshold above which two strings are considered equal under `distance_fun`. Ignored when `distance_fun` is `Exact`. `[0, 1]`.   |
-| `distance_fun`   | `StringDistanceFunction` | `StringDistanceFunction.Levenshtein` | String similarity function. See [`StringDistanceFunction`](#stringdistancefunction).                                          |
-| `process_num`    | `int`                    | `1`                              | Number of worker processes. Must be `>= 1`.                                                                                      |
+| Parameter              | Type                     | Default                              | Description                                                                                                                                                 |
+|------------------------|--------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `threshold_dist`       | `float`                  | `0.8`                                | Threshold above which two strings are considered equal under `distance_fun`. For `Embedding` mode this is a cosine-similarity threshold. Ignored for `Exact`. `[0, 1]`. |
+| `distance_fun`         | `StringDistanceFunction` | `StringDistanceFunction.Levenshtein` | Element-equality function. See [`StringDistanceFunction`](#stringdistancefunction).                                                                         |
+| `process_num`          | `int`                    | `1`                                  | Number of worker processes. Must be `>= 1`.                                                                                                                 |
+| `embedding_model`      | `str`                    | `"all-MiniLM-L6-v2"`                 | Sentence-transformer model name. Only used when `distance_fun=Embedding`. Requires `pip install valentine[embeddings]`.                                     |
+| `embedding_device`     | `str \| None`            | `None`                               | Device for embedding inference (`"cuda"`, `"mps"`, `"cpu"`). `None` auto-selects: CUDA → MPS → CPU.                                                        |
+| `embedding_batch_size` | `int`                    | `64`                                 | Batch size for embedding inference. Only used when `distance_fun=Embedding`.                                                                                |
+| `tversky_alpha`        | `float`                  | `0.5`                                | Tversky α weight (false positives). Default `0.5` reproduces Jaccard exactly. Set to `0.0` for set containment; `1.0` for Dice.                             |
+| `tversky_beta`         | `float`                  | `0.5`                                | Tversky β weight (false negatives). Default `0.5` reproduces Jaccard exactly.                                                                               |
 
 #### `StringDistanceFunction`
 
 Enum of supported element-equality functions for
 `JaccardDistanceMatcher`:
 
-| Value                                  | Description                                       |
-|----------------------------------------|---------------------------------------------------|
-| `StringDistanceFunction.Levenshtein`   | Normalized Levenshtein ratio (default).           |
-| `StringDistanceFunction.DamerauLevenshtein` | Normalized Damerau–Levenshtein ratio.        |
-| `StringDistanceFunction.Hamming`       | Normalized Hamming distance (strings of equal length). |
-| `StringDistanceFunction.Jaro`          | Jaro similarity.                                  |
-| `StringDistanceFunction.JaroWinkler`   | Jaro–Winkler similarity.                          |
-| `StringDistanceFunction.Exact`         | Exact string equality (forces threshold to 1.0).  |
+| Value                                       | Description                                                                                            |
+|---------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| `StringDistanceFunction.Levenshtein`        | Normalized Levenshtein ratio (default).                                                                |
+| `StringDistanceFunction.DamerauLevenshtein` | Normalized Damerau–Levenshtein ratio.                                                                  |
+| `StringDistanceFunction.Hamming`            | Normalized Hamming distance (strings of equal length).                                                 |
+| `StringDistanceFunction.Jaro`               | Jaro similarity.                                                                                       |
+| `StringDistanceFunction.JaroWinkler`        | Jaro–Winkler similarity.                                                                               |
+| `StringDistanceFunction.Exact`              | Exact string equality (forces threshold to 1.0).                                                       |
+| `StringDistanceFunction.Embedding`          | Cosine similarity of sentence-transformer embeddings. Requires `pip install valentine[embeddings]`.    |
 
 ```python
 from valentine.algorithms.jaccard_distance import StringDistanceFunction
@@ -577,6 +602,7 @@ from valentine.metrics import (
     F1Score,
     PrecisionTopNPercent,
     RecallAtSizeofGroundTruth,
+    MeanReciprocalRank,
     METRICS_CORE,
     METRICS_ALL,
     METRICS_PRECISION_RECALL,
@@ -680,14 +706,26 @@ Recall at the top `len(ground_truth)` predictions — i.e. what fraction
 of gold pairs you recover if you select as many predictions as there
 are gold matches. One-to-one filtering is **off** by default here.
 
+#### `MeanReciprocalRank`
+
+```python
+MeanReciprocalRank()
+```
+
+For each source column, finds the rank of the first correct target column
+in the matcher's ranked output and averages the reciprocal of that rank
+across all source columns — a standard information-retrieval metric
+that rewards having the right answer near the top rather than merely
+present somewhere in the list.
+
 ### Predefined metric sets
 
-| Set                              | Contents                                                                                  |
-|----------------------------------|-------------------------------------------------------------------------------------------|
-| `METRICS_CORE`                   | `Precision`, `Recall`, `F1Score`, `PrecisionTopNPercent`, `RecallAtSizeofGroundTruth` (defaults). |
-| `METRICS_ALL`                    | Both `one_to_one=True` and `one_to_one=False` variants of `Precision`, `Recall`, `F1Score`, plus `PrecisionTopNPercent` and `RecallAtSizeofGroundTruth`. |
-| `METRICS_PRECISION_RECALL`       | `{Precision(), Recall()}`.                                                                |
-| `METRICS_PRECISION_INCREASING_N` | `PrecisionTopNPercent` for `n ∈ {10, 20, 30, …, 100}`.                                    |
+| Set                              | Contents                                                                                                                                         |
+|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `METRICS_CORE`                   | `Precision`, `Recall`, `F1Score`, `PrecisionTopNPercent`, `RecallAtSizeofGroundTruth`, `MeanReciprocalRank` (defaults).                          |
+| `METRICS_ALL`                    | Both `one_to_one=True` and `one_to_one=False` variants of `Precision`, `Recall`, `F1Score`, plus `PrecisionTopNPercent`, `RecallAtSizeofGroundTruth`, and `MeanReciprocalRank`. |
+| `METRICS_PRECISION_RECALL`       | `{Precision(), Recall()}`.                                                                                                                       |
+| `METRICS_PRECISION_INCREASING_N` | `PrecisionTopNPercent` for `n ∈ {10, 20, 30, …, 100}`.                                                                                          |
 
 ---
 

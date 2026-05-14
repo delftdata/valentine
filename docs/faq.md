@@ -112,7 +112,9 @@ ground_truth = [("emp_id", "employee_number"), ("fname", "first_name")]
 print(matches.get_metrics(ground_truth))
 ```
 
-By default this computes Precision, Recall, and F1. Pass a
+By default this computes all six metrics in `METRICS_CORE`:
+`Precision`, `Recall`, `F1Score`, `PrecisionTopNPercent`,
+`RecallAtSizeofGroundTruth`, and `MeanReciprocalRank`. Pass a
 `metrics={...}` set with custom thresholds or your own
 [`Metric`](api.md#metric) subclasses for more detail. See
 [Evaluation metrics](metrics.md).
@@ -157,7 +159,7 @@ filtered = {
 **No.** Every matcher in v1.x is pure Python — including the COMA
 implementation. There is no JVM, no subprocess, no temp file shuffling.
 The Java version of COMA was removed in
-[v1.0.0](changelog.md#v100-2026-05-06).
+[v1.0.0](changelog.md#v100-2026-05-14).
 
 ## What changed in v1.0.0?
 

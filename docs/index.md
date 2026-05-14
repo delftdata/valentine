@@ -1,7 +1,6 @@
 ---
 icon: lucide/heart
 hide:
-  - navigation
   - toc
 ---
 

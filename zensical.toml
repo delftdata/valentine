@@ -6,7 +6,7 @@
 [project]
 
 site_name = "Valentine"
-site_description = "Schema matching for pandas DataFrames — made easy."
+site_description = "Schema matching for pandas and Polars DataFrames — made easy."
 site_author = "Delft Data"
 site_url = "https://delftdata.github.io/valentine/"
 copyright = """
@@ -27,6 +27,8 @@ nav = [
     { "Full example" = "example.md" },
     { "API reference" = "api.md" },
     { "FAQ" = "faq.md" },
+    { "What's new in v1.0.0" = "blog-v100.md" },
+    { "Benchmark" = "benchmark.md" },
     { "Changelog" = "changelog.md" },
     { "Research" = "research.md" },
 ]
@@ -50,13 +52,9 @@ features = [
     "content.tabs.link",
     "content.tooltips",
     "navigation.footer",
-    "navigation.indexes",
     "navigation.instant",
     "navigation.instant.prefetch",
     "navigation.path",
-    "navigation.sections",
-    "navigation.tabs",
-    "navigation.tabs.sticky",
     "navigation.top",
     "navigation.tracking",
     "search.highlight",

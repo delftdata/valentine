@@ -21,7 +21,7 @@ For the full commit history, see [GitHub releases][releases].
     to empty. Keep sub-section order consistent:
     *Added · Changed · Deprecated · Removed · Fixed · Security*.
 
-## Unreleased
+<!-- ## Unreleased
 
 ### Added
 
@@ -47,16 +47,18 @@ For the full commit history, see [GitHub releases][releases].
 
 - _Nothing yet._
 
-## v1.0.0 — 2026-05-06
+-->
+
+## v1.0.0 — 2026-05-14
 
 v1.0.0 is a significant redesign of Valentine's public API together
 with a performance and accuracy overhaul of every matcher. If you are
 coming from 0.5.x or earlier, the changes below will affect your code.
 
-**Headline:** ~27× wall-clock speedup on the full NYU Open Data
-benchmark (1048s → 39s), pure-Python Coma (no JVM), Polars support,
-embedding-based Jaccard, and Hungarian as the new default 1:1
-selector.
+**Headline:** 13×–243× per-matcher speedup on the NYU Open Data
+benchmark (1,442 s → 19 s total), pure-Python Coma (no JVM), Polars
+support, embedding-based Jaccard, and Hungarian as the new default
+1:1 selector.
 
 ### Added
 
@@ -136,14 +138,13 @@ selector.
 - Parameter validation happens at matcher construction time: invalid
   thresholds, negative counts, or mutually-exclusive flags raise
   `ValueError` immediately rather than failing mid-match.
-- **~27× faster across the suite.** Coma uses TF-IDF cosine on cached
-  float32 sparse CSR matrices with pair-level memoisation; Cupid
-  caches WordNet synsets and lemma walks; DistributionBased replaces
-  the per-row `bucket_binary_search` with `np.searchsorted` +
-  `np.bincount` over precomputed bound arrays;
-  `JaccardDistanceMatcher` uses `rapidfuzz.process.cdist` with
-  `score_cutoff` short-circuit. NYU full-suite numbers in the
-  [v1.0.0 PR description](https://github.com/delftdata/valentine/pull/96).
+- **13×–243× faster per matcher across the NYU benchmark suite (1,442 s → 19 s total).** Coma uses TF-IDF cosine on cached float32 sparse CSR matrices with
+  pair-level memoisation; Cupid caches WordNet synsets and lemma walks;
+  DistributionBased replaces the per-row `bucket_binary_search` with
+  `np.searchsorted` + `np.bincount` over precomputed bound arrays;
+  `JaccardDistanceMatcher` uses `rapidfuzz.process.cdist` with a
+  `score_cutoff` short-circuit. Full per-matcher numbers in the
+  [Benchmark](benchmark.md) page.
 - `BaseTable.get_data_type` treats pandas `"str"` / `"string"` dtypes
   as text (previously misclassified as unknown).
 - Cupid datatype compatibility is now binary (same family = 1.0,

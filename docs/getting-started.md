@@ -7,7 +7,7 @@ icon: lucide/rocket
 ## Installation
 
 Valentine is published on [PyPI][pypi] and installs with a single `pip`
-command. It requires **Python 3.10 or newer** (and is tested up to 3.14).
+command. It requires **Python >=3.10, <3.15**.
 
   [pypi]: https://pypi.org/project/valentine/
 
