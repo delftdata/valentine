@@ -51,6 +51,35 @@ To use Polars DataFrames, install the optional `polars` extra:
     poetry add valentine -E polars
     ```
 
+### Sentence-transformer embeddings
+
+To use the embedding-based variant of
+[`JaccardDistanceMatcher`](api.md#jaccarddistancematcher), where value
+"equality" between two columns is decided by cosine similarity of
+sentence-transformer embeddings instead of a string distance like
+Levenshtein, install the optional `embeddings` extra:
+
+=== "pip"
+
+    ```shell
+    pip install valentine[embeddings]
+    ```
+
+=== "uv"
+
+    ```shell
+    uv add valentine[embeddings]
+    ```
+
+=== "poetry"
+
+    ```shell
+    poetry add valentine -E embeddings
+    ```
+
+This pulls in `sentence-transformers`, which itself depends on
+`torch`.
+
 For local development, clone the repo and install in editable mode:
 
 ```shell
@@ -153,13 +182,13 @@ pair.
 Valentine ships with five matching algorithms covering both schema- and
 instance-based matching:
 
-| Matcher                                                      | Type                 | Good at                                      |
-|--------------------------------------------------------------|----------------------|----------------------------------------------|
-| [`Coma`](api.md#coma)                                         | Schema + Instance    | General-purpose, interpretable, well-tuned   |
-| [`Cupid`](api.md#cupid)                                       | Schema only          | Tree/linguistic similarity                   |
-| [`DistributionBased`](api.md#distributionbased)               | Instance only        | Numeric & categorical value distributions    |
-| [`JaccardDistanceMatcher`](api.md#jaccarddistancematcher)     | Instance only        | Exact/fuzzy Jaccard on value sets            |
-| [`SimilarityFlooding`](api.md#similarityflooding)             | Schema only          | Graph-based fixpoint propagation             |
+| Matcher                                                   | Type              | Good at                                                                                                              |
+|-----------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------------------------------------|
+| [`Coma`](api.md#coma)                                     | Schema + Instance | General-purpose, interpretable, well-tuned                                                                           |
+| [`Cupid`](api.md#cupid)                                   | Schema only       | Tree/linguistic similarity                                                                                           |
+| [`DistributionBased`](api.md#distributionbased)           | Instance only     | Numeric & categorical value distributions                                                                            |
+| [`JaccardDistanceMatcher`](api.md#jaccarddistancematcher) | Instance only     | Tversky / Jaccard / containment on value sets; supports exact, fuzzy (rapidfuzz), and embedding-based value matching |
+| [`SimilarityFlooding`](api.md#similarityflooding)         | Schema only       | Graph-based fixpoint propagation                                                                                     |
 
 See [Matchers](matchers.md) for the conceptual guide, or jump straight
 to the [API reference](api.md#matchers-valentinealgorithms) for

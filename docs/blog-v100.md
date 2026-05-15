@@ -4,13 +4,13 @@ icon: lucide/newspaper
 
 # Announcing Valentine v1.0.0
 
-Schema matching is one of those problems that sounds solved until you actually have to do it in
-production. You have two tables, they clearly describe the same thing, and yet the column names
-are subtly different — `emp_id` vs `employee_number`, `fname` vs `first_name`, `office_loc` vs
-`work_location`. Valentine was built to solve this: one call, several battle-tested algorithms,
-and evaluation metrics to tell you how well they did.
+Four years ago we built Valentine with a simple goal: make schema matching genuinely
+accessible to anyone who needs it. The promise was one call, several
+battle-tested algorithms, and evaluation metrics to tell you how well they did, without
+asking you to wire up Java, parse XML configs, or read a paper before getting your first
+result.
 
-Today we're shipping **v1.0.0** — a complete overhaul of everything from the public API to
+We are excited to ship **v1.0.0**, a complete overhaul of everything from the public API to
 the internals of every matcher. The headline number is a **~27× wall-clock speedup** across
 our benchmark suite, with accuracy essentially unchanged. But the speed is only part of the
 story. v1.0.0 also drops the JVM dependency entirely, adds Polars support, introduces
@@ -20,7 +20,7 @@ embedding-based matching, and gives the API the consistency and safety it always
 
 ## The benchmarks first
 
-We ran every matcher on the [NYU Open Data benchmark](research.md) — 10 real-world table
+We ran every matcher on the [NYC Open Data benchmark](research.md) — 10 real-world table
 pairs spanning city government, education, housing, and transportation — on the same Windows
 machine, with a 120 s per-dataset timeout.
 
@@ -228,7 +228,7 @@ matcher = JaccardDistanceMatcher(
 )
 ```
 
-On the NYU benchmark, the embedding variant trades ~14× more time for a small accuracy
+On the NYC benchmark, the embedding variant trades ~14× more time for a small accuracy
 gain (+0.01 F1), and it performs particularly well on columns with semantically related but
 lexically dissimilar names.
 
@@ -297,6 +297,6 @@ pip install valentine[embeddings]  # + sentence-transformer Jaccard
 - **Docs:** <https://delftdata.github.io/valentine/>
 - **GitHub:** <https://github.com/delftdata/valentine>
 - **Changelog:** [Full changelog and migration guide](changelog.md)
-- **Benchmark details:** [NYU per-dataset results](benchmark.md)
+- **Benchmark details:** [NYC per-dataset results](benchmark.md)
 
 Feedback, issues, and PRs welcome.

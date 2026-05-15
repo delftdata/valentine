@@ -43,8 +43,9 @@ mixed in the same call.
 ## Installation
 
 ```shell
-pip install valentine            # pandas only
-pip install valentine[polars]    # pandas + Polars support
+pip install valentine             # pandas only
+pip install valentine[polars]     # pandas + Polars support
+pip install valentine[embeddings] # pandas + embeddings support
 ```
 
 Requires Python **>=3.10, <3.15**.

@@ -5,7 +5,7 @@ icon: lucide/bar-chart-2
 # Benchmark: v0.5.0 → v1.0.0
 
 This page documents the performance comparison between valentine v0.5.0 and v1.0.0
-on the [NYU dataset collection](research.md) — 10 real-world table pairs from NYC
+on the [NYC dataset collection](research.md) — 10 real-world table pairs from NYC
 Open Data spanning city government, education, housing, and transportation domains.
 
 All timings are wall-clock seconds measured on a single Windows machine.
@@ -259,7 +259,7 @@ differences are immediately visible. v0.5.0 `Coma` = Java-backed (canonical).
 
 ## Methodology
 
-- **Datasets**: 10 real-world NYC Open Data table pairs from the NYU schema-matching
+- **Datasets**: 10 real-world NYC Open Data table pairs from the NYC schema-matching
   benchmark, covering city government, education, housing, and transportation domains.
 - **Metrics**: F1Score and RecallAtSizeofGroundTruth (top-|GT| predictions, TP/|GT|)
   via `matches.get_metrics()`; MRR computed manually from ranked match order.
