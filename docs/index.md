@@ -75,4 +75,4 @@ Valentine started as a research project at [Delft Data][delftdata] and is
 based on the ICDE 2021 paper. See the [Research](research.md) page for the
 papers behind the package, the algorithms it implements, and citation info.
 
-  [delftdata]: https://www.wis.ewi.tudelft.nl/data-management
+  [delftdata]: https://dis.ewi.tudelft.nl
