@@ -71,7 +71,7 @@ or jump straight to the [API reference](api.md).
 
 ## Research
 
-Valentine started as a research project at [Delft Data][delftdata] and is
+Valentine started as a research project at [TU Delft][delftdata] and is
 based on the ICDE 2021 paper. See the [Research](research.md) page for the
 papers behind the package, the algorithms it implements, and citation info.
 
