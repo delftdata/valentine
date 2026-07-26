@@ -14,20 +14,51 @@ hide:
 [API reference :material-book-open:](api.md){ .md-button }
 [View on GitHub :fontawesome-brands-github:](https://github.com/delftdata/valentine){ .md-button }
 
-<div class="valentine-chips" markdown>
-[Coma](api.md#coma)
-[Cupid](api.md#cupid)
-[DistributionBased](api.md#distributionbased)
-[JaccardDistanceMatcher](api.md#jaccarddistancematcher)
-[SimilarityFlooding](api.md#similarityflooding)
+<div class="grid cards valentine-matcher-cards" markdown>
+
+- __[Coma](api.md#coma)__
+
+    ---
+
+    Schema + instances. General-purpose first choice — strong defaults,
+    informative sub-scores.
+
+- __[Cupid](api.md#cupid)__
+
+    ---
+
+    Schema only. Nested schemas where column names and structure matter
+    more than data.
+
+- __[DistributionBased](api.md#distributionbased)__
+
+    ---
+
+    Instances only. Matching by value distributions when names are
+    unreliable.
+
+- __[JaccardDistanceMatcher](api.md#jaccarddistancematcher)__
+
+    ---
+
+    Instances only. Simple, explainable baseline — useful for sanity
+    checks.
+
+- __[SimilarityFlooding](api.md#similarityflooding)__
+
+    ---
+
+    Schema only. Structure-heavy schemas where graph neighbourhoods
+    carry signal.
+
 </div>
 
 <p class="valentine-badges">
 <a href="https://pypi.org/project/valentine/"><img src="https://img.shields.io/pypi/v/valentine.svg" alt="PyPI version"></a>
 <a href="https://pypi.org/project/valentine/"><img src="https://img.shields.io/pypi/pyversions/valentine.svg" alt="Python versions"></a>
-<a href="https://pypi.org/project/valentine/"><img src="https://img.shields.io/pypi/dm/valentine.svg" alt="PyPI downloads"></a>
-<a href="https://github.com/delftdata/valentine/actions/workflows/build.yml"><img src="https://github.com/delftdata/valentine/actions/workflows/build.yml/badge.svg" alt="Build"></a>
-<a href="https://codecov.io/gh/delftdata/valentine"><img src="https://codecov.io/gh/delftdata/valentine/branch/master/graph/badge.svg?token=4QR0X315CL" alt="codecov"></a>
+<a href="https://pypi.org/project/valentine/"><img src="https://static.pepy.tech/badge/valentine/month" alt="PyPI downloads"></a>
+<a href="https://github.com/delftdata/valentine/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/delftdata/valentine/build.yml?label=build" alt="Build"></a>
+<a href="https://codecov.io/gh/delftdata/valentine"><img src="https://img.shields.io/codecov/c/github/delftdata/valentine?label=coverage" alt="codecov"></a>
 <a href="https://github.com/delftdata/valentine/blob/master/LICENSE"><img src="https://img.shields.io/github/license/delftdata/valentine.svg" alt="License"></a>
 </p>
 

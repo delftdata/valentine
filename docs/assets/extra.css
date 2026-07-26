@@ -146,37 +146,37 @@
   margin: 0.25rem 0.35rem;
 }
 
-/* --- Inline algorithm "chips" -------------------------------------------- */
-.valentine-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
+/* Pink-tinted outline for secondary buttons, so they read as part of the
+   same brand as the filled primary button instead of generic grey. */
+.md-typeset .md-button:not(.md-button--primary) {
+  color: var(--md-primary-fg-color);
+  background-color: transparent;
+  border-color: var(--md-primary-fg-color--light);
+}
+
+.md-typeset .md-button:not(.md-button--primary):hover,
+.md-typeset .md-button:not(.md-button--primary):focus {
+  color: #fff;
+  background-color: var(--md-primary-fg-color);
+  border-color: var(--md-primary-fg-color);
+}
+
+/* --- Matcher grid cards on the homepage ---------------------------------- */
+.valentine-matcher-cards {
   margin: 0.5rem 0 1.5rem;
 }
 
-.valentine-chips a {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  background: var(--md-primary-fg-color--light);
-  color: #fff !important;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.valentine-chips a:hover {
-  background: var(--md-primary-fg-color);
-  transform: translateY(-1px);
-}
-
-/* --- Grid cards: lift on hover ------------------------------------------- */
+/* --- Grid cards: a visible resting border, brand-colored on hover -------- */
 .md-typeset .grid.cards > :is(ul, ol) > li,
 .md-typeset .grid > .card {
+  border-color: rgba(233, 30, 99, 0.18);
   transition: transform 0.18s ease, box-shadow 0.18s ease,
     border-color 0.18s ease;
+}
+
+[data-md-color-scheme="slate"] .md-typeset .grid.cards > :is(ul, ol) > li,
+[data-md-color-scheme="slate"] .md-typeset .grid > .card {
+  border-color: rgba(240, 98, 146, 0.25);
 }
 
 .md-typeset .grid.cards > :is(ul, ol) > li:hover,

@@ -24,7 +24,7 @@
     <img src="https://img.shields.io/pypi/pyversions/valentine.svg" alt="Python versions">
   </a>
   <a href="https://pypi.org/project/valentine/">
-    <img src="https://img.shields.io/pypi/dm/valentine.svg" alt="PyPI downloads">
+    <img src="https://static.pepy.tech/badge/valentine/month" alt="PyPI downloads">
   </a>
   <a href="https://github.com/delftdata/valentine/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/delftdata/valentine.svg" alt="License">

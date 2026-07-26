@@ -48,15 +48,15 @@ datasets that completed without error or timeout.
 | Matcher | v0.5.0 F1 | v1.0.0 F1 | v0.5.0 Recall@GT | v1.0.0 Recall@GT | v0.5.0 MRR | v1.0.0 MRR |
 |---|---:|---:|---:|---:|---:|---:|
 | Coma (schema) | 0.6582 | 0.6647 | 0.6424 | 0.6507 | 0.3050 | 0.3024 |
-| Coma (instances) | 0.7654 § | 0.7717 | 0.8132 § | 0.7631 | 0.3427 § | 0.3384 |
+| Coma (instances) | 0.7654[^coma-instances] | 0.7717 | 0.8132[^coma-instances] | 0.7631 | 0.3427[^coma-instances] | 0.3384 |
 | Cupid | 0.4800 | 0.4848 | 0.4275 | 0.4298 | 0.2452 | 0.2489 |
-| DistributionBased | 0.6465 † | 0.6805 | 0.5903 † | 0.6205 | 0.2892 † | 0.3019 |
-| JaccardDistanceMatcher | 0.6664 ‡ | 0.6463 | 0.6250 ‡ | 0.5611 | 0.3354 ‡ | 0.2474 |
+| DistributionBased | 0.6465[^distributionbased] | 0.6805 | 0.5903[^distributionbased] | 0.6205 | 0.2892[^distributionbased] | 0.3019 |
+| JaccardDistanceMatcher | 0.6664[^jaccard] | 0.6463 | 0.6250[^jaccard] | 0.5611 | 0.3354[^jaccard] | 0.2474 |
 | SimilarityFlooding | 0.5071 | 0.4929 | 0.5014 | 0.5798 | 0.2853 | 0.3034 |
 
-*§ v0.5.0 Coma (instances) mean computed over 9 completed datasets (Housing_Maintenance timed out).*  
-*† v0.5.0 DistributionBased excludes the one crashed dataset (Public Design Commission).*  
-*‡ v0.5.0 Jaccard computed over 5 completed datasets only (5 timeouts).*
+[^coma-instances]: v0.5.0 Coma (instances) mean computed over 9 completed datasets (Housing_Maintenance timed out).
+[^distributionbased]: v0.5.0 DistributionBased excludes the one crashed dataset (Public Design Commission).
+[^jaccard]: v0.5.0 Jaccard computed over 5 completed datasets only (5 timeouts).
 
 !!! note "Recall@GT"
     **Recall@GT** (`RecallAtSizeofGroundTruth`) measures recall when selecting exactly

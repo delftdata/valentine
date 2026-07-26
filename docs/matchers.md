@@ -203,9 +203,18 @@ exposes `Levenshtein`, `DamerauLevenshtein`, `Hamming`, `Jaro`,
 
 The value-set comparison itself can be generalised from Jaccard to
 [Tversky similarity](https://en.wikipedia.org/wiki/Tversky_index) via
-the `tversky_alpha` and `tversky_beta` parameters (both default `0.5`,
-reproducing Jaccard exactly). Other presets: `alpha=beta=1` gives
-Sørensen–Dice; `alpha=1, beta=0` gives set containment.
+the `tversky_alpha` and `tversky_beta` parameters, symmetrised by
+computing both directions and taking the max:
+
+$$
+T(A, B; \alpha, \beta) = \frac{|A \cap B|}{|A \cap B| + \alpha|A \setminus B| + \beta|B \setminus A|}
+$$
+
+Both default to `1.0`, reproducing Jaccard exactly. Setting
+`alpha=1, beta=0` (or vice versa) reduces to set containment —
+`max(|A ∩ B| / |A|, |A ∩ B| / |B|)` — the right choice when one
+column is expected to be a subset of the other. Intermediate values
+trade off between these extremes.
 
 When `distance_fun=StringDistanceFunction.Embedding`, `JaccardDistanceMatcher`
 overrides [`get_matches_batch`](api.md#get_matches_batch) to embed every

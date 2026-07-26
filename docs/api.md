@@ -494,9 +494,9 @@ JaccardDistanceMatcher(
     process_num: int = 1,
     embedding_model: str = "all-MiniLM-L6-v2",
     embedding_device: str | None = None,
-    embedding_batch_size: int = 64,
-    tversky_alpha: float = 0.5,
-    tversky_beta: float = 0.5,
+    embedding_batch_size: int | None = None,
+    tversky_alpha: float = 1.0,
+    tversky_beta: float = 1.0,
 )
 ```
 
@@ -512,9 +512,9 @@ across all column pairs when `distance_fun=StringDistanceFunction.Embedding`.
 | `process_num`          | `int`                    | `1`                                  | Number of worker processes. Must be `>= 1`.                                                                                                                 |
 | `embedding_model`      | `str`                    | `"all-MiniLM-L6-v2"`                 | Sentence-transformer model name. Only used when `distance_fun=Embedding`. Requires `pip install valentine[embeddings]`.                                     |
 | `embedding_device`     | `str \| None`            | `None`                               | Device for embedding inference (`"cuda"`, `"mps"`, `"cpu"`). `None` auto-selects: CUDA → MPS → CPU.                                                        |
-| `embedding_batch_size` | `int`                    | `64`                                 | Batch size for embedding inference. Only used when `distance_fun=Embedding`.                                                                                |
-| `tversky_alpha`        | `float`                  | `0.5`                                | Tversky α weight (false positives). Default `0.5` reproduces Jaccard exactly. Set to `0.0` for set containment; `1.0` for Dice.                             |
-| `tversky_beta`         | `float`                  | `0.5`                                | Tversky β weight (false negatives). Default `0.5` reproduces Jaccard exactly.                                                                               |
+| `embedding_batch_size` | `int \| None`            | `None`                               | Batch size for embedding inference. `None` (default) lets sentence-transformers use its own default (`32`). Only used when `distance_fun=Embedding`.       |
+| `tversky_alpha`        | `float`                  | `1.0`                                | Tversky penalty for unmatched values on the reference side. Default `1.0` reproduces Jaccard exactly. Set `alpha=1.0, beta=0.0` for set containment.        |
+| `tversky_beta`         | `float`                  | `1.0`                                | Tversky penalty for unmatched values on the other side. Default `1.0` reproduces Jaccard exactly. See `tversky_alpha`.                                      |
 
 #### `StringDistanceFunction`
 

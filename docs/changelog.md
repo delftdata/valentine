@@ -55,8 +55,8 @@ v1.0.0 is a significant redesign of Valentine's public API together
 with a performance and accuracy overhaul of every matcher. If you are
 coming from 0.5.x or earlier, the changes below will affect your code.
 
-**Headline:** 13×–243× per-matcher speedup on the NYC Open Data
-benchmark (1,442 s → 19 s total), pure-Python Coma (no JVM), Polars
+**Headline:** 13×–186× per-matcher speedup on the NYC Open Data
+benchmark (1,442 s → 20 s total), pure-Python Coma (no JVM), Polars
 support, embedding-based Jaccard, and Hungarian as the new default
 1:1 selector.
 
@@ -138,7 +138,7 @@ support, embedding-based Jaccard, and Hungarian as the new default
 - Parameter validation happens at matcher construction time: invalid
   thresholds, negative counts, or mutually-exclusive flags raise
   `ValueError` immediately rather than failing mid-match.
-- **13×–243× faster per matcher across the NYC benchmark dataset pairs (1,442 s → 19 s total).** Coma uses TF-IDF cosine on cached float32 sparse CSR matrices with
+- **13×–186× faster per matcher across the NYC benchmark dataset pairs (1,442 s → 20 s total).** Coma uses TF-IDF cosine on cached float32 sparse CSR matrices with
   pair-level memoisation; Cupid caches WordNet synsets and lemma walks;
   DistributionBased replaces the per-row `bucket_binary_search` with
   `np.searchsorted` + `np.bincount` over precomputed bound arrays;

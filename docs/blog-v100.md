@@ -32,7 +32,7 @@ machine, with a 120 s per-dataset timeout.
 | Coma (instances) | 322.23 s | 4.71 s | **68×** |
 | Cupid | 163.04 s | 3.55 s | **46×** |
 | DistributionBased | 164.70 s | 3.94 s | **42×** |
-| JaccardDistanceMatcher | 730.36 s ⚠ | 3.01 s | **243×** |
+| JaccardDistanceMatcher | 730.36 s ⚠ | 3.92 s | **186×** |
 | SimilarityFlooding | 53.84 s | 3.30 s | **16×** |
 
 !!! warning "v0.5.0 reliability"
@@ -48,15 +48,15 @@ differences are within ±0.02 on every matcher.
 | Matcher | v0.5.0 F1 | v1.0.0 F1 | v0.5.0 Recall@GT | v1.0.0 Recall@GT | v0.5.0 MRR | v1.0.0 MRR |
 |---|---:|---:|---:|---:|---:|---:|
 | Coma (schema) | 0.658 | 0.665 | 0.642 | 0.651 | 0.305 | 0.302 |
-| Coma (instances) | 0.765 § | 0.772 | 0.813 § | 0.763 | 0.343 § | 0.338 |
+| Coma (instances) | 0.765[^coma-instances] | 0.772 | 0.813[^coma-instances] | 0.763 | 0.343[^coma-instances] | 0.338 |
 | Cupid | 0.480 | 0.485 | 0.427 | 0.430 | 0.245 | 0.249 |
-| DistributionBased | 0.647 † | 0.681 | 0.590 † | 0.621 | 0.289 † | 0.302 |
-| JaccardDistanceMatcher | 0.666 ‡ | 0.646 | 0.625 ‡ | 0.561 | 0.335 ‡ | 0.247 |
+| DistributionBased | 0.647[^distributionbased] | 0.681 | 0.590[^distributionbased] | 0.621 | 0.289[^distributionbased] | 0.302 |
+| JaccardDistanceMatcher | 0.666[^jaccard] | 0.646 | 0.625[^jaccard] | 0.561 | 0.335[^jaccard] | 0.247 |
 | SimilarityFlooding | 0.507 | 0.493 | 0.501 | 0.580 | 0.285 | 0.303 |
 
-*§ Coma (instances) v0.5.0 mean computed over 9 completed datasets (Housing_Maintenance timed out even at 8 GB heap).
-† DistributionBased v0.5.0 excludes one crashed dataset.
-‡ Jaccard v0.5.0 computed over 5 completed datasets only.*
+[^coma-instances]: Coma (instances) v0.5.0 mean computed over 9 completed datasets (Housing_Maintenance timed out even at 8 GB heap).
+[^distributionbased]: DistributionBased v0.5.0 excludes one crashed dataset.
+[^jaccard]: Jaccard v0.5.0 computed over 5 completed datasets only.
 
 Full per-dataset breakdowns, side-by-side by matcher, are in the [Benchmark](benchmark.md) page.
 
@@ -185,7 +185,7 @@ between O(n × k) Python loops and a single vectorised C call.
 
 **JaccardDistanceMatcher** — uses `rapidfuzz.process.cdist` with a `score_cutoff`
 short-circuit. Pairs that can't possibly beat the threshold don't run string distance at all.
-This is why the 243× speedup is so dramatic: in v0.5.0, every value pair ran regardless.
+This is why the 186× speedup is so dramatic: in v0.5.0, every value pair ran regardless.
 
 **SimilarityFlooding** — the `NodeID` prefix collision (columns named `"NodeID*"` clashing
 with internal graph nodes) is fixed, and the tokeniser now handles `snake_case`,
