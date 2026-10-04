@@ -4,7 +4,7 @@ from multiprocessing import Pool
 import networkx as nx
 import numpy as np
 import pulp as plp
-from pulp import PULP_CBC_CMD
+from pulp import COIN_CMD
 
 from .clustering_utils import (
     column_combinations,
@@ -238,7 +238,7 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
     set_v = vertexes
 
     x_vars = {
-        (i, j): plp.LpVariable(
+        (i, j): opt_model.add_variable(
             cat=plp.LpInteger,
             lowBound=0,
             upBound=1,
@@ -274,7 +274,7 @@ def correlation_clustering_pulp(vertexes: list, edges: dict):
                 if len({u, v, w}) == 3:
                     opt_model += x_vars[u, w] <= x_vars[u, v] + x_vars[v, w]
 
-    opt_model.solve(PULP_CBC_CMD(msg=False, options=["RandomS", "42"]))
+    opt_model.solve(COIN_CMD(msg=False, randomSeed=42))
 
     result = {}
 

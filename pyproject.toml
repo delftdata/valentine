@@ -40,7 +40,7 @@ dependencies = [
     "networkx>=2.8,<4.0",
     "chardet>=7.0,<8.0",
     "rapidfuzz>=3.0,<4.0",
-    "PuLP>=2.5,<4.0",
+    "PuLP[cbc]>=2.5,<5.0",
     "POT>=0.9.5,<1.0",
     "scipy>=1.12,<2.0",
     "python-dateutil>=2.8,<3.0",
@@ -56,13 +56,15 @@ polars = [
     "polars>=1.0,<2.0",
 ]
 embeddings = [
-    "sentence-transformers>=2.0,<6.0",
+    "sentence-transformers>=2.0,<7.0",
 ]
 docs = [
     # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
     # deliberately rather than relying on a range, so a bad release
     # can't silently break the docs build.
-    "zensical==0.0.51",
+    "zensical==0.0.67",
+    "mkdocstrings==1.0.6",
+    "mkdocstrings-python==2.0.9",
 ]
 
 [project.urls]
@@ -141,6 +143,7 @@ ignore = [
 
     # Practicality for algorithms / research code
     "PLR0913", # too many arguments (common in matching algorithms)
+    "PLR0917", # too many positional arguments (same rationale as PLR0913)
     "PLR2004", # magic values (similarity thresholds, etc.)
     "PLR0915", # too many statements (complex pipelines)
 

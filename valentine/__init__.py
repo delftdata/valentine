@@ -98,7 +98,7 @@ def valentine_match(
     Returns
     -------
     MatcherResults
-        Immutable mapping of :class:`ColumnPair` to similarity scores,
+        Immutable mapping of `ColumnPair` to similarity scores,
         sorted high to low. Use ``.details`` to access per-matcher
         score breakdowns (when the matcher provides them).
 

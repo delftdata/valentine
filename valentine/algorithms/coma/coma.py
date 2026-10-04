@@ -42,27 +42,35 @@ class Coma(BaseMatcher):
     results using bidirectional best-match logic (DIR_BOTH) controlled by
     ``max_n``, ``delta``, and ``threshold``.
 
-    When matching more than two tables via :meth:`get_matches_batch`, the
+    When matching more than two tables via `get_matches_batch`, the
     TF-IDF corpus is built once from **all** tables, giving each pair the
     benefit of global IDF statistics.
+
+    Populates `MatcherResults.details` with
+    ``{name, path, leaves, parents, instances}`` sub-scores.
 
     Parameters
     ----------
     max_n : int, optional
-        Maximum number of matches to keep per column (0 = unlimited).
+        Maximum number of matches to keep per column. ``0`` means
+        unlimited (default). Must be ``>= 0``.
     use_instances : bool, optional
         Enable TF-IDF instance-based matching (default: False).
     use_schema : bool, optional
-        Enable schema-based matching (default: True).
+        Enable schema-based matching (default: True). At least one of
+        ``use_schema`` or ``use_instances`` must be ``True``.
     delta : float, optional
-        Fraction from the best score within which matches are kept.
-        For example, 0.15 keeps all matches scoring within 15%% of the
-        best match for that column (default: 0.15).
+        Fraction from the best per-column score within which matches are
+        kept. For example, 0.15 keeps all matches scoring within 15% of
+        the best match for that column. Must be in ``[0, 1]``
+        (default: ``0.15``).
     threshold : float, optional
-        Absolute minimum similarity score to keep a match (default: 0.0).
+        Absolute minimum similarity score to keep a match. Must be in
+        ``[0, 1]`` (default: ``0.0``).
     instance_weight : float, optional
         Weight for the instance matcher relative to schema matchers
-        (which always have weight 1.0). Default: 1.0 (uniform).
+        (which always have weight 1.0). Must be ``>= 0``
+        (default: ``1.0``, uniform).
     """
 
     def __init__(

@@ -10,12 +10,12 @@ from .match import ColumnPair
 
 
 class MatcherResults(Mapping):
-    """Immutable mapping of :class:`ColumnPair` to similarity scores.
+    """Immutable mapping of `ColumnPair` to similarity scores.
 
-    Returned by :func:`valentine_match` and individual matcher methods.
+    Returned by `valentine_match` and individual matcher methods.
     Results are sorted from highest to lowest similarity and cannot be
     mutated after creation (preventing accidental invalidation of cached
-    derived views like :meth:`one_to_one`).
+    derived views like `one_to_one`).
 
     Aside from standard mapping operations (``len``, iteration, indexing),
     provides convenience methods for filtering, subsetting, and computing
@@ -75,7 +75,7 @@ class MatcherResults(Mapping):
 
         When the matcher provides component scores (e.g. Coma's name,
         path, leaves, parents, instances matchers), this maps each
-        :class:`ColumnPair` to ``{matcher_name: score}``.
+        `ColumnPair` to ``{matcher_name: score}``.
 
         Returns an empty dict when the matcher does not provide details.
         """
@@ -94,7 +94,7 @@ class MatcherResults(Mapping):
         """Globally optimal 1:1 column matching via Hungarian assignment.
 
         This is the **default** 1:1 selector — it is what
-        :class:`Precision` / :class:`Recall` / :class:`F1Score` call when
+        `Precision` / `Recall` / `F1Score` call when
         their ``one_to_one`` flag is set. Each source and target appears
         in at most one returned pair, with the assignment chosen to
         maximise **total** similarity over all valid one-to-one
@@ -184,7 +184,7 @@ class MatcherResults(Mapping):
         default), the median similarity score is used.
 
         Greedy can lock in a locally-best pair that blocks a better
-        globally-optimal assignment, so :meth:`one_to_one_hungarian` is
+        globally-optimal assignment, so `one_to_one_hungarian` is
         the recommended default; this method is exposed for
         compatibility and for test pinning.
 
@@ -233,7 +233,7 @@ class MatcherResults(Mapping):
         scoring targets AND ``s`` is among ``t``'s ``n`` highest-scoring
         sources. With ``n=1`` this is the classic mutual nearest-
         neighbour filter — high-precision, drops one-sided affinities.
-        Strictly stricter than :meth:`one_to_one_hungarian`: only
+        Strictly stricter than `one_to_one_hungarian`: only
         mutually-confirmed pairs survive, even at the cost of recall.
 
         Parameters
@@ -365,7 +365,7 @@ class MatcherResults(Mapping):
         ----------
         ground_truth : list[tuple[str, str]] | list[ColumnPair]
             Expected column matches. Can be simple column-name pairs like
-            ``[("col_a", "col_b")]`` or full :class:`ColumnPair` instances.
+            ``[("col_a", "col_b")]`` or full `ColumnPair` instances.
             When column-name pairs are used, table names are ignored during
             comparison.
         metrics : set[Metric], optional

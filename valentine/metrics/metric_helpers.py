@@ -74,7 +74,7 @@ def get_tp_fn(
         Match results from a matcher.
     ground_truth : list
         Expected column matches as ``(source_col, target_col)`` pairs
-        or full :class:`ColumnPair` instances.
+        or full `ColumnPair` instances.
     n : int, optional
         If provided, only consider the first ``n`` matches.
 
@@ -114,7 +114,7 @@ def get_fp(
         Match results from a matcher.
     ground_truth : list
         Expected column matches as ``(source_col, target_col)`` pairs
-        or full :class:`ColumnPair` instances.
+        or full `ColumnPair` instances.
     n : int, optional
         If provided, only consider the first ``n`` matches.
 

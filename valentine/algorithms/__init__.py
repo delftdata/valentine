@@ -8,9 +8,15 @@ from .similarity_flooding import Formula, Policy, StringMatcher
 from .similarity_flooding.similarity_flooding import SimilarityFlooding
 
 schema_only_algorithms = [SimilarityFlooding.__name__, Cupid.__name__]
+"""Names of matchers that only use schema information."""
 instance_only_algorithms = [DistributionBased.__name__, JaccardDistanceMatcher.__name__]
+"""Names of matchers that only use instance (value) information."""
 schema_instance_algorithms = [Coma.__name__]
+"""Names of matchers that can combine schema and instance information."""
 all_matchers = schema_only_algorithms + instance_only_algorithms + schema_instance_algorithms
+"""Union of `schema_only_algorithms`, `instance_only_algorithms`,
+and `schema_instance_algorithms`.
+"""
 
 __all__ = [
     "BaseMatcher",

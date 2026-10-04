@@ -8,6 +8,15 @@ from .match import ColumnPair
 
 
 class BaseMatcher(ABC):
+    """Abstract base class for every matching algorithm.
+
+    Subclasses must implement `get_matches`. `get_matches_batch`
+    has a default fall-back that calls `get_matches` on each unique
+    pair of tables; override it in subclasses that benefit from a holistic
+    view of all tables (e.g. a global TF-IDF corpus or global distribution
+    ranks).
+    """
+
     @abstractmethod
     def get_matches(
         self, source_input: BaseTable, target_input: BaseTable
@@ -24,14 +33,14 @@ class BaseMatcher(ABC):
         Returns
         -------
         dict
-            Mapping of :class:`ColumnPair` to similarity score.
+            Mapping of `ColumnPair` to similarity score.
         """
         raise NotImplementedError
 
     def get_matches_batch(self, tables: list[BaseTable]) -> dict[ColumnPair, float]:
         """Match columns across all unique pairs of tables.
 
-        The default implementation calls :meth:`get_matches` for each pair
+        The default implementation calls `get_matches` for each pair
         independently. Algorithms that benefit from a holistic view of all
         tables (e.g. global TF-IDF corpus, global distribution ranks) can
         override this method.
@@ -55,7 +64,7 @@ class BaseMatcher(ABC):
     def match_details(self) -> dict[ColumnPair, dict[str, float]]:
         """Per-pair score breakdowns from the most recent match call.
 
-        Returns a mapping from :class:`ColumnPair` to a dictionary of
+        Returns a mapping from `ColumnPair` to a dictionary of
         ``{matcher_name: score}`` showing how each sub-matcher contributed
         to the final similarity. Empty by default; override in subclasses
         that combine multiple matchers (e.g. Coma).

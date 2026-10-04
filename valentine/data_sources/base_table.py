@@ -25,15 +25,18 @@ class BaseTable(ABC):
     @property
     @abstractmethod
     def unique_identifier(self) -> object:
+        """Stable identifier used internally to key per-table state."""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def name(self) -> str:
+        """Table name. Becomes ``source_table``/``target_table`` in emitted `ColumnPair` instances."""
         raise NotImplementedError
 
     @abstractmethod
     def get_columns(self) -> list[BaseColumn]:
+        """All columns in the table."""
         raise NotImplementedError
 
     @abstractmethod
@@ -42,19 +45,21 @@ class BaseTable(ABC):
         raise NotImplementedError
 
     def get_instances_df(self) -> Any:
-        """Return the frame used for instance-based sampling."""
+        """Return the frame used for instance-based sampling. Defaults to `get_df`."""
         return self.get_df()
 
     def get_instances_columns(self) -> list[BaseColumn]:
-        """Return columns built from the instance-sampled frame."""
+        """Return columns built from the instance-sampled frame. Defaults to `get_columns`."""
         return self.get_columns()
 
     @property
     @abstractmethod
     def is_empty(self) -> bool:
+        """Whether the table has zero rows."""
         raise NotImplementedError
 
     def get_guid_column_lookup(self) -> dict[str, object]:
+        """Return a ``{column_name: column.unique_identifier}`` lookup."""
         return {column.name: column.unique_identifier for column in self.get_columns()}
 
     @staticmethod

@@ -1,6 +1,6 @@
 """Common metric implementations for Valentine.
 
-Custom metrics can be created by subclassing :class:`Metric`. We use ``@dataclass``
+Custom metrics can be created by subclassing `Metric`. We use ``@dataclass``
 with ``frozen=True`` so instances are hashable and comparable without boilerplate.
 """
 

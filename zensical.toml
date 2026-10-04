@@ -72,6 +72,12 @@ text = "Inter"
 code = "JetBrains Mono"
 
 [[project.theme.palette]]
+media = "(prefers-color-scheme)"
+toggle.icon = "lucide/sun-moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
 scheme = "default"
 primary = "pink"
 accent = "pink"
@@ -79,11 +85,12 @@ toggle.icon = "lucide/sun"
 toggle.name = "Switch to dark mode"
 
 [[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
 scheme = "slate"
 primary = "pink"
 accent = "pink"
 toggle.icon = "lucide/moon"
-toggle.name = "Switch to light mode"
+toggle.name = "Switch to system preference"
 
 # ----------------------------------------------------------------------------
 # Social links in the footer
@@ -95,3 +102,26 @@ link = "https://github.com/delftdata/valentine"
 [[project.extra.social]]
 icon = "fontawesome/brands/python"
 link = "https://pypi.org/project/valentine/"
+
+# ----------------------------------------------------------------------------
+# Plugins
+# ----------------------------------------------------------------------------
+[project.plugins.social]
+
+[project.plugins.minify]
+minify_html = true
+
+[project.plugins.llmstxt]
+
+[project.plugins.mkdocstrings]
+default_handler = "python"
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "numpy"
+show_source = false
+show_root_heading = true
+show_root_toc_entry = false
+separate_signature = true
+show_signature_annotations = true
+merge_init_into_class = true
+members_order = "source"

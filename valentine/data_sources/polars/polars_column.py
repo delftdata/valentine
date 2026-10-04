@@ -2,6 +2,15 @@ from ..base_column import BaseColumn
 
 
 class PolarsColumn(BaseColumn):
+    """A `BaseColumn` adapter for a single Polars ``Series``.
+
+    Constructed internally by
+    `PolarsTable`; exposes the column
+    name, detected data type, unique identifier, and sampled instance
+    values via the standard `BaseColumn`
+    interface.
+    """
+
     def __init__(self, column_name: str, data: list, d_type: str, table_guid: str):
         self.__column_name = column_name
         self.__data = data
