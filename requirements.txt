@@ -2,7 +2,7 @@
 numpy==2.4.4
 pandas==3.0.3
 polars==1.40.1
-nltk==3.9.4
+nltk==3.10.3
 anytree==2.13.0
 networkx==3.6.1
 chardet==7.4.3
