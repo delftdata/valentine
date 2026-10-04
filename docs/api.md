@@ -34,116 +34,30 @@ from valentine import (
 
 ## `valentine_match`
 
-```python
-valentine_match(
-    dfs: Iterable[pd.DataFrame | pl.DataFrame],
-    matcher: BaseMatcher,
-    df_names: list[str] | None = None,
-    instance_sample_size: int | None = 1000,
-) -> MatcherResults
-```
-
-Match columns across every unique pair of DataFrames. Accepts both pandas
-and Polars DataFrames, which can be freely mixed within the same call.
-
-**Parameters**
-
-| Name                   | Type                         | Default | Description                                                                                                                                                                                                     |
-|------------------------|------------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dfs`                  | `Iterable[pd.DataFrame \| pl.DataFrame]` | —       | Two or more DataFrames to match against each other. Any iterable works (list, tuple, generator). Pandas and Polars frames may be mixed freely.                                                             |
-| `matcher`              | `BaseMatcher`                | —       | Matcher instance (e.g. `Coma()`, `Cupid()`).                                                                                                                                                                     |
-| `df_names`             | `list[str] \| None`          | `None`  | Optional names for each DataFrame. When `None`, defaults to `"aaa"`, `"bbb"`, `"ccc"`, … (chosen for minimum string similarity so defaults don't influence schema-based matchers). Limited to 26 unnamed tables. |
-| `instance_sample_size` | `int \| None`                | `1000`  | Cap on the number of non-empty rows sampled per column for instance-based matchers (Coma with `use_instances=True`, `DistributionBased`, `JaccardDistanceMatcher`). Pass `None` to use every row. Pass `0` to skip instance data entirely — schema-only matchers are unaffected, but instance-based matchers will see empty columns. |
-
-**Returns**
-
-A [`MatcherResults`](#matcherresults) instance — an immutable mapping of
-[`ColumnPair`](#columnpair) to similarity scores, sorted high to low.
-
-**Raises**
-
-- `ValueError` — fewer than 2 DataFrames, mismatched `df_names` length, or
-  more than 26 DataFrames without explicit names.
-- `InvalidMatcherError` — `matcher` is not a `BaseMatcher` instance.
-
-**Example**
-
-```python
-import pandas as pd
-from valentine import valentine_match
-from valentine.algorithms import Coma
-
-df1 = pd.DataFrame({"id": [1, 2], "name": ["a", "b"]})
-df2 = pd.DataFrame({"user_id": [1, 2], "full_name": ["a", "b"]})
-
-matches = valentine_match(
-    [df1, df2],
-    matcher=Coma(use_instances=True),
-    df_names=["users", "accounts"],
-    instance_sample_size=500,
-)
-```
+::: valentine.valentine_match
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ---
 
 ## `ColumnPair`
 
-```python
-class ColumnPair(NamedTuple):
-    source_table: str
-    source_column: str
-    target_table: str
-    target_column: str
-```
-
-Immutable, hashable key identifying a matched pair of columns. Used
-everywhere a match result or ground truth entry is required.
-
-**Attributes**
-
-| Attribute       | Type   | Description                             |
-|-----------------|--------|-----------------------------------------|
-| `source_table`  | `str`  | Name of the source table.               |
-| `source_column` | `str`  | Name of the source column.              |
-| `target_table`  | `str`  | Name of the target table.               |
-| `target_column` | `str`  | Name of the target column.              |
-
-**Computed properties**
-
-| Property | Type               | Description                     |
-|----------|--------------------|---------------------------------|
-| `source` | `tuple[str, str]`  | `(source_table, source_column)` |
-| `target` | `tuple[str, str]`  | `(target_table, target_column)` |
-
-Because `ColumnPair` is a `NamedTuple`, it also supports positional
-indexing, iteration, and unpacking:
-
-```python
-pair = ColumnPair("orders", "price", "sales", "amount")
-st, sc, tt, tc = pair
-pair[0]            # "orders"
-pair.source        # ("orders", "price")
-```
+::: valentine.ColumnPair
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: [source_table, source_column, target_table, target_column, source, target]
 
 ---
 
 ## `MatcherResults`
 
-```python
-class MatcherResults(Mapping[ColumnPair, float]):
-    def __init__(
-        self,
-        matches: dict[ColumnPair, float],
-        details: dict[ColumnPair, dict[str, float]] | None = None,
-    ): ...
-```
-
-Immutable `Mapping` returned by [`valentine_match`](#valentine_match).
-Entries are sorted from highest to lowest similarity score on
-construction. Because the mapping is immutable, derived views (such as
-the cached result of [`one_to_one_hungarian`](#one_to_one_hungarian))
-cannot be silently
-invalidated.
+::: valentine.algorithms.matcher_results.MatcherResults
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### Mapping protocol
 
@@ -162,24 +76,17 @@ invalidated.
 
 #### `details`
 
-```python
-@property
-def details -> dict[ColumnPair, dict[str, float]]
-```
-
-Per-pair sub-matcher score breakdowns. Returns an empty `dict` when the
-matcher does not provide details. Currently populated by
-[`Coma`](#coma), which exposes scores for its `name`, `path`, `leaves`,
-`parents`, and `instances` sub-matchers.
+::: valentine.algorithms.matcher_results.MatcherResults.details
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `get_details`
 
-```python
-def get_details(key: ColumnPair) -> dict[str, float] | None
-```
-
-Return the sub-matcher breakdown for a single pair, or `None` if no
-details are available.
+::: valentine.algorithms.matcher_results.MatcherResults.get_details
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ### Transformations
 
@@ -189,121 +96,77 @@ filtered subset.
 
 #### `one_to_one_hungarian`
 
-```python
-def one_to_one_hungarian(threshold: float | None = None) -> MatcherResults
-```
-
-Default 1:1 selector. Globally optimal bipartite filter via Hungarian
-assignment (`scipy.optimize.linear_sum_assignment`): each source and
-each target column appears in **at most one** returned pair, with the
-assignment chosen to maximise total similarity. Pairs below `threshold`
-are discarded.
-
-- `threshold=None` (default) uses the median of unique similarity scores
-  as the cutoff, and the result is cached.
-- Passing an explicit `threshold` bypasses the cache.
-- When the input has fewer than two distinct score values, all entries
-  are returned unchanged.
+::: valentine.algorithms.matcher_results.MatcherResults.one_to_one_hungarian
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `one_to_one_greedy`
 
-```python
-def one_to_one_greedy(threshold: float | None = None) -> MatcherResults
-```
-
-Greedy bipartite filter, kept for backwards compatibility. Starting
-from the highest-scoring pair, greedily assigns each source and each
-target column at most one partner. Same threshold semantics as
-`one_to_one_hungarian`. Greedy can lock in a locally-best pair that
-blocks a better global assignment, so prefer the Hungarian variant
-unless you need the legacy behaviour.
+::: valentine.algorithms.matcher_results.MatcherResults.one_to_one_greedy
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `one_to_one_mutual_top`
 
-```python
-def one_to_one_mutual_top(n: int = 1) -> MatcherResults
-```
-
-Mutual top-`n` filter: keeps pair `(s, t)` only if `t` is in `s`'s
-top-`n` targets AND `s` is in `t`'s top-`n` sources. With `n=1` this
-is the classic mutual nearest-neighbour filter — high-precision, drops
-one-sided affinities. Strictly stricter than `one_to_one_hungarian`.
+::: valentine.algorithms.matcher_results.MatcherResults.one_to_one_mutual_top
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `filter`
 
-```python
-def filter(min_score: float) -> MatcherResults
-```
-
-Return only matches whose similarity is `>= min_score`.
+::: valentine.algorithms.matcher_results.MatcherResults.filter
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `take_top_n`
 
-```python
-def take_top_n(n: int) -> MatcherResults
-```
-
-Return the top `n` matches by score.
+::: valentine.algorithms.matcher_results.MatcherResults.take_top_n
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `take_top_percent`
 
-```python
-def take_top_percent(percent: int) -> MatcherResults
-```
+::: valentine.algorithms.matcher_results.MatcherResults.take_top_percent
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
-Return the top `percent`% (0–100) of matches, rounded up.
+#### `take_top_n_per_source`
+
+::: valentine.algorithms.matcher_results.MatcherResults.take_top_n_per_source
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `get_copy`
 
-```python
-def get_copy() -> MatcherResults
-```
-
-Return a shallow copy of the instance.
+::: valentine.algorithms.matcher_results.MatcherResults.get_copy
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ### Metrics
 
 #### `get_metrics`
 
-```python
-def get_metrics(
-    ground_truth: list[tuple[str, str]] | list[ColumnPair],
-    metrics: set[Metric] = METRICS_CORE,
-    one_to_one_method: str = "hungarian",
-) -> dict[str, Any]
-```
-
-Compute evaluation metrics against a ground truth. The ground truth can
-be either:
-
-- **Column-name pairs** — `[("src_col", "tgt_col"), …]`. Table names are
-  ignored during comparison, which is convenient when you only care
-  about column-level alignment.
-- **`ColumnPair` instances** — full table-aware comparison. Use this
-  when the same column name appears in multiple tables.
-
-Both formats may also be passed as plain 2- or 4-tuples; they are
-normalized internally. Returns a flat `dict` keyed by metric name
-(e.g. `{"Precision": 0.9, "Recall": 0.8, "F1Score": 0.85, …}`).
-
-**Parameters**
-
-| Name                | Type                                              | Default          | Description                                                                                                                           |
-|---------------------|---------------------------------------------------|------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `ground_truth`      | `list[tuple[str, str]] \| list[ColumnPair]`       | —                | Expected column-pair mappings. Column-name pairs are table-agnostic; `ColumnPair` instances are table-aware.                          |
-| `metrics`           | `set[Metric]`                                     | `METRICS_CORE`   | Set of [`Metric`](#metric) instances to compute.                                                                                      |
-| `one_to_one_method` | `str`                                             | `"hungarian"`    | 1:1 selector used by metrics that apply one-to-one filtering. One of `"hungarian"`, `"greedy"`, or `"mutual_top"`.                    |
+::: valentine.algorithms.matcher_results.MatcherResults.get_metrics
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ---
 
 ## `InvalidMatcherError`
 
-```python
-class InvalidMatcherError(Exception): ...
-```
-
-Raised by [`valentine_match`](#valentine_match) when the `matcher`
-argument is not a [`BaseMatcher`](#basematcher) subclass instance.
+::: valentine.InvalidMatcherError
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 !!! warning "Deprecated alias"
 
@@ -349,7 +212,7 @@ from valentine.algorithms import (
 The groupings are plain lists of class names:
 
 | Constant                     | Contents                                |
-|------------------------------|-----------------------------------------|
+|------------------------------|------------------------------------------|
 | `schema_only_algorithms`     | `["SimilarityFlooding", "Cupid"]`       |
 | `instance_only_algorithms`   | `["DistributionBased", "JaccardDistanceMatcher"]` |
 | `schema_instance_algorithms` | `["Coma"]`                              |
@@ -361,175 +224,71 @@ Abstract base. Subclasses must implement [`get_matches`](#get_matches);
 [`get_matches_batch`](#get_matches_batch) has a default fall-back that
 calls [`get_matches`](#get_matches) on each unique pair.
 
+::: valentine.algorithms.BaseMatcher
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
+
 #### `get_matches`
 
-```python
-@abstractmethod
-def get_matches(
-    source_input: BaseTable,
-    target_input: BaseTable,
-) -> dict[ColumnPair, float]
-```
-
-Match columns between a single pair of tables. Returns a raw dict, not a
-`MatcherResults`.
+::: valentine.algorithms.BaseMatcher.get_matches
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `get_matches_batch`
 
-```python
-def get_matches_batch(tables: list[BaseTable]) -> dict[ColumnPair, float]
-```
-
-Match columns across every unique pair of tables. Override this method
-in subclasses that benefit from a holistic view (e.g. global TF-IDF
-corpus, global distribution ranks). All three of `Coma`, `DistributionBased`,
-and `SimilarityFlooding` override it, as does `JaccardDistanceMatcher` when
-`distance_fun=StringDistanceFunction.Embedding`.
+::: valentine.algorithms.BaseMatcher.get_matches_batch
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `match_details`
 
-```python
-@property
-def match_details -> dict[ColumnPair, dict[str, float]]
-```
-
-Per-pair score breakdowns from the most recent match call. Empty by
-default; populated by matchers that combine multiple sub-scorers. The
-contents are propagated into `MatcherResults.details` by
-`valentine_match`.
+::: valentine.algorithms.BaseMatcher.match_details
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ### `Coma`
 
-```python
-Coma(
-    max_n: int = 0,
-    use_instances: bool = False,
-    use_schema: bool = True,
-    delta: float = 0.15,
-    threshold: float = 0.0,
-    instance_weight: float = 1.0,
-)
-```
-
-Pure-Python COMA 3.0 implementation. Combines schema-based matchers
-(name, path, leaves, parents) with an optional TF-IDF instance matcher
-and selects results using bidirectional best-match logic.
-
-| Parameter       | Type    | Default | Description                                                                                                                     |
-|-----------------|---------|---------|---------------------------------------------------------------------------------------------------------------------------------|
-| `max_n`            | `int`   | `0`   | Maximum number of matches to keep per column. `0` means unlimited. Must be `>= 0`.                                              |
-| `use_instances`    | `bool`  | `False` | Enable TF-IDF instance-based matching.                                                                                        |
-| `use_schema`       | `bool`  | `True`  | Enable schema-based matching. At least one of `use_schema` and `use_instances` must be `True`.                                |
-| `delta`            | `float` | `0.15`  | Fraction from the best per-column score within which matches are kept (e.g. `0.15` keeps all within 15% of the column's best). Must be in `[0, 1]`. |
-| `threshold`        | `float` | `0.0`   | Absolute minimum similarity to keep a match. Must be in `[0, 1]`.                                                             |
-| `instance_weight`  | `float` | `1.0`   | Relative weight of the instance matcher score when combining with schema scores. Must be `>= 0`.                               |
-
-Populates `MatcherResults.details` with `{name, path, leaves, parents, instances}` sub-scores.
+::: valentine.algorithms.Coma
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### `Cupid`
 
-```python
-Cupid(
-    leaf_w_struct: float = 0.2,
-    w_struct: float = 0.2,
-    th_accept: float = 0.7,
-    th_high: float = 0.6,
-    th_low: float = 0.35,
-    c_inc: float = 1.2,
-    c_dec: float = 0.9,
-    th_ns: float = 0.7,
-    process_num: int = 1,
-)
-```
-
-Python implementation of Cupid (Madhavan, Bernstein & Rahm, VLDB 2001):
-combines linguistic similarity of column names with structural
-similarity derived from schema tree shape.
-
-| Parameter       | Type    | Default | Description                                                                                                          |
-|-----------------|---------|---------|----------------------------------------------------------------------------------------------------------------------|
-| `leaf_w_struct` | `float` | `0.2`   | Weight of structural similarity at leaf level. Must be in `[0, 1]`.                                                  |
-| `w_struct`      | `float` | `0.2`   | Weight of structural similarity at inner-node level. Must be in `[0, 1]`.                                            |
-| `th_accept`     | `float` | `0.7`   | Acceptance similarity threshold for the final mapping. Must be in `[0, 1]`.                                          |
-| `th_high`       | `float` | `0.6`   | High-confidence threshold used during structural propagation. Must be in `[0, 1]`.                                   |
-| `th_low`        | `float` | `0.35`  | Low-confidence threshold used during structural propagation. Must be in `[0, 1]`.                                    |
-| `c_inc`         | `float` | `1.2`   | Positive reinforcement coefficient for matching children. Must be `> 0`.                                             |
-| `c_dec`         | `float` | `0.9`   | Negative reinforcement coefficient for non-matching children. Must be `> 0`.                                         |
-| `th_ns`         | `float` | `0.7`   | Name-similarity threshold. Must be in `[0, 1]`.                                                                      |
-| `process_num`   | `int`   | `1`     | Number of worker processes. Must be `>= 1`.                                                                          |
+::: valentine.algorithms.Cupid
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### `DistributionBased`
 
-```python
-DistributionBased(
-    threshold1: float = 0.15,
-    threshold2: float = 0.15,
-    quantiles: int = 256,
-    process_num: int = 1,
-    use_bloom_filters: bool = False,
-)
-```
-
-Instance-based matcher from *Automatic Discovery of Attributes in
-Relational Databases* (Zhang et al., SIGMOD 2011). Compares quantile
-histograms with Earth Mover's Distance.
-
-| Parameter           | Type    | Default | Description                                                                                                           |
-|---------------------|---------|---------|-----------------------------------------------------------------------------------------------------------------------|
-| `threshold1`        | `float` | `0.15`  | Distance threshold for phase 1 distribution clustering. Must be in `[0, 1]`.                                          |
-| `threshold2`        | `float` | `0.15`  | Distance threshold for phase 2 attribute clustering. Must be in `[0, 1]`.                                             |
-| `quantiles`         | `int`   | `256`   | Number of quantiles for histogram summaries. Must be `>= 1`.                                                          |
-| `process_num`       | `int`   | `1`     | Number of worker processes. Must be `>= 1`.                                                                           |
-| `use_bloom_filters` | `bool`  | `False` | Use Bloom filters for approximate set intersection in phase 2. Trades a small false-positive rate for cheaper cost.   |
-
-Overrides `get_matches_batch` to compute global distribution ranks
-across **all** tables.
+::: valentine.algorithms.DistributionBased
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### `JaccardDistanceMatcher`
 
-```python
-JaccardDistanceMatcher(
-    threshold_dist: float = 0.8,
-    distance_fun: StringDistanceFunction = StringDistanceFunction.Levenshtein,
-    process_num: int = 1,
-    embedding_model: str = "all-MiniLM-L6-v2",
-    embedding_device: str | None = None,
-    embedding_batch_size: int | None = None,
-    tversky_alpha: float = 1.0,
-    tversky_beta: float = 1.0,
-)
-```
-
-Instance-based matcher using Jaccard (or Tversky) similarity of column
-value sets, with configurable string-distance or embedding-based element
-equality. Overrides `get_matches_batch` to share a single embedding pass
-across all column pairs when `distance_fun=StringDistanceFunction.Embedding`.
-
-| Parameter              | Type                     | Default                              | Description                                                                                                                                                 |
-|------------------------|--------------------------|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `threshold_dist`       | `float`                  | `0.8`                                | Threshold above which two strings are considered equal under `distance_fun`. For `Embedding` mode this is a cosine-similarity threshold. Ignored for `Exact`. `[0, 1]`. |
-| `distance_fun`         | `StringDistanceFunction` | `StringDistanceFunction.Levenshtein` | Element-equality function. See [`StringDistanceFunction`](#stringdistancefunction).                                                                         |
-| `process_num`          | `int`                    | `1`                                  | Number of worker processes. Must be `>= 1`.                                                                                                                 |
-| `embedding_model`      | `str`                    | `"all-MiniLM-L6-v2"`                 | Sentence-transformer model name. Only used when `distance_fun=Embedding`. Requires `pip install valentine[embeddings]`.                                     |
-| `embedding_device`     | `str \| None`            | `None`                               | Device for embedding inference (`"cuda"`, `"mps"`, `"cpu"`). `None` auto-selects: CUDA → MPS → CPU.                                                        |
-| `embedding_batch_size` | `int \| None`            | `None`                               | Batch size for embedding inference. `None` (default) lets sentence-transformers use its own default (`32`). Only used when `distance_fun=Embedding`.       |
-| `tversky_alpha`        | `float`                  | `1.0`                                | Tversky penalty for unmatched values on the reference side. Default `1.0` reproduces Jaccard exactly. Set `alpha=1.0, beta=0.0` for set containment.        |
-| `tversky_beta`         | `float`                  | `1.0`                                | Tversky penalty for unmatched values on the other side. Default `1.0` reproduces Jaccard exactly. See `tversky_alpha`.                                      |
+::: valentine.algorithms.JaccardDistanceMatcher
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `StringDistanceFunction`
 
-Enum of supported element-equality functions for
-`JaccardDistanceMatcher`:
-
-| Value                                       | Description                                                                                            |
-|---------------------------------------------|--------------------------------------------------------------------------------------------------------|
-| `StringDistanceFunction.Levenshtein`        | Normalized Levenshtein ratio (default).                                                                |
-| `StringDistanceFunction.DamerauLevenshtein` | Normalized Damerau–Levenshtein ratio.                                                                  |
-| `StringDistanceFunction.Hamming`            | Normalized Hamming distance (strings of equal length).                                                 |
-| `StringDistanceFunction.Jaro`               | Jaro similarity.                                                                                       |
-| `StringDistanceFunction.JaroWinkler`        | Jaro–Winkler similarity.                                                                               |
-| `StringDistanceFunction.Exact`              | Exact string equality (forces threshold to 1.0).                                                       |
-| `StringDistanceFunction.Embedding`          | Cosine similarity of sentence-transformer embeddings. Requires `pip install valentine[embeddings]`.    |
+::: valentine.algorithms.jaccard_distance.StringDistanceFunction
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ```python
 from valentine.algorithms.jaccard_distance import StringDistanceFunction
@@ -543,52 +302,32 @@ m = JaccardDistanceMatcher(
 
 ### `SimilarityFlooding`
 
-```python
-SimilarityFlooding(
-    coeff_policy: Policy = Policy.INVERSE_AVERAGE,
-    formula: Formula = Formula.FORMULA_C,
-    string_matcher: StringMatcher = StringMatcher.PREFIX_SUFFIX,
-    tfidf_corpus: list[BaseTable] | None = None,
-)
-```
-
-Python implementation of Similarity Flooding (Melnik, Garcia-Molina &
-Rahm, ICDE 2002). Treats each schema as a labelled graph and iteratively
-propagates an initial element-level similarity to a fixpoint.
-
-| Parameter        | Type                      | Default                      | Description                                                                                               |
-|------------------|---------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------|
-| `coeff_policy`   | `Policy`                  | `Policy.INVERSE_AVERAGE`     | Coefficient policy for the propagation graph.                                                             |
-| `formula`        | `Formula`                 | `Formula.FORMULA_C`          | Fixpoint iteration formula.                                                                               |
-| `string_matcher` | `StringMatcher`           | `StringMatcher.PREFIX_SUFFIX`| String similarity function for the initial element-level mapping.                                        |
-| `tfidf_corpus`   | `list[BaseTable] \| None` | `None`                       | Additional tables to include when computing IDF weights for the `PREFIX_SUFFIX_TFIDF` matcher. Ignored otherwise. |
-
-Overrides `get_matches_batch` to compute a global IDF across all tables
-when `string_matcher=PREFIX_SUFFIX_TFIDF`.
+::: valentine.algorithms.SimilarityFlooding
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `Policy`
 
-| Value                     | Description                                     |
-|---------------------------|-------------------------------------------------|
-| `Policy.INVERSE_AVERAGE`  | Inverse of the average in-degree (default).     |
-| `Policy.INVERSE_PRODUCT`  | Inverse of the product of in-degrees.           |
+::: valentine.algorithms.Policy
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `Formula`
 
-| Value              | Description                                      |
-|--------------------|--------------------------------------------------|
-| `Formula.BASIC`    | Basic fixpoint formula.                          |
-| `Formula.FORMULA_A`| Variant A from the Similarity Flooding paper.    |
-| `Formula.FORMULA_B`| Variant B from the Similarity Flooding paper.    |
-| `Formula.FORMULA_C`| Variant C (default in Valentine).                |
+::: valentine.algorithms.Formula
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `StringMatcher`
 
-| Value                               | Description                                                       |
-|-------------------------------------|-------------------------------------------------------------------|
-| `StringMatcher.PREFIX_SUFFIX`       | Prefix/suffix trigram matcher (default).                          |
-| `StringMatcher.PREFIX_SUFFIX_TFIDF` | Prefix/suffix matcher weighted by IDF computed from the corpus.   |
-| `StringMatcher.LEVENSHTEIN`         | Normalized Levenshtein similarity on node labels.                 |
+::: valentine.algorithms.StringMatcher
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ---
 
@@ -627,34 +366,24 @@ class MyMetric(Metric):
 
 #### `apply`
 
-```python
-@abstractmethod
-def apply(
-    matches: MatcherResults,
-    ground_truth: list[tuple[str, str]] | list[ColumnPair],
-) -> dict[str, Any]
-```
-
-Compute the metric value. `ground_truth` accepts either column-name
-pairs (table-agnostic) or full `ColumnPair` tuples (table-aware).
+::: valentine.metrics.Metric.apply
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `name`
 
-```python
-def name() -> str
-```
-
-Default: the class name. Override to parameterize the reported name
-(e.g. `PrecisionTopNPercent` substitutes the current `n` into its name).
+::: valentine.metrics.Metric.name
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 #### `return_format`
 
-```python
-@final
-def return_format(value: Any) -> dict[str, Any]
-```
-
-Final helper that formats a metric value as `{self.name(): value}`.
+::: valentine.metrics.Metric.return_format
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
 
 ### Built-in metrics
 
@@ -663,65 +392,56 @@ can live in the predefined metric sets.
 
 #### `Precision`
 
-```python
-Precision(one_to_one: bool = True)
-```
-
-`TP / (TP + FP)`. When `one_to_one=True` (default), applies
-`MatcherResults.one_to_one_hungarian()` before counting.
+::: valentine.metrics.Precision
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `Recall`
 
-```python
-Recall(one_to_one: bool = True)
-```
-
-`TP / (TP + FN)`. Honors `one_to_one` the same way as `Precision`.
+::: valentine.metrics.Recall
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `F1Score`
 
-```python
-F1Score(one_to_one: bool = True)
-```
-
-Harmonic mean of precision and recall. Honors `one_to_one`.
+::: valentine.metrics.F1Score
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `PrecisionTopNPercent`
 
-```python
-PrecisionTopNPercent(one_to_one: bool = True, n: int = 10)
-```
-
-Precision restricted to the top `n%` of predictions by score. `n` is
-clamped to `[0, 100]`. The reported metric name reflects the chosen
-percentage (e.g. `PrecisionTop10Percent`).
+::: valentine.metrics.PrecisionTopNPercent
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `RecallAtSizeofGroundTruth`
 
-```python
-RecallAtSizeofGroundTruth(one_to_one: bool = False)
-```
-
-Recall at the top `len(ground_truth)` predictions — i.e. what fraction
-of gold pairs you recover if you select as many predictions as there
-are gold matches. One-to-one filtering is **off** by default here.
+::: valentine.metrics.RecallAtSizeofGroundTruth
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 #### `MeanReciprocalRank`
 
-```python
-MeanReciprocalRank()
-```
-
-For each source column, finds the rank of the first correct target column
-in the matcher's ranked output and averages the reciprocal of that rank
-across all source columns — a standard information-retrieval metric
-that rewards having the right answer near the top rather than merely
-present somewhere in the list.
+::: valentine.metrics.MeanReciprocalRank
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### Predefined metric sets
 
 | Set                              | Contents                                                                                                                                         |
-|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
 | `METRICS_CORE`                   | `Precision`, `Recall`, `F1Score`, `PrecisionTopNPercent`, `RecallAtSizeofGroundTruth`, `MeanReciprocalRank` (defaults).                          |
 | `METRICS_ALL`                    | Both `one_to_one=True` and `one_to_one=False` variants of `Precision`, `Recall`, `F1Score`, plus `PrecisionTopNPercent`, `RecallAtSizeofGroundTruth`, and `MeanReciprocalRank`. |
 | `METRICS_PRECISION_RECALL`       | `{Precision(), Recall()}`.                                                                                                                       |
@@ -752,106 +472,93 @@ from valentine.data_sources import PolarsTable, PolarsColumn
 
 ### `BaseTable`
 
-Abstract base for a table-like data source. Implement this to plug a
-non-DataFrame backend (e.g. SQL cursor, Parquet file, Arrow table) into
-Valentine's matchers.
+::: valentine.data_sources.BaseTable
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 **Abstract members** (must be provided by subclasses):
 
-| Member                         | Kind                  | Description                                                   |
-|--------------------------------|-----------------------|---------------------------------------------------------------|
-| `name`                         | `property -> str`     | Table name. Becomes `source_table`/`target_table` in emitted `ColumnPair`s. |
-| `unique_identifier`            | `property -> object`  | Stable identifier used internally to key per-table state.     |
-| `get_columns()`                | `method -> list[BaseColumn]` | All columns in the table.                              |
-| `get_df()`                     | `method -> pd.DataFrame`     | Full DataFrame view of the table.                      |
-| `is_empty`                     | `property -> bool`    | Whether the table has zero rows.                              |
+::: valentine.data_sources.BaseTable.name
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.unique_identifier
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.get_columns
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.get_df
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.is_empty
+    options: {show_root_heading: false, show_root_toc_entry: false}
 
 **Concrete members** (provided by `BaseTable`, override if needed):
 
-| Member                       | Kind                           | Description                                                                                  |
-|------------------------------|--------------------------------|----------------------------------------------------------------------------------------------|
-| `get_instances_df()`         | `method -> pd.DataFrame`       | DataFrame used for instance-based sampling. Defaults to `get_df()`.                          |
-| `get_instances_columns()`    | `method -> list[BaseColumn]`   | Columns built from the instance-sampled DataFrame. Defaults to `get_columns()`.              |
-| `get_guid_column_lookup()`   | `method -> dict[str, object]`  | `{column_name: column.unique_identifier}` lookup.                                            |
-| `get_data_type(data, d_type)`| `staticmethod -> str`          | Normalize a pandas dtype into one of `"varchar"`, `"int"`, `"float"`, or `"date"`.           |
+::: valentine.data_sources.BaseTable.get_instances_df
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.get_instances_columns
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.get_guid_column_lookup
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseTable.get_data_type
+    options: {show_root_heading: false, show_root_toc_entry: false}
 
 ### `BaseColumn`
 
-Abstract base for a single column. A `BaseColumn` knows its name, its
-values, and its detected data type.
+::: valentine.data_sources.BaseColumn
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 **Abstract members**:
 
-| Member              | Kind                  | Description                                              |
-|---------------------|-----------------------|----------------------------------------------------------|
-| `name`              | `property -> str`     | Column name.                                             |
-| `unique_identifier` | `property -> object`  | Stable identifier used internally.                       |
-| `data_type`         | `property -> str`     | Detected type: one of `"varchar"`, `"int"`, `"float"`, `"date"`. |
-| `data`              | `property -> list`    | The column's values.                                     |
+::: valentine.data_sources.BaseColumn.name
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseColumn.unique_identifier
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseColumn.data_type
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseColumn.data
+    options: {show_root_heading: false, show_root_toc_entry: false}
 
 **Concrete members**:
 
-| Member     | Kind                | Description                                          |
-|------------|---------------------|------------------------------------------------------|
-| `size`     | `property -> int`   | Number of elements in `data`.                        |
-| `is_empty` | `property -> bool`  | `True` when `size == 0`.                             |
+::: valentine.data_sources.BaseColumn.size
+    options: {show_root_heading: false, show_root_toc_entry: false}
+::: valentine.data_sources.BaseColumn.is_empty
+    options: {show_root_heading: false, show_root_toc_entry: false}
 
 ### `DataframeTable`
 
-```python
-DataframeTable(
-    df: pd.DataFrame,
-    name: str,
-    instance_sample_size: int | None = 1000,
-)
-```
-
-[`BaseTable`](#basetable) adapter for a pandas DataFrame — the concrete
-implementation used by [`valentine_match`](#valentine_match).
-
-| Parameter              | Type            | Default | Description                                                                                     |
-|------------------------|-----------------|---------|-------------------------------------------------------------------------------------------------|
-| `df`                   | `pd.DataFrame`  | —       | The DataFrame to wrap.                                                                          |
-| `name`                 | `str`           | —       | Name of the table. Used as `source_table` / `target_table` in emitted [`ColumnPair`](#columnpair)s. |
-| `instance_sample_size` | `int \| None`   | `1000`  | Cap on the number of non-empty rows sampled per column. Pass `None` to use the full DataFrame; pass `0` to expose no instance data at all. Must be `>= 0` or `None`; other values raise `ValueError`. |
-
-Automatic data-type detection classifies each column as `"varchar"`,
-`"int"`, `"float"`, or `"date"` based on the DataFrame's dtype and
-content.
+::: valentine.data_sources.DataframeTable
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### `DataframeColumn`
 
-[`BaseColumn`](#basecolumn) adapter for a single pandas `Series`.
-Constructed internally by [`DataframeTable`](#dataframetable); exposes
-the column name, detected data type, unique identifier, and sampled
-instance values via the standard [`BaseColumn`](#basecolumn) interface.
+::: valentine.data_sources.DataframeColumn
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### `PolarsTable`
 
-```python
-PolarsTable(
-    df: pl.DataFrame,
-    name: str,
-    instance_sample_size: int | None = 1000,
-)
-```
-
-[`BaseTable`](#basetable) adapter for a Polars DataFrame. Requires the
-`polars` extra (`pip install valentine[polars]`). Has the same interface
-as [`DataframeTable`](#dataframetable).
-
-| Parameter              | Type            | Default | Description                                                                                     |
-|------------------------|-----------------|---------|-------------------------------------------------------------------------------------------------|
-| `df`                   | `pl.DataFrame`  | —       | The Polars DataFrame to wrap.                                                                   |
-| `name`                 | `str`           | —       | Name of the table.                                                                              |
-| `instance_sample_size` | `int \| None`   | `1000`  | Cap on the number of non-empty rows sampled per column. Pass `None` to use the full DataFrame; pass `0` to expose no instance data at all. |
+::: valentine.data_sources.PolarsTable
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### `PolarsColumn`
 
-[`BaseColumn`](#basecolumn) adapter for a single Polars `Series`.
-Constructed internally by [`PolarsTable`](#polarstable); exposes
-the column name, detected data type, unique identifier, and sampled
-instance values via the standard [`BaseColumn`](#basecolumn) interface.
+::: valentine.data_sources.PolarsColumn
+    options:
+      show_root_heading: false
+      show_root_toc_entry: false
+      members: false
 
 ### Writing a custom data source
 

@@ -28,17 +28,17 @@ class SimilarityFlooding(BaseMatcher):
     ----------
     coeff_policy : Policy, optional
         Coefficient policy for the propagation graph. One of
-        :attr:`Policy.INVERSE_AVERAGE` (default) or
-        :attr:`Policy.INVERSE_PRODUCT`.
+        `Policy.INVERSE_AVERAGE` (default) or
+        `Policy.INVERSE_PRODUCT`.
     formula : Formula, optional
-        Fixpoint iteration formula. One of :attr:`Formula.BASIC`,
-        :attr:`Formula.FORMULA_A`, :attr:`Formula.FORMULA_B`, or
-        :attr:`Formula.FORMULA_C` (default).
+        Fixpoint iteration formula. One of `Formula.BASIC`,
+        `Formula.FORMULA_A`, `Formula.FORMULA_B`, or
+        `Formula.FORMULA_C` (default).
     string_matcher : StringMatcher, optional
         String similarity function used for the initial element-level
-        mapping. One of :attr:`StringMatcher.PREFIX_SUFFIX` (default),
-        :attr:`StringMatcher.PREFIX_SUFFIX_TFIDF`, or
-        :attr:`StringMatcher.LEVENSHTEIN`.
+        mapping. One of `StringMatcher.PREFIX_SUFFIX` (default),
+        `StringMatcher.PREFIX_SUFFIX_TFIDF`, or
+        `StringMatcher.LEVENSHTEIN`.
     tfidf_corpus : list[BaseTable] | None, optional
         Additional tables to include when computing IDF weights for the
         ``PREFIX_SUFFIX_TFIDF`` matcher. Ignored for other string matchers.

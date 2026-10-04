@@ -7,8 +7,10 @@ from typing import NamedTuple
 class ColumnPair(NamedTuple):
     """A matched pair of columns from two tables.
 
-    Used as the key in match result dictionaries. Provides named access
-    to all four identifiers::
+    Immutable, hashable key identifying a matched pair of columns. Used
+    everywhere a match result or ground truth entry is required. Because
+    it is a ``NamedTuple``, it also supports positional indexing,
+    iteration, and unpacking::
 
         pair = ColumnPair("orders", "price", "sales", "amount")
         pair.source_table  # "orders"
@@ -17,6 +19,18 @@ class ColumnPair(NamedTuple):
         pair.target_column  # "amount"
         pair.source  # ("orders", "price")
         pair.target  # ("sales", "amount")
+        st, sc, tt, tc = pair  # positional unpacking
+
+    Attributes
+    ----------
+    source_table : str
+        Name of the source table.
+    source_column : str
+        Name of the source column.
+    target_table : str
+        Name of the target table.
+    target_column : str
+        Name of the target column.
     """
 
     source_table: str

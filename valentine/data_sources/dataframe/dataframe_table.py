@@ -6,6 +6,26 @@ from .dataframe_column import DataframeColumn
 
 
 class DataframeTable(BaseTable):
+    """A `BaseTable` backed by a pandas DataFrame.
+
+    The concrete implementation used by `valentine_match`.
+    Automatic data-type detection classifies each column as ``"varchar"``,
+    ``"int"``, ``"float"``, or ``"date"`` based on the DataFrame's dtype
+    and content.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The DataFrame to wrap.
+    name : str
+        Name of the table. Used as ``source_table`` / ``target_table`` in
+        emitted `ColumnPair` instances.
+    instance_sample_size : int | None, optional
+        Cap on the number of non-empty rows sampled per column. ``None``
+        uses the full DataFrame; ``0`` exposes no instance data at all.
+        Must be ``>= 0`` or ``None`` (default: ``1000``).
+    """
+
     def __init__(self, df: pd.DataFrame, name: str, instance_sample_size: int | None = 1000):
         if instance_sample_size is not None and instance_sample_size < 0:
             raise ValueError(

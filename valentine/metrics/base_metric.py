@@ -40,7 +40,7 @@ class Metric(ABC):
         ground_truth : list
             Expected column matches. Either column-name pairs
             ``[("src_col", "tgt_col"), ...]`` (table names ignored during
-            comparison) or full :class:`~valentine.algorithms.ColumnPair`
+            comparison) or full `ColumnPair`
             instances for table-aware comparison.
         one_to_one_method : {"greedy", "hungarian", "mutual_top"}
             Selection algorithm used when the metric's ``one_to_one``

@@ -8,11 +8,11 @@ from .polars_column import PolarsColumn
 
 
 class PolarsTable(BaseTable):
-    """A :class:`BaseTable` backed by a Polars DataFrame.
+    """A `BaseTable` backed by a Polars DataFrame.
 
-    Drop-in replacement for :class:`DataframeTable`; all matching
+    Drop-in replacement for `DataframeTable`; all matching
     algorithms work identically because they consume the
-    :class:`BaseTable` / :class:`BaseColumn` interface, not the
+    `BaseTable` / `BaseColumn` interface, not the
     underlying frame type.
 
     Parameters

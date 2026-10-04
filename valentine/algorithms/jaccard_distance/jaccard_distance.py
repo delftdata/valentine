@@ -66,19 +66,19 @@ class JaccardDistanceMatcher(BaseMatcher):
         Acceptance threshold above which two string values are considered
         equal under the chosen ``distance_fun``, in ``[0, 1]``
         (default: ``0.8``). Ignored when ``distance_fun`` is
-        :attr:`StringDistanceFunction.Exact`. For
-        :attr:`StringDistanceFunction.Embedding`, the threshold is
+        `StringDistanceFunction.Exact`. For
+        `StringDistanceFunction.Embedding`, the threshold is
         applied to cosine similarity of sentence-transformer embeddings;
         ~0.7 is a typical operating point.
     distance_fun : StringDistanceFunction, optional
         String similarity function. One of
-        :attr:`StringDistanceFunction.Levenshtein` (default),
-        :attr:`StringDistanceFunction.DamerauLevenshtein`,
-        :attr:`StringDistanceFunction.Hamming`,
-        :attr:`StringDistanceFunction.Jaro`,
-        :attr:`StringDistanceFunction.JaroWinkler`,
-        :attr:`StringDistanceFunction.Exact`, or
-        :attr:`StringDistanceFunction.Embedding`.
+        `StringDistanceFunction.Levenshtein` (default),
+        `StringDistanceFunction.DamerauLevenshtein`,
+        `StringDistanceFunction.Hamming`,
+        `StringDistanceFunction.Jaro`,
+        `StringDistanceFunction.JaroWinkler`,
+        `StringDistanceFunction.Exact`, or
+        `StringDistanceFunction.Embedding`.
     process_num : int, optional
         Number of worker threads passed to ``rapidfuzz.process.cdist``
         (must be ``>= 1``, default: ``1``). Earlier versions used a

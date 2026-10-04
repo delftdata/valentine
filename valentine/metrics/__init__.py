@@ -25,7 +25,7 @@ __all__ = [
 # Predefined metric sets.
 #
 # ``METRICS_ALL`` is an explicit listing rather than a dynamic scan of
-# :class:`Metric` subclasses so that:
+# `Metric` subclasses so that:
 #   1. metrics requiring constructor arguments aren't silently dropped, and
 #   2. user-defined metrics don't accidentally bleed into the predefined set.
 METRICS_ALL = {
@@ -39,6 +39,11 @@ METRICS_ALL = {
     RecallAtSizeofGroundTruth(),
     MeanReciprocalRank(),
 }
+"""Both ``one_to_one=True`` and ``one_to_one=False`` variants of
+`Precision`, `Recall`, `F1Score`, plus
+`PrecisionTopNPercent`, `RecallAtSizeofGroundTruth`, and
+`MeanReciprocalRank`.
+"""
 METRICS_CORE = {
     Precision(),
     Recall(),
@@ -47,5 +52,10 @@ METRICS_CORE = {
     RecallAtSizeofGroundTruth(),
     MeanReciprocalRank(),
 }
+"""``Precision``, ``Recall``, ``F1Score``, ``PrecisionTopNPercent``,
+``RecallAtSizeofGroundTruth``, ``MeanReciprocalRank`` (defaults).
+"""
 METRICS_PRECISION_RECALL = {Precision(), Recall()}
+"""``{Precision(), Recall()}``."""
 METRICS_PRECISION_INCREASING_N = {PrecisionTopNPercent(n=x + 10) for x in range(0, 100, 10)}
+"""``PrecisionTopNPercent`` for ``n`` in ``{10, 20, 30, ..., 100}``."""
