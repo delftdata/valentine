@@ -49,7 +49,7 @@ The original experimental suite version of Valentine, as first published for the
 ## Installation instructions
 ### Requirements
 
-*   *Python* >=3.10,<3.15
+*   *Python* >=3.12,<3.16
 
 To install Valentine simply run:
 

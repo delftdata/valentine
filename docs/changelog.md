@@ -49,6 +49,35 @@ For the full commit history, see [GitHub releases][releases].
 
 -->
 
+## Unreleased
+
+### Added
+
+- Support for Python 3.15.
+
+### Changed
+
+- Upgraded to PuLP 4 (`PuLP[cbc]>=4.0,<5.0`). PuLP 4 no longer bundles
+  the CBC solver; it is now pulled in through the `cbc` extra
+  (`cbcbox`). `DistributionBased` uses `COIN_CMD` and
+  `LpProblem.add_variable()` in place of the removed `PULP_CBC_CMD`
+  and `LpVariable(...)` APIs. Matching results are unchanged.
+- Widened the `polars` extra to allow Polars 2.x (`>=1.0,<3.0`).
+- Bumped pinned dev/test dependencies in `requirements.txt`: numpy 2.5.4,
+  polars 2.0.0, PuLP 4.0.1, POT 0.9.7.post1, ruff 0.17.0.
+- Bumped the pinned docs toolchain: zensical 0.0.70, mkdocstrings 1.0.7.
+
+### Removed
+
+- Dropped support for Python 3.10 and 3.11 (PuLP 4 requires
+  Python >=3.12). Supported versions are now 3.12, 3.13, 3.14 and 3.15.
+
+### Internal
+
+- CI: test matrix is now Python 3.12–3.15 on Linux, macOS and Windows.
+  The embeddings extra is installed best-effort, since torch does not
+  yet ship wheels for every new Python release.
+
 ## v1.0.1 — 2026-10-14
 
 ### Security

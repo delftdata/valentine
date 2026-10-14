@@ -55,7 +55,7 @@ ruff format .
 - Update the relevant documentation pages in `docs/` if needed.
 - Reference any related issue in the PR description.
 
-The CI pipeline will run tests on all supported Python versions (3.10–3.14)
+The CI pipeline will run tests on all supported Python versions (3.12–3.15)
 across Linux, macOS, and Windows. PRs must pass CI before merging.
 
 ## Reporting bugs and requesting features

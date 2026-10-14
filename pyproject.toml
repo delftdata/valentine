@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "valentine"
-version = "1.0.1"
+version = "1.1.0.dev0"
 description = "Valentine: find relationships between columns of different tabular datasets"
 readme = "README.md"
 authors = [
@@ -21,17 +21,16 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "License :: OSI Approved :: Apache Software License",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Operating System :: POSIX",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
 ]
 
-requires-python = ">=3.10,<3.15"
+requires-python = ">=3.12,<3.16"
 dependencies = [
     "numpy>=2.0,<3.0",
     "pandas>=2.0,<4.0",
@@ -40,7 +39,7 @@ dependencies = [
     "networkx>=2.8,<4.0",
     "chardet>=7.0,<8.0",
     "rapidfuzz>=3.0,<4.0",
-    "PuLP>=2.5,<4.0",
+    "PuLP[cbc]>=4.0,<5.0",
     "POT>=0.9.5,<1.0",
     "scipy>=1.12,<2.0",
     "python-dateutil>=2.8,<3.0",
@@ -50,10 +49,10 @@ dependencies = [
 dev = [
     "pytest>=9.0,<10.0",
     "coverage>=7.0,<8.0",
-    "ruff>=0.15,<1.0",
+    "ruff>=0.17,<1.0",
 ]
 polars = [
-    "polars>=1.0,<2.0",
+    "polars>=1.0,<3.0",
 ]
 embeddings = [
     "sentence-transformers>=2.0,<7.0",
@@ -62,8 +61,8 @@ docs = [
     # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
     # deliberately rather than relying on a range, so a bad release
     # can't silently break the docs build.
-    "zensical==0.0.67",
-    "mkdocstrings==1.0.6",
+    "zensical==0.0.70",
+    "mkdocstrings==1.0.7",
     "mkdocstrings-python==2.0.9",
 ]
 
@@ -81,7 +80,7 @@ license-files = ["LICENSE"]
 
 
 [tool.ruff]
-target-version = "py310"
+target-version = "py312"
 line-length = 100
 indent-width = 4
 
