@@ -56,7 +56,9 @@ unchanged. If you are still on Python 3.10 or 3.11, stay on v1.0.1.
 
 ### Added
 
-- Support for Python 3.15.
+- Support for Python 3.15. On Windows and macOS this needs PuLP to
+  publish Python 3.15 wheels, which PuLP 4.0.1 does not yet do, so use
+  Python 3.12–3.14 on those platforms for now.
 
 ### Changed
 
@@ -88,7 +90,8 @@ unchanged. If you are still on Python 3.10 or 3.11, stay on v1.0.1.
 
 ### Internal
 
-- CI: test matrix is now Python 3.12–3.15 on Linux, macOS and Windows.
+- CI: test matrix is now Python 3.12–3.14 on Linux, macOS and Windows,
+  plus 3.15 on Linux.
   The embeddings extra is installed best-effort, since torch does not
   yet ship wheels for every new Python release.
 - CI: the "Test (wheel)" jobs now really test the installed wheel.

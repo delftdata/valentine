@@ -56,7 +56,8 @@ ruff format .
 - Reference any related issue in the PR description.
 
 The CI pipeline will run tests on all supported Python versions (3.12–3.15)
-across Linux, macOS, and Windows. PRs must pass CI before merging.
+across Linux, macOS, and Windows (3.15 on Linux only, until PuLP publishes
+3.15 wheels for Windows and macOS). PRs must pass CI before merging.
 
 ## Reporting bugs and requesting features
 
