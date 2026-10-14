@@ -20,8 +20,8 @@ pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
 def main():
     # Load the source with pandas, the target with Polars
-    d1_path = Path("data") / "source_candidates.csv"
-    d2_path = Path("data") / "target_candidates.csv"
+    d1_path = Path(__file__).parent / "data" / "source_candidates.csv"
+    d2_path = Path(__file__).parent / "data" / "target_candidates.csv"
     df_pandas = pd.read_csv(d1_path)
     df_polars = pl.read_csv(d2_path)
 

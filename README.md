@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="docs/assets/favicon.png" alt="" width="40" valign="middle">
+  <img src="https://raw.githubusercontent.com/delftdata/valentine/master/docs/assets/favicon.png" alt="" width="40" valign="middle">
   Valentine
 </h1>
 <p align="center"><em>(Schema-) Matching DataFrames Made Easy</em></p>

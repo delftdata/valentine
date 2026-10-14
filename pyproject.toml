@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,14 +13,14 @@ authors = [
 maintainers = [
     { name = "Delft Data", email = "delftdatasystems@gmail.com" }
 ]
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 keywords = ["matching", "valentine", "schema matching", "dataset discovery", "coma", "cupid", "similarity flooding"]
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Topic :: Scientific/Engineering :: Information Analysis",
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -76,7 +76,12 @@ Changelog = "https://github.com/delftdata/valentine/releases"
 [tool.setuptools]
 packages = { find = { include = ["valentine*"], exclude = ["tests*", "examples*", "docs*", "experiments*"] } }
 include-package-data = true
-license-files = ["LICENSE"]
+
+
+[tool.pytest.ini_options]
+# Fail on any warning so new deprecations (e.g. from a new Python or
+# dependency release) surface in CI instead of scrolling past.
+filterwarnings = ["error"]
 
 
 [tool.ruff]

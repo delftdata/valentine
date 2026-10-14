@@ -69,17 +69,38 @@ unchanged. If you are still on Python 3.10 or 3.11, stay on v1.0.1.
 - Bumped pinned dev/test dependencies in `requirements.txt`: numpy 2.5.4,
   polars 2.0.0, PuLP 4.0.1, POT 0.9.7.post1, ruff 0.17.0.
 - Bumped the pinned docs toolchain: zensical 0.0.70, mkdocstrings 1.0.7.
+- Package metadata now declares the license as an SPDX expression
+  (`License-Expression: Apache-2.0`, PEP 639) in place of the
+  deprecated license table and classifier. Building from source now
+  needs `setuptools>=77`.
 
 ### Removed
 
 - Dropped support for Python 3.10 and 3.11 (PuLP 4 requires
   Python >=3.12). Supported versions are now 3.12, 3.13, 3.14 and 3.15.
 
+### Fixed
+
+- The examples in `examples/` now run from any working directory, not
+  only from inside `examples/`.
+- The logo in the README (also the PyPI project description) now uses an
+  absolute URL, so it no longer shows as a broken image on PyPI.
+
 ### Internal
 
 - CI: test matrix is now Python 3.12–3.15 on Linux, macOS and Windows.
   The embeddings extra is installed best-effort, since torch does not
   yet ship wheels for every new Python release.
+- CI: the "Test (wheel)" jobs now really test the installed wheel.
+  Previously pytest imported the source tree from the checkout.
+- CI: `twine check --strict` runs on the built distributions before
+  they can be published.
+- CI: all GitHub Actions updated to their latest releases, which removes
+  the Node.js 20 deprecation warnings (including in the PyPI publish
+  step).
+- Tests: pytest now treats warnings as errors, so new deprecations
+  surface in CI. Fixed the one existing pytest deprecation (a
+  class-scoped fixture defined as an instance method).
 
 ## v1.0.1 — 2026-10-14
 
