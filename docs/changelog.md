@@ -49,7 +49,10 @@ For the full commit history, see [GitHub releases][releases].
 
 -->
 
-## Unreleased
+## v1.1.0 — 2026-10-14
+
+v1.1.0 moves to PuLP 4 and supports Python 3.12–3.15. The public API is
+unchanged. If you are still on Python 3.10 or 3.11, stay on v1.0.1.
 
 ### Added
 

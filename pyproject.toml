@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "valentine"
-version = "1.1.0.dev0"
+version = "1.1.0"
 description = "Valentine: find relationships between columns of different tabular datasets"
 readme = "README.md"
 authors = [
