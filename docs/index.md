@@ -79,7 +79,7 @@ pip install valentine[polars]     # pandas + Polars support
 pip install valentine[embeddings] # pandas + embeddings support
 ```
 
-Requires Python **>=3.10, <3.15**.
+Requires Python **>=3.12, <3.16**.
 
 ## A 30-second taste
 
