@@ -49,6 +49,28 @@ For the full commit history, see [GitHub releases][releases].
 
 -->
 
+## v1.0.1 — 2026-10-14
+
+### Security
+
+- Raised the minimum `nltk` to `>=3.10.3` to pick up fixes for known
+  vulnerabilities in earlier versions.
+
+### Changed
+
+- Widened the `embeddings` extra to allow `sentence-transformers` 6.x
+  (`>=2.0,<7.0`, was `<6.0`).
+- Bumped pinned dev/test dependencies in `requirements.txt`: numpy 2.5.3,
+  pandas 3.0.6, polars 1.44.2, networkx 3.7, scipy 1.18.1, chardet 7.6.0,
+  rapidfuzz 3.14.6, PuLP 3.3.2, sentence-transformers 6.1.0,
+  pytest 9.1.1, coverage 7.16.2, ruff 0.16.10.
+
+### Internal
+
+- CI: updated GitHub Actions (codecov-action v7, checkout v7,
+  setup-python v6, Pages actions) and made the pytest version the same
+  across all workflows.
+
 ## v1.0.0 — 2026-05-14
 
 v1.0.0 is a significant redesign of Valentine's public API together
