@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="docs/assets/favicon.png" alt="" width="40" valign="middle">
+  <img src="https://raw.githubusercontent.com/delftdata/valentine/master/docs/assets/favicon.png" alt="" width="40" valign="middle">
   Valentine
 </h1>
 <p align="center"><em>(Schema-) Matching DataFrames Made Easy</em></p>
@@ -50,6 +50,8 @@ The original experimental suite version of Valentine, as first published for the
 ### Requirements
 
 *   *Python* >=3.12,<3.16
+    *   On Windows and macOS, use Python 3.12–3.14 for now: Valentine's
+        dependency PuLP does not yet publish Python 3.15 wheels for those platforms.
 
 To install Valentine simply run:
 

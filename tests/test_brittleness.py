@@ -243,7 +243,8 @@ class TestEndToEndRegression:
     """Verify that all fixes preserve algorithm output on the standard test data."""
 
     @pytest.fixture(scope="class")
-    def test_data(self):
+    @classmethod
+    def test_data(cls):
         df1 = pd.read_csv(_DATA / "source_candidates.csv")
         df2 = pd.read_csv(_DATA / "target_candidates.csv")
         return df1, df2

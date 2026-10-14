@@ -11,6 +11,16 @@ command. It requires **Python >=3.12, <3.16**.
 
   [pypi]: https://pypi.org/project/valentine/
 
+!!! note "Python 3.15 on Windows and macOS"
+
+    Valentine depends on [PuLP][pulp], which does not yet publish
+    Python 3.15 wheels for Windows or macOS, and its source build fails
+    there. Until it does, use Python 3.12–3.14 on those platforms.
+    Python 3.15 on Linux works. No Valentine update is needed once PuLP
+    ships the wheels.
+
+  [pulp]: https://pypi.org/project/PuLP/
+
 === "pip"
 
     ```shell
