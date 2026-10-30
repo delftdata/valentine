@@ -90,7 +90,18 @@ class MatcherResults(Mapping):
 
     # -- Transformations ---------------------------------------------------
 
-    def one_to_one_hungarian(self, threshold: float | None = None) -> MatcherResults:  # noqa: PLR0912
+    def _default_threshold(self) -> float:
+        """Threshold used by the 1:1 selectors when none is given.
+
+        When every score is the same there is nothing to cut, so that score
+        is returned and all selected pairs are kept.
+        """
+        distinct = sorted(set(self._data.values()), reverse=True)
+        if len(distinct) < 2:
+            return distinct[0]
+        return distinct[math.ceil(len(distinct) / 2)]
+
+    def one_to_one_hungarian(self, threshold: float | None = None) -> MatcherResults:
         """Globally optimal 1:1 column matching via Hungarian assignment.
 
         This is the **default** 1:1 selector — it is what
@@ -149,16 +160,7 @@ class MatcherResults(Mapping):
         cost = [[-s for s in row] for row in sim]
         row_ind, col_ind = linear_sum_assignment(cost)
 
-        set_match_values = set(self._data.values())
-        if len(set_match_values) < 2:
-            result = MatcherResults(dict(self._data), details=dict(self._details))
-            if threshold is None:
-                self._cached_hungarian = result
-            return result
-        if threshold is None:
-            min_sim = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
-        else:
-            min_sim = threshold
+        min_sim = self._default_threshold() if threshold is None else threshold
 
         selected: dict[ColumnPair, float] = {}
         for r, c in zip(row_ind, col_ind, strict=False):
@@ -198,20 +200,15 @@ class MatcherResults(Mapping):
         MatcherResults
             A new instance with the greedy 1:1 assignment.
         """
-        set_match_values = set(self._data.values())
-
-        if len(set_match_values) < 2:
-            return MatcherResults(dict(self._data), details=dict(self._details))
+        if not self._data:
+            return MatcherResults({})
 
         matched: dict[tuple[str, str], bool] = {}
         for key in self._data:
             matched[key.source] = False
             matched[key.target] = False
 
-        if threshold is None:
-            min_sim = sorted(set_match_values, reverse=True)[math.ceil(len(set_match_values) / 2)]
-        else:
-            min_sim = threshold
+        min_sim = self._default_threshold() if threshold is None else threshold
 
         matches1to1: dict[ColumnPair, float] = {}
         for key, similarity in self._data.items():

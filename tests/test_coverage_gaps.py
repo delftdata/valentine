@@ -42,6 +42,7 @@ from valentine.algorithms.jaccard_distance import StringDistanceFunction
 from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
 from valentine.data_sources.dataframe.dataframe_table import DataframeTable
+from valentine.metrics import Precision
 from valentine.metrics.metric_helpers import _apply_one_to_one, _normalize_ground_truth
 
 _ST_AVAILABLE = importlib.util.find_spec("sentence_transformers") is not None
@@ -642,17 +643,66 @@ class TestMutualTopN:
             assert cp in result.details
 
 
-# -- MatcherResults.one_to_one_greedy early-return branch ------------------
+# -- 1:1 selection when every score is the same ----------------------------
 
 
-class TestGreedyEarlyReturn:
-    def test_all_identical_scores_returns_all_pairs(self):
-        # < 2 distinct values → skip threshold logic and return everything.
+# Every pair shares a source or target with another pair, all scored 1.0.
+_TIED_SCORES = {
+    ColumnPair("s", "a", "t", "x"): 1.0,
+    ColumnPair("s", "a", "t", "y"): 1.0,
+    ColumnPair("s", "b", "t", "x"): 1.0,
+    ColumnPair("s", "b", "t", "y"): 1.0,
+}
+
+
+class TestOneToOneTiedScores:
+    @staticmethod
+    def _assert_one_to_one(result):
+        sources = [cp.source for cp in result]
+        targets = [cp.target for cp in result]
+        assert len(sources) == len(set(sources))
+        assert len(targets) == len(set(targets))
+
+    def test_all_identical_scores_disjoint_pairs_kept(self):
         data = {
             ColumnPair("s", "a", "t", "x"): 0.5,
             ColumnPair("s", "b", "t", "y"): 0.5,
         }
         assert len(MatcherResults(data).one_to_one_greedy()) == 2
+        assert len(MatcherResults(data).one_to_one_hungarian()) == 2
+
+    @pytest.mark.parametrize("method", ["one_to_one_greedy", "one_to_one_hungarian"])
+    def test_tied_scores_still_one_to_one(self, method):
+        result = getattr(MatcherResults(_TIED_SCORES), method)()
+        self._assert_one_to_one(result)
+        assert len(result) == 2
+
+    @pytest.mark.parametrize("method", ["one_to_one_greedy", "one_to_one_hungarian"])
+    def test_explicit_threshold_applied_with_one_distinct_score(self, method):
+        single = MatcherResults({ColumnPair("s", "a", "t", "x"): 0.2})
+        assert len(getattr(single, method)(threshold=0.9)) == 0
+        assert len(getattr(single, method)(threshold=0.1)) == 1
+
+    def test_greedy_empty(self):
+        assert len(MatcherResults({}).one_to_one_greedy()) == 0
+
+    def test_precision_uses_one_to_one_selection(self):
+        # Before the fix all four pairs were scored, giving Precision 0.5.
+        matches = MatcherResults(_TIED_SCORES)
+        gt = [("a", "x"), ("b", "y")]
+        for method in ("hungarian", "greedy"):
+            metrics = matches.get_metrics(gt, metrics={Precision()}, one_to_one_method=method)
+            assert metrics["Precision"] in (0.0, 1.0)
+
+    def test_jaccard_identical_columns(self):
+        # A real matcher producing tied scores: every pair scores 1.0.
+        left = pd.DataFrame({"id": [1, 2, 3], "code": [1, 2, 3]})
+        right = pd.DataFrame({"key": [1, 2, 3], "ref": [1, 2, 3]})
+        matches = valentine_match([left, right], JaccardDistanceMatcher())
+        assert len(matches) == 4
+        assert len(set(matches.values())) == 1
+        self._assert_one_to_one(matches.one_to_one_hungarian())
+        assert len(matches.one_to_one_hungarian()) == 2
 
 
 # -- metric_helpers dispatch & ground-truth normalisation ------------------
