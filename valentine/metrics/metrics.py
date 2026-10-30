@@ -130,12 +130,21 @@ class PrecisionTopNPercent(Metric):
     ----------
     one_to_one : bool
         Whether to apply the one-to-one filter to the MatcherResults first.
-    n : int
+    n : float
         Percentage of matches to consider (0-100).
+
+    Raises
+    ------
+    ValueError
+        If ``n`` is outside 0-100.
     """
 
     one_to_one: bool = True
-    n: int = 10
+    n: float = 10
+
+    def __post_init__(self) -> None:
+        if not 0 <= self.n <= 100:
+            raise ValueError(f"n must be between 0 and 100, got {self.n!r}")
 
     def name(self) -> str:
         # Replace the 'N' in the base name with the chosen percent, e.g. "PrecisionTop70Percent".
@@ -152,9 +161,7 @@ class PrecisionTopNPercent(Metric):
         if self.one_to_one:
             matches = _apply_one_to_one(matches, one_to_one_method)
 
-        # Clamp N to a sensible range without mutating the dataclass.
-        n_clamped = min(100, max(0, int(self.n)))
-        n_matches = matches.take_top_percent(n_clamped)
+        n_matches = matches.take_top_percent(self.n)
 
         tp, _ = get_tp_fn(n_matches, ground_truth)
         fp = get_fp(n_matches, ground_truth)
@@ -186,7 +193,8 @@ class RecallAtSizeofGroundTruth(Metric):
     ) -> dict[str, float]:
         if self.one_to_one:
             matches = _apply_one_to_one(matches, one_to_one_method)
-        n_matches = matches.take_top_n(len(ground_truth))
+        gt_pairs, _ = _normalize_ground_truth(ground_truth)
+        n_matches = matches.take_top_n(len(gt_pairs))
         tp, fn = get_tp_fn(n_matches, ground_truth)
         recall = _safe_div(tp, tp + fn)
         return self.return_format(recall)
@@ -196,10 +204,12 @@ class RecallAtSizeofGroundTruth(Metric):
 class MeanReciprocalRank(Metric):
     """Mean Reciprocal Rank (MRR).
 
-    For each ground truth pair, finds its rank (1-indexed position) in
-    the matcher results sorted by descending score. The reciprocal rank
-    is ``1/rank`` if the pair is found, or ``0`` if absent. MRR is the
-    mean of reciprocal ranks across all ground truth pairs.
+    For each source column in the ground truth, ranks that source's
+    predicted targets by descending score and finds the rank (1-indexed)
+    of the first correct target. The reciprocal rank is ``1/rank``, or
+    ``0`` if no correct target is predicted. MRR is the mean of the
+    reciprocal ranks over the ground-truth source columns, so a source
+    with several correct targets counts once.
 
     Attributes
     ----------

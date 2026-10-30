@@ -37,6 +37,14 @@ For the full commit history, see [GitHub releases][releases].
 - `MatcherResults.get_metrics()` raises `ValueError` when two different
   metrics report a score under the same name, instead of keeping only
   one of them. Duplicate (equal) metric instances are computed once.
+- Stricter input checks, each raising `ValueError`:
+  `PrecisionTopNPercent(n=...)` outside 0–100 (previously clamped
+  silently, so `n=150` was reported as `"PrecisionTop150Percent"` but
+  computed at 100%); `take_top_n()` with a negative `n`;
+  `take_top_percent()` outside 0–100; an unknown `one_to_one_method` in
+  `get_metrics()`, even when no metric uses 1:1 selection; and ground
+  truth that mixes column-name pairs with `ColumnPair` entries or has
+  entries with other than 2 or 4 fields.
 
 ### Fixed
 
@@ -52,6 +60,17 @@ For the full commit history, see [GitHub releases][releases].
   `Recall`, `F1Score`, `PrecisionTopNPercent` with their default
   `one_to_one=True`) were computed on those many-to-many results, so their
   values change for such inputs.
+- Ground truth passed to `get_metrics()` may be any iterable, such as a
+  set (which raised `TypeError`) or a generator (which only the first
+  metric saw). Duplicate entries now count once; they were counted
+  twice in recall but once in precision.
+- `PrecisionTopNPercent` with a fractional `n` computed with `n`
+  truncated to an integer while reporting the fractional value in its
+  name.
+- Docstrings: the default threshold of the 1:1 selectors is described
+  accurately (it is at or below the median of the distinct scores, not
+  the median), and `MeanReciprocalRank` is described as averaging over
+  ground-truth source columns, which is what it computes.
 
 ## v1.1.0 — 2026-10-14
 

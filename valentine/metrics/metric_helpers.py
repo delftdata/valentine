@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from ..algorithms.match import ColumnPair
     from ..algorithms.matcher_results import MatcherResults
     from .base_metric import OneToOneMethod
@@ -27,7 +29,7 @@ def _apply_one_to_one(matches: MatcherResults, method: OneToOneMethod) -> Matche
 
 
 def _normalize_ground_truth(
-    ground_truth: list[tuple[str, str]] | list[ColumnPair],
+    ground_truth: Iterable[tuple[str, str]] | Iterable[ColumnPair],
 ) -> tuple[list[tuple], bool]:
     """Normalize ground truth into a comparable list of tuples.
 
@@ -39,20 +41,36 @@ def _normalize_ground_truth(
       are then table-aware, which matters when matching more than two
       tables or when source and target share column names.
 
+    Any iterable is accepted (list, tuple, set, ...). Duplicate entries
+    are dropped, keeping the first occurrence.
+
     Returns
     -------
     tuple[list[tuple], bool]
         The normalized ground truth and a ``table_aware`` flag indicating
         whether comparisons should include table names.
+
+    Raises
+    ------
+    ValueError
+        If an entry does not have 2 or 4 fields, or if the two formats
+        are mixed.
     """
-    if not ground_truth:
+    pairs = list(dict.fromkeys(tuple(e) for e in ground_truth))
+    if not pairs:
         return [], False
-    first = ground_truth[0]
-    if len(first) == 4:
-        # Full ColumnPair format — keep table names for exact comparison
-        return [(e[0], e[1], e[2], e[3]) for e in ground_truth], True
-    # Simple (source_col, target_col) format — column names only
-    return [(e[0], e[1]) for e in ground_truth], False
+    lengths = {len(e) for e in pairs}
+    if not lengths <= {2, 4}:
+        raise ValueError(
+            "Ground truth entries must be (source_column, target_column) pairs or "
+            f"ColumnPair instances; got entries with {sorted(lengths)} fields"
+        )
+    if len(lengths) > 1:
+        raise ValueError(
+            "Ground truth mixes (source_column, target_column) pairs with ColumnPair "
+            "instances; use one format for all entries"
+        )
+    return pairs, lengths == {4}
 
 
 def _matches_as_tuples(matches: MatcherResults, table_aware: bool) -> list[tuple]:

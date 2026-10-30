@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Iterator, Mapping
-from typing import Any
+from collections.abc import Iterable, Iterator, Mapping
+from typing import Any, get_args
 
 from ..metrics import METRICS_CORE
-from ..metrics.base_metric import Metric
+from ..metrics.base_metric import Metric, OneToOneMethod
 from .match import ColumnPair
 
 
@@ -93,8 +93,12 @@ class MatcherResults(Mapping):
     def _default_threshold(self) -> float:
         """Threshold used by the 1:1 selectors when none is given.
 
-        When every score is the same there is nothing to cut, so that score
-        is returned and all selected pairs are kept.
+        The distinct scores are sorted from highest to lowest and the one at
+        0-based index ``ceil(k / 2)`` is used, where ``k`` is the number of
+        distinct scores. This is at or below their median: with 3 distinct
+        scores it is the lowest. When every score is the same there is
+        nothing to cut, so that score is returned and all selected pairs are
+        kept.
         """
         distinct = sorted(set(self._data.values()), reverse=True)
         if len(distinct) < 2:
@@ -117,8 +121,9 @@ class MatcherResults(Mapping):
         Parameters
         ----------
         threshold : float | None
-            Minimum similarity to keep. If ``None``, uses the median
-            similarity score.
+            Minimum similarity to keep. If ``None``, uses a default taken
+            from the distinct scores, at or below their median: sorted from
+            highest to lowest, the one at 0-based index ``ceil(k / 2)``.
 
         Returns
         -------
@@ -183,7 +188,7 @@ class MatcherResults(Mapping):
         Starting from the highest-scoring pair, greedily assigns each
         source and target column at most one match. Pairs below
         ``threshold`` are discarded. When ``threshold`` is ``None`` (the
-        default), the median similarity score is used.
+        default), the same default as `one_to_one_hungarian` is used.
 
         Greedy can lock in a locally-best pair that blocks a better
         globally-optimal assignment, so `one_to_one_hungarian` is
@@ -193,7 +198,8 @@ class MatcherResults(Mapping):
         Parameters
         ----------
         threshold : float | None
-            Minimum similarity to keep. If ``None``, uses the median score.
+            Minimum similarity to keep. If ``None``, uses the same default
+            as `one_to_one_hungarian`.
 
         Returns
         -------
@@ -290,19 +296,26 @@ class MatcherResults(Mapping):
         filtered_details = {k: v for k, v in self._details.items() if k in filtered}
         return MatcherResults(filtered, details=filtered_details)
 
-    def take_top_percent(self, percent: int) -> MatcherResults:
+    def take_top_percent(self, percent: float) -> MatcherResults:
         """Keep the top ``percent``% of matches by score.
 
         Parameters
         ----------
-        percent : int
+        percent : float
             Percentage of matches to keep (0-100).
 
         Returns
         -------
         MatcherResults
             A new instance with only the top matches.
+
+        Raises
+        ------
+        ValueError
+            If ``percent`` is outside 0-100.
         """
+        if not 0 <= percent <= 100:
+            raise ValueError(f"percent must be between 0 and 100, got {percent!r}")
         number_to_keep = math.ceil((percent / 100) * len(self._data))
         top_items = dict(list(self._data.items())[:number_to_keep])
         filtered_details = {k: v for k, v in self._details.items() if k in top_items}
@@ -320,7 +333,14 @@ class MatcherResults(Mapping):
         -------
         MatcherResults
             A new instance with only the top ``n`` matches.
+
+        Raises
+        ------
+        ValueError
+            If ``n`` is negative.
         """
+        if n < 0:
+            raise ValueError(f"n must be >= 0, got {n!r}")
         top_items = dict(list(self._data.items())[:n])
         filtered_details = {k: v for k, v in self._details.items() if k in top_items}
         return MatcherResults(top_items, details=filtered_details)
@@ -352,19 +372,19 @@ class MatcherResults(Mapping):
 
     def get_metrics(
         self,
-        ground_truth: list[tuple[str, str]] | list[ColumnPair],
+        ground_truth: Iterable[tuple[str, str]] | Iterable[ColumnPair],
         metrics: set[Metric] = METRICS_CORE,
-        one_to_one_method: str = "hungarian",
+        one_to_one_method: OneToOneMethod = "hungarian",
     ) -> dict[str, Any]:
         """Compute evaluation metrics against a ground truth.
 
         Parameters
         ----------
-        ground_truth : list[tuple[str, str]] | list[ColumnPair]
+        ground_truth : Iterable[tuple[str, str]] | Iterable[ColumnPair]
             Expected column matches. Can be simple column-name pairs like
-            ``[("col_a", "col_b")]`` or full `ColumnPair` instances.
-            When column-name pairs are used, table names are ignored during
-            comparison.
+            ``[("col_a", "col_b")]`` or full `ColumnPair` instances, but
+            not a mix of both. When column-name pairs are used, table names
+            are ignored during comparison. Duplicate entries count once.
         metrics : set[Metric], optional
             Set of metric instances to compute (default: ``METRICS_CORE``).
         one_to_one_method : {"greedy", "hungarian", "mutual_top"}
@@ -380,8 +400,18 @@ class MatcherResults(Mapping):
         Raises
         ------
         ValueError
-            If two different metrics report a score under the same name.
+            If ``one_to_one_method`` is not a valid choice, the ground truth
+            is malformed, or two different metrics report a score under the
+            same name.
         """
+        if one_to_one_method not in get_args(OneToOneMethod):
+            raise ValueError(
+                f"Unknown one_to_one_method: {one_to_one_method!r}; "
+                f"expected one of {list(get_args(OneToOneMethod))}"
+            )
+        # Materialise once so every metric sees the same entries, even when
+        # a generator is passed.
+        ground_truth = list(ground_truth)
         res: dict[str, Any] = {}
         # Equal metric instances (e.g. duplicates in a list) are computed once.
         for metric in dict.fromkeys(metrics):
