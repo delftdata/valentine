@@ -139,7 +139,9 @@ class PrecisionTopNPercent(Metric):
 
     def name(self) -> str:
         # Replace the 'N' in the base name with the chosen percent, e.g. "PrecisionTop70Percent".
-        return super().name().replace("N", str(self.n))
+        # ``n`` is already part of the name, so only the remaining fields are appended.
+        base = self.__class__.__name__.replace("N", str(self.n))
+        return base + self._non_default_params(exclude={"n"})
 
     def apply(
         self,

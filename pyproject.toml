@@ -81,7 +81,12 @@ include-package-data = true
 [tool.pytest.ini_options]
 # Fail on any warning so new deprecations (e.g. from a new Python or
 # dependency release) surface in CI instead of scrolling past.
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    # torch warns while probing for MPS on GitHub's macOS runners, whose
+    # virtual GPU lacks Metal 2.0. It is about the CI machine, not Valentine.
+    "ignore:Skipping device .* does not support Metal:UserWarning",
+]
 
 
 [tool.ruff]

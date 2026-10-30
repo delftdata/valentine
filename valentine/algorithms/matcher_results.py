@@ -379,10 +379,23 @@ class MatcherResults(Mapping):
         -------
         dict[str, Any]
             Metric name to score mapping.
+
+        Raises
+        ------
+        ValueError
+            If two different metrics report a score under the same name.
         """
         res: dict[str, Any] = {}
-        for metric in metrics:
-            res.update(metric.apply(self, ground_truth, one_to_one_method=one_to_one_method))
+        # Equal metric instances (e.g. duplicates in a list) are computed once.
+        for metric in dict.fromkeys(metrics):
+            scores = metric.apply(self, ground_truth, one_to_one_method=one_to_one_method)
+            if collisions := res.keys() & scores.keys():
+                raise ValueError(
+                    f"Metric {metric!r} reports {sorted(collisions)}, which another metric "
+                    "already reported. Give each metric a distinct name() so its score "
+                    "is not overwritten."
+                )
+            res.update(scores)
         return res
 
     # -- Copies ------------------------------------------------------------

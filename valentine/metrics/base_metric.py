@@ -9,7 +9,8 @@ from typing import TYPE_CHECKING, Literal
 if TYPE_CHECKING:
     from ..algorithms.matcher_results import MatcherResults
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from collections.abc import Collection
+from dataclasses import MISSING, dataclass, fields
 from typing import Any, final
 
 # Valid choices for the 1:1 selection algorithm used by Precision /
@@ -55,12 +56,47 @@ class Metric(ABC):
     def name(self: Metric) -> str:
         """The name of the metric, as it appears in the metric results.
 
+        Instances constructed with default arguments are named after their
+        class (e.g. ``"F1Score"``). Any field that differs from its default
+        is appended so that differently configured instances of the same
+        metric do not collide in the results, e.g.
+        ``"F1Score(one_to_one=False)"``.
+
         Returns
         -------
         str
             The name of the metric.
         """
-        return self.__class__.__name__
+        return self.__class__.__name__ + self._non_default_params()
+
+    def _non_default_params(self: Metric, exclude: Collection[str] = ()) -> str:
+        """Format the dataclass fields that differ from their defaults.
+
+        Parameters
+        ----------
+        exclude : Collection[str]
+            Field names to leave out, e.g. ones already encoded in the name.
+
+        Returns
+        -------
+        str
+            ``"(field=value, ...)"``, or an empty string if every field has
+            its default value.
+        """
+        params = []
+        for f in fields(self):
+            if not f.repr or f.name in exclude:
+                continue
+            value = getattr(self, f.name)
+            if f.default is not MISSING:
+                default = f.default
+            elif f.default_factory is not MISSING:
+                default = f.default_factory()
+            else:
+                default = MISSING
+            if default is MISSING or value != default:
+                params.append(f"{f.name}={value!r}")
+        return f"({', '.join(params)})" if params else ""
 
     @final
     def return_format(self: Metric, value: Any) -> dict[str, Any]:
