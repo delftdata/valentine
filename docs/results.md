@@ -81,7 +81,8 @@ top_quarter = matches.take_top_percent(25)
 strong = matches.filter(min_score=0.7)
 
 # Reduce to one-to-one matches (globally optimal Hungarian assignment).
-# Threshold defaults to the median score of the current results.
+# The default threshold is taken from the distinct scores and sits at or
+# below their median (see the API reference for the exact rule).
 one_to_one = matches.one_to_one_hungarian()
 
 # Override the threshold to be stricter

@@ -45,7 +45,14 @@ ground_truth = [
 Use [`ColumnPair`](api.md#columnpair) ground truth when you're matching
 more than two tables, or when source and target tables share column
 names — without table info the metric code can't tell which match is
-which.
+which. For example, with column-name pairs, matches
+`s1.id → t.id` and `s2.id → t.id` both reduce to `("id", "id")`: a single
+ground-truth entry counts as one true positive, and the second match
+neither adds a true positive nor counts as a false positive.
+
+Any iterable of entries works (list, tuple, set, generator). Duplicate
+entries count once, and mixing the two formats in one ground truth
+raises a `ValueError`.
 
 ## Built-in metrics
 
@@ -74,7 +81,8 @@ from valentine.metrics import (
 `Precision`, `Recall`, `F1Score` and `PrecisionTopNPercent` all accept a
 `one_to_one: bool` flag that applies
 [`MatcherResults.one_to_one_hungarian()`](api.md#one_to_one_hungarian) before counting.
-`PrecisionTopNPercent` additionally takes `n: int` for the cutoff, and
+`PrecisionTopNPercent` additionally takes `n` (a percentage from 0 to
+100, fractions allowed) for the cutoff, and
 `RecallAtSizeofGroundTruth` defaults to `one_to_one=False`. See the
 [API reference](api.md#built-in-metrics) for full defaults.
 

@@ -270,5 +270,75 @@ class TestMetrics(unittest.TestCase):
             self.matches.get_metrics(self.ground_truth, metrics=[F1Score(), _Shadow()])
 
 
+class TestGroundTruthInput(unittest.TestCase):
+    def setUp(self) -> None:
+        self.matches = MatcherResults(
+            {
+                ColumnPair("s", "a", "t", "a"): 0.9,
+                ColumnPair("s", "b", "t", "c"): 0.8,
+            }
+        )
+
+    def test_any_iterable_accepted(self) -> None:
+        expected = self.matches.get_metrics([("a", "a"), ("b", "b")])
+        self.assertEqual(self.matches.get_metrics({("a", "a"), ("b", "b")}), expected)
+        self.assertEqual(self.matches.get_metrics((("a", "a"), ("b", "b"))), expected)
+        # A generator is consumed once but every metric must still see it.
+        from_gen = self.matches.get_metrics(x for x in [("a", "a"), ("b", "b")])
+        self.assertEqual(from_gen, expected)
+
+    def test_duplicates_count_once(self) -> None:
+        metrics = {Recall(one_to_one=False), RecallAtSizeofGroundTruth()}
+        res = self.matches.get_metrics([("a", "a"), ("a", "a"), ("b", "b")], metrics=metrics)
+        self.assertAlmostEqual(res["Recall(one_to_one=False)"], 0.5)
+        self.assertAlmostEqual(res["RecallAtSizeofGroundTruth"], 0.5)
+
+    def test_mixed_formats_raise(self) -> None:
+        for gt in (
+            [("a", "a"), ColumnPair("s", "b", "t", "b")],
+            [ColumnPair("s", "b", "t", "b"), ("a", "a")],
+        ):
+            with self.subTest(gt=gt), self.assertRaisesRegex(ValueError, "mixes"):
+                self.matches.get_metrics(gt)
+
+    def test_wrong_entry_length_raises(self) -> None:
+        with self.assertRaisesRegex(ValueError, r"\[3\] fields"):
+            self.matches.get_metrics([("s", "a", "a")])
+
+    def test_invalid_one_to_one_method_raises_without_one_to_one_metric(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Unknown one_to_one_method"):
+            self.matches.get_metrics(
+                [("a", "a")], metrics={RecallAtSizeofGroundTruth()}, one_to_one_method="bogus"
+            )
+
+
+class TestTopSelectionValidation(unittest.TestCase):
+    def setUp(self) -> None:
+        self.matches = MatcherResults(
+            {ColumnPair("s", c, "t", c): v for c, v in zip("abc", [0.9, 0.8, 0.7], strict=True)}
+        )
+
+    def test_precision_top_n_percent_out_of_range(self) -> None:
+        for n in (-1, 100.5, 150):
+            with self.subTest(n=n), self.assertRaisesRegex(ValueError, "between 0 and 100"):
+                PrecisionTopNPercent(n=n)
+
+    def test_precision_top_n_percent_fractional(self) -> None:
+        # 33.4% of 3 matches keeps ceil(1.002) = 2; truncating n to 33 would keep only 1.
+        metric = PrecisionTopNPercent(n=33.4, one_to_one=False)
+        self.assertEqual(metric.name(), "PrecisionTop33.4Percent(one_to_one=False)")
+        res = self.matches.get_metrics([("a", "a")], metrics={metric})
+        self.assertAlmostEqual(res[metric.name()], 0.5)
+
+    def test_take_top_n_negative(self) -> None:
+        with self.assertRaisesRegex(ValueError, "n must be >= 0"):
+            self.matches.take_top_n(-1)
+
+    def test_take_top_percent_out_of_range(self) -> None:
+        for percent in (-50, 101):
+            with self.subTest(percent=percent), self.assertRaisesRegex(ValueError, "percent"):
+                self.matches.take_top_percent(percent)
+
+
 if __name__ == "__main__":
     unittest.main()
