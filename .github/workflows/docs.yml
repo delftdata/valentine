@@ -17,9 +17,10 @@ permissions:
   pages: write
   id-token: write
 
-# Only one concurrent deploy, cancelling in-progress runs.
+# Only one concurrent deploy, cancelling in-progress runs. PR builds don't
+# deploy, so each PR gets its own group and only cancels its own older runs.
 concurrency:
-  group: pages
+  group: pages-${{ github.event_name == 'pull_request' && github.head_ref || 'deploy' }}
   cancel-in-progress: true
 
 jobs:
