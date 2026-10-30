@@ -21,33 +21,30 @@ For the full commit history, see [GitHub releases][releases].
     to empty. Keep sub-section order consistent:
     *Added · Changed · Deprecated · Removed · Fixed · Security*.
 
-<!-- ## Unreleased
-
-### Added
-
-- _Nothing yet._
+## Unreleased
 
 ### Changed
 
-- _Nothing yet._
-
-### Deprecated
-
-- _Nothing yet._
-
-### Removed
-
-- _Nothing yet._
+- Metric names now include every argument that differs from its default,
+  e.g. `F1Score(one_to_one=False)` is reported as
+  `"F1Score(one_to_one=False)"` and
+  `PrecisionTopNPercent(n=70, one_to_one=False)` as
+  `"PrecisionTop70Percent(one_to_one=False)"`. Metrics built with default
+  arguments keep their old keys (`"F1Score"`, `"PrecisionTop10Percent"`,
+  ...), so `METRICS_CORE` output is unchanged. **Migration:** if you read
+  the score of a non-default metric by its bare class name, use
+  `metric.name()` or the new key instead.
+- `MatcherResults.get_metrics()` raises `ValueError` when two different
+  metrics report a score under the same name, instead of keeping only
+  one of them. Duplicate (equal) metric instances are computed once.
 
 ### Fixed
 
-- _Nothing yet._
-
-### Security
-
-- _Nothing yet._
-
--->
+- `MatcherResults.get_metrics()` silently dropped scores when it was given
+  several configurations of the same metric, such as `METRICS_ALL`, which
+  returned 6 of its 9 scores, and the `Precision`/`Recall`/`F1Score` values
+  could come from either the `one_to_one=True` or the `one_to_one=False`
+  variant ([#105](https://github.com/delftdata/valentine/issues/105)).
 
 ## v1.1.0 — 2026-10-14
 

@@ -123,9 +123,22 @@ metrics = matches.get_metrics(
 ```
 
 Each metric is computed independently, and the returned dict is keyed
-by the metric's `name()` — which for
-[`PrecisionTopNPercent`](api.md#precisiontopnpercent) substitutes the
-`n` value, so you get `PrecisionTop70Percent` in the output.
+by the metric's `name()`. A metric built with default arguments is
+keyed by its class name; any argument that differs from its default is
+appended, so several configurations of the same metric can be computed
+together without overwriting each other. For
+[`PrecisionTopNPercent`](api.md#precisiontopnpercent) the `n` value is
+substituted into the name instead:
+
+```python
+# {
+#   "F1Score(one_to_one=False)": ...,
+#   "PrecisionTop70Percent": ...,
+# }
+```
+
+Two different metrics that report the same name raise a `ValueError`
+rather than silently overwriting one another.
 
 ## Defining your own metric
 
