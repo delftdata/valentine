@@ -45,6 +45,13 @@ For the full commit history, see [GitHub releases][releases].
   returned 6 of its 9 scores, and the `Precision`/`Recall`/`F1Score` values
   could come from either the `one_to_one=True` or the `one_to_one=False`
   variant ([#105](https://github.com/delftdata/valentine/issues/105)).
+- `one_to_one_hungarian()` and `one_to_one_greedy()` returned every pair,
+  not a one-to-one selection, when all scores were equal (e.g.
+  `JaccardDistanceMatcher` on columns with identical values), and ignored
+  an explicit `threshold` in that case. The 1:1 metrics (`Precision`,
+  `Recall`, `F1Score`, `PrecisionTopNPercent` with their default
+  `one_to_one=True`) were computed on those many-to-many results, so their
+  values change for such inputs.
 
 ## v1.1.0 — 2026-10-14
 
