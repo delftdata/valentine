@@ -1,5 +1,5 @@
 import unittest
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from valentine.algorithms.match import ColumnPair
 from valentine.algorithms.matcher_results import MatcherResults
@@ -192,6 +192,48 @@ class TestMetrics(unittest.TestCase):
             PrecisionTopNPercent(n=70, one_to_one=False).name(),
             "PrecisionTop70Percent(one_to_one=False)",
         )
+
+    def test_custom_metric_configurations_kept_apart(self) -> None:
+        # A user-defined metric in the style of docs/metrics.md, with a required
+        # field and a field whose default comes from a factory.
+        @dataclass(eq=True, frozen=True)
+        class SupportAtK(Metric):
+            k: int
+            sources: tuple = field(default_factory=tuple)
+
+            def apply(self, matches, ground_truth, one_to_one_method="hungarian"):
+                top_k = matches.take_top_n(self.k)
+                hits = sum(
+                    1 for cp in top_k if not self.sources or cp.source_column in self.sources
+                )
+                return self.return_format(hits / self.k)
+
+        res = self.matches.get_metrics(
+            self.ground_truth,
+            metrics=[SupportAtK(k=2), SupportAtK(k=10), SupportAtK(k=2, sources=("Authors",))],
+        )
+        self.assertEqual(
+            res,
+            {
+                "SupportAtK(k=2)": 1.0,
+                "SupportAtK(k=10)": 0.5,
+                "SupportAtK(k=2, sources=('Authors',))": 0.5,
+            },
+        )
+
+    def test_custom_metric_hidden_field_collision_raises(self) -> None:
+        # Fields with repr=False are left out of the name, so two instances that
+        # differ only there can't be told apart: raise instead of dropping a score.
+        @dataclass(eq=True, frozen=True)
+        class Seeded(Metric):
+            seed: int = field(default=0, repr=False)
+
+            def apply(self, matches, ground_truth, one_to_one_method="hungarian"):
+                return self.return_format(float(self.seed))
+
+        self.assertEqual(Seeded(seed=1).name(), "Seeded")
+        with self.assertRaisesRegex(ValueError, "Seeded"):
+            self.matches.get_metrics(self.ground_truth, metrics=[Seeded(seed=1), Seeded(seed=2)])
 
     def test_metric_variants_do_not_overwrite(self) -> None:
         # https://github.com/delftdata/valentine/issues/105
