@@ -7,7 +7,7 @@ anytree==2.13.0
 networkx==3.7
 chardet==7.6.0
 rapidfuzz==3.14.6
-PuLP[cbc]==4.0.1
+PuLP[cbc]==4.2.0
 POT==0.9.7.post1
 scipy==1.18.1
 sentence-transformers==6.1.0

@@ -79,8 +79,7 @@ pip install valentine[polars]     # pandas + Polars support
 pip install valentine[embeddings] # pandas + embeddings support
 ```
 
-Requires Python **>=3.12, <3.16**. On Windows and macOS, use Python
-3.12–3.14 for now (see [Installation](getting-started.md#installation)).
+Requires Python **>=3.12, <3.16**.
 
 ## A 30-second taste
 
