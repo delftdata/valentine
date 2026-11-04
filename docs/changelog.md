@@ -45,6 +45,10 @@ For the full commit history, see [GitHub releases][releases].
   `get_metrics()`, even when no metric uses 1:1 selection; and ground
   truth that mixes column-name pairs with `ColumnPair` entries or has
   entries with other than 2 or 4 fields.
+- Python 3.15 now works on Windows and macOS too, not only on Linux.
+  Valentine requires PuLP 4.2 or newer (`PuLP[cbc]>=4.2,<5.0`), the
+  first PuLP release with Python 3.15 wheels for those platforms. The
+  pinned PuLP in `requirements.txt` is now 4.2.0.
 
 ### Fixed
 
