@@ -69,7 +69,7 @@ jobs:
           pip install ".[embeddings]" || true
 
       - name: Install test deps
-        run: pip install pytest==9.1.1
+        run: pip install pytest==9.2.0
 
       - name: Run tests
         run: python -m pytest -q tests
@@ -115,7 +115,7 @@ jobs:
           pip install "sentence-transformers>=2.0,<7.0" || true
 
       - name: Install test deps
-        run: pip install pytest==9.1.1
+        run: pip install pytest==9.2.0
 
       # tests/ is a package, so pytest puts the repo root on sys.path and
       # would import the source tree instead of the installed wheel.
