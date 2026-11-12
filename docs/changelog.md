@@ -21,7 +21,42 @@ For the full commit history, see [GitHub releases][releases].
     to empty. Keep sub-section order consistent:
     *Added · Changed · Deprecated · Removed · Fixed · Security*.
 
-## Unreleased
+<!-- ## Unreleased
+
+### Added
+
+- _Nothing yet._
+
+### Changed
+
+- _Nothing yet._
+
+### Deprecated
+
+- _Nothing yet._
+
+### Removed
+
+- _Nothing yet._
+
+### Fixed
+
+- _Nothing yet._
+
+### Security
+
+- _Nothing yet._
+
+-->
+
+## v1.1.1 — 2026-11-12
+
+v1.1.1 fixes how `get_metrics()` handles several configurations of the
+same metric and tied match scores, checks metric inputs more strictly,
+and makes Python 3.15 work on Windows and macOS. Code that only uses
+metrics with default arguments (such as `METRICS_CORE`) needs no
+changes. If you read the score of a non-default metric by its class
+name, see the migration note under *Changed*.
 
 ### Changed
 
@@ -49,6 +84,14 @@ For the full commit history, see [GitHub releases][releases].
   Valentine requires PuLP 4.2 or newer (`PuLP[cbc]>=4.2,<5.0`), the
   first PuLP release with Python 3.15 wheels for those platforms. The
   pinned PuLP in `requirements.txt` is now 4.2.0.
+- Widened `python-dateutil` to allow 3.x and 4.x (`>=2.8,<5.0`, was
+  `<3.0`). Valentine only uses `dateutil.parser.parse`, which those
+  releases do not change.
+- Bumped pinned dev/test dependencies in `requirements.txt`: pandas 3.1.1,
+  polars 2.1.0, nltk 3.10.4, chardet 7.7.0, sentence-transformers 6.3.0,
+  python-dateutil 4.0.0, pytest 9.2.0, coverage 7.17.2, ruff 0.17.4.
+- Bumped the pinned docs toolchain: zensical 0.1.1, mkdocstrings 1.0.8,
+  mkdocstrings-python 2.0.10.
 
 ### Fixed
 
@@ -75,6 +118,22 @@ For the full commit history, see [GitHub releases][releases].
   accurately (it is at or below the median of the distinct scores, not
   the median), and `MeanReciprocalRank` is described as averaging over
   ground-truth source columns, which is what it computes.
+
+### Security
+
+- Raised the minimum `nltk` to `>=3.10.4`, which fixes
+  [GHSA-j456-xh4h-cpf2](https://github.com/advisories/GHSA-j456-xh4h-cpf2).
+
+### Internal
+
+- CI: Python 3.15 is now tested on macOS and Windows as well as Linux.
+- CI: updated `actions/setup-python` to v7.1.0 and
+  `pypa/gh-action-pypi-publish` to v1.14.3, which fixes
+  [GHSA-5xjx-3w67-w9x9](https://github.com/pypa/gh-action-pypi-publish/security/advisories/GHSA-5xjx-3w67-w9x9)
+  (a revoked CA in the Sigstore chain used for Trusted Publishing and
+  attestations).
+- Tests: ignore the warning torch emits while probing for MPS on GitHub's
+  macOS runners, which warnings-as-errors turned into test failures.
 
 ## v1.1.0 — 2026-10-14
 
