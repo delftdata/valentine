@@ -42,7 +42,7 @@ dependencies = [
     "PuLP[cbc]>=4.2,<5.0",
     "POT>=0.9.5,<1.0",
     "scipy>=1.12,<2.0",
-    "python-dateutil>=2.8,<3.0",
+    "python-dateutil>=2.8,<5.0",
 ]
 
 [project.optional-dependencies]
@@ -61,9 +61,9 @@ docs = [
     # Pinned intentionally: Zensical is pre-1.0 and moves fast. Bump
     # deliberately rather than relying on a range, so a bad release
     # can't silently break the docs build.
-    "zensical==0.1.0",
-    "mkdocstrings==1.0.7",
-    "mkdocstrings-python==2.0.9",
+    "zensical==0.1.1",
+    "mkdocstrings==1.0.8",
+    "mkdocstrings-python==2.0.10",
 ]
 
 [project.urls]
