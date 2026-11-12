@@ -110,7 +110,8 @@ name, see the migration note under *Changed*.
 - Ground truth passed to `get_metrics()` may be any iterable, such as a
   set (which raised `TypeError`) or a generator (which only the first
   metric saw). Duplicate entries now count once; they were counted
-  twice in recall but once in precision.
+  twice in recall but once in precision. `RecallAtSizeofGroundTruth`
+  likewise sizes its cutoff from the deduplicated ground truth.
 - `PrecisionTopNPercent` with a fractional `n` computed with `n`
   truncated to an integer while reporting the fractional value in its
   name.
@@ -132,6 +133,9 @@ name, see the migration note under *Changed*.
   [GHSA-5xjx-3w67-w9x9](https://github.com/pypa/gh-action-pypi-publish/security/advisories/GHSA-5xjx-3w67-w9x9)
   (a revoked CA in the Sigstore chain used for Trusted Publishing and
   attestations).
+- CI: a docs build on one PR no longer cancels the docs builds of other
+  open PRs. A new push to a PR still cancels that PR's older build, and
+  only one deploy runs at a time.
 - Tests: ignore the warning torch emits while probing for MPS on GitHub's
   macOS runners, which warnings-as-errors turned into test failures.
 
