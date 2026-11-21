@@ -57,6 +57,7 @@ hide:
 <a href="https://pypi.org/project/valentine/"><img src="https://img.shields.io/pypi/v/valentine.svg" alt="PyPI version"></a>
 <a href="https://pypi.org/project/valentine/"><img src="https://img.shields.io/pypi/pyversions/valentine.svg" alt="Python versions"></a>
 <a href="https://pypi.org/project/valentine/"><img src="https://static.pepy.tech/badge/valentine/month" alt="PyPI downloads"></a>
+<a href="https://pepy.tech/projects/valentine"><img src="https://static.pepy.tech/badge/valentine" alt="Total downloads"></a>
 <a href="https://github.com/delftdata/valentine/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/delftdata/valentine/build.yml?label=build" alt="Build"></a>
 <a href="https://codecov.io/gh/delftdata/valentine"><img src="https://img.shields.io/codecov/c/github/delftdata/valentine?label=coverage" alt="codecov"></a>
 <a href="https://github.com/delftdata/valentine/blob/master/LICENSE"><img src="https://img.shields.io/github/license/delftdata/valentine.svg" alt="License"></a>
